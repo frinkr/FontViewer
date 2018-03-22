@@ -11,7 +11,7 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 
-set(UI ${CMAKE_CURRENT_LIST_DIR}/QUMainWindow.ui)
+set(UI QUDocumentWindow.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 

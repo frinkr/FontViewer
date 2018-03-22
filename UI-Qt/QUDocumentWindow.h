@@ -22,6 +22,10 @@ class QMessageBox;
 
 class QUDocumentWindowManager;
 
+namespace Ui {
+    class QUDocumentWindow;
+}
+
 class QUDocumentWindow : public QMainWindow
 {
     friend class QUDocumentWindowManager;
@@ -30,11 +34,18 @@ class QUDocumentWindow : public QMainWindow
 
 public:
     QUDocumentWindow(QWidget *parent = 0);
+    ~QUDocumentWindow();
 
     static QUDocumentWindow *createUntitled(int seqNum);
     static QUDocumentWindow *createFromFile(const QString &fn);
 
     void definitelyClose();  // called in DocumentWindowManager::closeDocumentsAndQuit()
+
+public slots:
+    void doOpenFromFile();
+
+private:
+    Ui::QUDocumentWindow *ui;
 
 private slots:
     void save();

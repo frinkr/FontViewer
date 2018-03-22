@@ -20,9 +20,16 @@
 
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
+#include "ui_QUDocumentWindow.h"
 
-QUDocumentWindow::QUDocumentWindow(QWidget *parent) : QMainWindow(parent)
+QUDocumentWindow::QUDocumentWindow(QWidget *parent) 
+    : QMainWindow(parent)
+    , ui(new Ui::QUDocumentWindow)
 {
+    ui->setupUi(this);
+    return;
+
+
     setAttribute(Qt::WA_DeleteOnClose);
 
     QWidget *centralWidget = new QWidget(this);
@@ -45,6 +52,11 @@ QUDocumentWindow::QUDocumentWindow(QWidget *parent) : QMainWindow(parent)
     shouldCloseAfterSaveAs = false;
 }
 
+QUDocumentWindow::~QUDocumentWindow()
+{
+    delete ui;
+}
+
 QUDocumentWindow *QUDocumentWindow::createUntitled(int seqNum)
 {
     QUDocumentWindow *w = new QUDocumentWindow;
@@ -56,7 +68,7 @@ QUDocumentWindow *QUDocumentWindow::createUntitled(int seqNum)
         w->setCurrFile(tr("untitled"));
 
     // Qt requires window title to be set and contain a '[*]' placeholder before setWindowModified is called.
-    connect(w->textEdit->document(), SIGNAL(modificationChanged(bool)), w, SLOT(setWindowModified(bool)));
+    //connect(w->textEdit->document(), SIGNAL(modificationChanged(bool)), w, SLOT(setWindowModified(bool)));
 
     return w;
 }
@@ -64,6 +76,9 @@ QUDocumentWindow *QUDocumentWindow::createUntitled(int seqNum)
 QUDocumentWindow *QUDocumentWindow::createFromFile(const QString &fn)
 {
     QUDocumentWindow *w = new QUDocumentWindow;
+
+    QUDocumentWindowManager::instance()->addToRecentFiles(fn);
+    return w;
 
     if (w->loadFile(fn))
     {
@@ -73,12 +88,23 @@ QUDocumentWindow *QUDocumentWindow::createFromFile(const QString &fn)
         // See comment about '[*]' placeholder in createUntitled().
         connect(w->textEdit->document(), SIGNAL(modificationChanged(bool)), w, SLOT(setWindowModified(bool)));
 
-        QUDocumentWindowManager::instance()->addToRecentFiles(fn);
+        
 
         return w;
     }
     else
         return 0;
+}
+
+void QUDocumentWindow::doOpenFromFile()
+{
+    QUDocumentWindowManager::instance()->open();
+    return;
+    QString file = QFileDialog::getOpenFileName(this, 
+        tr("Select Font File"), 
+        QString(), 
+        tr("Font Files(*.ttf, *.otf)"));
+    createFromFile(file);
 }
 
 // This closes the document window without saving it whether it has been modified or not.
@@ -231,7 +257,7 @@ bool QUDocumentWindow::loadFile(const QString &fn)
     if (!file.open(QFile::ReadOnly))
         return false;
 
-    textEdit->setPlainText(QTextStream(&file).readAll());
+    //textEdit->setPlainText(QTextStream(&file).readAll());
 
     return true;
 }
@@ -307,7 +333,7 @@ void QUDocumentWindow::maybeSave()
     saveMessageBox->setAttribute(Qt::WA_DeleteOnClose);  // pass ownership to window system
 
     saveMessageBox->setIcon(QMessageBox::Warning);
-    saveMessageBox->setText(tr("Do you want to save the changes you made in the document “%1”?").arg(currFile));
+    saveMessageBox->setText(tr("Do you want to save the changes you made in the document \"%1\"?").arg(currFile));
     saveMessageBox->setInformativeText(tr("Your changes will be lost if you don’t save them."));
     saveMessageBox->setDefaultButton(saveMessageBox->addButton(isUntitled ? tr("Save...") : tr("Save"), QMessageBox::AcceptRole));
     saveMessageBox->addButton(tr("Cancel"), QMessageBox::RejectRole);
