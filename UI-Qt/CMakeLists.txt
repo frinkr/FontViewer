@@ -22,6 +22,6 @@ add_library(UI-Qt
     QUApp.cpp
     QUApp.h)
 
-target_link_libraries(UI-Qt PRIVATE Qt5::Core Qt5::CorePrivate Qt5::WinMain)
+target_link_libraries(UI-Qt PRIVATE Qt5::Core Qt5::CorePrivate)
 target_link_libraries(UI-Qt PRIVATE Qt5::Gui Qt5::GuiPrivate)
 target_link_libraries(UI-Qt PRIVATE Qt5::Widgets Qt5::WidgetsPrivate)
