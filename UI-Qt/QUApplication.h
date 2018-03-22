@@ -11,8 +11,7 @@
 #ifndef QUAPPLICATION_H
 #define QUAPPLICATION_H
 
-// The C++-style QtSingleApplication causes "make" to recompile QtSingleApplication.cpp in the library src causing all sorts of "No Such File or Directory" errors on Windows!!  Oh well.
-#include "qusingleapplication.h"
+#include "QUSingleApplication.h"
 
 class QEvent;
 

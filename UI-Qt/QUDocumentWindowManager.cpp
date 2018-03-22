@@ -22,9 +22,8 @@
 #  import "ApplicationDelegate.h"
 #endif
 
-#include "qudocumentwindow.h"
-
-#include "qudocumentwindowmanager.h"
+#include "QUDocumentWindow.h"
+#include "QUDocumentWindowManager.h"
 
 QUDocumentWindowManager *QUDocumentWindowManager::_instance = 0;
 

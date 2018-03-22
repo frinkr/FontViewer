@@ -12,15 +12,8 @@
 #include <QtDebug>
 #include <QMessageBox>
 
-#include "qudocumentwindowmanager.h"
-
-#include "quapplication.h"
-
-// The QtApplication virtual function commitData doesn't seem to be called on Mac.  So a way to handle an external request to terminate this application seems to be to catch the Apple event kAEQuitApplication.  A little Carbon code.  No big deal.
-
-#ifdef Q_OS_MAC
-const QEvent::Type kMacQuitEventType = QEvent::Type(QEvent::registerEventType());
-#endif
+#include "QUDocumentWindowManager.h"
+#include "QUApplication.h"
 
 QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc, argv)
 {

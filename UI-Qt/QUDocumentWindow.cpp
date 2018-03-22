@@ -17,9 +17,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QAbstractButton>
-#include "qudocumentwindowmanager.h"
 
-#include "qudocumentwindow.h"
+#include "QUDocumentWindowManager.h"
+#include "QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QWidget *parent) : QMainWindow(parent)
 {
