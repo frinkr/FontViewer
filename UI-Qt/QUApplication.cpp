@@ -17,6 +17,10 @@
 
 QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc, argv)
 {
+    setOrganizationName("DANIEL JIANG");
+    setOrganizationDomain("frinkr.top");
+    setApplicationName("FontViewer");
+    
 #ifdef Q_OS_MAC
     setQuitOnLastWindowClosed(false);
 #endif

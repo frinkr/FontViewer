@@ -14,53 +14,19 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QPushButton" name="pushButton">
+   <widget class="QLabel" name="fileLabel">
     <property name="geometry">
      <rect>
-      <x>200</x>
-      <y>110</y>
-      <width>75</width>
-      <height>23</height>
+      <x>59</x>
+      <y>80</y>
+      <width>491</width>
+      <height>20</height>
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>TextLabel</string>
     </property>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>800</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actionOpen"/>
-    <addaction name="actionOpen_From_File"/>
-    <addaction name="actionClose"/>
-    <addaction name="actionRencents"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actionAbout_Qt"/>
-    <addaction name="actionAbout"/>
-   </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuView"/>
-   <addaction name="menuHelp"/>
   </widget>
   <action name="actionOpen">
    <property name="text">

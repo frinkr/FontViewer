@@ -35,7 +35,7 @@
 #include <QtCore/QSharedMemory>
 #include <QtNetwork/QLocalServer>
 #include <QtNetwork/QLocalSocket>
-#include "qusingleapplication.h"
+#include "QUSingleApplication.h"
 
 struct InstancesInfo {
     bool primary;

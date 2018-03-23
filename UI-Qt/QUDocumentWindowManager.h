@@ -1,15 +1,5 @@
-/*
-  Permission for the use of this code is granted only for research, educational, and non-commercial purposes.
-
-  Redistribution of this code or its parts in source, binary, and any other form without permission, with or without modification, is prohibited.  Modifications include, but are not limited to, translation to other programming languages and reuse of tables, constant definitions, and API's defined in it.
-
-  Andrew Choi is not liable for any losses or damages caused by the use of this code.
-
-  Copyright 2009 Andrew Choi.
-*/
-
-#ifndef DOCUMENTWINDOWMANAGER_H
-#define DOCUMENTWINDOWMANAGER_H
+#ifndef QUDOCUMENTWINDOWMANAGER_H
+#define QUDOCUMENTWINDOWMANAGER_H
 
 #include <QObject>
 
@@ -17,9 +7,12 @@
 #include <QPointer>
 #include <QStringList>
 
-class QUDocumentWindow;
-class QMenu;
+#include "QUDocument.h"
 
+class QUDocumentWindow;
+
+
+class QMenu;
 class QString;
 
 class QUDocumentWindowManager : public QObject
@@ -29,66 +22,69 @@ class QUDocumentWindowManager : public QObject
 public:
     QUDocumentWindowManager();
 
-    static QUDocumentWindowManager *instance();
+    static QUDocumentWindowManager *
+    instance();
 
+    void
+    addDocument(QUDocument * document);
+
+    void
+    removeDocument(QUDocument * document);
+    
+    QUDocument *
+    getDocument(const QUFontURI & fontURI) const;
+    
+    QUDocumentWindow *
+    getDocumentWindow(const QUDocument * document) const;
+
+    QUDocumentWindow *
+    createDocumentWindow(QUDocument * document);
+
+
+public slots:
+    void
+    slotOpenFont();
+    
+    void
+    slotDocumentWindowDestroyed(QObject * obj);
+
+    
+
+private:
+    QList<QPointer<QUDocumentWindow> > documentWindows_;
+    QList<QPointer<QUDocument> > documents_; 
+    static QUDocumentWindowManager * instance_;
+
+    //////////////////////////////////////////////////////////////////////////
+    
+public:
     void removeDocumentWindow(QUDocumentWindow *w);
-    bool eventFilter(QObject *watched, QEvent *event);
     void addRecentFilesMenuActions(QMenu *recentFilesMenu);
-
-#ifdef Q_OS_MAC
-    void addWindowMenuActions(QMenu *windowMenu, QUDocumentWindow *currentWindow);
-#endif
 
     void addToRecentFiles(const QString &fn);
     void removeNonExistingRecentFiles();
     QStringList recentFileDisplayNames();
 
-    int countModifiedDocs();
-    void forceCloseAllDocs();
-
-    void continueQuit();
-    void cancelQuit();
-
 public slots:
-    void newFile();
-    void open();
-
+    void slotOpenFile();
+    
     void openFile(const QString &fn);
-
-#ifdef Q_OS_MAC
-    void bringAllToFront();
-#endif
+    void closeAllDocumentsAndQuit();
 
     void about();
     void help();
-    void closeDocumentsAndQuit();
 
 private slots:
-    void slotOpenFile();
+    void slotOpenRecentFile();
 #ifdef Q_OS_MAC
     void slotShowWindow();
 
     void slotAboutToShowFileMenu();
 #endif
 
-    void closeAllUnmodifiedDocsAndInitiateQuit();
     void saveRecentFilesSettings();
 
-signals:
-    void quitNotPending(bool);
-
 private:
-    void initiateQuit();
-    void closeNextDoc();
-
-#ifdef Q_OS_MAC
-    void cascade(QUDocumentWindow *w);
-#endif
-
-    QList<QPointer<QUDocumentWindow> > windows;
-
-    static QUDocumentWindowManager *_instance;
-
     enum {kMaxRecentFiles = 8};
     QStringList recentFiles;
 
@@ -96,10 +92,6 @@ private:
     QMenu *openRecentSubMenu;
 #endif
 
-    bool noDocOpened;
-    bool onlyFirstUntitledDocOpened;
-
-    bool quitPending;
 };
 
-#endif // DOCUMENTWINDOWMANAGER_H
+#endif // QUDOCUMENTWINDOWMANAGER_H

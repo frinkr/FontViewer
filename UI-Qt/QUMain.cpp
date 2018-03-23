@@ -30,7 +30,7 @@ int quMain(int argc, char *argv[])
 #ifdef Q_OS_MAC
     // Initiate shared application and setup delegate so QApplication constructor (ancestor of QtDocBasedApplication) will pick that up as "reflection delegate" (see src/gui/kernel/qapplication_mac.mm)
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    [[NSApplication sharedApplication] setDelegate:[[ApplicationDelegate alloc] init]];
+    [[NSApplication sharedApplication] setDelegate:[[MacApplicationDelegate alloc] init]];
     [pool release];
 #endif
 
@@ -57,7 +57,7 @@ int quMain(int argc, char *argv[])
             QUDocumentWindowManager::instance()->openFile(arguments.at(i));
     }
     else
-        QUDocumentWindowManager::instance()->newFile();
+        QUDocumentWindowManager::instance()->slotOpenFont();
 
     return a.exec();
 }
