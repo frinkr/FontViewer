@@ -117,7 +117,9 @@ QUDocumentWindowManager::slotOpenFont()
         QUDocument * document = getDocument(fontURI);
         if (document) {
             QUDocumentWindow * window = getDocumentWindow(document);
-            window->setWindowState(window->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+            window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+            window->activateWindow();
+            window->raise();
         }
         else {
             // or open new
@@ -233,8 +235,6 @@ QStringList QUDocumentWindowManager::recentFileDisplayNames()
 
     return result;
 }
-
-
 
 void QUDocumentWindowManager::slotOpenFile()
 {

@@ -37,6 +37,8 @@ int quMain(int argc, char *argv[])
     // For use of fancy single and double quotes in dialog messages.
     //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
+    Q_INIT_RESOURCE(QUApplication);
+    
     QUApplication a(argc, argv);
 
     QStringList arguments = a.arguments();

@@ -19,6 +19,7 @@ set(SHARED_SOURCES
   QUMain.h
   QUApplication.h
   QUApplication.cpp
+  QUApplication.qrc
   QUSingleApplication.h
   QUSingleApplication.cpp
   QUSingleApplication_p.h

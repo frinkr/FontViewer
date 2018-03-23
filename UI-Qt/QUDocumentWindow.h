@@ -28,6 +28,17 @@ public:
     QUDocument * document() const {
         return document_;
     }
+
+private:
+    void
+    initUI();
+
+    void
+    initWindowTitle();
+
+    void
+    initToolBar();
+    
 private:
     Ui::QUDocumentWindow * ui_;
 
