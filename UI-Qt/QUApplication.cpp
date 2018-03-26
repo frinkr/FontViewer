@@ -44,38 +44,3 @@ bool QUApplication::event(QEvent *event)
     return QApplication::event(event);
 }
 #endif
-
-// Does not seem to be called on Mac.
-#ifndef Q_OS_MAC
-void QUApplication::commitData(QSessionManager &sm)
-{
-    int modifiedDocCount = QUDocumentWindowManager::instance()->countModifiedDocs();
-
-    if (modifiedDocCount == 0)
-        return;
-
-    if (sm.allowsInteraction())
-    {
-        QMessageBox logoutMessageBox(0);
-
-        logoutMessageBox.setIcon(QMessageBox::Warning);
-        logoutMessageBox.setText(tr("You have %1 QtDocBasedApp documents with unsaved changes. Do you want to cancel logout so that you can have a chance to first save them?").arg(modifiedDocCount));
-        logoutMessageBox.setInformativeText(tr("If you click “Discard Changes and Logout”, all your changes will be lost."));
-        logoutMessageBox.setDefaultButton(logoutMessageBox.addButton(tr("Cancel Logout"), QMessageBox::AcceptRole));
-        logoutMessageBox.addButton(tr("Discard Changes and Logout"), QMessageBox::DestructiveRole);
-
-        logoutMessageBox.exec();
-
-        switch(logoutMessageBox.buttonRole(logoutMessageBox.clickedButton()))
-        {
-        case QMessageBox::DestructiveRole:
-            sm.release();
-            QUDocumentWindowManager::instance()->forceCloseAllDocs();
-            break;
-        case QMessageBox::AcceptRole:
-        default:
-            sm.cancel();
-        }
-    }
-}
-#endif

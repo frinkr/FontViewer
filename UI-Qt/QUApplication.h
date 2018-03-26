@@ -24,11 +24,6 @@ public:
 #ifdef Q_OS_MAC
     bool event(QEvent *);
 #endif
-
-#ifndef Q_OS_MAC
-    void commitData(QSessionManager &sm);
-#endif
-
 };
 
 #endif // QTDOCBASEDAPPLICATION_H
