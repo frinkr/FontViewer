@@ -31,7 +31,17 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QListWidget" name="listWidget"/>
+     <widget class="QListView" name="listView">
+      <property name="dragDropMode">
+       <enum>QAbstractItemView::NoDragDrop</enum>
+      </property>
+      <property name="flow">
+       <enum>QListView::LeftToRight</enum>
+      </property>
+      <property name="viewMode">
+       <enum>QListView::IconMode</enum>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QLabel" name="fileLabel">

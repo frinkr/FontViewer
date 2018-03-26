@@ -249,26 +249,8 @@ void QUDocumentWindowManager::slotOpenFile()
 
 void QUDocumentWindowManager::openFile(const QString &fn)
 {
-    for (int i = 0; i < documentWindows_.size(); i++)
-    {
-        if (documentWindows_.at(i)->currFile == fn)
-        {
-            documentWindows_.at(i)->activateWindow();
 
-            return;
-        }
-    }
-#if 0
-    QUDocumentWindow *w = QUDocumentWindow::createFromFile(fn);
 
-#ifdef Q_OS_MAC
-    cascade(w);
-#endif
-    w->installEventFilter(this);
-        
-    documentWindows_.append(w);
-    w->show();
-#endif
 }
 
 
