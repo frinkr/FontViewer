@@ -30,6 +30,8 @@ set(SHARED_SOURCES
   QUDocument.cpp
   QUOpenFontDialog.h
   QUOpenFontDialog.cpp
+  QUGlyphListModel.h
+  QUGlyphListModel.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

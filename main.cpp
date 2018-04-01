@@ -1,7 +1,7 @@
 #include <iostream>
 #include <zlib.h>
 #include "UI-Qt/QUMain.h"
-#include "Font/FVFace.h"
+#include "FontCore/FVFace.h"
 
 int main(int argc, char *argv[])
 {

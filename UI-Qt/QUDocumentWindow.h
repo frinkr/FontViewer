@@ -19,35 +19,6 @@ namespace Ui {
     class QUDocumentWindow;
 }
 
-class QUGlyphItemDelegate : public QItemDelegate {
-    void
-    paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
-        painter->drawText(option.rect, Qt::AlignLeft, "hell");
-    }
-};
-
-class QUGlyphListModel : public QAbstractListModel {
-    int columnCount(const QModelIndex &parent) const {
-        return 5;
-    }
-    int rowCount(const QModelIndex &parent) const {
-        return 1000;
-    }
-
-    QVariant data(const QModelIndex &index, int role) const {
-           if ( role == Qt::DisplayRole ) 
-               return "hello";
-           return QVariant();
-    }
-
-    QModelIndex index(int row, int column, const QModelIndex &parent) const
-    {
-        if (!hasIndex(row, column, parent))
-            return QModelIndex();
-        return createIndex(row, column, nullptr);
-    }
-};
-
 class QUDocumentWindow : public QMainWindow
 {
     friend class QUDocumentWindowManager;
@@ -79,7 +50,7 @@ private:
     Ui::QUDocumentWindow * ui_;
 
     QUDocument * document_;
-    QStringListModel * model_;
+    QAbstractItemModel * model_;
 
 };
 
