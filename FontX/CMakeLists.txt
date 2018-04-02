@@ -3,13 +3,8 @@ project(FontX)
 
 set(FX_DIR ${PROJECT_SOURCE_DIR})
 
-find_package(PkgConfig)
-set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/icu4c/lib/pkgconfig")
-
-#include(FindFreetype)
-pkg_check_modules(FREETYPE REQUIRED freetype2)
-pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
-pkg_check_modules(ICU REQUIRED icu-uc)
+include(FindFreetype)
+include(FindICU)
 
 add_library(FontX
   FX.h
@@ -33,9 +28,9 @@ target_include_directories(FontX PUBLIC
   )
 
 target_link_libraries(FontX
-  ${FREETYPE_LDFLAGS} #${FREETYPE_LIBRARIES}
-  ${ICU_LDFLAGS}
-  ${HARFBUZZ_LDFLAGS}
+  ${FREETYPE_LIBRARIES}
+  ${ICU_LIBRARIES}
+  ${HARFBUZZ_LIBRARIES}
   )
 
 
