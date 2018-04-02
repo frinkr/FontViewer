@@ -30,7 +30,7 @@ public:
 
     virtual size_t
     size() const {
-        return to_ - from_;
+        return to_ - from_ + 1;
     }
 
     virtual FXChar
