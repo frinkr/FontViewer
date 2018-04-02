@@ -9,7 +9,7 @@ public:
     static bool
     finish();
 
-    static TXFTLibrary
+    static FXFTLibrary
     get();
 };
 

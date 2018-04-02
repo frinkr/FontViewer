@@ -11,9 +11,16 @@ add_library(FontX
   FX.h
   FXLib.h
   FXLib.cpp
-  FXPrivate.h
   FXFace.cpp
-  FXFace.h)
+  FXFace.h
+  FXCMap.h
+  FXCMap.cpp
+  
+  FXPrivate.h
+  FXPrivate.cpp
+  FXNamesPrivate.h
+  FXNamesPrivate.cpp
+  )
 
 target_include_directories(FontX PUBLIC ${FREETYPE_INCLUDE_DIRS})
 target_link_libraries(FontX ${FREETYPE_LIBRARIES})

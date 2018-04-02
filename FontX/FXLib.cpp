@@ -2,7 +2,7 @@
 #include "FXPrivate.h"
 
 namespace {
-    TXFTLibrary lib_;
+    FXFTLibrary lib_;
 }
 
 bool
@@ -29,7 +29,7 @@ FXLib::finish() {
     return false;
 }
 
-TXFTLibrary
+FXFTLibrary
 FXLib::get() {
     return lib_;
 }
