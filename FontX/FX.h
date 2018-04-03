@@ -38,3 +38,5 @@ struct FXCharRange {
     FXChar from;
     FXChar to;
 };
+
+using fu = short;  // font units

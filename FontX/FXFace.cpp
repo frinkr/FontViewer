@@ -2,6 +2,11 @@
 #include "FXLib.h"
 #include "FXPrivate.h"
 
+double
+pt2px(double p, double dpi) {
+    return (p * dpi + 36) / 72.0;
+}
+
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
     return FXPtr<FXFace>(new FXFace(descriptor));
@@ -73,7 +78,43 @@ FXFace::currentCMapIndex() const {
     return -1;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//                     GLYPH
+//
 
+FXGlyph
+FXFace::glyph(FXChar c) {
+    FXGlyphID id = FT_Get_Char_Index(face_, c);
+    FXGlyph glyph;
+    glyph.id = id;
+    FT_Load_Glyph(face_, id, FT_LOAD_NO_SCALE);
+    FT_GlyphSlot slot = face_->glyph;
+
+    glyph.metrics.width        = slot->metrics.width;
+    glyph.metrics.height       = slot->metrics.height;
+    glyph.metrics.horiBearingX = slot->metrics.horiBearingX;
+    glyph.metrics.horiBearingY = slot->metrics.horiBearingY;
+    glyph.metrics.horiAdvance  = slot->metrics.horiAdvance;
+    glyph.metrics.vertBearingX = slot->metrics.vertBearingX;
+    glyph.metrics.vertBearingY = slot->metrics.vertBearingY;
+    glyph.metrics.vertAdvance  = slot->metrics.vertAdvance;
+
+    // let's render pixmap
+    FT_Load_Glyph(face_, id, FT_LOAD_RENDER);
+    slot = face_->glyph;
+    FT_Bitmap  ft_bm = slot->bitmap;
+    glyph.bitmap = FXBitmapARGB(pt2px(FXDefaultFontSize), pt2px(FXDefaultFontSize));
+    for (size_t y = 0; y < ft_bm.rows; ++ y) {
+        for (size_t x = 0; x < ft_bm.width; ++ x) {
+            uint8_t a = ft_bm.buffer[y * ft_bm.pitch + x];
+            glyph.bitmap.setPixel(slot->bitmap_left + x,
+                                  slot->bitmap_top + y,  // minus means bottom aligned
+                                  makeARGB(a, FXRed)); 
+        }
+    }
+    return glyph;
+}
+    
 //////////////////////////////////////////////////////////////////////////////////////////
 //                     PRIVATE IMPL
 //
@@ -82,6 +123,7 @@ FXFace::init() {
     if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), desc_.faceIndex, &face_))
         return false;
 
+    FT_Set_Char_Size(face_, FXDefaultFontSize * 64, FXDefaultFontSize * 64, FXDefaultDPI, FXDefaultDPI);
     return initAttributes() && initCMap();
 }
 

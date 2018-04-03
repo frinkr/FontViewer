@@ -20,16 +20,32 @@ int main() {
         assert(face->postscriptName() == "MyriadPro-Regular");
         assert(face->upem() == 1000);
 
-        FXCMap cm = face->currentCMap();
-        assert(cm.isUnicode());
-
+#if 0
         for (const FXCMap & cm : face->cmaps()) {
             std::cout << cm.description()  << ": " << std::endl;
             for (const auto & block : cm.blocks()) {
                 std::cout << " - " << block->name() << ": " << block->size() << std::endl;
             };
         }
+#endif
 
+        FXCMap cm = face->currentCMap();
+        assert(cm.isUnicode());
+        for (FXPtr<FXCharBlock> block : cm.blocks()) {
+            std::cout << "BLOCK " << block->name() << ": " << block->size() << std::endl;
+            size_t count = block->size();
+            for (size_t i = 0; i < count; ++ i) {
+                FXChar c = block->get(i);
+                FXGlyph glyph = face->glyph(c);
+                std::cout << " - char " << std::hex << c << std::dec
+                          << ": id " << glyph.id
+                          << ", lsb: " << glyph.metrics.lsb()
+                          << ", rsb: " << glyph.metrics.rsb()
+                          << std::endl;
+            }
+        }
+        
+        
     } FXLib::finish();
     return 0;
 }

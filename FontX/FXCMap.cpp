@@ -103,8 +103,6 @@ FXCMapPlatform::getUnicodeBlocks() {
     if (unicodeBlocks_.size())
         return unicodeBlocks_;
 
-    unicodeBlocks_.push_back(std::make_shared<FXCharRangeBlock>(0, FXCharMax, "Unicode Full"));
-
     for (const FXUCDBlock & ucdBlock : FXLib::ucd()->blocks()) 
         unicodeBlocks_.push_back(std::make_shared<FXCharRangeBlock>(
                                      ucdBlock.from,

@@ -1,6 +1,7 @@
 #pragma once
 #include "FX.h"
 #include "FXCMap.h"
+#include "FXGlyph.h"
 
 struct FXFaceDescriptor {
     std::string  filePath;
@@ -17,6 +18,15 @@ struct FXFaceAttributes {
     std::map<std::string, std::string> fullNames;
 };
 
+constexpr double FXDefaultFontSize = 100;
+constexpr double FXDefaultDPI      = 72;
+
+double
+pt2px(double p, double dpi = FXDefaultDPI);
+
+double
+px2pt(double p, double dpi = FXDefaultDPI);
+    
 class FXFace {
 public:
     static FXPtr<FXFace>
@@ -56,7 +66,11 @@ public:
 
     bool
     selectCMap(const FXCMap & cmap);
-    
+
+public:
+    FXGlyph
+    glyph(FXChar c);
+
 private:
     FXFace(const FXFaceDescriptor & descriptor);
     
