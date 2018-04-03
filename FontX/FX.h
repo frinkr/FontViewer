@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cassert>
+#include <algorithm>
 #include <memory>
 #include <string>
 
@@ -9,6 +10,9 @@
 
 template <typename T>
 using FXPtr = std::shared_ptr<T>;
+template <typename T>
+using FXVector = std::vector<T>;
+using FXString    = std::string;
 
 struct FT_LibraryRec_;
 struct FT_FaceRec_;
@@ -20,10 +24,14 @@ using FXFTFace    = struct FT_FaceRec_ *;
 using FXHBFace    = struct hb_face_t *;
 using FXHBFont    = struct hb_font_t *;
 
-
 using FXChar      = uint32_t;
 using FXGlyphID   = uint32_t;
 
-constexpr FXChar UnicodeMax = 0x10FFFF;
+constexpr FXChar FXCharMax = 0x10FFFF;
+constexpr FXChar FXCharInvalid = FXCharMax + 1;
 constexpr FXGlyphID NotDef  = 0;
 
+struct FXCharRange {
+    FXChar from;
+    FXChar to;
+};

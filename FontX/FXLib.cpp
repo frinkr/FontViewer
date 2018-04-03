@@ -1,35 +1,43 @@
 #include "FXLib.h"
 #include "FXPrivate.h"
 
-namespace {
-    FXFTLibrary lib_;
-}
+FXPtr<FXLib> FXLib::lib_;
 
 bool
-FXLib::init() {
+FXLib::init(const std::string & ucdRoot) {
     if (lib_)
         return true;
     
-    if (FT_Init_FreeType(&lib_)) {
-        lib_ = nullptr;
-        return false;
-    }
+    lib_.reset(new FXLib(ucdRoot));
     return true;
 }
 
-bool
+void
 FXLib::finish() {
-    if (!lib_)
-        return true;
-
-    if (!FT_Done_Library(lib_)) {
-        lib_ = nullptr;
-        return true;
-    }
-    return false;
+    lib_.reset();
 }
 
 FXFTLibrary
 FXLib::get() {
-    return lib_;
+    return lib_->ftlib_;
 }
+
+ FXPtr<FXUCD>
+ FXLib::ucd() {
+     return lib_->ucd_;
+ }
+
+FXLib::FXLib(const std::string & ucdRoot) {
+    if (FT_Init_FreeType(&ftlib_)) 
+        ftlib_ = nullptr;
+    
+    if (ftlib_) {
+        ucd_.reset(new FXUCD(ucdRoot));
+    }
+}
+
+FXLib::~FXLib() {
+    if (ftlib_ && !FT_Done_Library(ftlib_)) 
+        ftlib_ = nullptr;
+}
+

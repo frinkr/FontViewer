@@ -1,4 +1,5 @@
 #include "FXCMap.h"
+#include "FXLib.h"
 #include "FXPrivate.h"
 #include "FXNamesPrivate.h"
 
@@ -102,11 +103,16 @@ FXCMapPlatform::getUnicodeBlocks() {
     if (unicodeBlocks_.size())
         return unicodeBlocks_;
 
-    unicodeBlocks_.push_back(std::make_shared<FXSimpleCharBlock>(0, UnicodeMax, "Unicode Full"));
+    unicodeBlocks_.push_back(std::make_shared<FXSimpleCharBlock>(0, FXCharMax, "Unicode Full"));
+
+    for (const FXUCDBlock & ucdBlock : FXLib::ucd()->blocks()) 
+        unicodeBlocks_.push_back(std::make_shared<FXSimpleCharBlock>(
+                                     ucdBlock.from,
+                                     ucdBlock.to,
+                                     ucdBlock.name,
+                                     true));
     return unicodeBlocks_;
 }
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //            FXCMAP

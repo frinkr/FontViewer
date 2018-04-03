@@ -3,11 +3,15 @@
 #include <iostream>
 
 std::string getFontFile(const std::string & fileName) {
-    return std::string(FX_FONT_DIR) + "/" + fileName;
+    return std::string(FX_RESOURCES_DIR) + "/Fonts/" + fileName;
+}
+
+std::string getUCDRoot() {
+    return std::string(FX_RESOURCES_DIR) + "/UCD";
 }
 
 int main() {
-    FXLib::init(); {
+    FXLib::init(getUCDRoot()); {
         auto face = FXFace::createFace(getFontFile("MyriadPro-Regular.otf"), 0);
         assert(face);
 
