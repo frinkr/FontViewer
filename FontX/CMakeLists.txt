@@ -30,6 +30,7 @@ target_include_directories(FontX PUBLIC
 target_link_libraries(FontX
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
+  ${ICU_LDFLAGS}
   ${HARFBUZZ_LIBRARIES}
   )
 
