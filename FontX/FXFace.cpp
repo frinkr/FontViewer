@@ -47,6 +47,11 @@ FXFace::upem() const {
     return atts_.upem;
 }
 
+size_t
+FXFace::glyphCount() const {
+    return atts_.glyphCount;
+}
+
 const FXFaceAttributes &
 FXFace::attributes() const {
     return atts_;
@@ -83,8 +88,11 @@ FXFace::currentCMapIndex() const {
 //
 
 FXGlyph
-FXFace::glyph(FXChar c) {
-    FXGlyphID id = FT_Get_Char_Index(face_, c);
+FXFace::glyph(FXChar c, bool isGID) {
+    FXGlyphID id = c;
+    if (!isGID)
+        FT_Get_Char_Index(face_, c);
+    
     FXGlyph glyph;
     glyph.id = id;
     FT_Load_Glyph(face_, id, FT_LOAD_NO_SCALE);
@@ -99,17 +107,19 @@ FXFace::glyph(FXChar c) {
     glyph.metrics.vertBearingY = slot->metrics.vertBearingY;
     glyph.metrics.vertAdvance  = slot->metrics.vertAdvance;
 
+    char glyphName[256] = {0};
+    if (!FT_Get_Glyph_Name(face_, id, glyphName, sizeof(glyphName))) 
+        glyph.name = glyphName;
+
     // let's render pixmap
     FT_Load_Glyph(face_, id, FT_LOAD_RENDER);
     slot = face_->glyph;
-    FT_Bitmap  ft_bm = slot->bitmap;
-    glyph.bitmap = FXBitmapARGB(pt2px(FXDefaultFontSize), pt2px(FXDefaultFontSize));
-    for (size_t y = 0; y < ft_bm.rows; ++ y) {
-        for (size_t x = 0; x < ft_bm.width; ++ x) {
-            uint8_t a = ft_bm.buffer[y * ft_bm.pitch + x];
-            glyph.bitmap.setPixel(slot->bitmap_left + x,
-                                  slot->bitmap_top + y,  // minus means bottom aligned
-                                  makeARGB(a, FXRed)); 
+    FT_Bitmap ftBm = slot->bitmap;
+    glyph.bitmap = FXBitmapARGB(ftBm.width, ftBm.rows);
+    for (size_t y = 0; y < ftBm.rows; ++ y) {
+        for (size_t x = 0; x < ftBm.width; ++ x) {
+            uint8_t a = ftBm.buffer[y * ftBm.pitch + x];
+            glyph.bitmap.setPixel(x, y, makeARGB(a, FXBlack)); 
         }
     }
     return glyph;
@@ -135,7 +145,7 @@ FXFace::initAttributes() {
     if (psName) atts_.postscriptName = psName;
 
     atts_.upem = face_->units_per_EM;       
-
+    atts_.glyphCount = face_->num_glyphs;
     return true;
 }
 

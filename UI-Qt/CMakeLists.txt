@@ -30,8 +30,8 @@ set(SHARED_SOURCES
   QUDocument.cpp
   QUOpenFontDialog.h
   QUOpenFontDialog.cpp
-  QUGlyphListModel.h
-  QUGlyphListModel.cpp
+  QUConv.h
+  QUConv.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm
@@ -65,3 +65,7 @@ target_link_libraries(UI-Qt PRIVATE Qt5::Network Qt5::NetworkPrivate)
 if (APPLE)
   target_link_libraries(UI-Qt PRIVATE "-framework Cocoa")
 endif()
+
+target_include_directories(UI-Qt PUBLIC
+  ${CMAKE_SOURCE_DIR}
+  )

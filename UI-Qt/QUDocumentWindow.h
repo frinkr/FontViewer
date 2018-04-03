@@ -1,5 +1,4 @@
-#ifndef QUDOCUMENTWINDOW_H
-#define QUDOCUMENTWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QPainter>
@@ -50,8 +49,4 @@ private:
     Ui::QUDocumentWindow * ui_;
 
     QUDocument * document_;
-    QAbstractItemModel * model_;
-
 };
-
-#endif // QUDOCUMENTWINDOW_H

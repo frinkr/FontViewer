@@ -161,5 +161,7 @@ get_argb(FXARGB argb, uint8_t &a, uint8_t &r, uint8_t &g, uint8_t &b) {
 constexpr FXARGB FXRed    = makeRGB(0xff, 0, 0);
 constexpr FXARGB FXGreen  = makeRGB(0, 0xff, 0);
 constexpr FXARGB FXBlue   = makeRGB(0, 0, 0xff);
+constexpr FXARGB FXBlack  = makeRGB(0, 0, 0);
+constexpr FXARGB FXWhite  = makeRGB(0xff, 0xff, 0xff);
 
 using FXBitmapARGB = FXBitmap<FXARGB>;

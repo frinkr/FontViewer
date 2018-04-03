@@ -28,6 +28,8 @@ struct FXGlyphMetrics {
 
 struct FXGlyph {
     FXGlyphID         id;
+    FXString          name;    
+    FXChar            character;
     FXGlyphMetrics    metrics;
     FXBitmapARGB      bitmap;
 };

@@ -12,13 +12,14 @@ struct FXFaceAttributes {
     size_t      index;
     std::string postscriptName;
     size_t      upem;
-
+    size_t      glyphCount;
+    
     std::map<std::string, std::string> familyNames;
     std::map<std::string, std::string> styleNames;
     std::map<std::string, std::string> fullNames;
 };
 
-constexpr double FXDefaultFontSize = 100;
+constexpr double FXDefaultFontSize = 90;
 constexpr double FXDefaultDPI      = 72;
 
 double
@@ -48,6 +49,9 @@ public:
     size_t
     upem() const;
 
+    size_t
+    glyphCount() const;
+    
     const FXFaceAttributes &
     attributes() const;
 
@@ -69,7 +73,7 @@ public:
 
 public:
     FXGlyph
-    glyph(FXChar c);
+    glyph(FXChar c, bool isGID = false);
 
 private:
     FXFace(const FXFaceDescriptor & descriptor);

@@ -8,7 +8,6 @@
 
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
-#include "QUGlyphListModel.h"
 #include "ui_QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
@@ -61,8 +60,7 @@ QUDocumentWindow::initToolBar() {
 
 void
 QUDocumentWindow::initListView() {
-    model_ = new QUGlyphListModel(this);
-    ui_->listView->setModel(model_);
+    ui_->listView->setModel(document_);
     ui_->listView->setLayoutMode(QListView::Batched);
     ui_->listView->setBatchSize(100);
     ui_->listView->setGridSize(QSize(100, 120));
@@ -72,6 +70,5 @@ QUDocumentWindow::initListView() {
     ui_->listView->setViewMode(QListView::IconMode);
     ui_->listView->setResizeMode(QListView::Adjust);
     ui_->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    //ui_->listView->setItemDelegate(new QUGlyphItemDelegate);
 }
     

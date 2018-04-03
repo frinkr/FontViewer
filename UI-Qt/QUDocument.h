@@ -2,6 +2,9 @@
 #define QUDOCUMENT_H
 #include <QObject>
 #include <QSharedPointer>
+#include <QAbstractListModel>
+
+#include "FontX/FXFace.h"
 
 struct QUFontURI
 {
@@ -21,7 +24,7 @@ struct QUFontURI
 
 };
 
-class QUDocument : public QObject
+class QUDocument : public QAbstractListModel
 {
     Q_OBJECT
 public:
@@ -37,7 +40,14 @@ public:
 public:
     const QUFontURI &
     uri() const { return uri_; }
+
+public:
+    int
+    rowCount(const QModelIndex &) const;
     
+    QVariant
+    data(const QModelIndex &, int) const;
+
 private:
     QUDocument(const QUFontURI & uri, QObject * parent);
 
@@ -46,6 +56,7 @@ private:
 
     
 private:
-    QUFontURI uri_;
+    QUFontURI        uri_;
+    FXPtr<FXFace>    face_;
 };
 #endif
