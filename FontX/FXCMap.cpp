@@ -75,7 +75,7 @@ FXCMapPlatform::initUnicodeEncoding() {
 
 void
 FXCMapPlatform::initMacintoshEncoding() {
-    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXSimpleCharBlock>(0, 255, "Mac Roman", false));
+    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Mac Roman", false));
 }
 
 void
@@ -87,15 +87,15 @@ void
 FXCMapPlatform::initMicrosoftEncoding() {
     blocksMap_[TT_MS_ID_UNICODE_CS] = getUnicodeBlocks();
     blocksMap_[TT_MS_ID_UCS_4] = getUnicodeBlocks();
-    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXSimpleCharBlock>(0xF020, 0xF0FF, "Windows Symbol"));
+    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF, "Windows Symbol"));
 }
 
 void
 FXCMapPlatform::initAdobeEncoding() {
-    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXSimpleCharBlock>(0, 255, "Standard", false));
-    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXSimpleCharBlock>(0, 255, "Expert", false));
-    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXSimpleCharBlock>(0, 255, "Custom", false));
-    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXSimpleCharBlock>(0, 255, "Latin 1", false));
+    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Standard", false));
+    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Expert", false));
+    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Custom", false));
+    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Latin 1", false));
 }
 
 const std::vector<FXPtr<FXCharBlock> > &
@@ -103,10 +103,10 @@ FXCMapPlatform::getUnicodeBlocks() {
     if (unicodeBlocks_.size())
         return unicodeBlocks_;
 
-    unicodeBlocks_.push_back(std::make_shared<FXSimpleCharBlock>(0, FXCharMax, "Unicode Full"));
+    unicodeBlocks_.push_back(std::make_shared<FXCharRangeBlock>(0, FXCharMax, "Unicode Full"));
 
     for (const FXUCDBlock & ucdBlock : FXLib::ucd()->blocks()) 
-        unicodeBlocks_.push_back(std::make_shared<FXSimpleCharBlock>(
+        unicodeBlocks_.push_back(std::make_shared<FXCharRangeBlock>(
                                      ucdBlock.from,
                                      ucdBlock.to,
                                      ucdBlock.name,

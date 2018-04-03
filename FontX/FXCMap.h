@@ -16,12 +16,12 @@ public:
     get(size_t index) const = 0;
 };
 
-class FXSimpleCharBlock : public FXCharBlock {
+class FXCharRangeBlock : public FXCharBlock {
 public:
-    FXSimpleCharBlock(FXChar from, FXChar to, const std::string & name, bool isUnicode = true)
-        : from_(from)
-        , to_(to)
-        , name_(name) {}
+    FXCharRangeBlock(FXChar from, FXChar to, const std::string & name, bool isUnicode = true)
+        : range_{from, to}
+        , name_(name)
+        , isUnicode_(isUnicode) {}
 
     virtual std::string
     name() const {
@@ -30,33 +30,28 @@ public:
 
     virtual size_t
     size() const {
-        return to_ - from_ + 1;
+        return range_.to - range_.from + 1;
     }
 
     virtual FXChar
     get(size_t index) const {
-        return index + from_;
-    }
-    
-    FXChar
-    from() const {
-        return from_;
+        return index + range_.from;
     }
 
-    FXChar
-    to() const {
-        return to_;
+    const FXCharRange &
+    range() const {
+        return range_;
     }
 
     bool
     isUnicode() const {
         return isUnicode_;
     }
+    
 protected:
-    FXChar      from_;
-    FXChar      to_;
-    bool        isUnicode_;
-    std::string name_;
+    FXCharRange    range_;
+    std::string    name_;    
+    bool           isUnicode_;
 };
 
 class FXCMapPlatform {

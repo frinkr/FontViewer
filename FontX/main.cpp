@@ -26,7 +26,7 @@ int main() {
         for (const FXCMap & cm : face->cmaps()) {
             std::cout << cm.description()  << ": " << std::endl;
             for (const auto & block : cm.blocks()) {
-                std::cout << " - " << block->name() << std::endl;
+                std::cout << " - " << block->name() << ": " << block->size() << std::endl;
             };
         }
 
