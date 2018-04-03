@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(FontX)
 
-set(FX_DIR ${PROJECT_SOURCE_DIR})
-
 if (APPLE)
   find_package(PkgConfig)
   set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/icu4c/lib/pkgconfig")
@@ -72,9 +70,4 @@ endif()
 
 #########################################################
 add_executable(FontXCL main.cpp)
-target_compile_definitions(FontXCL
-  PRIVATE
-  -DFX_RESOURCES_DIR=\"${FX_DIR}/../Resources\"
-  )
-
 target_link_libraries(FontXCL FontX)

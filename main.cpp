@@ -1,9 +1,13 @@
 #include <iostream>
 #include <zlib.h>
 #include "UI-Qt/QUMain.h"
-#include "FontX/FXFace.h"
+#include "FontX/FXLib.h"
 
 int main(int argc, char *argv[])
 {
-    return quMain(argc, argv);
+    FXLib::init(FX_RESOURCES_DIR "/UCD");
+    
+    quMain(argc, argv);
+    
+    FXLib::finish();
 }
