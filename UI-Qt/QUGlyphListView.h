@@ -1,5 +1,6 @@
 #pragma once
 #include <QAbstractListModel>
+#include <QImage>
 #include <QStyledItemDelegate>
 #include <QListView>
 
@@ -51,6 +52,8 @@ public:
 protected:
     FXPtr<FXFace>    face_;
     size_t           blockIndex_;
+
+    QImage           dummyImage_;
 };
 
 

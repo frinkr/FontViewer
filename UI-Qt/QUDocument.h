@@ -23,6 +23,23 @@ struct QUFontURI
     }
 };
 
+class QUGlyph : public QObject {
+    Q_OBJECT
+public:
+    QUGlyph(const FXGlyph & glyph, QObject * parent = nullptr);
+    QUGlyph(QObject * parent = nullptr);
+    QUGlyph(const QUGlyph & other);
+
+    const FXGlyph &
+    g() const {
+        return g_;
+    }
+
+protected:
+    FXGlyph  g_;
+};
+
+Q_DECLARE_METATYPE(QUGlyph);
 
 class QUDocument : public QObject
 {

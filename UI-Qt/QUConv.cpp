@@ -40,11 +40,7 @@ placeImage(const QImage & image, const QSize & emSize) {
 
     QPainter p(&out);
     QPen pen;
-    pen.setWidth(2);
-    pen.setColor(Qt::red);
-    p.setPen(pen);
-    p.fillRect(emRect, Qt::gray);
-    p.drawRect(emRect);
+    p.fillRect(emRect, Qt::white);
 
     const double r = 0.8;
     QRect outRect((1 - r) / 2 * emSize.width(),
@@ -80,7 +76,7 @@ charImage(FXChar c, const QSize & emSize) {
     p.setFont(f);
     uint u = c;
     QString text = QString::fromUcs4(&u, 1);
-    p.drawText(emRect, text);
+    p.drawText(emRect, Qt::AlignCenter, text);
 
     out.setDevicePixelRatio(2);
     return out;

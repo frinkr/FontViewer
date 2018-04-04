@@ -2,6 +2,17 @@
 #include "QUConv.h"
 #include "QUDocument.h"
 
+QUGlyph::QUGlyph(const FXGlyph & glyph, QObject * parent)
+    : QObject(parent)
+    , g_(glyph) {}
+
+QUGlyph::QUGlyph(QObject * parent)
+    : QObject(parent) {}
+
+QUGlyph::QUGlyph(const QUGlyph & other)
+    : g_(other.g()){
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 QUDocument *
