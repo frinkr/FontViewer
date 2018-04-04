@@ -76,6 +76,9 @@ public slots:
 
     void
     selectBlock(size_t index);
+
+    void
+    setCharMode(bool state);
 private:
     QUDocument(const QUFontURI & uri, QObject * parent);
 

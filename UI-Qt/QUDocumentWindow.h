@@ -1,7 +1,9 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QCombobox>
+#include <QComboBox>
+#include <QPushButton>
+#include <QCheckBox>
 #include <QAbstractListModel>
 #include <QItemDelegate>
 
@@ -53,10 +55,13 @@ private slots:
     void
     reloadBlocks();
 
+    void
+    slotSetGlyphMode(bool state);
 private:
     Ui::QUDocumentWindow * ui_;
 
     QComboBox  * cmapCombobox_;
     QComboBox  * blockCombobox_;
+    QPushButton * glyphModelToggle_;
     QUDocument * document_;
 };

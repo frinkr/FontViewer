@@ -72,3 +72,8 @@ void
 QUDocument::selectBlock(size_t index) {
     model_->selectBlock(index);
 }
+
+void
+QUDocument::setCharMode(bool state) {
+    model_->setCharMode(state);
+}

@@ -42,6 +42,10 @@ public:
     void
     selectBlock(size_t index);
     
+    bool
+    charMode() const;
+    void
+    setCharMode(bool state);
 public:
     int
     rowCount(const QModelIndex &) const;
@@ -54,6 +58,8 @@ protected:
     size_t           blockIndex_;
 
     QImage           dummyImage_;
+
+    bool             charMode_;
 };
 
 

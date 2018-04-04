@@ -41,7 +41,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
         QImage image;
-        if (g.id || !model->currentCMap().isUnicode())
+        if (g.id || !model->charMode() || !model->currentCMap().isUnicode())
             image = placeImage(toQImage(g.bitmap), emSize);
         else
             image = charImage(g.character, emSize);
@@ -55,7 +55,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     // draw the text
     if (true) {
         QString text = toQString(g.name);
-        if (!g.id) 
+        if (!g.id && model->charMode()) 
             text = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
         
         if (!text.isEmpty()) {
@@ -74,7 +74,8 @@ QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     : QAbstractListModel(parent)
     , face_(face)
     , blockIndex_(0)
-    , dummyImage_(glyphEmSize(), QImage::Format_ARGB32) {
+    , dummyImage_(glyphEmSize(), QImage::Format_ARGB32)
+    , charMode_(true) {
     dummyImage_.fill(Qt::black);
     dummyImage_.setDevicePixelRatio(2);
 }
@@ -91,7 +92,10 @@ QUGlyphListModel::currentBlock() const {
 
 int
 QUGlyphListModel::rowCount(const QModelIndex & index) const {
-    return int(currentBlock()->size());
+    if (charMode_)
+        return face_->attributes().glyphCount;
+    else
+        return int(currentBlock()->size());
 }
     
 QVariant
@@ -103,7 +107,11 @@ QUGlyphListModel::data(const QModelIndex & index, int role) const {
         return QVariant();
 
     if (role == QUGlyphRole) {
-        FXGlyph g = face_->glyph(currentBlock()->get(index.row()), false);
+        FXGlyph g;
+        if (charMode_)
+            g = face_->glyph(currentBlock()->get(index.row()), false);
+        else
+            g = face_->glyph(index.row(), true);
         QVariant v;
         v.setValue(QUGlyph(g));
         return v;
@@ -126,6 +134,18 @@ QUGlyphListModel::selectBlock(size_t index) {
 QSize
 QUGlyphListModel::iconSize() const {
     return QSize(100, 100);
+}
+
+bool
+QUGlyphListModel::charMode() const {
+    return charMode_;
+}
+
+void
+QUGlyphListModel::setCharMode(bool state) {
+    beginResetModel();
+    charMode_ = state;
+    endResetModel();
 }
 
 QUGlyphListView::QUGlyphListView(QWidget * parent)

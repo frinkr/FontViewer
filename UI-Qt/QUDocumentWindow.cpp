@@ -53,7 +53,10 @@ QUDocumentWindow::initToolBar() {
     blockCombobox_ = new QComboBox;
     toolBar->addWidget(blockCombobox_);
     reloadBlocks();
-        
+
+    glyphModelToggle_ = new QPushButton(tr("All Glyphs"));
+    glyphModelToggle_->setCheckable(true);
+    toolBar->addWidget(glyphModelToggle_);
     toolBar->addAction(QIcon(":/images/copy.png"), "Copy");
     
     QWidget * spacer = new QWidget;
@@ -83,6 +86,9 @@ QUDocumentWindow::connectSingals() {
 
     connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectBlock);
+    
+    connect(glyphModelToggle_, &QPushButton::toggled,
+            this, &QUDocumentWindow::slotSetGlyphMode);
 }
 
 void
@@ -92,4 +98,11 @@ QUDocumentWindow::reloadBlocks() {
     FXCMap cmap = document_->face()->currentCMap();
     for (const auto & block: cmap.blocks()) 
         blockCombobox_->addItem(toQString(block->name()));
+}
+
+void
+QUDocumentWindow::slotSetGlyphMode(bool state) {
+    cmapCombobox_->setEnabled(!state);
+    blockCombobox_->setEnabled(!state);
+    document_->setCharMode(!state);
 }
