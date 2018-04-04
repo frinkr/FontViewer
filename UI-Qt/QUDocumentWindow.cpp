@@ -63,8 +63,6 @@ QUDocumentWindow::initListView() {
     ui_->listView->setModel(document_);
     ui_->listView->setLayoutMode(QListView::Batched);
     ui_->listView->setBatchSize(100);
-    ui_->listView->setGridSize(QSize(100, 120));
-    ui_->listView->setIconSize(QSize(100, 100));
     ui_->listView->setUniformItemSizes(true);
     ui_->listView->setMovement(QListView::Static);
     ui_->listView->setViewMode(QListView::IconMode);

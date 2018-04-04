@@ -36,8 +36,8 @@ placeImage(const QImage & image, const QSize & emSize) {
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());
     
-    QImage out(emSize, image.format());
-    
+    QImage out(emSize, image.isNull()?QImage::Format_ARGB32 : image.format());
+
     QPainter p(&out);
     QPen pen;
     pen.setWidth(2);
@@ -46,8 +46,7 @@ placeImage(const QImage & image, const QSize & emSize) {
     p.fillRect(emRect, Qt::gray);
     p.drawRect(emRect);
 
-    double r = 0.8;
-    
+    const double r = 0.8;
     QRect outRect((1 - r) / 2 * emSize.width(),
                   (1 - r) / 2 * emSize.height(),
                   emSize.width() * r,
@@ -59,5 +58,7 @@ placeImage(const QImage & image, const QSize & emSize) {
                         imageRect.width(),
                         imageRect.height());
     p.drawImage(outRect, image, imageRect);
+
+    out.setDevicePixelRatio(2);
     return out;
 }

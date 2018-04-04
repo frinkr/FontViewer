@@ -41,6 +41,8 @@ public:
     const QUFontURI &
     uri() const { return uri_; }
 
+    QSize
+    iconSize() const;
 public:
     int
     rowCount(const QModelIndex &) const;

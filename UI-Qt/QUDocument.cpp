@@ -23,6 +23,11 @@ QUDocument::QUDocument(const QUFontURI & uri, QObject * parent)
     : QAbstractListModel(parent)
     , uri_(uri) {}
 
+QSize
+QUDocument::iconSize() const {
+    return QSize(100, 100);
+}
+
 bool
 QUDocument::load() {
     face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);

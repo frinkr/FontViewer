@@ -19,7 +19,7 @@ struct FXFaceAttributes {
     std::map<std::string, std::string> fullNames;
 };
 
-constexpr double FXDefaultFontSize = 90;
+constexpr double FXDefaultFontSize = 200;
 constexpr double FXDefaultDPI      = 72;
 
 double
