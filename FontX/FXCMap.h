@@ -35,7 +35,7 @@ public:
 
     virtual FXChar
     get(size_t index) const {
-        return index + range_.from;
+        return static_cast<FXChar>(index + range_.from);
     }
 
     const FXCharRange &

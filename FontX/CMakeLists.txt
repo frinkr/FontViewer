@@ -10,10 +10,10 @@ find_package(Freetype REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem regex)
 
 if (WIN32)
-  include(FindICU)
+  find_package(ICU REQUIRED uc)
 else()
   pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
-#  pkg_check_modules(ICU REQUIRED icu-uc)
+  pkg_check_modules(ICU REQUIRED icu-uc)
 endif()
 
 add_library(FontX

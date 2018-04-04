@@ -11,6 +11,8 @@ constexpr int QUGlyphRole= Qt::UserRole + 1;
 void
 QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
+    QUGlyphListModel * model = (QUGlyphListModel*)index.model();
+
     QVariant v = index.data(QUGlyphRole);
     if (!v.canConvert<QUGlyph>())
         return QStyledItemDelegate::paint(painter, option, index);
@@ -39,7 +41,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
         QImage image;
-        if (g.id) 
+        if (g.id || !model->currentCMap().isUnicode())
             image = placeImage(toQImage(g.bitmap), emSize);
         else
             image = charImage(g.character, emSize);
@@ -89,7 +91,7 @@ QUGlyphListModel::currentBlock() const {
 
 int
 QUGlyphListModel::rowCount(const QModelIndex & index) const {
-    return currentBlock()->size();
+    return int(currentBlock()->size());
 }
     
 QVariant

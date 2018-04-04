@@ -64,7 +64,7 @@ void
 QUDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {
         model_->selectBlock(0);
-        emit cmapActivated(index);
+        emit cmapActivated(int(index));
     }
 }
 

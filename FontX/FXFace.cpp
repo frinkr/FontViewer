@@ -106,14 +106,14 @@ FXFace::glyph(FXChar c, bool isGID) {
     FT_Load_Glyph(face_, id, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 
-    glyph.metrics.width        = slot->metrics.width;
-    glyph.metrics.height       = slot->metrics.height;
-    glyph.metrics.horiBearingX = slot->metrics.horiBearingX;
-    glyph.metrics.horiBearingY = slot->metrics.horiBearingY;
-    glyph.metrics.horiAdvance  = slot->metrics.horiAdvance;
-    glyph.metrics.vertBearingX = slot->metrics.vertBearingX;
-    glyph.metrics.vertBearingY = slot->metrics.vertBearingY;
-    glyph.metrics.vertAdvance  = slot->metrics.vertAdvance;
+    glyph.metrics.width        = (fu)slot->metrics.width;
+    glyph.metrics.height       = (fu)slot->metrics.height;
+    glyph.metrics.horiBearingX = (fu)slot->metrics.horiBearingX;
+    glyph.metrics.horiBearingY = (fu)slot->metrics.horiBearingY;
+    glyph.metrics.horiAdvance  = (fu)slot->metrics.horiAdvance;
+    glyph.metrics.vertBearingX = (fu)slot->metrics.vertBearingX;
+    glyph.metrics.vertBearingY = (fu)slot->metrics.vertBearingY;
+    glyph.metrics.vertAdvance  = (fu)slot->metrics.vertAdvance;
 
     char glyphName[256] = {0};
     if (!FT_Get_Glyph_Name(face_, id, glyphName, sizeof(glyphName))) 
@@ -127,7 +127,7 @@ FXFace::glyph(FXChar c, bool isGID) {
     for (size_t y = 0; y < ftBm.rows; ++ y) {
         for (size_t x = 0; x < ftBm.width; ++ x) {
             uint8_t a = ftBm.buffer[y * ftBm.pitch + x];
-            glyph.bitmap.setPixel(x, y, makeARGB(a, FXBlack)); 
+            glyph.bitmap.setPixel(int(x), int(y), makeARGB(a, FXBlack)); 
         }
     }
     return glyph;
@@ -138,10 +138,14 @@ FXFace::glyph(FXChar c, bool isGID) {
 //
 bool
 FXFace::init() {
-    if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), desc_.faceIndex, &face_))
+    if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), FT_Long(desc_.faceIndex), &face_))
         return false;
 
-    FT_Set_Char_Size(face_, FXDefaultFontSize * 64, FXDefaultFontSize * 64, FXDefaultDPI, FXDefaultDPI);
+    FT_Set_Char_Size(face_, 
+        FT_UInt(FXDefaultFontSize * 64), 
+        FT_UInt(FXDefaultFontSize * 64),
+        FT_UInt(FXDefaultDPI),
+        FT_UInt(FXDefaultDPI));
     return initAttributes() && initCMap();
 }
 
