@@ -49,8 +49,11 @@ QUDocument::data(const QModelIndex & index, int role) const {
 
     FXGlyph g = face_->glyph(index.row(), true);
     
-    if (role == Qt::DisplayRole)
+    if (role == Qt::DisplayRole) {
+        if (g.name.empty())
+            return QString("%1").arg(g.id);
         return toQString(g.name);
+    }
     else if (role == Qt::DecorationRole)
         return placeImage(toQImage(g.bitmap), glyphEmSize());
     else

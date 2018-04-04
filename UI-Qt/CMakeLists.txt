@@ -32,6 +32,7 @@ set(SHARED_SOURCES
   QUOpenFontDialog.cpp
   QUConv.h
   QUConv.cpp
+  QUEncoding.h
   )
 set(APPLE_SOURCES
   MacMain.mm
