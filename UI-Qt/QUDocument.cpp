@@ -21,7 +21,13 @@ QUDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * p
 
 QUDocument::QUDocument(const QUFontURI & uri, QObject * parent)
     : QAbstractListModel(parent)
-    , uri_(uri) {}
+    , uri_(uri)
+    , blockIndex_(0) {}
+
+FXPtr<FXFace>
+QUDocument::face() const {
+    return face_;
+}
 
 QSize
 QUDocument::iconSize() const {
@@ -34,9 +40,14 @@ QUDocument::load() {
     return true;
 }
 
+FXPtr<FXCharBlock>
+QUDocument::currentBlock() const {
+    return face_->currentCMap().blocks()[blockIndex_];
+}
+
 int
 QUDocument::rowCount(const QModelIndex & index) const {
-    return face_->glyphCount();
+    return currentBlock()->size();
 }
     
 QVariant
@@ -47,7 +58,7 @@ QUDocument::data(const QModelIndex & index, int role) const {
     if (index.row() >= face_->glyphCount())
         return QVariant();
 
-    FXGlyph g = face_->glyph(index.row(), true);
+    FXGlyph g = face_->glyph(currentBlock()->get(index.row()), false);
     
     if (role == Qt::DisplayRole) {
         if (g.name.empty())
@@ -61,3 +72,17 @@ QUDocument::data(const QModelIndex & index, int role) const {
 
 }
 
+void
+QUDocument::selectCMap(int index) {
+    if (face_->selectCMap(index)) {
+        selectBlock(0);
+        emit cmapActivated(index);
+    }
+}
+
+void
+QUDocument::selectBlock(int index) {
+    beginResetModel();
+    blockIndex_ = index;
+    endResetModel();
+}

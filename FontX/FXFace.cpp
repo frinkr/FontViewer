@@ -83,6 +83,13 @@ FXFace::currentCMapIndex() const {
     return -1;
 }
 
+bool
+FXFace::selectCMap(size_t cmapIndex) {
+    if (cmapIndex >= cmaps_.size())
+        return false;
+    return !FT_Set_Charmap(face_, face_->charmaps[cmapIndex]);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                     GLYPH
 //

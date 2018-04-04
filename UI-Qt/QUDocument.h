@@ -41,6 +41,9 @@ public:
     const QUFontURI &
     uri() const { return uri_; }
 
+    FXPtr<FXFace>
+    face() const;
+    
     QSize
     iconSize() const;
 public:
@@ -49,16 +52,31 @@ public:
     
     QVariant
     data(const QModelIndex &, int) const;
+    
+signals:
+    void
+    cmapActivated(int index);
+        
+public slots:
+    void
+    selectCMap(int index);
 
+    void
+    selectBlock(int index);
+    
 private:
     QUDocument(const QUFontURI & uri, QObject * parent);
 
     bool
     load();
 
+    FXPtr<FXCharBlock>
+    currentBlock() const;
     
 private:
     QUFontURI        uri_;
     FXPtr<FXFace>    face_;
+
+    size_t           blockIndex_;
 };
 #endif

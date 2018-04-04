@@ -6,6 +6,7 @@
 #include <QStringListModel>
 #include <QStandardItemModel>
 
+#include "QUConv.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
 #include "ui_QUDocumentWindow.h"
@@ -30,6 +31,8 @@ QUDocumentWindow::initUI() {
     initWindowTitle();
     initToolBar();
     initListView();
+    
+    connectSingals();
 }
 
 void
@@ -43,8 +46,18 @@ QUDocumentWindow::initWindowTitle() {
 void
 QUDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
-    QComboBox * cmapCombobox = new QComboBox;
-    toolBar->addWidget(cmapCombobox);
+
+    // cmap Combobox
+    cmapCombobox_ = new QComboBox;
+    cmapCombobox_->setMinimumWidth(200);
+    toolBar->addWidget(cmapCombobox_);
+    for (const auto & cmap : document_->face()->cmaps())
+        cmapCombobox_->addItem(toQString(cmap.description()));
+
+    blockCombobox_ = new QComboBox;
+    toolBar->addWidget(blockCombobox_);
+    reloadBlocks();
+        
     toolBar->addAction(QIcon(":/images/copy.png"), "Copy");
     
     QWidget * spacer = new QWidget;
@@ -69,4 +82,24 @@ QUDocumentWindow::initListView() {
     ui_->listView->setResizeMode(QListView::Adjust);
     ui_->listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
+
+void
+QUDocumentWindow::connectSingals() {
+    connect(cmapCombobox_, QOverload<int>::of(&QComboBox::activated),
+            document_, &QUDocument::selectCMap);
     
+    connect(document_, &QUDocument::cmapActivated,
+            this, &QUDocumentWindow::reloadBlocks);
+
+    connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
+            document_, &QUDocument::selectBlock);
+}
+
+void
+QUDocumentWindow::reloadBlocks() {
+    blockCombobox_->clear();
+        
+    FXCMap cmap = document_->face()->currentCMap();
+    for (const auto & block: cmap.blocks()) 
+        blockCombobox_->addItem(toQString(block->name()));
+}

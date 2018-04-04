@@ -1,7 +1,7 @@
 #pragma once
 
 #include <QMainWindow>
-#include <QPainter>
+#include <QCombobox>
 #include <QAbstractListModel>
 #include <QItemDelegate>
 
@@ -44,9 +44,18 @@ private:
 
     void
     initListView();
-    
+
+    void
+    connectSingals();
+
+private slots:
+    void
+    reloadBlocks();
+
 private:
     Ui::QUDocumentWindow * ui_;
 
+    QComboBox  * cmapCombobox_;
+    QComboBox  * blockCombobox_;
     QUDocument * document_;
 };
