@@ -31,9 +31,9 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="QListView" name="listView">
+     <widget class="QUGlyphListView" name="listView">
       <property name="dragDropMode">
-       <enum>QAbstractItemView::NoDragDrop</enum>
+       <enum>QAbstractItemView::DragDrop</enum>
       </property>
       <property name="flow">
        <enum>QListView::LeftToRight</enum>
@@ -73,6 +73,13 @@
    </attribute>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QUGlyphListView</class>
+   <extends>QListView</extends>
+   <header>QUGlyphListView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

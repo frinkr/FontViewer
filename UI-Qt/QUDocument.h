@@ -1,11 +1,10 @@
-#ifndef QUDOCUMENT_H
-#define QUDOCUMENT_H
+#pragma once
 #include <QObject>
 #include <QSharedPointer>
-#include <QAbstractListModel>
-#include <QStyledItemDelegate>
-
 #include "FontX/FXFace.h"
+
+class QUGlyphItemDelegate;
+class QUGlyphListModel;
 
 struct QUFontURI
 {
@@ -22,23 +21,10 @@ struct QUFontURI
     operator!=(const QUFontURI & other) const {
         return !(*this == other);
     }
-
-};
-
-class QUGlyphItemDelegate : public QStyledItemDelegate
-{
-    Q_OBJECT
-
-public:
-    QUGlyphItemDelegate(QWidget *parent = 0)
-        : QStyledItemDelegate(parent) {}
-
-    void
-    paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 
-class QUDocument : public QAbstractListModel
+class QUDocument : public QObject
 {
     Q_OBJECT
 public:
@@ -57,40 +43,32 @@ public:
 
     FXPtr<FXFace>
     face() const;
-    
-    QSize
-    iconSize() const;
-public:
-    int
-    rowCount(const QModelIndex &) const;
-    
-    QVariant
-    data(const QModelIndex &, int) const;
-    
+
+    QUGlyphListModel *
+    model() const;
+
+    QUGlyphItemDelegate *
+    delegate() const;
 signals:
     void
     cmapActivated(int index);
         
 public slots:
     void
-    selectCMap(int index);
+    selectCMap(size_t index);
 
     void
-    selectBlock(int index);
-    
+    selectBlock(size_t index);
 private:
     QUDocument(const QUFontURI & uri, QObject * parent);
 
     bool
     load();
 
-    FXPtr<FXCharBlock>
-    currentBlock() const;
-    
 private:
     QUFontURI        uri_;
     FXPtr<FXFace>    face_;
 
-    size_t           blockIndex_;
+    QSharedPointer<QUGlyphListModel>    model_;
+    QSharedPointer<QUGlyphItemDelegate> delegate_;
 };
-#endif

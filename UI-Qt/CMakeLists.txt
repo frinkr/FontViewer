@@ -33,6 +33,8 @@ set(SHARED_SOURCES
   QUConv.h
   QUConv.cpp
   QUEncoding.h
+  QUGlyphListView.h
+  QUGlyphListView.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm
