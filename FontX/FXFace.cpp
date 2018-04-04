@@ -98,10 +98,11 @@ FXGlyph
 FXFace::glyph(FXChar c, bool isGID) {
     FXGlyphID id = c;
     if (!isGID)
-        FT_Get_Char_Index(face_, c);
+        id = FT_Get_Char_Index(face_, c);
     
     FXGlyph glyph;
     glyph.id = id;
+    glyph.character = c;
     FT_Load_Glyph(face_, id, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 

@@ -19,3 +19,6 @@ glyphEmSize();
 
 QImage
 placeImage(const QImage & image, const QSize & emSize);
+
+QImage
+charImage(FXChar c, const QSize & emSize);

@@ -1,10 +1,5 @@
-#include <QtGui>
-#include <QtDebug>
-#include <QCombobox>
 #include <QFileInfo>
 #include <QLineEdit>
-#include <QStringListModel>
-#include <QStandardItemModel>
 
 #include "QUConv.h"
 #include "QUDocumentWindowManager.h"
@@ -74,6 +69,7 @@ QUDocumentWindow::initToolBar() {
 void
 QUDocumentWindow::initListView() {
     ui_->listView->setModel(document_);
+    ui_->listView->setItemDelegate(new QUGlyphItemDelegate);
     ui_->listView->setLayoutMode(QListView::Batched);
     ui_->listView->setBatchSize(100);
     ui_->listView->setUniformItemSizes(true);

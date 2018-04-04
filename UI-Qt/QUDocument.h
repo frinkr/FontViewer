@@ -3,6 +3,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QAbstractListModel>
+#include <QStyledItemDelegate>
 
 #include "FontX/FXFace.h"
 
@@ -23,6 +24,19 @@ struct QUFontURI
     }
 
 };
+
+class QUGlyphItemDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+
+public:
+    QUGlyphItemDelegate(QWidget *parent = 0)
+        : QStyledItemDelegate(parent) {}
+
+    void
+    paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+};
+
 
 class QUDocument : public QAbstractListModel
 {
