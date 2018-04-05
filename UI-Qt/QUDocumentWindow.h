@@ -62,6 +62,6 @@ private:
 
     QComboBox  * cmapCombobox_;
     QComboBox  * blockCombobox_;
-    QPushButton * glyphModelToggle_;
+    QAction * glyphModelToggle_;
     QUDocument * document_;
 };

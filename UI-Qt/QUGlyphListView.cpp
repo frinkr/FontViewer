@@ -55,9 +55,13 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     // draw the text
     if (true) {
         QString text = toQString(g.name);
-        if (!g.id && model->charMode()) 
-            text = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
-        
+        if (!g.id && model->charMode()) {
+            if (model->currentCMap().isUnicode())
+                text = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+            else
+                text = QString("0x%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+        }
+
         if (!text.isEmpty()) {
             if (opt.state & QStyle::State_Selected)
                 painter->setPen(opt.palette.color(QPalette::Normal, QPalette::HighlightedText));
@@ -93,9 +97,9 @@ QUGlyphListModel::currentBlock() const {
 int
 QUGlyphListModel::rowCount(const QModelIndex & index) const {
     if (charMode_)
-        return face_->attributes().glyphCount;
-    else
         return int(currentBlock()->size());
+    else
+        return int(face_->attributes().glyphCount);
 }
     
 QVariant

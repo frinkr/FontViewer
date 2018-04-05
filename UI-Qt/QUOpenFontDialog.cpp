@@ -10,7 +10,7 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
     connect(ui_->browseButton, &QPushButton::clicked,
             this, &QUOpenFontDialog::slotBrowseFile);
         
-    ui_->textEdit->setText("/Data/git/github/FontViewer/Resources/Fonts/MyriadPro-Regular.otf");
+    ui_->textEdit->setText(FX_RESOURCES_DIR "/Fonts/MyriadPro-Regular.otf");
 }
 
 QUOpenFontDialog::~QUOpenFontDialog() {

@@ -45,20 +45,19 @@ QUDocumentWindow::initToolBar() {
 
     // cmap Combobox
     cmapCombobox_ = new QComboBox;
-    cmapCombobox_->setMinimumWidth(200);
+    cmapCombobox_->setFixedWidth(150);
     toolBar->addWidget(cmapCombobox_);
     for (const auto & cmap : document_->face()->cmaps())
         cmapCombobox_->addItem(toQString(cmap.description()));
 
     blockCombobox_ = new QComboBox;
+    blockCombobox_->setFixedWidth(200);
     toolBar->addWidget(blockCombobox_);
     reloadBlocks();
-
-    glyphModelToggle_ = new QPushButton(tr("All Glyphs"));
-    glyphModelToggle_->setCheckable(true);
-    toolBar->addWidget(glyphModelToggle_);
-    toolBar->addAction(QIcon(":/images/copy.png"), "Copy");
     
+    glyphModelToggle_ = toolBar->addAction(QIcon(":/images/glyph.png"), "All Glyphs");
+    glyphModelToggle_->setCheckable(true);
+
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
@@ -67,6 +66,8 @@ QUDocumentWindow::initToolBar() {
     searchEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     toolBar->addWidget(searchEdit);
     
+    toolBar->setStyleSheet("QToolBar{spacing:4px;}");
+
     this->setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -87,7 +88,7 @@ QUDocumentWindow::connectSingals() {
     connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectBlock);
     
-    connect(glyphModelToggle_, &QPushButton::toggled,
+    connect(glyphModelToggle_, &QAction::toggled,
             this, &QUDocumentWindow::slotSetGlyphMode);
 }
 
