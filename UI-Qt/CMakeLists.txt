@@ -35,6 +35,8 @@ set(SHARED_SOURCES
   QUEncoding.h
   QUGlyphListView.h
   QUGlyphListView.cpp
+  QUToolBarWidget.cpp
+  QUToolBarWidget.h
   )
 set(APPLE_SOURCES
   MacMain.mm

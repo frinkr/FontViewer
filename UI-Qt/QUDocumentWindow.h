@@ -56,12 +56,16 @@ private slots:
     reloadBlocks();
 
     void
-    slotSetGlyphMode(bool state);
+    showFullGlyphList(bool state);
 private:
     Ui::QUDocumentWindow * ui_;
 
     QComboBox  * cmapCombobox_;
+    QAction    * cmapAction_;
     QComboBox  * blockCombobox_;
-    QAction * glyphModelToggle_;
+    QAction    * blockAction_;
+    QLineEdit  * searchEdit_;
+    QAction    * searchAction_;
+
     QUDocument * document_;
 };

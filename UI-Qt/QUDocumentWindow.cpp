@@ -1,10 +1,12 @@
 #include <QFileInfo>
 #include <QLineEdit>
-
+#include <QToolButton>
+#include <QWidgetAction>
 #include "QUConv.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
 #include "QUGlyphListView.h"
+#include "QUToolBarWidget.h"
 #include "ui_QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
@@ -46,28 +48,28 @@ QUDocumentWindow::initToolBar() {
     // cmap Combobox
     cmapCombobox_ = new QComboBox;
     cmapCombobox_->setFixedWidth(150);
-    toolBar->addWidget(cmapCombobox_);
+    cmapAction_ = toolBar->addWidget(new QUToolBarWidget(cmapCombobox_, tr("Character Maps")));
     for (const auto & cmap : document_->face()->cmaps())
         cmapCombobox_->addItem(toQString(cmap.description()));
 
     blockCombobox_ = new QComboBox;
     blockCombobox_->setFixedWidth(200);
-    toolBar->addWidget(blockCombobox_);
+    blockAction_ = toolBar->addWidget(new QUToolBarWidget(blockCombobox_, tr("Character Blocks")));
     reloadBlocks();
     
-    glyphModelToggle_ = toolBar->addAction(QIcon(":/images/glyph.png"), "All Glyphs");
-    glyphModelToggle_->setCheckable(true);
+    ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph.png"));
 
+    toolBar->addAction(QIcon(":/images/shape.png"), tr("Shape"));
+    toolBar->addAction(QIcon(":/images/table.png"), tr("Table"));
+    toolBar->addAction(QIcon(":/images/search.png"), tr("Search"));
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
     
-    QLineEdit * searchEdit = new QLineEdit;
-    searchEdit->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    toolBar->addWidget(searchEdit);
+    searchEdit_ = new QLineEdit;
+    searchEdit_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    searchAction_ = toolBar->addWidget(new QUToolBarWidget(searchEdit_, tr("Search")));
     
-    toolBar->setStyleSheet("QToolBar{spacing:4px;}");
-
     this->setUnifiedTitleAndToolBarOnMac(true);
 }
 
@@ -88,8 +90,9 @@ QUDocumentWindow::connectSingals() {
     connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectBlock);
     
-    connect(glyphModelToggle_, &QAction::toggled,
-            this, &QUDocumentWindow::slotSetGlyphMode);
+    connect(ui_->actionFull_Glyph_List, &QAction::toggled,
+            this, &QUDocumentWindow::showFullGlyphList);
+
 }
 
 void
@@ -102,8 +105,8 @@ QUDocumentWindow::reloadBlocks() {
 }
 
 void
-QUDocumentWindow::slotSetGlyphMode(bool state) {
-    cmapCombobox_->setEnabled(!state);
-    blockCombobox_->setEnabled(!state);
+QUDocumentWindow::showFullGlyphList(bool state) {
+    cmapAction_->setEnabled(!state);
+    blockAction_->setEnabled(!state);
     document_->setCharMode(!state);
 }

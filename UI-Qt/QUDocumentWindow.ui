@@ -103,7 +103,7 @@
     </property>
     <widget class="QMenu" name="menuLabel">
      <property name="title">
-      <string>Label</string>
+      <string>Glyph Label</string>
      </property>
      <addaction name="actionCharacter_Code"/>
      <addaction name="actionGlyph_Name"/>
@@ -111,6 +111,7 @@
     </widget>
     <addaction name="action_Full_Screen"/>
     <addaction name="separator"/>
+    <addaction name="actionFull_Glyph_List"/>
     <addaction name="menuLabel"/>
    </widget>
    <widget class="QMenu" name="menu_Window">
@@ -196,6 +197,14 @@
   <action name="actionGlyph_ID">
    <property name="text">
     <string>Glyph &amp;ID</string>
+   </property>
+  </action>
+  <action name="actionFull_Glyph_List">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Full &amp;Glyph List</string>
    </property>
   </action>
  </widget>
