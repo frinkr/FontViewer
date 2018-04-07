@@ -54,12 +54,26 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 
     // draw the text
     if (true) {
-        QString text = toQString(g.name);
-        if (!g.id && model->charMode()) {
-            if (model->currentCMap().isUnicode())
-                text = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
-            else
-                text = QString("0x%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+        QString charCode;
+        if (model->currentCMap().isUnicode())
+            charCode = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+        else
+            charCode = QString("0x%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+
+        QString text;
+        switch (model->glyphLabel()) {
+            case QUGlyphLabel::CharacterCode:
+                text = charCode;
+                break;
+            case QUGlyphLabel::GlyphID:
+                text = QString("%1").arg(g.id);
+                break;
+            case QUGlyphLabel::GlyphName:
+                text = toQString(g.name);
+                if (!g.id && model->charMode())
+                    text = charCode;
+                break;
+
         }
 
         if (!text.isEmpty()) {
@@ -79,7 +93,8 @@ QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     , face_(face)
     , blockIndex_(0)
     , dummyImage_(glyphEmSize(), QImage::Format_ARGB32)
-    , charMode_(true) {
+    , charMode_(true)
+    , glyphLabel_(QUGlyphLabel::GlyphName) {
     dummyImage_.fill(Qt::black);
     dummyImage_.setDevicePixelRatio(2);
 }
@@ -149,6 +164,18 @@ void
 QUGlyphListModel::setCharMode(bool state) {
     beginResetModel();
     charMode_ = state;
+    endResetModel();
+}
+
+QUGlyphLabel
+QUGlyphListModel::glyphLabel() const {
+    return glyphLabel_;
+}
+
+void
+QUGlyphListModel::setGlyphLabel(QUGlyphLabel label) {
+    beginResetModel();
+    glyphLabel_ = label;
     endResetModel();
 }
 

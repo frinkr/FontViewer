@@ -43,6 +43,9 @@ private:
     initWindowTitle();
 
     void
+    initMenu();
+    
+    void
     initToolBar();
 
     void
@@ -57,6 +60,10 @@ private slots:
 
     void
     showFullGlyphList(bool state);
+
+    void
+    switchGlyphLabel();
+
 private:
     Ui::QUDocumentWindow * ui_;
 

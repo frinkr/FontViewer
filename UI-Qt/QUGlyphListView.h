@@ -20,6 +20,11 @@ public:
           const QModelIndex &index) const;
 };
 
+enum class QUGlyphLabel {
+    CharacterCode,
+    GlyphID,
+    GlyphName
+};
 
 class QUGlyphListModel : public QAbstractListModel {
     
@@ -44,8 +49,15 @@ public:
     
     bool
     charMode() const;
+
     void
     setCharMode(bool state);
+    
+    QUGlyphLabel
+    glyphLabel() const;
+
+    void 
+    setGlyphLabel(QUGlyphLabel label);
 public:
     int
     rowCount(const QModelIndex &) const;
@@ -60,6 +72,7 @@ protected:
     QImage           dummyImage_;
 
     bool             charMode_;
+    QUGlyphLabel     glyphLabel_;
 };
 
 

@@ -35,8 +35,20 @@
       <property name="dragDropMode">
        <enum>QAbstractItemView::DragDrop</enum>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
+      <property name="movement">
+       <enum>QListView::Snap</enum>
+      </property>
       <property name="flow">
        <enum>QListView::LeftToRight</enum>
+      </property>
+      <property name="resizeMode">
+       <enum>QListView::Adjust</enum>
+      </property>
+      <property name="layoutMode">
+       <enum>QListView::Batched</enum>
       </property>
       <property name="viewMode">
        <enum>QListView::IconMode</enum>
@@ -136,10 +148,16 @@
    <property name="text">
     <string>&amp;About</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::AboutRole</enum>
+   </property>
   </action>
   <action name="actionAbout_Qt">
    <property name="text">
     <string>About &amp;Qt</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
   <action name="action_Open">
@@ -185,16 +203,28 @@
    </property>
   </action>
   <action name="actionCharacter_Code">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Character Code</string>
    </property>
   </action>
   <action name="actionGlyph_Name">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Glyph Name</string>
    </property>
   </action>
   <action name="actionGlyph_ID">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Glyph &amp;ID</string>
    </property>

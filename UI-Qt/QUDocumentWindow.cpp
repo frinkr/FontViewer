@@ -2,6 +2,7 @@
 #include <QLineEdit>
 #include <QToolButton>
 #include <QWidgetAction>
+#include <QActionGroup>
 #include "QUConv.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
@@ -27,6 +28,7 @@ QUDocumentWindow::~QUDocumentWindow() {
 void 
 QUDocumentWindow::initUI() {
     initWindowTitle();
+    initMenu();
     initToolBar();
     initListView();
     
@@ -39,6 +41,20 @@ QUDocumentWindow::initWindowTitle() {
     ui_->fileLabel->setText(filePath);
     setWindowFilePath(filePath);
     setWindowTitle(QFileInfo(filePath).fileName());
+}
+
+void
+QUDocumentWindow::initMenu() {
+    QActionGroup * group = new QActionGroup(this);
+    group->addAction(ui_->actionCharacter_Code);
+    group->addAction(ui_->actionGlyph_ID);
+    group->addAction(ui_->actionGlyph_Name);
+    group->setExclusive(true);
+    ui_->actionGlyph_Name->setChecked(true);
+
+
+    connect(group, &QActionGroup::triggered,
+            this, &QUDocumentWindow::switchGlyphLabel);
 }
 
 void
@@ -109,4 +125,14 @@ QUDocumentWindow::showFullGlyphList(bool state) {
     cmapAction_->setEnabled(!state);
     blockAction_->setEnabled(!state);
     document_->setCharMode(!state);
+}
+
+void
+QUDocumentWindow::switchGlyphLabel() {
+    if (ui_->actionCharacter_Code->isChecked())
+        document_->model()->setGlyphLabel(QUGlyphLabel::CharacterCode);
+    else if (ui_->actionGlyph_ID->isChecked())
+        document_->model()->setGlyphLabel(QUGlyphLabel::GlyphID);
+    else
+        document_->model()->setGlyphLabel(QUGlyphLabel::GlyphName);
 }
