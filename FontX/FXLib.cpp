@@ -1,3 +1,4 @@
+#include "FXUnicode.h"
 #include "FXLib.h"
 #include "FXPrivate.h"
 
@@ -22,17 +23,12 @@ FXLib::get() {
     return lib_->ftlib_;
 }
 
- FXPtr<FXUCD>
- FXLib::ucd() {
-     return lib_->ucd_;
- }
-
 FXLib::FXLib(const std::string & ucdRoot) {
     if (FT_Init_FreeType(&ftlib_)) 
         ftlib_ = nullptr;
     
     if (ftlib_) {
-        ucd_.reset(new FXUCD(ucdRoot));
+	FXUnicode::init(ucdRoot);
     }
 }
 

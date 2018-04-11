@@ -1,6 +1,7 @@
 #include <iostream>
-
-#include "FXUCD.h"
+#include <unicode/uchar.h>
+#include <unicode/uscript.h>
+#include "FXUnicode.h"
 #include "FXBoostPrivate.h"
 
 namespace {
@@ -107,16 +108,61 @@ FXUCD::blocks() const {
 const FXUCDBlock &
 FXUCD::block(FXChar c) const {
     auto const & blks = blocks();
-    auto itr = std::lower_bound(blks.begin(), blks.end(), c, [](const FXUCDBlock & block, FXChar c) {
-        return block.from < c;
+    auto itr = std::find_if(blks.begin(), blks.end(), [c](const FXUCDBlock & block) {
+        return block.contains(c);
     });
-    if ((itr != blks.end()) && (itr->contains(c)))
+
+    if ((itr != blks.end()))
         return *itr;
     return FXUCDInvalidBlock;
 }
-
 
 FXString
 FXUCD::file(const FXString & name) const {
     return BFS::pathJoin({root_, name});
 }
+
+/////////////////////////////////////////////////////////////////////////////////////
+//               FXUNICODE
+
+FXPtr<FXUCD> FXUnicode::ucd_;
+
+void
+FXUnicode::init(const FXString & ucdRoot) {
+    ucd_.reset(new FXUCD(ucdRoot));
+}
+    
+FXPtr<FXUCD>
+FXUnicode::ucd() {
+    return ucd_;
+}
+
+const FXVector<FXUCDBlock> &
+FXUnicode::blocks() {
+    return ucd()->blocks();
+}
+
+const  FXUCDBlock &
+FXUnicode::block(FXChar c) {
+    return ucd()->block(c);
+}
+  
+FXString
+FXUnicode::name(FXChar c) {
+    char name[1024] = {0};
+    UErrorCode error = U_ZERO_ERROR;
+    u_charName(c, U_UNICODE_CHAR_NAME, name, sizeof(name), &error);
+    return name;
+}
+
+FXString
+FXUnicode::script(FXChar c) {
+    UErrorCode error = U_ZERO_ERROR;
+
+    UScriptCode script = uscript_getScript(c, &error);
+    if (!error) 
+        return uscript_getName(script);
+
+    return FXString();
+}
+

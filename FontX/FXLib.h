@@ -1,6 +1,5 @@
 #pragma once
 #include "FX.h"
-#include "FXUCD.h"
 
 class FXLib {
 public:
@@ -13,8 +12,6 @@ public:
     static FXFTLibrary
     get();
 
-    static FXPtr<FXUCD>
-    ucd();
 private:
     static FXPtr<FXLib> lib_;
 
@@ -24,7 +21,6 @@ private:
     FXLib(const std::string & ucdRoot);
     
     FXFTLibrary     ftlib_;
-    FXPtr<FXUCD>    ucd_;
 };
 
 

@@ -149,10 +149,11 @@ void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
+        FXChar c = document_->model()->currentBlock()->get(index.row());
         if (document_->model()->charMode())
-            ui_->textBrowser->setChar(index.row());
+            ui_->textBrowser->setChar(c);
         else
-            ui_->textBrowser->setGlyph(index.row());
+            ui_->textBrowser->setGlyph(c);
     }
 }
     
