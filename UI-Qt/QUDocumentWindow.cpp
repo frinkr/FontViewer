@@ -31,6 +31,7 @@ QUDocumentWindow::initUI() {
     initMenu();
     initToolBar();
     initListView();
+    initGlyphInfoView();
     
     connectSingals();
 }
@@ -54,7 +55,7 @@ QUDocumentWindow::initMenu() {
 
 
     connect(group, &QActionGroup::triggered,
-            this, &QUDocumentWindow::switchGlyphLabel);
+            this, &QUDocumentWindow::onSwitchGlyphLabel);
 }
 
 void
@@ -96,6 +97,11 @@ QUDocumentWindow::initListView() {
 }
 
 void
+QUDocumentWindow::initGlyphInfoView() {
+    ui_->textBrowser->setQUDocument(document_);
+}
+    
+void
 QUDocumentWindow::connectSingals() {
     connect(cmapCombobox_, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectCMap);
@@ -104,11 +110,13 @@ QUDocumentWindow::connectSingals() {
             this, &QUDocumentWindow::reloadBlocks);
 
     connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
-            document_, &QUDocument::selectBlock);
+            document_->model(), &QUGlyphListModel::selectBlock);
     
     connect(ui_->actionFull_Glyph_List, &QAction::toggled,
             this, &QUDocumentWindow::showFullGlyphList);
 
+    connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+            this, &QUDocumentWindow::onSelectionChanged);
 }
 
 void
@@ -124,11 +132,11 @@ void
 QUDocumentWindow::showFullGlyphList(bool state) {
     cmapAction_->setEnabled(!state);
     blockAction_->setEnabled(!state);
-    document_->setCharMode(!state);
+    document_->model()->setCharMode(!state);
 }
 
 void
-QUDocumentWindow::switchGlyphLabel() {
+QUDocumentWindow::onSwitchGlyphLabel() {
     if (ui_->actionCharacter_Code->isChecked())
         document_->model()->setGlyphLabel(QUGlyphLabel::CharacterCode);
     else if (ui_->actionGlyph_ID->isChecked())
@@ -136,3 +144,15 @@ QUDocumentWindow::switchGlyphLabel() {
     else
         document_->model()->setGlyphLabel(QUGlyphLabel::GlyphName);
 }
+
+void
+QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    if (selected.indexes().size()) {
+        QModelIndex index = selected.indexes()[0];
+        if (document_->model()->charMode())
+            ui_->textBrowser->setChar(index.row());
+        else
+            ui_->textBrowser->setGlyph(index.row());
+    }
+}
+    

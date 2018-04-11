@@ -67,13 +67,3 @@ QUDocument::selectCMap(size_t index) {
         emit cmapActivated(int(index));
     }
 }
-
-void
-QUDocument::selectBlock(size_t index) {
-    model_->selectBlock(index);
-}
-
-void
-QUDocument::setCharMode(bool state) {
-    model_->setCharMode(state);
-}

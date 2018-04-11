@@ -35,8 +35,12 @@ set(SHARED_SOURCES
   QUEncoding.h
   QUGlyphListView.h
   QUGlyphListView.cpp
+  QUGlyphInfoWidget.h
+  QUGlyphInfoWidget.cpp
   QUToolBarWidget.cpp
   QUToolBarWidget.h
+  QUTemplateInstantializer.h
+  QUTemplateInstantializer.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

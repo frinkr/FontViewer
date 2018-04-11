@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style type="text/css">
+    html,
+    body {
+      width: 100%;
+    }
+
+    table {
+      margin: 0;
+    }
+
+    td {
+      padding: 0 2px 0 5px;
+    }
+
+    .key {
+      text-align: right
+    }
+
+    .head {
+      font-weight: bold;
+    }
+  </style>
+
+</head>
+
+<body>
+  <table>
+    <tbody>
+      <tr>
+        <td>
+          <img src="fv://glyph.png" />
+        </td>
+        <td style="vertical-align:middle;">
+          <table>
+            <tbody>
+              <tr>
+                <td class="key">Name:</td>
+                <td>${NAME}</td>
+              </tr>
+              <tr>
+                <td class="key">Char:</td>
+                <td>${CHAR}</td>
+              </tr>
+              <tr>
+                <td class="key">ID:</td>
+                <td>${ID}</td>
+              </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+  </table>
+
+  <br>
+  <table>
+    <tbody>
+
+      <!--  METRICS -->
+      <tr>
+        <td class="key">
+          <strong>Metrics</strong>
+        </td>
+      </tr>
+      <tr>
+        <td class="key">Width:</td>
+        <td>${WIDTH}</td>
+      </tr>
+      <tr>
+        <td class="key">Height:</td>
+        <td>${HEIGHT}</td>
+      </tr>
+      <tr>
+        <td class="key">Hori Advance:</td>
+        <td>${HORI_ADVANCE}</td>
+      </tr>
+      <tr>
+        <td class="key">Hori Bearing X:</td>
+        <td>${HORI_BEARING_X}</td>
+      </tr>
+      <tr>
+        <td class="key">Hori Bearing Y:</td>
+        <td>${HORI_BEARING_Y}</td>
+      </tr>
+      <tr>
+        <td class="key">Vert Advance:</td>
+        <td>${VERT_ADVANCE}</td>
+      </tr>
+      <tr>
+        <td class="key">Vert Bearing X:</td>
+        <td>${VERT_BEARING_X}</td>
+      </tr>
+      <tr>
+        <td class="key">Vert Bearing Y:</td>
+        <td>${VERT_BEARING_Y}</td>
+      </tr>
+      <tr></tr>
+
+      <!--  UNICODE -->
+      <tr>
+        <td class="key">
+          <strong>Unicode</strong>
+        </td>
+      </tr>
+      <tr>
+        <td class="key">Name:</td>
+        <td>${UNICODE_NAME}</td>
+      </tr>
+      <tr>
+        <td class="key">Block:</td>
+        <td>${UNICODE_BLOCK}</td>
+      </tr>
+      <tr>
+        <td class="key">Script:</td>
+        <td>${UNICODE_SCRIPT}</td>
+      </tr>
+      <tr>
+        <td class="key">Language:</td>
+        <td>${UNICODE_LANGUAGE}</td>
+      </tr>
+      <tr>
+        <td class="key">Derived Age:</td>
+        <td>${UNICODE_AGE}</td>
+      </tr>
+      <tr>
+        <td class="key">General Category:</td>
+        <td>${UNICODE_GENERAL_CATEGORY}</td>
+      </tr>
+      <tr>
+        <td class="key">Decomposition:</td>
+        <td>${UNICODE_DECOMPOSITION}</td>
+      </tr>
+      <tr></tr>
+
+      <!--  ENCODING -->
+      <tr>
+        <td class="key">
+          <strong>Encoding</strong>
+          <td>
+      </tr>
+      <tr>
+        <td class="key">UTF8:</td>
+        <td>${UTF8}</td>
+      </tr>
+      <tr>
+        <td class="key">UTF16:</td>
+        <td>${UTF16}</td>
+      </tr>
+
+    </tbody>
+  </table>
+</body>
+
+</html>

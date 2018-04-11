@@ -6,7 +6,7 @@
 #include <QCheckBox>
 #include <QAbstractListModel>
 #include <QItemDelegate>
-
+#include <QItemSelection>
 
 class QMenu;
 class QAction;
@@ -52,6 +52,9 @@ private:
     initListView();
 
     void
+    initGlyphInfoView();
+    
+    void
     connectSingals();
 
 private slots:
@@ -62,8 +65,11 @@ private slots:
     showFullGlyphList(bool state);
 
     void
-    switchGlyphLabel();
+    onSwitchGlyphLabel();
 
+    void
+    onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+    
 private:
     Ui::QUDocumentWindow * ui_;
 
