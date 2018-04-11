@@ -1,6 +1,7 @@
 #include "QUGlyphInfoWidget.h"
 #include "QUConv.h"
 #include "QUTemplateInstantializer.h"
+#include "QUEncoding.h"
 #include <QImage>
 #include <QTextDocument>
 #include <QFile>
@@ -18,6 +19,9 @@ namespace {
 
     QString instTemplate(const QString & temp, const FXGlyph & glyph) {
         QMap<QString, QVariant> map;
+        map["NAME"] = toQString(glyph.name);
+        map["CHAR"] = QUEncoding::charHexNotation(glyph.character, true);
+        map["ID"] = glyph.id;
         map["WIDTH"] = glyph.metrics.width;
         map["HEIGHT"] = glyph.metrics.height;
         map["HORI_ADVANCE"] = glyph.metrics.horiAdvance;

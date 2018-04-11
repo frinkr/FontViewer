@@ -5,6 +5,7 @@
 #include "QUConv.h"
 #include "QUGlyphListView.h"
 #include "QUDocument.h"
+#include "QUEncoding.h"
 
 constexpr int QUGlyphRole= Qt::UserRole + 1;
 
@@ -54,11 +55,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 
     // draw the text
     if (true) {
-        QString charCode;
-        if (model->currentCMap().isUnicode())
-            charCode = QString("U+%1").arg(g.character, 4, 16, QChar('0')).toUpper();
-        else
-            charCode = QString("0x%1").arg(g.character, 4, 16, QChar('0')).toUpper();
+        QString charCode = QUEncoding::charHexNotation(g.character, model->currentCMap().isUnicode());
 
         QString text;
         switch (model->glyphLabel()) {

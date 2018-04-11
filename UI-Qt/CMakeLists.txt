@@ -33,6 +33,7 @@ set(SHARED_SOURCES
   QUConv.h
   QUConv.cpp
   QUEncoding.h
+  QUEncoding.cpp
   QUGlyphListView.h
   QUGlyphListView.cpp
   QUGlyphInfoWidget.h
