@@ -117,6 +117,9 @@ QUDocumentWindow::connectSingals() {
 
     connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &QUDocumentWindow::onSelectionChanged);
+
+    connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
+            this, &QUDocumentWindow::onCharLinkClicked);
 }
 
 void
@@ -157,3 +160,7 @@ QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItem
     }
 }
     
+void
+QUDocumentWindow::onCharLinkClicked(FXChar c) {
+    //ui_->listView->selectChar(c);
+}

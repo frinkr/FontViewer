@@ -3,6 +3,8 @@
 #include "QUDocument.h"
 
 class QUGlyphInfoWidget : public QTextBrowser {
+    Q_OBJECT
+    
 public:
     explicit QUGlyphInfoWidget(QWidget *parent = nullptr);
 
@@ -20,10 +22,18 @@ public:
     
     FXGlyphID
     glyph() const;
+
+signals:
+    void
+    charLinkClicked(FXChar c);
     
 protected:
     void
     loadGlyph();
+
+protected slots:
+    void
+    onLinkClicked(const QUrl & link);
     
 protected:
     QUDocument *   document_;

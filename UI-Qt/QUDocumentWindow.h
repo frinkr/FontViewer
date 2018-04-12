@@ -69,6 +69,10 @@ private slots:
 
     void
     onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+
+    void
+    onCharLinkClicked(FXChar c);
+
     
 private:
     Ui::QUDocumentWindow * ui_;

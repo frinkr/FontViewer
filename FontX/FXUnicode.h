@@ -12,10 +12,12 @@ struct FXUCDBlock {
     }
 };
 
-struct FXUCDData {
-  FXChar     ch;
-  
+struct FXCharCategory {
+    int        type;      // UCharCategory
+    FXString   abbreviation;
+    FXString   fullName;
 };
+
 extern FXUCDBlock FXUCDInvalidBlock;
 
 class FXUCD {
@@ -29,13 +31,17 @@ protected:
     const FXUCDBlock &
     block(FXChar c) const;
 
+    const FXVector<FXCharCategory> &
+    categories() const;
+
     friend struct FXUnicode;
 protected:
     FXString
     file(const FXString & name) const;
 protected:
-    FXString                      root_;
-    mutable FXVector<FXUCDBlock>  blocks_;
+    FXString                          root_;
+    mutable FXVector<FXUCDBlock>      blocks_;
+    mutable FXVector<FXCharCategory>  categories_;
 };
 
 struct FXUnicode {
@@ -60,6 +66,22 @@ public:
 
     static bool
     defined(FXChar c);
+
+    static FXString
+    age(FXChar c);
+
+    static const FXCharCategory &
+    category(FXChar c);
+
+    static FXVector<FXChar>
+    decomposition(FXChar c, bool nfkd = false);
+
+    static FXVector<uint8_t>
+    utf8(FXChar c);
+
+    static FXVector<uint16_t>
+    utf16(FXChar c);
+    
 private:
     static FXPtr<FXUCD>    ucd_;
 };

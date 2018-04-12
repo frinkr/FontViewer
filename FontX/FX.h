@@ -40,3 +40,4 @@ struct FXCharRange {
 };
 
 using fu = short;  // font units
+

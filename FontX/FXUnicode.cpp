@@ -1,6 +1,8 @@
 #include <iostream>
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
+#include <unicode/unorm2.h>
+#include <unicode/unistr.h>
 #include "FXUnicode.h"
 #include "FXBoostPrivate.h"
 
@@ -117,6 +119,46 @@ FXUCD::block(FXChar c) const {
     return FXUCDInvalidBlock;
 }
 
+const FXVector<FXCharCategory> &
+FXUCD::categories() const {
+    if (categories_.empty()) {
+        categories_ = FXVector<FXCharCategory>({
+                {U_UPPERCASE_LETTER,       "Lu", "Letter, Uppercase"},
+                {U_LOWERCASE_LETTER,       "Ll", "Letter, Lowercase"},
+                {U_TITLECASE_LETTER,       "Lt", "Letter, Titlecase"},
+                {U_MODIFIER_LETTER,        "Lm", "Letter, Modifier"},
+                {U_OTHER_LETTER,           "Lo", "Letter, Other"},
+                {U_NON_SPACING_MARK,       "Mn", "Mark, Nonspacing"},
+                {U_COMBINING_SPACING_MARK, "Mc", "Mark, Spacing Combining"},
+                {U_ENCLOSING_MARK,         "Me", "Mark, Enclosing"},
+                {U_DECIMAL_DIGIT_NUMBER,   "Nd", "Number, Decimal Digit"},
+                {U_LETTER_NUMBER,          "Nl", "Number, Letter"},
+                {U_OTHER_NUMBER,           "No", "Number, Other"},
+                {U_CONNECTOR_PUNCTUATION,  "Pc", "Punctuation, Connector"},
+                {U_DASH_PUNCTUATION,       "Pd", "Punctuation, Dash"},
+                {U_START_PUNCTUATION,      "Ps", "Punctuation, Open"},
+                {U_END_PUNCTUATION,        "Pe", "Punctuation, Close"},
+                {U_INITIAL_PUNCTUATION,    "Pi", "Punctuation, Initial quote"},
+                {U_FINAL_PUNCTUATION,      "Pf", "Punctuation, Final quote"},
+                {U_OTHER_PUNCTUATION,      "Po", "Punctuation, Other"},
+                {U_MATH_SYMBOL,            "Sm", "Symbol, Math"},
+                {U_CURRENCY_SYMBOL,        "Sc", "Symbol, Currency"},
+                {U_MODIFIER_SYMBOL,        "Sk", "Symbol, Modifier"},
+                {U_OTHER_SYMBOL,           "So", "Symbol, Other"},
+                {U_SPACE_SEPARATOR,        "Zs", "Separator, Space"},
+                {U_LINE_SEPARATOR,         "Zl", "Separator, Line"},
+                {U_PARAGRAPH_SEPARATOR,    "Zp", "Separator, Paragraph"},
+                {U_CONTROL_CHAR,           "Cc", "Other, Control"},
+                {U_FORMAT_CHAR,            "Cf", "Other, Format"},
+                {U_SURROGATE,              "Cs", "Other, Surrogate"},
+                {U_PRIVATE_USE_CHAR,       "Co", "Other, Private Use"},
+                {U_UNASSIGNED,             "Cn", "Other, Not Assigned"},
+                    });
+    }
+
+    return categories_;
+}
+
 FXString
 FXUCD::file(const FXString & name) const {
     return BFS::pathJoin({root_, name});
@@ -170,3 +212,71 @@ bool
 FXUnicode::defined(FXChar c) {
     return u_isdefined(c);
 }
+
+FXString
+FXUnicode::age(FXChar c) {
+    UVersionInfo version;
+    u_charAge(c, version);
+
+    const UVersionInfo v1_0_0 = {1, 0, 0, 0};
+    const UVersionInfo v1_0_1 = {1, 0, 1, 0};
+
+    if (!memcmp(version, v1_0_0, sizeof(UVersionInfo)))
+        return "1.0.0";
+    if (!memcmp(version, v1_0_1, sizeof(UVersionInfo)))
+        return "1.0.1";
+
+    return std::to_string(version[0]) + "." + std::to_string(version[1]);
+}
+
+const FXCharCategory &
+FXUnicode::category(FXChar c) {
+    const auto & cats = ucd()->categories();
+    int t = u_charType(c);
+    for (const auto & cat : cats) {
+        if (cat.type == t)
+            return cat;
+    }
+    static FXCharCategory dummy;
+    return dummy;
+}
+
+FXVector<FXChar>
+FXUnicode::decomposition(FXChar c, bool nfkd) {
+    UErrorCode error = U_ZERO_ERROR;
+    const UNormalizer2 * nfdNormalizer = unorm2_getNFDInstance(&error);
+    const UNormalizer2 * nfkdNormalizer = unorm2_getNFKDInstance(&error);
+
+    UChar components[16] = {0};
+    int32_t len = unorm2_getDecomposition(
+        nfkd? nfkdNormalizer: nfdNormalizer,
+        c,
+        components,
+        sizeof(components),
+        &error);
+    
+    FXVector<FXChar> d;
+    if (len > 0) {
+        for (int32_t i = 0; i < len; ++ i)
+            d.push_back(components[i]);
+    }
+
+    return d;
+}
+
+FXVector<uint8_t>
+FXUnicode::utf8(FXChar c) {
+    icu::UnicodeString u((UChar32)c);
+    std::string str;
+    u.toUTF8String(str);
+    const uint8_t * buf = (const uint8_t*) &str[0];
+    return FXVector<uint8_t>(buf, buf + str.size());
+}
+
+FXVector<uint16_t>
+FXUnicode::utf16(FXChar c) {
+    icu::UnicodeString u((UChar32)c);
+    const uint16_t * buf = (const uint16_t *)u.getBuffer();
+    return FXVector<uint16_t>(buf, buf + u.length());
+}
+    

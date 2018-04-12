@@ -6,6 +6,7 @@
 #include <QImage>
 #include <QTextDocument>
 #include <QFile>
+#include <QDebug>
 #include <QTextStream>
 
 namespace {
@@ -24,7 +25,7 @@ namespace {
         map["CHAR"] = QUEncoding::charHexNotation(glyph.character, true);
         map["ID"] = glyph.id;
 
-        // metrics
+        // Metrics
         map["WIDTH"] = glyph.metrics.width;
         map["HEIGHT"] = glyph.metrics.height;
         map["HORI_ADVANCE"] = glyph.metrics.horiAdvance;
@@ -34,11 +35,35 @@ namespace {
         map["VERT_BEARING_X"] = glyph.metrics.vertBearingX;
         map["VERT_BEARING_Y"] = glyph.metrics.vertBearingY;
 
-        // unicode
-        map["UNICODE_NAME"] = toQString(FXUnicode::name(glyph.character));
-        map["UNICODE_BLOCK"] = toQString(FXUnicode::block(glyph.character).name);
-        map["UNICODE_SCRIPT"] = toQString(FXUnicode::script(glyph.character));
+        // Unicode
+        FXChar c = glyph.character;
+        bool isDefined = FXUnicode::defined(c);
+        map["UNICODE_NAME"] = isDefined? toQString(FXUnicode::name(c)): QString();
+        map["UNICODE_BLOCK"] = isDefined? toQString(FXUnicode::block(c).name): QString();
+        map["UNICODE_SCRIPT"] = isDefined? toQString(FXUnicode::script(c)) : QString();
+        map["UNICODE_AGE"] = isDefined? toQString(FXUnicode::age(c)) : QString();
+        map["UNICODE_GENERAL_CATEGORY"] = toQString(FXUnicode::category(c).fullName);
+
+        QStringList decompositionLinks;
+        for (FXChar d : FXUnicode::decomposition(c)) {
+            decompositionLinks << QString("<a href=\"%1\">%2</a>")
+                .arg(QUEncoding::charHexLink(d).toDisplayString())
+                .arg(QUEncoding::charHexNotation(d));
+        }
         
+        map["UNICODE_DECOMPOSITION"] = decompositionLinks.join(", ");
+
+        // Encoding
+        QStringList utf8;
+        for (auto b : FXUnicode::utf8(c))
+            utf8 << QString("%1").arg(b, 2, 16, QChar('0')).toUpper();
+        
+        QStringList utf16;
+        for (auto s : FXUnicode::utf16(c))
+            utf16 << QString("%1").arg(s, 4, 16, QChar('0')).toUpper();
+
+        map["UTF8"] = utf8.join(" ");
+        map["UTF16"] = utf16.join(" ");
         return instantializeTemplate(temp, map);
     };
 }
@@ -47,7 +72,12 @@ QUGlyphInfoWidget::QUGlyphInfoWidget(QWidget *parent)
     : QTextBrowser(parent)
     , document_(nullptr)
     , gid_(0)
-    , char_(0) {}
+    , char_(0) {
+
+    connect(this, &QTextBrowser::anchorClicked,
+            this, &QUGlyphInfoWidget::onLinkClicked);
+    setOpenLinks(false);
+}
 
 QUDocument *
 QUGlyphInfoWidget::document() const {
@@ -96,3 +126,9 @@ QUGlyphInfoWidget::loadGlyph() {
     setHtml(instTemplate(loadTemplate(), glyph));
 }
     
+void
+QUGlyphInfoWidget::onLinkClicked(const QUrl & link) {
+    FXChar c = QUEncoding::charFromLink(link);
+    if (c != FXCharInvalid)
+        emit charLinkClicked(c);
+}
