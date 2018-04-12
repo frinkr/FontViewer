@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FX.h"
+class FXFace;
 
 class FXCharBlock {
 public:
@@ -100,7 +101,7 @@ private:
 
 class FXCMap {
 public:
-    FXCMap(uint16_t platformID, uint16_t encodingID);
+    FXCMap(FXFTFace face, uint16_t platformID, uint16_t encodingID);
 
     uint16_t
     platformID() const;
@@ -123,11 +124,19 @@ public:
     const std::vector<FXPtr<FXCharBlock> > &
     blocks() const;
 
+    const FXVector<FXChar> &
+    charsForGlyph(FXGlyphID gid) const;
+    
 private:
     void
     initBlocks();
+
+    void
+    initGlyphsMap();
     
 private:
+    FXFTFace       face_;
     uint16_t       platformID_;
     uint16_t       encodingID_;
+    FXPtr<std::map<FXGlyphID, FXVector<FXChar> > > glyphsMap_;
 };

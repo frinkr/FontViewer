@@ -114,9 +114,11 @@ FXCMapPlatform::getUnicodeBlocks() {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //            FXCMAP
-FXCMap::FXCMap(uint16_t platformID, uint16_t encodingID)
-    : platformID_(platformID)
+FXCMap::FXCMap(FXFTFace face, uint16_t platformID, uint16_t encodingID)
+    : face_(face)
+    , platformID_(platformID)
     , encodingID_(encodingID) {
+    initGlyphsMap();
 }
 
 uint16_t
@@ -155,3 +157,21 @@ const std::vector<FXPtr<FXCharBlock> > &
 FXCMap::blocks() const {
     return FXCMapPlatform::get(platformID_).blocks(encodingID_);
 }
+
+const FXVector<FXChar> &
+FXCMap::charsForGlyph(FXGlyphID gid) const {
+    return (*glyphsMap_)[gid];
+}
+
+void
+FXCMap::initGlyphsMap() {
+    glyphsMap_.reset(new std::map<FXGlyphID, FXVector<FXChar>>);
+    
+    FT_UInt gid = 0;
+    FT_ULong ch = FT_Get_First_Char(face_, &gid);
+    while (gid != 0) {
+        (*glyphsMap_)[gid].push_back(ch);
+        ch = FT_Get_Next_Char(face_, ch, &gid);
+    }
+}
+    

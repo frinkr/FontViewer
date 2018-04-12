@@ -28,7 +28,7 @@ pt2px(double p, double dpi = FXDefaultDPI);
 double
 px2pt(double p, double dpi = FXDefaultDPI);
     
-class FXFace {
+class FXFace : public std::enable_shared_from_this<FXFace> {
 public:
     static FXPtr<FXFace>
     createFace(const FXFaceDescriptor & descriptor);
@@ -59,7 +59,7 @@ public:
     const std::vector<FXCMap> &
     cmaps() const;
 
-    FXCMap
+    const FXCMap &
     currentCMap() const;
 
     size_t
@@ -75,6 +75,12 @@ public:
     FXGlyph
     glyph(FXChar c, bool isGID = false);
 
+    /**
+     * return the chars which maps to the gid in current cmap
+     */
+    const FXVector<FXChar> &
+    charsForGlyph(FXGlyphID gid) const;
+    
 private:
     FXFace(const FXFaceDescriptor & descriptor);
     

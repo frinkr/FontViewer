@@ -11,6 +11,8 @@
 template <typename T>
 using FXPtr = std::shared_ptr<T>;
 template <typename T>
+using FXWeakPtr = std::weak_ptr<T>;
+template <typename T>
 using FXVector = std::vector<T>;
 using FXString = std::string;
 

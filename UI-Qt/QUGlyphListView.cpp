@@ -176,6 +176,14 @@ QUGlyphListModel::setGlyphLabel(QUGlyphLabel label) {
     endResetModel();
 }
 
+FXChar
+QUGlyphListModel::charAt(const QModelIndex & index) const {
+    if (charMode())
+        return currentBlock()->get(index.row());
+    else
+        return index.row();
+}
+
 QUGlyphListView::QUGlyphListView(QWidget * parent)
     : QListView(parent){
     setLayoutMode(QListView::Batched);

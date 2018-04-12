@@ -152,7 +152,7 @@ void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
-        FXChar c = document_->model()->currentBlock()->get(index.row());
+        FXChar c = document_->model()->charAt(index);
         if (document_->model()->charMode())
             ui_->textBrowser->setChar(c);
         else

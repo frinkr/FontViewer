@@ -69,7 +69,7 @@ FXFace::cmaps() const {
     return cmaps_;
 }
 
-FXCMap
+const FXCMap &
 FXFace::currentCMap() const {
     return cmaps()[currentCMapIndex()];
 }
@@ -85,7 +85,7 @@ FXFace::currentCMapIndex() const {
 
 bool
 FXFace::selectCMap(size_t cmapIndex) {
-    if (cmapIndex >= cmaps_.size())
+    if (cmapIndex >= face_->num_charmaps)
         return false;
     return !FT_Set_Charmap(face_, face_->charmaps[cmapIndex]);
 }
@@ -97,9 +97,16 @@ FXFace::selectCMap(size_t cmapIndex) {
 FXGlyph
 FXFace::glyph(FXChar c, bool isGID) {
     FXGlyphID id = c;
-    if (!isGID)
+    if (isGID) {
+        const auto & chs = charsForGlyph(id);
+        if (chs.size())
+            c = chs[0];
+        else
+            c = FXCharInvalid;
+    }
+    else {
         id = FT_Get_Char_Index(face_, c);
-    
+    }
     FXGlyph glyph;
     glyph.id = id;
     glyph.character = c;
@@ -132,7 +139,12 @@ FXFace::glyph(FXChar c, bool isGID) {
     }
     return glyph;
 }
-    
+
+const FXVector<FXChar> &
+FXFace::charsForGlyph(FXGlyphID gid) const {
+    return currentCMap().charsForGlyph(gid);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                     PRIVATE IMPL
 //
@@ -163,11 +175,15 @@ FXFace::initAttributes() {
 
 bool
 FXFace::initCMap() {
+    size_t current = currentCMapIndex();
     for (FT_Int i = 0; i < face_->num_charmaps; ++ i)  {
+        selectCMap(i);
         const FT_CharMap & cm = face_->charmaps[i];
-        FXCMap fxcm(cm->platform_id, cm->encoding_id);
+        FXCMap fxcm(face_, cm->platform_id, cm->encoding_id);
         cmaps_.push_back(fxcm);
     }
+    
+    selectCMap(current);
     
     return true;
 }

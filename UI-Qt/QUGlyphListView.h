@@ -58,6 +58,9 @@ public:
 
     void 
     setGlyphLabel(QUGlyphLabel label);
+
+    FXChar
+    charAt(const QModelIndex & index) const;
 public:
     int
     rowCount(const QModelIndex &) const;
