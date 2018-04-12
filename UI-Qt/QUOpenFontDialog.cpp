@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include "QUFontManager.h"
 #include "QUOpenFontDialog.h"
 #include "ui_QUOpenFontDialog.h"
 
@@ -11,6 +12,8 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
             this, &QUOpenFontDialog::slotBrowseFile);
         
     ui_->textEdit->setText(FX_RESOURCES_DIR "/Fonts/MyriadPro-Regular.otf");
+
+    QUFontManager::get();
 }
 
 QUOpenFontDialog::~QUOpenFontDialog() {

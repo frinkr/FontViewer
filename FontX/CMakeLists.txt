@@ -7,6 +7,7 @@ if (APPLE)
 endif()
 
 find_package(Freetype REQUIRED)
+find_package(sqlite3 REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem regex)
 
 if (WIN32)
@@ -30,6 +31,8 @@ add_library(FontX
   FXGlyph.cpp
   FXBitmap.h
   FXBitmap.cpp
+  FXFaceDatabase.h
+  FXFaceDatabase.cpp
   
   FXPrivate.h
   FXPrivate.cpp
@@ -48,6 +51,7 @@ target_include_directories(FontX PUBLIC
 
 target_link_libraries(FontX
   ${Boost_LIBRARIES}
+  sqlite3
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
