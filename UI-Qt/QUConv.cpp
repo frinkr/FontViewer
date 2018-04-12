@@ -1,6 +1,7 @@
 #include <QPainter>
 #include "QUConv.h"
 #include "FontX/FXFace.h"
+#include "FontX/FXUnicode.h"
 
 QString
 toQString(const std::string & str) {
@@ -61,23 +62,28 @@ placeImage(const QImage & image, const QSize & emSize) {
 
 QImage
 charImage(FXChar c, const QSize & emSize) {
-    QRect emRect(0, 0, emSize.width(), emSize.height());
-    QImage out(emSize, QImage::Format_ARGB32);
-    QPainter p(&out);
-    QPen pen;
-    pen.setWidth(2);
-    pen.setColor(Qt::red);
-    p.setPen(pen);
-    p.fillRect(emRect, Qt::gray);
-    p.drawRect(emRect);
+    if (FXUnicode::defined(c)) {
+        QRect emRect(0, 0, emSize.width(), emSize.height());
+        QImage out(emSize, QImage::Format_ARGB32);
+        QPainter p(&out);
+        QPen pen;
+        pen.setWidth(2);
+        pen.setColor(Qt::red);
+        p.setPen(pen);
+        p.fillRect(emRect, Qt::gray);
+        p.drawRect(emRect);
 
-    QFont f = p.font();
-    f.setPointSize(100);
-    p.setFont(f);
-    uint u = c;
-    QString text = QString::fromUcs4(&u, 1);
-    p.drawText(emRect, Qt::AlignCenter, text);
+        QFont f = p.font();
+        f.setPointSize(100);
+        p.setFont(f);
+        uint u = c;
+        QString text = QString::fromUcs4(&u, 1);
+        p.drawText(emRect, Qt::AlignCenter, text);
 
-    out.setDevicePixelRatio(2);
-    return out;
+        out.setDevicePixelRatio(2);
+        return out;
+    }
+    else {
+        return QImage(":images/undefined.png");
+    }
 }

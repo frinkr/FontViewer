@@ -24,8 +24,8 @@ namespace {
         map["CHAR"] = QUEncoding::charHexNotation(glyph.character, true);
         map["ID"] = glyph.id;
 
-	// metrics
-	map["WIDTH"] = glyph.metrics.width;
+        // metrics
+        map["WIDTH"] = glyph.metrics.width;
         map["HEIGHT"] = glyph.metrics.height;
         map["HORI_ADVANCE"] = glyph.metrics.horiAdvance;
         map["HORI_BEARING_X"] = glyph.metrics.horiBearingX;
@@ -34,10 +34,11 @@ namespace {
         map["VERT_BEARING_X"] = glyph.metrics.vertBearingX;
         map["VERT_BEARING_Y"] = glyph.metrics.vertBearingY;
 
-	// unicode
-	map["UNICODE_NAME"] = toQString(FXUnicode::name(glyph.character));
-	map["UNICODE_BLOCK"] = toQString(FXUnicode::block(glyph.character).name);
-	map["UNICODE_SCRIPT"] = toQString(FXUnicode::script(glyph.character));
+        // unicode
+        map["UNICODE_NAME"] = toQString(FXUnicode::name(glyph.character));
+        map["UNICODE_BLOCK"] = toQString(FXUnicode::block(glyph.character).name);
+        map["UNICODE_SCRIPT"] = toQString(FXUnicode::script(glyph.character));
+        
         return instantializeTemplate(temp, map);
     };
 }

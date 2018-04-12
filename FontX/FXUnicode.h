@@ -58,6 +58,8 @@ public:
     static FXString
     script(FXChar c);
 
+    static bool
+    defined(FXChar c);
 private:
     static FXPtr<FXUCD>    ucd_;
 };

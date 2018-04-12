@@ -1,15 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
-<qresource>
-    <file>images/copy.png</file>
-    <file>images/cut.png</file>
-    <file>images/new.png</file>
-    <file>images/open.png</file>
-    <file>images/paste.png</file>
-    <file>images/save.png</file>
-    <file>images/app.png</file>    
-    <file>images/glyph.png</file>
-    <file>images/search.png</file>
-    <file>images/shape.png</file>
-    <file>images/table.png</file>
+  <qresource>
+    <file alias="images/app.png">../Resources/Images/app.png</file>
+    <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
+    <file alias="images/search.png">../Resources/Images/search.png</file>
+    <file alias="images/shape.png">../Resources/Images/shape.png</file>
+    <file alias="images/table.png">../Resources/Images/table.png</file>
+    <file alias="images/undefined.png">../Resources/Images/undefined.png</file>
 </qresource>
 </RCC>

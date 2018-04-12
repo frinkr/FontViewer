@@ -166,3 +166,7 @@ FXUnicode::script(FXChar c) {
     return FXString();
 }
 
+bool
+FXUnicode::defined(FXChar c) {
+    return u_isdefined(c);
+}
