@@ -1,3 +1,4 @@
+#include <boost/foreach.hpp>
 #include "FXBoostPrivate.h"
 
 namespace BFS {
@@ -31,4 +32,29 @@ namespace BFS {
         return path;
     }
 
+    bool
+    foreachFile(const FXString & directory,
+                bool recursive,
+                std::function<bool(const FXString &)> handler) {
+        if (directory.empty())
+            return true;
+        try {
+            fs::path dir(directory, UTF8Cvt); 
+            fs::directory_iterator it(dir), eod;
+            BOOST_FOREACH(fs::path const & p, std::make_pair(it, eod)) {
+                if (recursive && fs::is_directory(p)) {
+                    if (foreachFile(p.string(UTF8Cvt), recursive, handler))
+                        continue;
+                    else
+                        return false;
+                }
+                if (!handler(p.string(UTF8Cvt)))
+                    return false;
+            }
+        }
+        catch(...) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -7,11 +7,11 @@ if (APPLE)
 endif()
 
 find_package(Freetype REQUIRED)
-find_package(sqlite3 REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem regex)
+find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
+  find_package(sqlite3 REQUIRED)
 else()
   pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
   pkg_check_modules(ICU REQUIRED icu-uc)

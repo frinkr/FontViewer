@@ -7,6 +7,7 @@
 
 #include <map>
 #include <vector>
+#include <set>
 
 template <typename T>
 using FXPtr = std::shared_ptr<T>;
@@ -14,6 +15,8 @@ template <typename T>
 using FXWeakPtr = std::weak_ptr<T>;
 template <typename T>
 using FXVector = std::vector<T>;
+template <typename T>
+using FXSet = std::set<T>;
 using FXString = std::string;
 
 struct FT_LibraryRec_;

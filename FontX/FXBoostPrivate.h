@@ -24,6 +24,12 @@ namespace BFS {
 
     FXString &
     pathConcat(FXString & path, std::initializer_list<FXString> list);
+
+    bool
+    foreachFile(const FXString & directory,
+                bool recursive,
+                std::function<bool(const FXString &)> handler);
+    
 }
 
 
