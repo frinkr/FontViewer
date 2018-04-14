@@ -6,7 +6,6 @@
 struct FXFaceDescriptor {
     FXString  filePath;
     size_t    index;
-    bool operator<(const FXFaceDescriptor & other) const;
 };
 
 struct FXFaceAttributes {

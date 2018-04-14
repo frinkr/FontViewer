@@ -44,6 +44,8 @@ set(SHARED_SOURCES
   QUTemplateInstantializer.cpp
   QUFontManager.h
   QUFontManager.cpp
+  QUFontComboBox.h
+  QUFontComboBox.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

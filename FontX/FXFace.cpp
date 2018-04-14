@@ -7,11 +7,6 @@ pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
 }
 
-bool FXFaceDescriptor::operator<(const FXFaceDescriptor & other) const {
-    return (filePath < other.filePath) &&
-        (index < other.index);
-}
-
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
     return FXPtr<FXFace>(new FXFace(descriptor));

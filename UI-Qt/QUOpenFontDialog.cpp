@@ -22,8 +22,7 @@ QUOpenFontDialog::~QUOpenFontDialog() {
 
 QUFontURI
 QUOpenFontDialog::selectedFont() {
-    QUFontURI uri{ui_->textEdit->toPlainText(), 0};
-    return uri;
+    return ui_->fontComboBox->selectedFont();
 }
 
 void

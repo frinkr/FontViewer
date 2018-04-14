@@ -9,6 +9,11 @@ QUFontManager::get() {
     return inst;
 }
 
+FXPtr<FXFaceDatabase>
+QUFontManager::db() const {
+    return db_;
+}
+
 QUFontManager::QUFontManager() {
     directories_ = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
 

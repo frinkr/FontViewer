@@ -19,19 +19,21 @@ FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXStrin
     rescan();
 }
 
-const FXVector<FXFaceDescriptor> &
-FXFaceDatabase::faces() const {
-    return faces_;
+size_t
+FXFaceDatabase::faceCount() const {
+    return faces_.size();
+}
+
+const FXFaceDescriptor &
+FXFaceDatabase::faceDescriptor(size_t index) {
+    return faces_[index];
 }
 
 const FXFaceAttributes &
-FXFaceDatabase::faceAttributes(const FXFaceDescriptor & descriptor) const {
-    auto itr = map_.find(descriptor);
-    if (itr != map_.end())
-        return itr->second;
-    return emptyAttributes;
+FXFaceDatabase::faceAttributes(size_t index) const {
+    return attrs_[index];
 }
-    
+
 FXPtr<FXFace>
 FXFaceDatabase::createFace(const FXFaceDescriptor & descriptor) const {
     return FXFace::createFace(descriptor);
@@ -44,8 +46,7 @@ FXFaceDatabase::rescan() {
     boost::archive::text_oarchive ar(ofs);
 
     faces_.clear();
-    map_.clear();
-    
+    attrs_.clear();
     int count = 0;
     for(const auto & folder : folders_) {
         BFS::foreachFile(folder, true, [this, &ar, &count](const FXString & file) {
@@ -62,6 +63,6 @@ FXFaceDatabase::rescan() {
 
     for (const auto & desc : faces_) {
         FXPtr<FXFace> face = FXFace::createFace(desc);
-        map_[desc] = face->attributes();
-    }    
+        attrs_.push_back(face->attributes());
+    }
 }

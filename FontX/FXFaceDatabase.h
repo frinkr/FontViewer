@@ -4,12 +4,15 @@
 class FXFaceDatabase {
 public:
     explicit FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath);
-    
-    const FXVector<FXFaceDescriptor> &
-    faces() const;
+
+    size_t
+    faceCount() const;
+
+    const FXFaceDescriptor &
+    faceDescriptor(size_t index);
 
     const FXFaceAttributes &
-    faceAttributes(const FXFaceDescriptor & descriptor) const;
+    faceAttributes(size_t index) const;
     
     FXPtr<FXFace>
     createFace(const FXFaceDescriptor & descriptor) const;
@@ -21,5 +24,5 @@ protected:
     FXVector<FXString> folders_;
     FXString           dbPath_;
     FXVector<FXFaceDescriptor>  faces_;
-    FXMap<FXFaceDescriptor, FXFaceAttributes> map_;
+    FXVector<FXFaceAttributes>  attrs_;
 };
