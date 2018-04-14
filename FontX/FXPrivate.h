@@ -2,7 +2,7 @@
 #include "FX.h"
 
 /* include headers of FreeType */
-
+#include <functional>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_CID_H

@@ -4,7 +4,8 @@
 #include "FXNamesPrivate.h"
 
 namespace {
-    
+    constexpr FXChar UNDEFINED_CHAR_MARK = FXCharInvalid;
+    constexpr FXChar EXTRA_CHARS_MARK = UNDEFINED_CHAR_MARK + 1;
 }
 
 std::vector<FXCMapPlatform> FXCMapPlatform::platforms_;
@@ -158,19 +159,39 @@ FXCMap::blocks() const {
     return FXCMapPlatform::get(platformID_).blocks(encodingID_);
 }
 
-const FXVector<FXChar> &
+FXVector<FXChar>
 FXCMap::charsForGlyph(FXGlyphID gid) const {
-    return (*glyphsMap_)[gid];
+    FXVector<FXChar> ret;
+
+    FXChar c = glyphMap_[gid];
+    if (c == UNDEFINED_CHAR_MARK)
+        return ret;
+    else if (c == EXTRA_CHARS_MARK) {
+        auto itr = extraGlyphsMap_.find(gid);
+        if (itr != extraGlyphsMap_.end())
+            return itr->second;
+        else
+            return ret;
+    }
+    else {
+        ret.push_back(c);
+        return ret;
+    }
 }
 
 void
 FXCMap::initGlyphsMap() {
-    glyphsMap_.reset(new std::map<FXGlyphID, FXVector<FXChar>>);
-    
+    glyphMap_ = FXVector<FXChar>(face_->num_glyphs, UNDEFINED_CHAR_MARK);
     FT_UInt gid = 0;
     FT_ULong ch = FT_Get_First_Char(face_, &gid);
     while (gid != 0) {
-        (*glyphsMap_)[gid].push_back(ch);
+        FXChar c = glyphMap_[gid];
+        if (c == UNDEFINED_CHAR_MARK)
+            glyphMap_[gid] = ch;
+        else {
+            glyphMap_[gid] = EXTRA_CHARS_MARK;
+            extraGlyphsMap_[gid].push_back(ch);
+        }
         ch = FT_Get_Next_Char(face_, ch, &gid);
     }
 }

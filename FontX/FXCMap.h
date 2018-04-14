@@ -1,5 +1,5 @@
 #pragma once
-
+#include <unordered_map>
 #include "FX.h"
 class FXFace;
 
@@ -124,7 +124,7 @@ public:
     const std::vector<FXPtr<FXCharBlock> > &
     blocks() const;
 
-    const FXVector<FXChar> &
+    FXVector<FXChar> 
     charsForGlyph(FXGlyphID gid) const;
     
 private:
@@ -138,5 +138,6 @@ private:
     FXFTFace       face_;
     uint16_t       platformID_;
     uint16_t       encodingID_;
-    FXPtr<std::map<FXGlyphID, FXVector<FXChar> > > glyphsMap_;
+    FXVector<FXChar> glyphMap_;
+    FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
 };

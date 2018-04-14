@@ -4,15 +4,16 @@
 #include "FXGlyph.h"
 
 struct FXFaceDescriptor {
-    std::string  filePath;
-    size_t       faceIndex;
+    FXString  filePath;
+    size_t    index;
+    bool operator<(const FXFaceDescriptor & other) const;
 };
 
 struct FXFaceAttributes {
-    size_t      index;
+    size_t      index { 0 };
     std::string postscriptName;
-    size_t      upem;
-    size_t      glyphCount;
+    size_t      upem { 0 };
+    size_t      glyphCount { 0 };
     
     std::map<std::string, std::string> familyNames;
     std::map<std::string, std::string> styleNames;
@@ -34,8 +35,10 @@ public:
     createFace(const FXFaceDescriptor & descriptor);
     
     static FXPtr<FXFace>
-    createFace(const std::string & filePath, size_t faceIndex);
-    
+    createFace(const std::string & filePath, size_t index);
+
+    static FXPtr<FXFace>
+    createFace(FXFTFace face);
 public:
     FXFTFace
     face() const;
@@ -78,15 +81,18 @@ public:
     /**
      * return the chars which maps to the gid in current cmap
      */
-    const FXVector<FXChar> &
+    FXVector<FXChar>
     charsForGlyph(FXGlyphID gid) const;
     
 private:
-    FXFace(const FXFaceDescriptor & descriptor);
-    
+    explicit FXFace(const FXFaceDescriptor & descriptor);
+    explicit FXFace(FXFTFace face);
     FXFace(const FXFace &) = delete;
     FXFace & operator=(const FXFace & ) = delete;
-
+public:    
+    ~FXFace();
+    
+private:
     bool
     init();
 

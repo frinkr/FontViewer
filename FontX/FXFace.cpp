@@ -7,6 +7,11 @@ pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
 }
 
+bool FXFaceDescriptor::operator<(const FXFaceDescriptor & other) const {
+    return (filePath < other.filePath) &&
+        (index < other.index);
+}
+
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
     return FXPtr<FXFace>(new FXFace(descriptor));
@@ -18,10 +23,28 @@ FXFace::createFace(const std::string & filePath, size_t faceIndex) {
     return FXFace::createFace(descritptor);
 }
 
+FXPtr<FXFace>
+FXFace::createFace(FXFTFace face) {
+    return FXPtr<FXFace>(new FXFace(face));
+}
+
 FXFace::FXFace(const FXFaceDescriptor & descriptor)
 : desc_(descriptor)
 , face_(nullptr) {
+    if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), FT_Long(desc_.index), &face_))
+        return;
     init();
+}
+
+FXFace::FXFace(FXFTFace face)
+    : face_(face) {
+    FT_Reference_Face(face_);
+    init();
+}
+
+FXFace::~FXFace() {
+    if (face_)
+        FT_Done_Face(face_);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +121,7 @@ FXGlyph
 FXFace::glyph(FXChar c, bool isGID) {
     FXGlyphID id = c;
     if (isGID) {
-        const auto & chs = charsForGlyph(id);
+        const auto chs = charsForGlyph(id);
         if (chs.size())
             c = chs[0];
         else
@@ -140,7 +163,7 @@ FXFace::glyph(FXChar c, bool isGID) {
     return glyph;
 }
 
-const FXVector<FXChar> &
+FXVector<FXChar>
 FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);
 }
@@ -150,9 +173,6 @@ FXFace::charsForGlyph(FXGlyphID gid) const {
 //
 bool
 FXFace::init() {
-    if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), FT_Long(desc_.faceIndex), &face_))
-        return false;
-
     FT_Set_Char_Size(face_, 
         FT_UInt(FXDefaultFontSize * 64), 
         FT_UInt(FXDefaultFontSize * 64),
@@ -163,7 +183,7 @@ FXFace::init() {
 
 bool
 FXFace::initAttributes() {
-    atts_.index = desc_.faceIndex;
+    atts_.index = desc_.index;
 
     const char * psName = FT_Get_Postscript_Name(face_);
     if (psName) atts_.postscriptName = psName;

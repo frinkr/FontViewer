@@ -17,6 +17,9 @@ template <typename T>
 using FXVector = std::vector<T>;
 template <typename T>
 using FXSet = std::set<T>;
+template <typename K, typename V>
+using FXMap = std::map<K, V>;
+
 using FXString = std::string;
 
 struct FT_LibraryRec_;
