@@ -1,6 +1,6 @@
 #include "FXUnicode.h"
 #include "FXLib.h"
-#include "FXPrivate.h"
+#include "FXFTPrivate.h"
 
 FXPtr<FXLib> FXLib::lib_;
 

@@ -1,6 +1,7 @@
 #include "FXFace.h"
 #include "FXLib.h"
-#include "FXPrivate.h"
+#include "FXFTNames.h"
+#include "FXFTPrivate.h"
 
 double
 pt2px(double p, double dpi) {
@@ -185,6 +186,13 @@ FXFace::initAttributes() {
 
     atts_.upem = face_->units_per_EM;       
     atts_.glyphCount = face_->num_glyphs;
+
+    FT_UInt sfntCount = FT_Get_Sfnt_Name_Count(face_);
+    for (FT_UInt i = 0; i < sfntCount; ++i) {
+        FT_SfntName sfnt;
+        if (FT_Get_Sfnt_Name(face_, i, &sfnt))
+            continue;
+    }
     return true;
 }
 

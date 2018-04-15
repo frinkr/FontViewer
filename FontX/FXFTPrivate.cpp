@@ -1,4 +1,4 @@
-#include "FXPrivate.h"
+#include "FXFTPrivate.h"
 
 FT_Error FXFilePathToOpenArgs(const FXString & filePath, FT_Open_Args * args) {
     memset(args, 0, sizeof(FT_Open_Args));

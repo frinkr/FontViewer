@@ -1,7 +1,7 @@
 #include "FXCMap.h"
 #include "FXUnicode.h"
-#include "FXPrivate.h"
-#include "FXNamesPrivate.h"
+#include "FXFTPrivate.h"
+#include "FXFTNames.h"
 
 namespace {
     constexpr FXChar UNDEFINED_CHAR_MARK = FXCharInvalid;
@@ -134,17 +134,17 @@ FXCMap::encodingID() const {
 
 std::string
 FXCMap::platformName() const {
-    return FTGetPlatformName(platformID_);
+    return FXPlatformName(platformID_);
 }
     
 std::string
 FXCMap::encodingName() const {
-    return FTGetEncodingName(platformID_, encodingID_);
+    return FXEncodingName(platformID_, encodingID_);
 }
 
 std::string
 FXCMap::description() const {
-    return FTGetPlatformName(platformID_) + " - " + FTGetEncodingName(platformID_, encodingID_);
+    return FXPlatformName(platformID_) + " - " + FXEncodingName(platformID_, encodingID_);
 }
 
 bool

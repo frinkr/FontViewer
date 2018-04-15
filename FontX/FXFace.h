@@ -8,15 +8,23 @@ struct FXFaceDescriptor {
     size_t    index;
 };
 
+struct FXSFNTEntry {
+    uint16_t     platformId;
+    uint16_t     encodingId;
+    uint16_t     languageId;
+    uint16_t     nameId;
+    FXString     value;
+};
+
 struct FXFaceAttributes {
     size_t      index { 0 };
-    std::string postscriptName;
+    FXString    postscriptName;
     size_t      upem { 0 };
     size_t      glyphCount { 0 };
-    
-    std::map<std::string, std::string> familyNames;
-    std::map<std::string, std::string> styleNames;
-    std::map<std::string, std::string> fullNames;
+    FXVector<FXSFNTEntry> names;
+
+    FXString
+    familyName() const;
 };
 
 constexpr double FXDefaultFontSize = 200;

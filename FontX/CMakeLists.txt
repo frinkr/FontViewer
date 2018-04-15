@@ -19,6 +19,7 @@ endif()
 
 add_library(FontX
   FX.h
+  FXFT.h
   FXLib.h
   FXLib.cpp
   FXFace.cpp
@@ -34,10 +35,11 @@ add_library(FontX
   FXFaceDatabase.h
   FXFaceDatabase.cpp
   
-  FXPrivate.h
-  FXPrivate.cpp
-  FXNamesPrivate.h
-  FXNamesPrivate.cpp
+  FXFTPrivate.h
+  FXFTPrivate.cpp
+  FXFTNames.h
+  FXFTNames.cpp
+  
   FXBoostPrivate.h
   FXBoostPrivate.cpp
   )

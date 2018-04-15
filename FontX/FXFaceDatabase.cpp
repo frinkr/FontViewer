@@ -7,7 +7,7 @@
 #include "FXLib.h"
 #include "FXFaceDatabase.h"
 #include "FXBoostPrivate.h"
-#include "FXPrivate.h"
+#include "FXFTPrivate.h"
 
 namespace {
     FXFaceAttributes emptyAttributes;
