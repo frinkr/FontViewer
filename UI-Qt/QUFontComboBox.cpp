@@ -19,7 +19,7 @@ QUFontListModel::data(const QModelIndex & index, int role) const {
     if (index.row() >= db()->faceCount())
         return QVariant();
     if (role == Qt::DisplayRole) 
-        return toQString(attributes(index.row()).postscriptName);
+        return displayName(index.row());
     else
         return QVariant();
     
@@ -28,6 +28,14 @@ QUFontListModel::data(const QModelIndex & index, int role) const {
 const FXFaceAttributes &
 QUFontListModel::attributes(size_t index) const {
     return db()->faceAttributes(index);
+}
+
+QString
+QUFontListModel::displayName(size_t index) const {
+    auto const & attrs = attributes(index);
+    return QString("%1 - %2")
+        .arg(toQString(attrs.names.familyName()),
+             toQString(attrs.names.styleName()));
 }
 
 FXPtr<FXFaceDatabase>
@@ -45,6 +53,8 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
 QUFontURI
 QUFontComboBox::selectedFont() const {
     auto desc = QUFontManager::get().db()->faceDescriptor(currentIndex());
+    auto atts = QUFontManager::get().db()->faceAttributes(currentIndex());
+    atts.names.familyName();
     QUFontURI uri{toQString(desc.filePath), desc.index};
     return uri;
 }

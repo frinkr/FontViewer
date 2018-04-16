@@ -2,10 +2,48 @@
 #include "FXLib.h"
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"
+#include "FXBoostPrivate.h"
 
 double
 pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
+}
+
+FXString
+FXSFNTNames::familyName() const {
+    return findName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
+                    {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"});
+}
+
+FXString
+FXSFNTNames::styleName() const {
+    return findName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
+                    {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"});
+}
+
+FXString
+FXSFNTNames::postscriptName() const {
+    return findName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
+                    {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"});
+}
+
+FXString
+FXSFNTNames::findName(const FXVector<int> & nameIds,
+                      const FXVector<FXString> & languages) const {
+    for (auto itr = cbegin(); itr != cend(); ++ itr) {
+        if (itr->value.empty())
+            continue;
+        for (int nameId : nameIds) {
+            if (itr->nameId == nameId) {
+                for (const FXString & lang: languages) {
+                    if (itr->language == lang)
+                        return itr->value;
+                }
+                return itr->value;
+            }
+        }
+    }
+    return FXString();
 }
 
 FXPtr<FXFace>
@@ -58,7 +96,7 @@ FXFace::index() const {
 
 std::string
 FXFace::postscriptName() const {
-    return atts_.postscriptName;
+    return atts_.names.postscriptName();
 }
 
 size_t
@@ -180,18 +218,24 @@ FXFace::init() {
 bool
 FXFace::initAttributes() {
     atts_.index = desc_.index;
-
-    const char * psName = FT_Get_Postscript_Name(face_);
-    if (psName) atts_.postscriptName = psName;
-
     atts_.upem = face_->units_per_EM;       
     atts_.glyphCount = face_->num_glyphs;
-
+    atts_.fileName = BFS::fileName(desc_.filePath);
+    
     FT_UInt sfntCount = FT_Get_Sfnt_Name_Count(face_);
     for (FT_UInt i = 0; i < sfntCount; ++i) {
         FT_SfntName sfnt;
         if (FT_Get_Sfnt_Name(face_, i, &sfnt))
             continue;
+
+        FXSFNTEntry entry;
+        entry.platformId = sfnt.platform_id;
+        entry.encodingId = sfnt.encoding_id;
+        entry.language   = FXGetLanguageName(sfnt.platform_id, sfnt.language_id);
+        entry.nameId     = sfnt.name_id;
+        entry.value      = FXToString(sfnt.platform_id, sfnt.encoding_id, sfnt.string, sfnt.string_len);
+
+        atts_.names.push_back(entry);
     }
     return true;
 }

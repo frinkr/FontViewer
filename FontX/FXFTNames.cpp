@@ -420,7 +420,7 @@ static const FtLanguage   ftLanguages[] = {
 #define NUM_FT_LANGUAGES  (int) (sizeof (ftLanguages) / sizeof (ftLanguages[0]))
 
 std::string
-FXPlatformName(FT_UShort platformId) {
+FXGetPlatformName(FT_UShort platformId) {
     switch (platformId) {
         case TT_PLATFORM_APPLE_UNICODE: return  "Unicode";
         case TT_PLATFORM_MACINTOSH: return "Macintosh";
@@ -432,7 +432,7 @@ FXPlatformName(FT_UShort platformId) {
 }
 
 std::string
-FXEncodingName(FT_UShort platformId, FT_UShort encodingId) {
+FXGetEncodingName(FT_UShort platformId, FT_UShort encodingId) {
 
     std::map<FT_UShort, std::string> encodings;
     switch (platformId) {
@@ -530,7 +530,7 @@ FXEncodingName(FT_UShort platformId, FT_UShort encodingId) {
 }
 
 FXString
-FXLanguageName(FT_UShort platformId, FT_UShort languageId) {
+FXGetLanguageName(FT_UShort platformId, FT_UShort languageId) {
     for (int i = 0; i < NUM_FT_LANGUAGES; i++)
         if (ftLanguages[i].platform_id == platformId &&
             (ftLanguages[i].language_id == TT_LANGUAGE_DONT_CARE ||
@@ -689,7 +689,7 @@ FXToString(FT_UShort platformId, FT_UShort encodingId, void * string, uint32_t s
 }
 
 FXString
-FXSFNTName(FT_SfntName * sfnt) {
+FXSFNTGetName(FT_SfntName * sfnt) {
     const char * names[] = {
         "Copyright",
         "Font Family",
@@ -725,7 +725,7 @@ FXSFNTName(FT_SfntName * sfnt) {
 }
 
 FXString
-FXSFNTValue(FT_SfntName * sfnt) {
+FXSFNTGetValue(FT_SfntName * sfnt) {
     return FXToString(sfnt->platform_id,
                         sfnt->encoding_id,
                         sfnt->string,
@@ -733,7 +733,7 @@ FXSFNTValue(FT_SfntName * sfnt) {
 }
 
 FXString
-FXSFNTLanguage(FT_SfntName *sfnt, FT_Face face) {
+FXSFNTGetLanguage(FT_SfntName *sfnt, FT_Face face) {
     if (sfnt->language_id >= 0x8000) {
         FT_SfntLangTag langTag;
         if (!FT_Get_Sfnt_LangTag(face, sfnt->language_id, &langTag)) {
@@ -743,6 +743,6 @@ FXSFNTLanguage(FT_SfntName *sfnt, FT_Face face) {
                                 langTag.string_len);
         }
     }
-    return FXLanguageName(sfnt->platform_id, sfnt->language_id);
+    return FXGetLanguageName(sfnt->platform_id, sfnt->language_id);
 }
 

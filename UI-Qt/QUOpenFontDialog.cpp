@@ -10,7 +10,9 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
     
     connect(ui_->browseButton, &QPushButton::clicked,
             this, &QUOpenFontDialog::slotBrowseFile);
-        
+    connect(ui_->fontComboBox, QOverload<int>::of(&QComboBox::activated),
+            this, &QUOpenFontDialog::slotFontSelected);
+    
     ui_->textEdit->setText(FX_RESOURCES_DIR "/Fonts/MyriadPro-Regular.otf");
 
     QUFontManager::get();
@@ -35,4 +37,9 @@ QUOpenFontDialog::slotBrowseFile() {
 
     if (!file.isEmpty())
         ui_->textEdit->setText(file);
+}
+
+void
+QUOpenFontDialog::slotFontSelected(int index) {
+    ui_->textEdit->setText(ui_->fontComboBox->selectedFont().filePath);
 }

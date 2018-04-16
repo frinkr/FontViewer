@@ -9,10 +9,6 @@
 #include "FXBoostPrivate.h"
 #include "FXFTPrivate.h"
 
-namespace {
-    FXFaceAttributes emptyAttributes;
-}
-
 FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath)
     : folders_(folders)
     , dbPath_(dbPath) {

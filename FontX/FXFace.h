@@ -11,20 +11,36 @@ struct FXFaceDescriptor {
 struct FXSFNTEntry {
     uint16_t     platformId;
     uint16_t     encodingId;
-    uint16_t     languageId;
+    FXString     language;
     uint16_t     nameId;
     FXString     value;
 };
 
-struct FXFaceAttributes {
-    size_t      index { 0 };
-    FXString    postscriptName;
-    size_t      upem { 0 };
-    size_t      glyphCount { 0 };
-    FXVector<FXSFNTEntry> names;
-
+class FXSFNTNames : public FXVector<FXSFNTEntry> {
+public:
     FXString
     familyName() const;
+
+    FXString
+    styleName() const;
+
+    FXString
+    postscriptName() const;
+
+protected:
+    FXString
+    findName(const FXVector<int> & nameIds,
+             const FXVector<FXString> & languages) const;
+        
+    
+};
+
+struct FXFaceAttributes {
+    size_t      index { 0 };
+    size_t      upem { 0 };
+    size_t      glyphCount { 0 };
+    FXString    fileName;
+    FXSFNTNames names;
 };
 
 constexpr double FXDefaultFontSize = 200;

@@ -21,6 +21,9 @@ public:
 private slots:
     void
     slotBrowseFile();
+
+    void
+    slotFontSelected(int index);
         
 private:
     Ui::QUOpenFontDialog * ui_;

@@ -20,6 +20,9 @@ protected:
 
     const FXFaceAttributes &
     attributes(size_t index) const;
+
+    QString
+    displayName(size_t index) const;
 };
 
 class QUFontComboBox : public QComboBox {

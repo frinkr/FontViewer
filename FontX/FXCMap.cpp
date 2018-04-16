@@ -134,17 +134,17 @@ FXCMap::encodingID() const {
 
 std::string
 FXCMap::platformName() const {
-    return FXPlatformName(platformID_);
+    return FXGetPlatformName(platformID_);
 }
     
 std::string
 FXCMap::encodingName() const {
-    return FXEncodingName(platformID_, encodingID_);
+    return FXGetEncodingName(platformID_, encodingID_);
 }
 
 std::string
 FXCMap::description() const {
-    return FXPlatformName(platformID_) + " - " + FXEncodingName(platformID_, encodingID_);
+    return FXGetPlatformName(platformID_) + " - " + FXGetEncodingName(platformID_, encodingID_);
 }
 
 bool
@@ -182,6 +182,7 @@ FXCMap::charsForGlyph(FXGlyphID gid) const {
 void
 FXCMap::initGlyphsMap() {
     glyphMap_ = FXVector<FXChar>(face_->num_glyphs, UNDEFINED_CHAR_MARK);
+    return;
     FT_UInt gid = 0;
     FT_ULong ch = FT_Get_First_Char(face_, &gid);
     while (gid != 0) {

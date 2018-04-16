@@ -32,6 +32,12 @@ namespace BFS {
         return path;
     }
 
+    FXString
+    fileName(const FXString & path) {
+        fs::path p(path, UTF8Cvt);
+        return p.filename().string(UTF8Cvt);
+    }
+    
     bool
     foreachFile(const FXString & directory,
                 bool recursive,
