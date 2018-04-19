@@ -4,6 +4,43 @@
 #include "FXFTPrivate.h"
 #include "FXBoostPrivate.h"
 
+namespace {
+    template <typename T>
+    void forEachPixel(FT_Bitmap ftBm, size_t pixelSize, T func) {
+        for (size_t y = 0; y < ftBm.rows; ++ y) {
+            for (size_t x = 0; x < ftBm.width; ++ x) {
+                unsigned char * p = ftBm.buffer + (y * ftBm.pitch + x * pixelSize);
+                func(x, y, p);
+            }
+        }
+    }
+    
+    FXBitmapARGB
+    loadBitmap(FT_Bitmap ftBm) {
+        FXBitmapARGB bm(ftBm.width, ftBm.rows);
+
+        
+        if (ftBm.pixel_mode == FT_PIXEL_MODE_GRAY) {
+            forEachPixel(ftBm, 1, [&bm](int x, int y, unsigned char * p) {
+                bm.setPixel(x, y, makeARGB(*p, FXBlack)); 
+            });
+        }
+        else if (ftBm.pixel_mode == FT_PIXEL_MODE_BGRA) {
+            forEachPixel(ftBm, 4, [&bm](int x, int y, unsigned char * p) {
+                bm.setPixel(x, y, makeARGB(*(p+3), *(p+2), *(p+1), *p));
+            });
+        }
+        else if (ftBm.pixel_mode == FT_PIXEL_MODE_MONO) {
+            forEachPixel(ftBm, 0, [&bm](int x, int y, unsigned char * row) {
+                unsigned char * b = row + x / 8;
+                bool v = (*b) & (1 << (7 - (x % 8)));
+                bm.setPixel(x, y, v? FXBlack: FXWhite);
+            });
+        }
+        return bm;
+    }
+}
+
 double
 pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
@@ -209,16 +246,8 @@ FXFace::glyph(FXChar c, bool isGID) {
         glyph.name = glyphName;
 
     // let's render pixmap
-    FT_Load_Glyph(face_, id, FT_LOAD_RENDER);
-    slot = face_->glyph;
-    FT_Bitmap ftBm = slot->bitmap;
-    glyph.bitmap = FXBitmapARGB(ftBm.width, ftBm.rows);
-    for (size_t y = 0; y < ftBm.rows; ++ y) {
-        for (size_t x = 0; x < ftBm.width; ++ x) {
-            uint8_t a = ftBm.buffer[y * ftBm.pitch + x];
-            glyph.bitmap.setPixel(int(x), int(y), makeARGB(a, FXBlack)); 
-        }
-    }
+    FT_Load_Glyph(face_, id, FT_LOAD_RENDER | FT_LOAD_COLOR);
+    glyph.bitmap = loadBitmap(face_->glyph->bitmap);
     return glyph;
 }
 

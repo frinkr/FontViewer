@@ -19,13 +19,13 @@ QUFontManager::QUFontManager() {
 
     FXVector<FXString> dirs;
     for (const auto & dir : directories_)
-	dirs.push_back(dir.toUtf8().constData());
+        dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
 
     QDir folder(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
     if (!folder.exists())
         folder.mkpath(".");
     
     db_.reset(new FXFaceDatabase(dirs,
-				 folder.filePath("FontViewer.db").toUtf8().constData()));
+                                 folder.filePath("FontViewer.db").toUtf8().constData()));
 }
 
