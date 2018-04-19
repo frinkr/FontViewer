@@ -14,9 +14,16 @@ if (APPLE)
     ${RESOURCE_FILES}
     )
 else()
+  set(
+    RESOURCE_FILES
+    win32/Resource.h
+    win32/Resource.rc
+  )
   add_executable(
     ${PROJECT_NAME}
-    main.cpp)
+    main.cpp
+    ${RESOURCE_FILES}
+    )
 endif()
 
 target_link_libraries(${PROJECT_NAME} FontX UI-Qt)
