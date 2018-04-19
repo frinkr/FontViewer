@@ -1,3 +1,4 @@
+#include <QFileInfo>
 #include "FontX/FXFaceDatabase.h"
 #include "QUFontManager.h"
 #include "QUFontComboBox.h"
@@ -33,9 +34,13 @@ QUFontListModel::attributes(size_t index) const {
 QString
 QUFontListModel::displayName(size_t index) const {
     auto const & attrs = attributes(index);
-    return QString("%1 - %2")
-        .arg(toQString(attrs.names.familyName()),
-             toQString(attrs.names.styleName()));
+    QString familyName = toQString(attrs.names.familyName());
+    QString styleName = toQString(attrs.names.styleName());
+    if (!familyName.isEmpty())
+        return QString("%1 - %2").arg(familyName, styleName);
+    else
+        return QFileInfo(toQString(attrs.desc.filePath)).fileName();
+    
 }
 
 FXPtr<FXFaceDatabase>

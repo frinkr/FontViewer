@@ -32,14 +32,13 @@ QUDocumentWindow::initUI() {
     initToolBar();
     initListView();
     initGlyphInfoView();
-    
+
     connectSingals();
 }
 
 void
 QUDocumentWindow::initWindowTitle() {
     const QString & filePath = document_->uri().filePath;
-    ui_->fileLabel->setText(filePath);
     setWindowFilePath(filePath);
     setWindowTitle(QFileInfo(filePath).fileName());
 }

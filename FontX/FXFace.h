@@ -5,10 +5,10 @@
 
 struct FXFaceDescriptor {
     FXString  filePath;
-    size_t    index;
+    size_t    index {0};
 };
 
-struct FXSFNTEntry {
+struct FXSFNTName {
     uint16_t     platformId;
     uint16_t     encodingId;
     FXString     language;
@@ -16,7 +16,7 @@ struct FXSFNTEntry {
     FXString     value;
 };
 
-class FXSFNTNames : public FXVector<FXSFNTEntry> {
+class FXFaceNames : public FXVector<FXSFNTName> {
 public:
     FXString
     familyName() const;
@@ -27,20 +27,32 @@ public:
     FXString
     postscriptName() const;
 
+    void
+    setFamilyName(const FXString & name);
+
+    void
+    setStyleName(const FXString & name);
+
+    void
+    setPostscriptName(const FXString & name);
 protected:
     FXString
-    findName(const FXVector<int> & nameIds,
-             const FXVector<FXString> & languages) const;
-        
+    findSFNTName(const FXVector<int> & nameIds,
+                 const FXVector<FXString> & languages,
+                 const FXString & defaultName = FXString()) const;
+
+    FXString     familyName_;
+    FXString     styleName_;
+    FXString     postscriptName_;
     
 };
 
 struct FXFaceAttributes {
-    size_t      index { 0 };
-    size_t      upem { 0 };
-    size_t      glyphCount { 0 };
-    FXString    fileName;
-    FXSFNTNames names;
+    FXFaceDescriptor desc;
+    size_t           upem { 0 };
+    size_t           glyphCount { 0 };
+    FXString         fileName;
+    FXFaceNames      names;
 };
 
 constexpr double FXDefaultFontSize = 200;
