@@ -5,7 +5,7 @@
 
 struct FXFaceDescriptor {
     FXString  filePath;
-    size_t    index {0};
+    size_t    index;
 };
 
 struct FXSFNTName {

@@ -115,8 +115,8 @@ FXFace::createFace(const FXFaceDescriptor & descriptor) {
     
 FXPtr<FXFace>
 FXFace::createFace(const std::string & filePath, size_t faceIndex) {
-    FXFaceDescriptor descritptor = {filePath, faceIndex};
-    return FXFace::createFace(descritptor);
+    FXFaceDescriptor descriptor = {filePath, faceIndex};
+    return FXFace::createFace(descriptor);
 }
 
 FXPtr<FXFace>
