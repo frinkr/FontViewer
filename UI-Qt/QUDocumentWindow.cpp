@@ -74,7 +74,8 @@ QUDocumentWindow::initToolBar() {
     reloadBlocks();
     
     ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph.png"));
-
+    
+    toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
     toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
     toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
     toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
