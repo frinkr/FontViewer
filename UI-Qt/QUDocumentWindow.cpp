@@ -6,6 +6,7 @@
 #include "QUConv.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
+#include "QUFontInfoWidget.h"
 #include "QUGlyphListView.h"
 #include "QUToolBarWidget.h"
 #include "ui_QUDocumentWindow.h"
@@ -13,6 +14,7 @@
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
     : QMainWindow(parent)
     , ui_(new Ui::QUDocumentWindow)
+    , infoDockWidget_(nullptr)
     , document_(document)
 {
     ui_->setupUi(this);
@@ -79,7 +81,7 @@ QUDocumentWindow::initToolBar() {
     toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
     toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
     toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
-    toolBar->addAction(QIcon(":/images/info_d.png"), tr("Info"));
+    toolBar->addAction(QIcon(":/images/info_d.png"), tr("Info"), this, &QUDocumentWindow::onFontInfoAction);
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
@@ -164,4 +166,20 @@ QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItem
 void
 QUDocumentWindow::onCharLinkClicked(FXChar c) {
     //ui_->listView->selectChar(c);
+}
+
+void
+QUDocumentWindow::onFontInfoAction() {
+    if (!infoDockWidget_) {
+        infoDockWidget_ = new QDockWidget(tr("Info"), this);
+        infoDockWidget_->setWidget(new QUFontInfoWidget(infoDockWidget_));
+        addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
+    }
+
+    if (infoDockWidget_->isVisible())
+        infoDockWidget_->hide();
+    else {
+        infoDockWidget_->show();
+        infoDockWidget_->raise();
+    }
 }

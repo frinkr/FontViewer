@@ -1,10 +1,11 @@
-#ifndef QUFONTINFOWIDGET_H
-#define QUFONTINFOWIDGET_H
+#pragma once
 
 #include <QWidget>
+#include <QWindow>
+#include <QMainWindow>
 
 namespace Ui {
-class QUFontInfoWidget;
+    class QUFontInfoWidget;
 }
 
 class QUFontInfoWidget : public QWidget
@@ -19,4 +20,3 @@ private:
     Ui::QUFontInfoWidget *ui;
 };
 
-#endif // QUFONTINFOWIDGET_H

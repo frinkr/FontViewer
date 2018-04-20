@@ -11,7 +11,10 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 
-set(UI QUDocumentWindow.ui QUOpenFontDialog.ui)
+set(UI
+  QUDocumentWindow.ui
+  QUOpenFontDialog.ui
+  QUFontInfoWidget.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -47,6 +50,8 @@ set(SHARED_SOURCES
   QUFontManager.cpp
   QUFontComboBox.h
   QUFontComboBox.cpp
+  QUFontInfoWidget.h
+  QUFontInfoWidget.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm
