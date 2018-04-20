@@ -28,21 +28,30 @@ int quMain(int argc, char *argv[])
     //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     Q_INIT_RESOURCE(QUApplication);
+    Q_INIT_RESOURCE(style);
     
-    QUApplication a(argc, argv);
-    a.setWindowIcon(QIcon(":/images/app.png"));
+    QUApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/images/app.png"));
 
-    QStringList arguments = a.arguments();
+    QStringList arguments = app.arguments();
     bool anotherInstanceExists = false;
     for (int i = 1; i < arguments.count(); i++)
-        anotherInstanceExists |= a.sendMessage(arguments.at(i).toUtf8());
+        anotherInstanceExists |= app.sendMessage(arguments.at(i).toUtf8());
 
     // Assume another instance of this application exists if *any* of the messages sent was handled.
     if (anotherInstanceExists)
         return 0;
 
+    // load the dark style
+    QFile f(":qdarkstyle/style.qss");
+    if (f.exists()) {
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        app.setStyleSheet(ts.readAll());
+    }
+        
     // Otherwise start this instance.
-    QObject::connect(&a, SIGNAL(messageReceived(const QString &)), QUDocumentWindowManager::instance(), SLOT(openFile(const QString &)));
+    QObject::connect(&app, SIGNAL(messageReceived(const QString &)), QUDocumentWindowManager::instance(), SLOT(openFile(const QString &)));
 
     if (arguments.count() > 1)
     {
@@ -52,5 +61,5 @@ int quMain(int argc, char *argv[])
     else
         QUDocumentWindowManager::instance()->slotOpenFont();
 
-    return a.exec();
+    return app.exec();
 }

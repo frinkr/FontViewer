@@ -75,9 +75,9 @@ QUDocumentWindow::initToolBar() {
     
     ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph.png"));
 
-    toolBar->addAction(QIcon(":/images/shape.png"), tr("Shape"));
-    toolBar->addAction(QIcon(":/images/table.png"), tr("Table"));
-    toolBar->addAction(QIcon(":/images/search.png"), tr("Search"));
+    toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
+    toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
+    toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);

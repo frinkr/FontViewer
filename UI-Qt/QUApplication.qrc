@@ -2,9 +2,13 @@
   <qresource>
     <file alias="images/app.png">../Resources/Images/app.png</file>
     <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
+    <file alias="images/glyph_d.png">../Resources/Images/glyph_d.png</file>
     <file alias="images/search.png">../Resources/Images/search.png</file>
+    <file alias="images/search_d.png">../Resources/Images/search_d.png</file>
     <file alias="images/shape.png">../Resources/Images/shape.png</file>
+    <file alias="images/shape_d.png">../Resources/Images/shape_d.png</file>
     <file alias="images/table.png">../Resources/Images/table.png</file>
+    <file alias="images/table_d.png">../Resources/Images/table_d.png</file>
     <file alias="images/undefined.png">../Resources/Images/undefined.png</file>
 </qresource>
 </RCC>
