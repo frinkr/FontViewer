@@ -84,6 +84,6 @@ charImage(FXChar c, const QSize & emSize) {
         return out;
     }
     else {
-        return QImage(":images/undefined.png");
+        return QImage(":images/undefined_d.png");
     }
 }

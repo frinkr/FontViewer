@@ -78,6 +78,7 @@ QUDocumentWindow::initToolBar() {
     toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
     toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
     toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
+    toolBar->addAction(QIcon(":/images/info_d.png"), tr("Info"));
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
