@@ -276,6 +276,10 @@ FXFace::initAttributes() {
     atts_.glyphCount = face_->num_glyphs;
     atts_.fileName = BFS::fileName(desc_.filePath);
 
+    const char * format = FT_Get_Font_Format(face_);
+    if (format)
+        atts_.format = format;
+    
     if (face_->family_name)
         atts_.names.setFamilyName(face_->family_name);
     if (face_->style_name)

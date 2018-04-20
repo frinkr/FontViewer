@@ -1,25 +1,18 @@
+#include "FontX/FXUnicode.h"
+
 #include "QUGlyphInfoWidget.h"
 #include "QUConv.h"
-#include "QUTemplateInstantializer.h"
+#include "QUHtmlTemplate.h"
 #include "QUEncoding.h"
-#include "FontX/FXUnicode.h"
+#include "QUResource.h"
+
 #include <QImage>
 #include <QTextDocument>
-#include <QFile>
 #include <QDebug>
-#include <QTextStream>
 
 namespace {
-    QString loadTemplate() {
-        QString file = FX_RESOURCES_DIR "/Html/GlyphInfoTemplate.html";
-        QFile f(file);
-        if (!f.open(QFile::ReadOnly | QFile::Text))
-            return QString();
-        QTextStream in(&f);
-        return in.readAll();
-    }
-
-    QString instTemplate(const QString & temp, const FXGlyph & glyph) {
+    QMap<QString, QVariant>
+    templateValues(const FXGlyph & glyph) {
         QMap<QString, QVariant> map;
         map["NAME"] = toQString(glyph.name);
         map["CHAR"] = QUEncoding::charHexNotation(glyph.character, true);
@@ -64,7 +57,7 @@ namespace {
 
         map["UTF8"] = utf8.join(" ");
         map["UTF16"] = utf16.join(" ");
-        return instantializeTemplate(temp, map);
+        return map;
     };
 }
 
@@ -123,7 +116,9 @@ QUGlyphInfoWidget::loadGlyph() {
                       QUrl("fv://glyph.png"), QVariant(placeImage(toQImage(glyph.bitmap), glyphEmSize())));
     
     setDocument(qdoc);
-    setHtml(instTemplate(loadTemplate(), glyph));
+    
+    QUHtmlTemplate html(QUResource::path("/Html/GlyphInfoTemplate.html"));
+    setHtml(html.instantialize(templateValues(glyph)));
 }
     
 void

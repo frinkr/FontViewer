@@ -9,5 +9,6 @@
 #include FT_SFNT_NAMES_H
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
+#include FT_FONT_FORMATS_H
 
 #include "FX.h"

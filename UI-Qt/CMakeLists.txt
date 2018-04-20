@@ -44,14 +44,16 @@ set(SHARED_SOURCES
   QUGlyphInfoWidget.cpp
   QUToolBarWidget.cpp
   QUToolBarWidget.h
-  QUTemplateInstantializer.h
-  QUTemplateInstantializer.cpp
+  QUHtmlTemplate.h
+  QUHtmlTemplate.cpp
   QUFontManager.h
   QUFontManager.cpp
   QUFontComboBox.h
   QUFontComboBox.cpp
   QUFontInfoWidget.h
   QUFontInfoWidget.cpp
+  QUResource.h
+  QUResource.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

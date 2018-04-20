@@ -50,6 +50,7 @@ protected:
 struct FXFaceAttributes {
     FXFaceDescriptor desc;
     size_t           upem { 0 };
+    FXString         format;
     size_t           glyphCount { 0 };
     FXString         fileName;
     FXFaceNames      names;

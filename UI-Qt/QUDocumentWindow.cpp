@@ -172,7 +172,7 @@ void
 QUDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
         infoDockWidget_ = new QDockWidget(tr("Info"), this);
-        infoDockWidget_->setWidget(new QUFontInfoWidget(infoDockWidget_));
+        infoDockWidget_->setWidget(new QUFontInfoWidget(document_->face(), infoDockWidget_));
         addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
     }
 
