@@ -49,7 +49,8 @@ int quMain(int argc, char *argv[])
         QTextStream ts(&f);
         app.setStyleSheet(ts.readAll());
     }
-        
+    app.setAttribute(Qt::AA_UseHighDpiPixmaps);
+    
     // Otherwise start this instance.
     QObject::connect(&app, SIGNAL(messageReceived(const QString &)), QUDocumentWindowManager::instance(), SLOT(openFile(const QString &)));
 
