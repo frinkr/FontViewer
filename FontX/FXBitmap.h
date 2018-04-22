@@ -92,8 +92,8 @@ public:
 #if __APPLE__
         memset_pattern4(buffer, &color, width * height * 4);
 #else
-        for (pos_type y = 0; y < height; ++ y)
-            for (pos_type x = 0; x < width; ++ x)
+        for (PosType y = 0; y < height; ++ y)
+            for (PosType x = 0; x < width; ++ x)
                 set_pixel(x, y, color);
 #endif        
     }

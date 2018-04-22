@@ -1,8 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 project(FontX)
 
-if (APPLE)
+if (NOT WIN32)
   find_package(PkgConfig)
+endif()
+
+if (APPLE)
   set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/icu4c/lib/pkgconfig")
 endif()
 
@@ -11,7 +14,6 @@ find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
-  find_package(sqlite3 REQUIRED)
 else()
   pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
   pkg_check_modules(ICU REQUIRED icu-uc)
@@ -53,7 +55,6 @@ target_include_directories(FontX PUBLIC
 
 target_link_libraries(FontX
   ${Boost_LIBRARIES}
-  sqlite3
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}

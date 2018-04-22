@@ -79,10 +79,11 @@ add_library(UI-Qt
   ${UI_HEADERS}
   )
 
-target_link_libraries(UI-Qt PRIVATE Qt5::Core Qt5::CorePrivate)
-target_link_libraries(UI-Qt PRIVATE Qt5::Gui Qt5::GuiPrivate)
-target_link_libraries(UI-Qt PRIVATE Qt5::Widgets Qt5::WidgetsPrivate)
-target_link_libraries(UI-Qt PRIVATE Qt5::Network Qt5::NetworkPrivate)
+target_link_libraries(UI-Qt PRIVATE Qt5::Core)
+target_link_libraries(UI-Qt PRIVATE Qt5::Gui)
+target_link_libraries(UI-Qt PRIVATE Qt5::Widgets)
+target_link_libraries(UI-Qt PRIVATE Qt5::Network)
+target_link_libraries(UI-Qt PRIVATE FontX)
 
 if (APPLE)
   target_link_libraries(UI-Qt PRIVATE "-framework Cocoa")

@@ -35,14 +35,14 @@ namespace {
             QMap<QString, QVariant> map;
 
             map["FILE"] = toQString(faceAtts().desc.filePath);
-            map["INDEX"] = faceAtts().desc.index;
+            map["INDEX"] = (int)faceAtts().desc.index;
             
             map["FAMILY_NAME"] = toQString(faceAtts().names.familyName());
             map["STYLE_NAME"] = toQString(faceAtts().names.styleName());
             map["PS_NAME"] = toQString(faceAtts().names.postscriptName());
 
             map["FORMAT"] = toQString(faceAtts().format);
-            map["UPEM"] = faceAtts().upem;
+            map["UPEM"] = (int)faceAtts().upem;
             return map;
         }
     };
