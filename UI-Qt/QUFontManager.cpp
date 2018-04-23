@@ -1,7 +1,27 @@
+#if UIQT_USE_FONTCONFIG
+#  include <fontconfig/fontconfig.h>
+#endif
+
 #include <QStandardPaths>
 #include <QDir>
 #include "QUConv.h"
 #include "QUFontManager.h"
+
+namespace {
+    QStringList fontDirs() {
+#if UIQT_USE_FONTCONFIG
+        FcConfig * fc = FcInitLoadConfig();
+        FcStrList * fcDirs = FcConfigGetFontDirs(fc);
+        const FcChar8 * dir = nullptr;
+        QStringList ret;
+        while ((dir = FcStrListNext(fcDirs))) 
+            ret.append(toQString(std::string((const char*)dir)));
+        return ret;
+#else
+        return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+#endif
+    }
+}
 
 QUFontManager &
 QUFontManager::get() {
@@ -15,8 +35,7 @@ QUFontManager::db() const {
 }
 
 QUFontManager::QUFontManager() {
-    directories_ = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
-
+    directories_ = fontDirs();
     FXVector<FXString> dirs;
     for (const auto & dir : directories_)
         dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());

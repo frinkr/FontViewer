@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(FX_DIR ${PROJECT_SOURCE_DIR})
 
+list(APPEND CMAKE_MODULE_PATH "${FX_DIR}/cmake")
+
 add_definitions(
   -DFX_RESOURCES_DIR=\"${FX_DIR}/Resources\"
   )
