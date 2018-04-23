@@ -1,3 +1,4 @@
+#include "FXFace.h"
 #include "FXCMap.h"
 #include "FXUnicode.h"
 #include "FXFTPrivate.h"
@@ -115,8 +116,9 @@ FXCMapPlatform::getUnicodeBlocks() {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //            FXCMAP
-FXCMap::FXCMap(FXFTFace face, uint16_t platformID, uint16_t encodingID)
+FXCMap::FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index)
     : face_(face)
+    , index_(index)
     , platformID_(platformID)
     , encodingID_(encodingID) {
     initGlyphsMap();
@@ -132,6 +134,16 @@ FXCMap::encodingID() const {
     return encodingID_;
 }
 
+size_t
+FXCMap::index() const {
+    return index_;
+}
+
+bool
+FXCMap::isCurrent() const {
+    return face_->currentCMapIndex() == index_;
+}
+    
 std::string
 FXCMap::platformName() const {
     return FXGetPlatformName(platformID_);
@@ -156,7 +168,8 @@ FXCMap::isUnicode() const {
 
 const std::vector<FXPtr<FXCharBlock> > & 
 FXCMap::blocks() const {
-    return FXCMapPlatform::get(platformID_).blocks(encodingID_);
+    auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
+    return fullBlocks;
 }
 
 FXVector<FXChar>
@@ -179,12 +192,21 @@ FXCMap::charsForGlyph(FXGlyphID gid) const {
     }
 }
 
+FXGlyphID
+FXCMap::glyphForChar(FXChar c) const {
+    assert(isCurrent());
+    // FIXME: remove requirement of isCurrent
+    return FT_Get_Char_Index(face0(), c);
+}
+
 void
 FXCMap::initGlyphsMap() {
-    glyphMap_ = FXVector<FXChar>(face_->num_glyphs, UNDEFINED_CHAR_MARK);
-    return;
+    assert(isCurrent());
+    
+    FXFTFace face = face0();
+    glyphMap_ = FXVector<FXChar>(face->num_glyphs, UNDEFINED_CHAR_MARK);
     FT_UInt gid = 0;
-    FT_ULong ch = FT_Get_First_Char(face_, &gid);
+    FT_ULong ch = FT_Get_First_Char(face, &gid);
     while (gid != 0) {
         FXChar c = glyphMap_[gid];
         if (c == UNDEFINED_CHAR_MARK)
@@ -193,7 +215,11 @@ FXCMap::initGlyphsMap() {
             glyphMap_[gid] = EXTRA_CHARS_MARK;
             extraGlyphsMap_[gid].push_back(ch);
         }
-        ch = FT_Get_Next_Char(face_, ch, &gid);
+        ch = FT_Get_Next_Char(face, ch, &gid);
     }
 }
     
+FXFTFace
+FXCMap::face0() const {
+    return face_->face();
+}

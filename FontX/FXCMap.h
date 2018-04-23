@@ -55,6 +55,31 @@ protected:
     bool           isUnicode_;
 };
 
+class FXCharListBlock : public FXCharBlock {
+public:
+    FXCharListBlock(const FXString & name)
+        : name_(name) {
+    }
+
+    virtual std::string
+    name() const {
+        return name_;
+    }
+
+    virtual size_t
+    size() const {
+        return chs_.size();
+    }
+
+    virtual FXChar
+    get(size_t index) const {
+        return chs_[index];
+    }
+protected:
+    FXString          name_;
+    FXVector<FXChar>  chs_;
+};
+
 class FXCMapPlatform {
 public:
     static const std::vector<FXCMapPlatform> &
@@ -101,13 +126,19 @@ private:
 
 class FXCMap {
 public:
-    FXCMap(FXFTFace face, uint16_t platformID, uint16_t encodingID);
+    FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index);
 
     uint16_t
     platformID() const;
 
     uint16_t
     encodingID() const;
+
+    size_t
+    index() const;
+
+    bool
+    isCurrent() const;
     
     std::string
     platformName() const;
@@ -126,18 +157,26 @@ public:
 
     FXVector<FXChar> 
     charsForGlyph(FXGlyphID gid) const;
-    
+
+    FXGlyphID
+    glyphForChar(FXChar c) const;
 private:
     void
     initBlocks();
 
     void
     initGlyphsMap();
-    
+
+    FXPtr<FXFace>
+    face() const;
+
+    FXFTFace
+    face0() const;
 private:
-    FXFTFace       face_;
-    uint16_t       platformID_;
-    uint16_t       encodingID_;
-    FXVector<FXChar> glyphMap_;
+    FXFace           * face_;
+    size_t             index_;
+    uint16_t           platformID_;
+    uint16_t           encodingID_;
+    FXVector<FXChar>   glyphMap_;
     FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
 };
