@@ -35,7 +35,7 @@ public:
                               QObject * parent = nullptr);
 
 public:
-    FXCMap
+    const FXCMap &
     currentCMap() const;
     
     FXPtr<FXCharBlock>

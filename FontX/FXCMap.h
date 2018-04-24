@@ -5,29 +5,44 @@ class FXFace;
 
 class FXCharBlock {
 public:
+    explicit FXCharBlock(const FXString & name)
+        : name_(name) {}
     virtual ~FXCharBlock() {}
 
     virtual std::string
-    name() const = 0;
+    name() const {
+        return name_;
+    }
     
     virtual size_t
     size() const = 0;
 
     virtual FXChar
     get(size_t index) const = 0;
+protected:
+    FXString   name_;
+};
+
+class FXNullCharBlock : public FXCharBlock {
+public:
+    using FXCharBlock::FXCharBlock;
+    virtual size_t
+    size() const {
+        return 0;
+    }
+
+    virtual FXChar
+    get(size_t) const {
+        return FXCharInvalid;
+    }
 };
 
 class FXCharRangeBlock : public FXCharBlock {
 public:
     FXCharRangeBlock(FXChar from, FXChar to, const std::string & name, bool isUnicode = true)
-        : range_{from, to}
-        , name_(name)
+        : FXCharBlock(name)
+        , range_{from, to}
         , isUnicode_(isUnicode) {}
-
-    virtual std::string
-    name() const {
-        return name_;
-    }
 
     virtual size_t
     size() const {
@@ -51,20 +66,12 @@ public:
     
 protected:
     FXCharRange    range_;
-    std::string    name_;    
     bool           isUnicode_;
 };
 
 class FXCharListBlock : public FXCharBlock {
 public:
-    FXCharListBlock(const FXString & name)
-        : name_(name) {
-    }
-
-    virtual std::string
-    name() const {
-        return name_;
-    }
+    using FXCharBlock::FXCharBlock;
 
     virtual size_t
     size() const {
@@ -76,7 +83,6 @@ public:
         return chs_[index];
     }
 protected:
-    FXString          name_;
     FXVector<FXChar>  chs_;
 };
 
@@ -139,7 +145,10 @@ public:
 
     bool
     isCurrent() const;
-    
+
+    bool
+    setCurrent() const;
+
     std::string
     platformName() const;
     
@@ -152,7 +161,7 @@ public:
     bool
     isUnicode() const;
 
-    const std::vector<FXPtr<FXCharBlock> > &
+    const FXVector<FXPtr<FXCharBlock> > &
     blocks() const;
 
     FXVector<FXChar> 
@@ -164,7 +173,7 @@ private:
     void
     initBlocks();
 
-    void
+    bool
     initGlyphsMap();
 
     FXPtr<FXFace>
@@ -179,4 +188,22 @@ private:
     uint16_t           encodingID_;
     FXVector<FXChar>   glyphMap_;
     FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
+};
+
+
+class FXAutoCMap  {
+public:
+    FXAutoCMap(FXFace * face, size_t index);
+    ~FXAutoCMap();
+
+    size_t
+    index() const;
+    
+    bool
+    ok() const;
+private:
+    FXFace   * face_;
+    size_t     index_;
+    bool       ok_;
+    size_t     oldIndex_;
 };

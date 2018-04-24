@@ -7,6 +7,7 @@
 namespace {
     constexpr FXChar UNDEFINED_CHAR_MARK = FXCharInvalid;
     constexpr FXChar EXTRA_CHARS_MARK = UNDEFINED_CHAR_MARK + 1;
+    constexpr FXChar NOT_INIT_MARK = EXTRA_CHARS_MARK + 1;
 }
 
 std::vector<FXCMapPlatform> FXCMapPlatform::platforms_;
@@ -121,7 +122,7 @@ FXCMap::FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t i
     , index_(index)
     , platformID_(platformID)
     , encodingID_(encodingID) {
-    initGlyphsMap();
+    glyphMap_.push_back(NOT_INIT_MARK);
 }
 
 uint16_t
@@ -142,6 +143,11 @@ FXCMap::index() const {
 bool
 FXCMap::isCurrent() const {
     return face_->currentCMapIndex() == index_;
+}
+
+bool
+FXCMap::setCurrent() const {
+    return face_->selectCMap(index_);
 }
     
 std::string
@@ -166,15 +172,28 @@ FXCMap::isUnicode() const {
         ;
 }
 
-const std::vector<FXPtr<FXCharBlock> > & 
+const FXVector<FXPtr<FXCharBlock> > & 
 FXCMap::blocks() const {
     auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
+    if (fullBlocks.empty()) {
+        static std::vector<FXPtr<FXCharBlock> > nilVec;
+        if (nilVec.empty()) {
+            FXPtr<FXCharBlock> nilBlock(new FXNullCharBlock("NIL"));
+            nilVec.push_back(nilBlock);
+        }
+        return nilVec;
+    }
     return fullBlocks;
 }
 
 FXVector<FXChar>
 FXCMap::charsForGlyph(FXGlyphID gid) const {
     FXVector<FXChar> ret;
+        
+    if (glyphMap_.size() && (glyphMap_[0] == NOT_INIT_MARK)) {
+        if (!const_cast<FXCMap*>(this)->initGlyphsMap())
+            return ret;
+    }
 
     FXChar c = glyphMap_[gid];
     if (c == UNDEFINED_CHAR_MARK)
@@ -199,8 +218,14 @@ FXCMap::glyphForChar(FXChar c) const {
     return FT_Get_Char_Index(face0(), c);
 }
 
-void
+bool
 FXCMap::initGlyphsMap() {
+    glyphMap_.clear();
+    
+    FXAutoCMap acm(face_, index_);
+    if (!acm.ok())
+        return false;
+    
     assert(isCurrent());
     
     FXFTFace face = face0();
@@ -217,9 +242,36 @@ FXCMap::initGlyphsMap() {
         }
         ch = FT_Get_Next_Char(face, ch, &gid);
     }
+    return true;
 }
     
 FXFTFace
 FXCMap::face0() const {
     return face_->face();
 }
+
+FXAutoCMap::FXAutoCMap(FXFace * face, size_t index)
+    : face_(face)
+    , index_(index)
+    , ok_(true) {
+    oldIndex_ = face_->currentCMapIndex();
+    if (index != oldIndex_) 
+        ok_ = face_->selectCMap(index);
+}
+
+size_t
+FXAutoCMap::index() const {
+    return index_;
+}
+    
+bool
+FXAutoCMap::ok() const {
+    return ok_;
+}
+
+FXAutoCMap::~FXAutoCMap() {
+    if (ok_) 
+        face_->selectCMap(oldIndex_);
+}
+
+

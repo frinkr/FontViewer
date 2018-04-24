@@ -96,7 +96,7 @@ QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     dummyImage_.setDevicePixelRatio(2);
 }
 
-FXCMap
+const FXCMap &
 QUGlyphListModel::currentCMap() const {
     return face_->currentCMap();
 }
