@@ -190,19 +190,12 @@ FXFace::cmaps() const {
 
 const FXCMap &
 FXFace::currentCMap() const {
-    return cmaps()[currentCMapIndex()];
+    return cmaps_[currentCMapIndex()];
 }
 
 size_t
 FXFace::currentCMapIndex() const {
 	return FT_Get_Charmap_Index(face_->charmap);
-#if 0
-    const FT_CharMap & curr = face_->charmap;
-    for (FT_Int i = 0; i < face_->num_charmaps; ++ i) 
-        if (face_->charmaps[i] == curr)
-            return i;
-    return -1;
-#endif
 }
 
 bool
@@ -218,21 +211,22 @@ FXFace::selectCMap(size_t cmapIndex) {
 
 FXGlyph
 FXFace::glyph(FXChar c, bool isGID) {
-    FXGlyphID id = c;
+    FXGlyphID gid = c;
     if (isGID) {
-        const auto chs = charsForGlyph(id);
+        const auto chs = charsForGlyph(gid);
         if (chs.size())
             c = chs[0];
         else
             c = FXCharInvalid;
     }
     else {
-        id = FT_Get_Char_Index(face_, c);
+        gid = FT_Get_Char_Index(face_, c);
     }
     FXGlyph glyph;
-    glyph.id = id;
+    glyph.gid = gid;
     glyph.character = c;
-    FT_Load_Glyph(face_, id, FT_LOAD_NO_SCALE);
+    glyph.isUnicode = currentCMap().isUnicode();
+    FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 
     glyph.metrics.width        = (fu)slot->metrics.width;
@@ -245,11 +239,11 @@ FXFace::glyph(FXChar c, bool isGID) {
     glyph.metrics.vertAdvance  = (fu)slot->metrics.vertAdvance;
 
     char glyphName[256] = {0};
-    if (!FT_Get_Glyph_Name(face_, id, glyphName, sizeof(glyphName))) 
+    if (!FT_Get_Glyph_Name(face_, gid, glyphName, sizeof(glyphName))) 
         glyph.name = glyphName;
 
     // let's render pixmap
-    FT_Load_Glyph(face_, id, FT_LOAD_RENDER | FT_LOAD_COLOR);
+    FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
     glyph.bitmap = loadBitmap(face_->glyph->bitmap);
     return glyph;
 }

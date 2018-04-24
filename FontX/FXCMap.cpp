@@ -182,8 +182,9 @@ FXCMap::blocks() const {
             nilVec.push_back(nilBlock);
         }
         return nilVec;
+    } else {
+        return fullBlocks;        
     }
-    return fullBlocks;
 }
 
 FXVector<FXChar>

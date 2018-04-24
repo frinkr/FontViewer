@@ -13,10 +13,13 @@
 namespace {
     QMap<QString, QVariant>
     templateValues(const FXGlyph & glyph) {
+        const FXChar c = glyph.character;
+        const bool isUnicode = glyph.isUnicode;
+        
         QMap<QString, QVariant> map;
         map["NAME"] = toQString(glyph.name);
-        map["CHAR"] = QUEncoding::charHexNotation(glyph.character, true);
-        map["ID"] = glyph.id;
+        map["CHAR"] = QUEncoding::charHexNotation(c, isUnicode);
+        map["ID"] = glyph.gid;
 
         // Metrics
         map["WIDTH"] = glyph.metrics.width;
@@ -29,13 +32,12 @@ namespace {
         map["VERT_BEARING_Y"] = glyph.metrics.vertBearingY;
 
         // Unicode
-        FXChar c = glyph.character;
-        bool isDefined = FXUnicode::defined(c);
+        bool isDefined = isUnicode && FXUnicode::defined(c);
         map["UNICODE_NAME"] = isDefined? toQString(FXUnicode::name(c)): QString();
         map["UNICODE_BLOCK"] = isDefined? toQString(FXUnicode::block(c).name): QString();
         map["UNICODE_SCRIPT"] = isDefined? toQString(FXUnicode::script(c)) : QString();
         map["UNICODE_AGE"] = isDefined? toQString(FXUnicode::age(c)) : QString();
-        map["UNICODE_GENERAL_CATEGORY"] = toQString(FXUnicode::category(c).fullName);
+        map["UNICODE_GENERAL_CATEGORY"] = isDefined? toQString(FXUnicode::category(c).fullName): QString();
 
         QStringList decompositionLinks;
         for (FXChar d : FXUnicode::decomposition(c)) {
@@ -44,7 +46,7 @@ namespace {
                 .arg(QUEncoding::charHexNotation(d));
         }
         
-        map["UNICODE_DECOMPOSITION"] = decompositionLinks.join(", ");
+        map["UNICODE_DECOMPOSITION"] = isDefined? decompositionLinks.join(", "): QString();
 
         // Encoding
         QStringList utf8;
@@ -55,8 +57,8 @@ namespace {
         for (auto s : FXUnicode::utf16(c))
             utf16 << QString("%1").arg(s, 4, 16, QChar('0')).toUpper();
 
-        map["UTF8"] = utf8.join(" ");
-        map["UTF16"] = utf16.join(" ");
+        map["UTF8"] = isDefined? utf8.join(" "): QString();
+        map["UTF16"] = isDefined? utf16.join(" "): QString();
         return map;
     };
 }

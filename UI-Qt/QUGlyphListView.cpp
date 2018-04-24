@@ -42,7 +42,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
         QImage image;
-        if (g.id || !model->charMode() || !model->currentCMap().isUnicode())
+        if (g.gid || !model->charMode() || !g.isUnicode)
             image = placeImage(toQImage(g.bitmap), emSize);
         else
             image = charImage(g.character, emSize);
@@ -55,7 +55,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 
     // draw the text
     if (true) {
-        QString charCode = QUEncoding::charHexNotation(g.character, model->currentCMap().isUnicode());
+        const QString charCode = QUEncoding::charHexNotation(g.character, g.isUnicode);
 
         QString text;
         switch (model->glyphLabel()) {
@@ -63,11 +63,11 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
                 text = charCode;
                 break;
             case QUGlyphLabel::GlyphID:
-                text = QString("%1").arg(g.id);
+                text = QString("%1").arg(g.gid);
                 break;
             case QUGlyphLabel::GlyphName:
                 text = toQString(g.name);
-                if (!g.id && model->charMode())
+                if (!g.gid && model->charMode())
                     text = charCode;
                 break;
 

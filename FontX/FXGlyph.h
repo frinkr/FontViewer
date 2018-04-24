@@ -27,9 +27,10 @@ struct FXGlyphMetrics {
 };
 
 struct FXGlyph {
-    FXGlyphID         id;
+    FXGlyphID         gid;
     FXString          name;    
     FXChar            character;
+    bool              isUnicode;
     FXGlyphMetrics    metrics;
     FXBitmapARGB      bitmap;
 };

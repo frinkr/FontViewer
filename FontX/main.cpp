@@ -38,7 +38,7 @@ int main() {
                 FXChar c = block->get(i);
                 FXGlyph glyph = face->glyph(c);
                 std::cout << " - char " << std::hex << c << std::dec
-                          << ": id " << glyph.id
+                          << ": id " << glyph.gid
                           << ", lsb: " << glyph.metrics.lsb()
                           << ", rsb: " << glyph.metrics.rsb()
                           << std::endl;
