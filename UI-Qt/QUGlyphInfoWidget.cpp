@@ -65,7 +65,7 @@ namespace {
 QUGlyphInfoWidget::QUGlyphInfoWidget(QWidget *parent)
     : QTextBrowser(parent)
     , document_(nullptr)
-    , char_{FXGCharTypeNone, 0} {
+    , char_(FXGCharInvalid) {
     connect(this, &QTextBrowser::anchorClicked,
             this, &QUGlyphInfoWidget::onLinkClicked);
     setOpenLinks(false);
