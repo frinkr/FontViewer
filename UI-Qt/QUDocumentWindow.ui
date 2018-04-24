@@ -92,7 +92,7 @@
      <x>0</x>
      <y>0</y>
      <width>1094</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -117,7 +117,7 @@
     </property>
     <widget class="QMenu" name="menuLabel">
      <property name="title">
-      <string>Glyph Label</string>
+      <string>Glyph &amp;Label</string>
      </property>
      <addaction name="actionCharacter_Code"/>
      <addaction name="actionGlyph_Name"/>
@@ -125,7 +125,7 @@
     </widget>
     <widget class="QMenu" name="menuPalettes">
      <property name="title">
-      <string>Palettes</string>
+      <string>&amp;Palettes</string>
      </property>
      <addaction name="actionGlyph_2"/>
      <addaction name="actionProperties_2"/>
@@ -157,7 +157,7 @@
   </widget>
   <widget class="QDockWidget" name="glyphDockWidget">
    <property name="windowTitle">
-    <string>Glyph</string>
+    <string>&amp;Glyph</string>
    </property>
    <attribute name="dockWidgetArea">
     <number>2</number>
@@ -191,8 +191,8 @@
         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.SF NS Text'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Hello &lt;span style=&quot; text-decoration: underline;&quot;&gt;world&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Noto Sans'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'.SF NS Text'; font-size:13pt;&quot;&gt;Hello &lt;/span&gt;&lt;span style=&quot; font-family:'.SF NS Text'; font-size:13pt; text-decoration: underline;&quot;&gt;world&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
       </widget>
      </item>
@@ -250,6 +250,9 @@ p, li { white-space: pre-wrap; }
    </property>
   </action>
   <action name="action_Full_Screen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>&amp;Full Screen</string>
    </property>
@@ -262,7 +265,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Character Code</string>
+    <string>&amp;Character Code</string>
    </property>
   </action>
   <action name="actionGlyph_Name">
@@ -273,7 +276,7 @@ p, li { white-space: pre-wrap; }
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Glyph Name</string>
+    <string>&amp;Glyph Name</string>
    </property>
   </action>
   <action name="actionGlyph_ID">
@@ -310,12 +313,12 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionGlyph_2">
    <property name="text">
-    <string>Glyph</string>
+    <string>&amp;Glyph</string>
    </property>
   </action>
   <action name="actionProperties_2">
    <property name="text">
-    <string>Properties</string>
+    <string>&amp;Properties</string>
    </property>
   </action>
  </widget>
@@ -331,6 +334,8 @@ p, li { white-space: pre-wrap; }
    <header>QUGlyphInfoWidget.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="QUApplication.qrc"/>
+ </resources>
  <connections/>
 </ui>

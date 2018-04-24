@@ -118,6 +118,9 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->actionFull_Glyph_List, &QAction::toggled,
             this, &QUDocumentWindow::showFullGlyphList);
 
+    connect(ui_->action_Full_Screen, &QAction::toggled,
+            this, &QUDocumentWindow::onToggleFullScreen);
+    
     connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &QUDocumentWindow::onSelectionChanged);
 
@@ -139,6 +142,14 @@ QUDocumentWindow::showFullGlyphList(bool state) {
     cmapAction_->setEnabled(!state);
     blockAction_->setEnabled(!state);
     document_->model()->setCharMode(!state);
+}
+
+void
+QUDocumentWindow::onToggleFullScreen(bool state) {
+    if (state)
+        showFullScreen();
+    else
+        showNormal();
 }
 
 void

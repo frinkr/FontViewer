@@ -66,6 +66,9 @@ private slots:
     showFullGlyphList(bool state);
 
     void
+    onToggleFullScreen(bool state);
+    
+    void
     onSwitchGlyphLabel();
 
     void
