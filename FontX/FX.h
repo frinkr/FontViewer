@@ -37,7 +37,7 @@ using FXGlyphID   = uint32_t;
 
 constexpr FXChar    FXUnicodeMax     = 0x10FFFF;
 constexpr FXChar    FXCharInvalid    = (FXChar)-1;
-constexpr FXGlyphID NotDef           = 0;
+constexpr FXGlyphID FXGIDNotDef      = 0;
 
 /**
  * A closed range

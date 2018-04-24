@@ -88,6 +88,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     : QAbstractListModel(parent)
     , face_(face)
+    , fullGlyphsBlock_(new FXCharRangeBlock(0, face->glyphCount(), "All Glyphs", true, false))
     , blockIndex_(0)
     , dummyImage_(glyphEmSize(), QImage::Format_ARGB32)
     , charMode_(true)
@@ -103,15 +104,15 @@ QUGlyphListModel::currentCMap() const {
     
 FXPtr<FXCharBlock>
 QUGlyphListModel::currentBlock() const {
-    return currentCMap().blocks()[blockIndex_];
+    if (charMode_)
+        return currentCMap().blocks()[blockIndex_];
+    else
+        return fullGlyphsBlock_;
 }
 
 int
 QUGlyphListModel::rowCount(const QModelIndex & index) const {
-    if (charMode_)
-        return int(currentBlock()->size());
-    else
-        return int(face_->attributes().glyphCount);
+    return int(currentBlock()->size());
 }
     
 QVariant
@@ -123,11 +124,7 @@ QUGlyphListModel::data(const QModelIndex & index, int role) const {
         return QVariant();
 
     if (role == QUGlyphRole) {
-        FXGlyph g;
-        if (charMode_)
-            g = face_->glyph(currentBlock()->get(index.row()), false);
-        else
-            g = face_->glyph(index.row(), true);
+        FXGlyph g = face_->glyph(currentBlock()->get(index.row()), currentBlock()->isGID());
         QVariant v;
         v.setValue(QUGlyph(g));
         return v;
@@ -177,11 +174,9 @@ QUGlyphListModel::setGlyphLabel(QUGlyphLabel label) {
 }
 
 FXChar
-QUGlyphListModel::charAt(const QModelIndex & index) const {
-    if (charMode())
-        return currentBlock()->get(index.row());
-    else
-        return index.row();
+QUGlyphListModel::charAt(const QModelIndex & index, bool & isGID) const {
+    isGID = currentBlock()->isGID();
+    return currentBlock()->get(index.row());
 }
 
 QUGlyphListView::QUGlyphListView(QWidget * parent)

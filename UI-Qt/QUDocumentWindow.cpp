@@ -155,8 +155,9 @@ void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
-        FXChar c = document_->model()->charAt(index);
-        if (document_->model()->charMode())
+        bool isGID = false;
+        FXChar c = document_->model()->charAt(index, isGID);
+        if (!isGID)
             ui_->textBrowser->setChar(c);
         else
             ui_->textBrowser->setGlyph(c);

@@ -1,3 +1,4 @@
+#include <algorithm>
 #include "FXFace.h"
 #include "FXCMap.h"
 #include "FXUnicode.h"
@@ -12,6 +13,11 @@ namespace {
 
 std::vector<FXCMapPlatform> FXCMapPlatform::platforms_;
 std::vector<FXPtr<FXCharBlock> > FXCMapPlatform::unicodeBlocks_;
+
+bool
+FXCharArrayBlock::contains(FXChar c) const {
+    return std::binary_search(chs_.begin(), chs_.end(), c);
+}
 
 const std::vector<FXCMapPlatform> &
 FXCMapPlatform::availablePlatforms() {
@@ -174,17 +180,10 @@ FXCMap::isUnicode() const {
 
 const FXVector<FXPtr<FXCharBlock> > & 
 FXCMap::blocks() const {
-    auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
-    if (fullBlocks.empty()) {
-        static std::vector<FXPtr<FXCharBlock> > nilVec;
-        if (nilVec.empty()) {
-            FXPtr<FXCharBlock> nilBlock(new FXNullCharBlock("NIL"));
-            nilVec.push_back(nilBlock);
-        }
-        return nilVec;
-    } else {
-        return fullBlocks;        
-    }
+    if (blocks_.empty())
+        const_cast<FXCMap*>(this)->initBlocks();
+    
+    return blocks_;
 }
 
 FXVector<FXChar>
@@ -214,9 +213,76 @@ FXCMap::charsForGlyph(FXGlyphID gid) const {
 
 FXGlyphID
 FXCMap::glyphForChar(FXChar c) const {
-    assert(isCurrent());
-    // FIXME: remove requirement of isCurrent
-    return FT_Get_Char_Index(face0(), c);
+    auto itr = std::lower_bound(charMap_.begin(), charMap_.end(), c, [](const FXCharMapItem & item, FXChar c) {
+        return item.c < c;
+    });
+    if (itr != charMap_.end() && (c == itr->c)) 
+        return itr->g;
+    return FXGIDNotDef;
+}
+
+
+void
+FXCMap::initBlocks() {
+    auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
+    if (fullBlocks.empty()) {
+        FXPtr<FXCharBlock> nilBlock(new FXNullCharBlock("NIL", true));
+        blocks_.push_back(nilBlock);
+    } else if (!isUnicode()) {
+        blocks_ = fullBlocks;
+    }
+    else {
+        // ensure charMap_ is properly initialized.
+        charsForGlyph(0);
+        
+        FXVector<bool> charFound(face0()->num_glyphs);
+        FXVector<FXPtr<FXCharBlock> > uniCompactBlocks;
+        FXVector<FXChar> chs;
+        size_t currentUniBlockIndex = 0;
+        
+        for (const auto & it : charMap_) {
+            charFound[it.g] = true;
+            
+            FXPtr<FXCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
+            if (currentUniBlock->contains(it.c)) {
+                chs.push_back(it.c);
+            }
+            else {
+                if (chs.size()) {
+                    FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, false, currentUniBlock->name()));
+                    uniCompactBlocks.push_back(newBlock);
+                }
+                // find next Unicode block
+                size_t uniBlockIndex = currentUniBlockIndex + 1;
+                while (uniBlockIndex < fullBlocks.size() && (!fullBlocks[uniBlockIndex]->contains(it.c)))
+                    ++ uniBlockIndex;
+                // can't find the next block
+                if (uniBlockIndex == fullBlocks.size())
+                    break;
+                
+                chs.clear();
+                chs.push_back(it.c);
+                currentUniBlockIndex = uniBlockIndex;
+            }
+        }
+
+        if (currentUniBlockIndex < fullBlocks.size() && chs.size()) {
+            FXPtr<FXCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
+            FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, false, currentUniBlock->name()));
+            uniCompactBlocks.push_back(newBlock);
+        }
+
+        // for glyphs which are not in the charMap
+        chs.clear();
+        for (size_t gid = 0; gid < charFound.size(); ++ gid) {
+            if (!charFound[gid])
+                chs.push_back(gid);
+        }
+        FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, true, "Unassigned"));
+        uniCompactBlocks.push_back(newBlock); 
+
+        blocks_ = uniCompactBlocks;
+    }
 }
 
 bool
@@ -231,7 +297,10 @@ FXCMap::initGlyphsMap() {
     
     FXFTFace face = face0();
     glyphMap_ = FXVector<FXChar>(face->num_glyphs, UNDEFINED_CHAR_MARK);
+    charMap_.reserve(face->num_glyphs);
     FT_UInt gid = 0;
+
+    // ch in order
     FT_ULong ch = FT_Get_First_Char(face, &gid);
     while (gid != 0) {
         FXChar c = glyphMap_[gid];
@@ -241,6 +310,7 @@ FXCMap::initGlyphsMap() {
             glyphMap_[gid] = EXTRA_CHARS_MARK;
             extraGlyphsMap_[gid].push_back(ch);
         }
+        charMap_.emplace_back(ch, gid);
         ch = FT_Get_Next_Char(face, ch, &gid);
     }
     return true;

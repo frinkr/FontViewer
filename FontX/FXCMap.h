@@ -5,8 +5,9 @@ class FXFace;
 
 class FXCharBlock {
 public:
-    explicit FXCharBlock(const FXString & name)
-        : name_(name) {}
+    explicit FXCharBlock(const FXString & name, bool isGID)
+        : name_(name)
+        , isGID_(isGID) {}
     virtual ~FXCharBlock() {}
 
     virtual std::string
@@ -19,8 +20,17 @@ public:
 
     virtual FXChar
     get(size_t index) const = 0;
+
+    virtual bool
+    contains(FXChar c) const = 0;
+
+    virtual bool
+    isGID() const {
+        return isGID_;
+    }
 protected:
     FXString   name_;
+    bool       isGID_;
 };
 
 class FXNullCharBlock : public FXCharBlock {
@@ -35,14 +45,19 @@ public:
     get(size_t) const {
         return FXCharInvalid;
     }
+    
+    virtual bool
+    contains(FXChar c) const {
+        return false;
+    }
 };
 
 class FXCharRangeBlock : public FXCharBlock {
 public:
-    FXCharRangeBlock(FXChar from, FXChar to, const std::string & name, bool isUnicode = true)
-        : FXCharBlock(name)
+    FXCharRangeBlock(FXChar from, FXChar to, const std::string & name, bool isGID = false, bool isUnicode = true)
+        : FXCharBlock(name, isGID)
         , range_{from, to}
-        , isUnicode_(isUnicode) {}
+        , isUnicode_(isUnicode && !isGID) {}
 
     virtual size_t
     size() const {
@@ -53,7 +68,12 @@ public:
     get(size_t index) const {
         return static_cast<FXChar>(index + range_.from);
     }
-
+    
+    virtual bool
+    contains(FXChar c) const {
+        return c >= range_.from && c <= range_.to;
+    }
+    
     const FXCharRange &
     range() const {
         return range_;
@@ -69,9 +89,11 @@ protected:
     bool           isUnicode_;
 };
 
-class FXCharListBlock : public FXCharBlock {
+class FXCharArrayBlock : public FXCharBlock {
 public:
-    using FXCharBlock::FXCharBlock;
+    FXCharArrayBlock(const FXVector<FXChar> chs, bool isGID, const FXString & name)
+        : FXCharBlock(name, isGID)
+        , chs_(chs) {}
 
     virtual size_t
     size() const {
@@ -82,6 +104,10 @@ public:
     get(size_t index) const {
         return chs_[index];
     }
+
+    virtual bool
+    contains(FXChar c) const;
+
 protected:
     FXVector<FXChar>  chs_;
 };
@@ -181,6 +207,14 @@ private:
 
     FXFTFace
     face0() const;
+    
+private:
+    struct FXCharMapItem {
+        FXChar    c;
+        FXGlyphID g;
+        FXCharMapItem(FXChar c, FXGlyphID g) : c(c), g(g) {}
+    };
+    
 private:
     FXFace           * face_;
     size_t             index_;
@@ -188,6 +222,9 @@ private:
     uint16_t           encodingID_;
     FXVector<FXChar>   glyphMap_;
     FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
+    FXVector<FXCharMapItem> charMap_;
+
+    FXVector<FXPtr<FXCharBlock> > blocks_;
 };
 
 

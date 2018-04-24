@@ -95,7 +95,7 @@ QUGlyphInfoWidget::setGlyph(FXGlyphID gid) {
 void
 QUGlyphInfoWidget::setChar(FXChar c) {
     char_ = c;
-    gid_ = NotDef;
+    gid_ = FXGIDNotDef;
     loadGlyph();
 }
 

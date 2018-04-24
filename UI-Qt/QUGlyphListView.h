@@ -60,7 +60,7 @@ public:
     setGlyphLabel(QUGlyphLabel label);
 
     FXChar
-    charAt(const QModelIndex & index) const;
+    charAt(const QModelIndex & index, bool & isGID) const;
 public:
     int
     rowCount(const QModelIndex &) const;
@@ -70,6 +70,7 @@ public:
 
 protected:
     FXPtr<FXFace>    face_;
+    FXPtr<FXCharBlock> fullGlyphsBlock_;
     size_t           blockIndex_;
 
     QImage           dummyImage_;
