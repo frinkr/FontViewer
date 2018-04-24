@@ -1,6 +1,7 @@
 #pragma once
 #include <QComboBox>
 #include <QAbstractListModel>
+#include <QSortFilterProxyModel>
 #include "FontX/FXFaceDatabase.h"
 #include "QUDocument.h"
 
@@ -25,6 +26,22 @@ protected:
     displayName(size_t index) const;
 };
 
+class QUSortFilterFontListModel : public QSortFilterProxyModel {
+    Q_OBJECT
+public:
+    using QSortFilterProxyModel::QSortFilterProxyModel;
+
+    bool
+    lessThan(const QModelIndex & left, const QModelIndex & right) const;
+
+    bool
+    filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const;
+
+protected:
+    QUFontListModel *
+    fontListModel() const;
+};
+
 class QUFontComboBox : public QComboBox {
     Q_OBJECT
 public:
@@ -32,5 +49,9 @@ public:
 
     QUFontURI
     selectedFont() const;
+
+protected:
+    int
+    currentSourceRow() const;
 };
 

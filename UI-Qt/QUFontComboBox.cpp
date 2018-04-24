@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QSortFilterProxyModel>
 #include "FontX/FXFaceDatabase.h"
 #include "QUFontManager.h"
 #include "QUFontComboBox.h"
@@ -48,18 +49,49 @@ QUFontListModel::db() const {
     return QUFontManager::get().db();
 }
 
+bool
+QUSortFilterFontListModel::lessThan(const QModelIndex & left, const QModelIndex & right) const {
+    QVariant d0 = fontListModel()->data(left, Qt::DisplayRole);
+    QVariant d1 = fontListModel()->data(right, Qt::DisplayRole);
+    return d0 < d1;
+    return true;
+}
+
+bool
+QUSortFilterFontListModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const {
+    return true;
+}
+
+QUFontListModel *
+QUSortFilterFontListModel::fontListModel() const {
+    return qobject_cast<QUFontListModel *>(sourceModel());
+}
+
 QUFontComboBox::QUFontComboBox(QWidget * parent)
     : QComboBox(parent) {
-    setModel(new QUFontListModel(this));
+    QSortFilterProxyModel * proxy = new QUSortFilterFontListModel(this);
+    proxy->setSourceModel(new QUFontListModel(this));
+    setModel(proxy);
+    proxy->sort(0);
     //setEditable(true);
     //setDuplicatesEnabled(true);
 }
 
 QUFontURI
 QUFontComboBox::selectedFont() const {
-    auto desc = QUFontManager::get().db()->faceDescriptor(currentIndex());
-    auto atts = QUFontManager::get().db()->faceAttributes(currentIndex());
+    int row = currentSourceRow();
+    auto desc = QUFontManager::get().db()->faceDescriptor(row);
+    auto atts = QUFontManager::get().db()->faceAttributes(row);
     atts.names.familyName();
     QUFontURI uri{toQString(desc.filePath), desc.index};
     return uri;
+}
+
+int
+QUFontComboBox::currentSourceRow() const {
+    QSortFilterProxyModel * m = qobject_cast<QSortFilterProxyModel*>(model());
+    QModelIndex index = m->index(currentIndex(), modelColumn());
+    
+    QModelIndex srcIndex = m->mapToSource(index);
+    return srcIndex.row();
 }
