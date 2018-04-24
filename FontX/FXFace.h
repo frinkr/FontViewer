@@ -112,7 +112,7 @@ public:
 
 public:
     FXGlyph
-    glyph(FXChar c, bool isGID = false);
+    glyph(FXGChar c);
 
     /**
      * return the chars which maps to the gid in current cmap

@@ -72,7 +72,7 @@ private slots:
     onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     void
-    onCharLinkClicked(FXChar c);
+    onCharLinkClicked(FXGChar c);
 
     void
     onFontInfoAction();

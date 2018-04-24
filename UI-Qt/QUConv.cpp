@@ -61,7 +61,7 @@ placeImage(const QImage & image, const QSize & emSize) {
 }
 
 QImage
-charImage(FXChar c, const QSize & emSize) {
+unicodeCharImage(FXChar c, const QSize & emSize) {
     if (FXUnicode::defined(c)) {
         QRect emRect(0, 0, emSize.width(), emSize.height());
         QImage out(emSize, QImage::Format_ARGB32);
@@ -86,4 +86,5 @@ charImage(FXChar c, const QSize & emSize) {
     else {
         return QImage(":images/undefined_d.png");
     }
+
 }

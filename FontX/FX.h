@@ -49,3 +49,40 @@ struct FXCharRange {
 
 using fu = short;  // font units
 
+enum FXGCharType {
+    FXGCharTypeNone,
+    FXGCharTypeUnicode,
+    FXGCharTypeGlyphID,
+    FXGCharTypeOther,   // characters in other encoding
+};
+
+struct FXGChar {
+    FXGCharType type;
+    FXChar      value;
+
+    constexpr FXGChar(FXGCharType type = FXGCharTypeNone, FXChar value = FXCharInvalid)
+        : type(type)
+        , value(value){}
+
+    constexpr bool
+    operator<(const FXGChar & u) const {
+        return u.type == type && value < u.value;
+    }
+    
+    constexpr bool
+    operator==(const FXGChar & u) const {
+        return u.type == type && u.value == value;
+    }
+    
+    constexpr bool
+    operator!=(const FXGChar & u) const {
+        return !operator==(u);
+    }
+
+    constexpr bool
+    isUnicode() const {
+        return type == FXGCharTypeUnicode;
+    }
+};
+
+constexpr FXGChar FXGCharInvalid(FXGCharTypeNone, FXCharInvalid);

@@ -210,9 +210,10 @@ FXFace::selectCMap(size_t cmapIndex) {
 //
 
 FXGlyph
-FXFace::glyph(FXChar c, bool isGID) {
-    FXGlyphID gid = c;
-    if (isGID) {
+FXFace::glyph(FXGChar gc) {
+    FXGlyphID gid = gc.value;
+    FXChar c = gc.value;
+    if (FXGCharTypeGlyphID == gc.type) {
         const auto chs = charsForGlyph(gid);
         if (chs.size())
             c = chs[0];
@@ -224,8 +225,7 @@ FXFace::glyph(FXChar c, bool isGID) {
     }
     FXGlyph glyph;
     glyph.gid = gid;
-    glyph.character = c;
-    glyph.isUnicode = currentCMap().isUnicode();
+    glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
     FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 

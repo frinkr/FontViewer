@@ -3,12 +3,11 @@
 #include "FX.h"
 class FXFace;
 
-class FXCharBlock {
+class FXGCharBlock {
 public:
-    explicit FXCharBlock(const FXString & name, bool isGID)
-        : name_(name)
-        , isGID_(isGID) {}
-    virtual ~FXCharBlock() {}
+    explicit FXGCharBlock(const FXString & name)
+        : name_(name) {}
+    virtual ~FXGCharBlock() {}
 
     virtual std::string
     name() const {
@@ -18,60 +17,57 @@ public:
     virtual size_t
     size() const = 0;
 
-    virtual FXChar
+    virtual FXGChar
     get(size_t index) const = 0;
 
     virtual bool
-    contains(FXChar c) const = 0;
+    contains(const FXGChar & c) const = 0;
 
-    virtual bool
-    isGID() const {
-        return isGID_;
-    }
 protected:
     FXString   name_;
-    bool       isGID_;
 };
 
-class FXNullCharBlock : public FXCharBlock {
+class FXNullGCharBlock : public FXGCharBlock {
 public:
-    using FXCharBlock::FXCharBlock;
+    using FXGCharBlock::FXGCharBlock;
     virtual size_t
     size() const {
         return 0;
     }
 
-    virtual FXChar
+    virtual FXGChar
     get(size_t) const {
-        return FXCharInvalid;
+        return FXGCharInvalid;
     }
     
     virtual bool
-    contains(FXChar c) const {
+    contains(const FXGChar & ) const {
         return false;
     }
 };
 
-class FXCharRangeBlock : public FXCharBlock {
+class FXCharRangeBlock : public FXGCharBlock {
 public:
-    FXCharRangeBlock(FXChar from, FXChar to, const std::string & name, bool isGID = false, bool isUnicode = true)
-        : FXCharBlock(name, isGID)
+    FXCharRangeBlock(FXChar from, FXChar to, FXGCharType type, const std::string & name)
+        : FXGCharBlock(name)
         , range_{from, to}
-        , isUnicode_(isUnicode && !isGID) {}
+        , type_(type){}
 
     virtual size_t
     size() const {
         return range_.to - range_.from + 1;
     }
 
-    virtual FXChar
+    virtual FXGChar
     get(size_t index) const {
-        return static_cast<FXChar>(index + range_.from);
+        return {type_, static_cast<FXChar>(index + range_.from)};
     }
     
     virtual bool
-    contains(FXChar c) const {
-        return c >= range_.from && c <= range_.to;
+    contains(const FXGChar & c) const {
+        if (c.type != type_)
+            return false;
+        return c.value >= range_.from && c.value <= range_.to;
     }
     
     const FXCharRange &
@@ -79,20 +75,15 @@ public:
         return range_;
     }
 
-    bool
-    isUnicode() const {
-        return isUnicode_;
-    }
-    
 protected:
     FXCharRange    range_;
-    bool           isUnicode_;
+    FXGCharType    type_;
 };
 
-class FXCharArrayBlock : public FXCharBlock {
+class FXCharArrayBlock : public FXGCharBlock {
 public:
-    FXCharArrayBlock(const FXVector<FXChar> chs, bool isGID, const FXString & name)
-        : FXCharBlock(name, isGID)
+    FXCharArrayBlock(const FXVector<FXGChar> chs, const FXString & name)
+        : FXGCharBlock(name)
         , chs_(chs) {}
 
     virtual size_t
@@ -100,16 +91,16 @@ public:
         return chs_.size();
     }
 
-    virtual FXChar
+    virtual FXGChar
     get(size_t index) const {
         return chs_[index];
     }
 
     virtual bool
-    contains(FXChar c) const;
+    contains(const FXGChar & c) const;
 
 protected:
-    FXVector<FXChar>  chs_;
+    FXVector<FXGChar>  chs_;
 };
 
 class FXCMapPlatform {
@@ -122,9 +113,9 @@ public:
 
 private:
     static std::vector<FXCMapPlatform> platforms_;
-    static std::vector<FXPtr<FXCharBlock> > unicodeBlocks_;
+    static std::vector<FXPtr<FXGCharBlock> > unicodeBlocks_;
 public:
-    const std::vector<FXPtr<FXCharBlock> > &
+    const std::vector<FXPtr<FXGCharBlock> > &
     blocks(uint16_t encodingID) const;
     
 private:
@@ -148,12 +139,12 @@ private:
     void
     initAdobeEncoding();
     
-    static const std::vector<FXPtr<FXCharBlock> > &
+    static const std::vector<FXPtr<FXGCharBlock> > &
     getUnicodeBlocks() ;
     
 private:
     uint16_t platformID_;
-    std::map<uint16_t, std::vector<FXPtr<FXCharBlock> > > blocksMap_;
+    std::map<uint16_t, std::vector<FXPtr<FXGCharBlock> > > blocksMap_;
 };
 
 class FXCMap {
@@ -187,7 +178,7 @@ public:
     bool
     isUnicode() const;
 
-    const FXVector<FXPtr<FXCharBlock> > &
+    const FXVector<FXPtr<FXGCharBlock> > &
     blocks() const;
 
     FXVector<FXChar> 
@@ -224,7 +215,7 @@ private:
     FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
     FXVector<FXCharMapItem> charMap_;
 
-    FXVector<FXPtr<FXCharBlock> > blocks_;
+    FXVector<FXPtr<FXGCharBlock> > blocks_;
 };
 
 

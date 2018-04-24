@@ -155,17 +155,13 @@ void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
-        bool isGID = false;
-        FXChar c = document_->model()->charAt(index, isGID);
-        if (!isGID)
-            ui_->textBrowser->setChar(c);
-        else
-            ui_->textBrowser->setGlyph(c);
+        FXGChar c = document_->model()->charAt(index);
+        ui_->textBrowser->setChar(c);
     }
 }
     
 void
-QUDocumentWindow::onCharLinkClicked(FXChar c) {
+QUDocumentWindow::onCharLinkClicked(FXGChar c) {
     //ui_->listView->selectChar(c);
 }
 

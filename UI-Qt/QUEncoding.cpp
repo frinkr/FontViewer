@@ -2,37 +2,47 @@
 #include "QUEncoding.h"
 
 QString
-QUEncoding::charHexNotation(FXChar c, bool unicode) {
-    if (unicode)
-        return QString("U+%1").arg(c, 4, 16, QChar('0')).toUpper();
-    else
-        return "0x" + QString("%1").arg(c, 4, 16, QChar('0')).toUpper();
+QUEncoding::charHexNotation(FXGChar c) {
+    switch (c.type) {
+    case FXGCharTypeUnicode:
+        return QString("U+%1").arg(c.value, 4, 16, QChar('0')).toUpper();
+    case FXGCharTypeOther:
+        return "0x" + QString("%1").arg(c.value, 4, 16, QChar('0')).toUpper();
+    case FXGCharTypeGlyphID:
+        return "gid" + QString("%1").arg(c.value);
+    default:
+        return QString();
+    }
 }
 
-FXChar
-QUEncoding::charFromHexNotation(const QString & str, bool * unicode) {
+FXGChar
+QUEncoding::charFromHexNotation(const QString & str) {
     QString code = str;
-
-    if (code.indexOf("U+") == 0 || code.indexOf("0x"))
-        code.remove(0, 2);
-    
     bool ok = false;
-    FXChar c = code.toUInt(&ok, 16);
-    if (ok) return c;
-    return FXCharInvalid;
+    if (code.indexOf("U+") == 0 || code.indexOf("0x") == 0) {
+        code.remove(0, 2);
+        FXChar c = code.toUInt(&ok, 16);
+        return ok? FXGChar(FXGCharTypeUnicode, c): FXGCharInvalid;
+    }
+    else if (code.indexOf("gid") == 0){
+        code.remove(0, 3);
+        FXChar c = code.toUInt(&ok);
+        return ok? FXGChar(FXGCharTypeGlyphID, c): FXGCharInvalid;
+    }
+    return FXGCharInvalid;
 }
 
 QUrl
-QUEncoding::charHexLink(FXChar c, bool unicode) {
-    return QUrl(QString("fv://go/%1").arg(charHexNotation(c, unicode)));
+QUEncoding::charHexLink(FXGChar c) {
+    return QUrl(QString("fv://go/%1").arg(charHexNotation(c)));
 }
 
 bool
 QUEncoding::isCharHexLink(const QUrl & link) {
-    return charFromLink(link) != FXCharInvalid;
+    return charFromLink(link) != FXGCharInvalid;
 }
 
-FXChar
+FXGChar
 QUEncoding::charFromLink(const QUrl & link) {
     if (link.scheme() == "fv" && link.host() == "go") {
         QString path = link.path();
@@ -40,5 +50,5 @@ QUEncoding::charFromLink(const QUrl & link) {
             path.remove(0, 1);
         return charFromHexNotation(path);
     }
-    return FXCharInvalid;
+    return FXGCharInvalid;
 }

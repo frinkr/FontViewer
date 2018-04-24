@@ -15,17 +15,11 @@ public:
     setQUDocument(QUDocument * document);
 
     void
-    setGlyph(FXGlyphID gid);
-
-    void
-    setChar(FXChar c);
+    setChar(FXGChar c);
     
-    FXGlyphID
-    glyph() const;
-
 signals:
     void
-    charLinkClicked(FXChar c);
+    charLinkClicked(FXGChar c);
     
 protected:
     void
@@ -37,7 +31,6 @@ protected slots:
     
 protected:
     QUDocument *   document_;
-    FXGlyphID      gid_;
-    FXChar         char_;
+    FXGChar        char_;
 };
 

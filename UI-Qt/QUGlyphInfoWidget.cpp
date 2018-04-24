@@ -13,12 +13,11 @@
 namespace {
     QMap<QString, QVariant>
     templateValues(const FXGlyph & glyph) {
-        const FXChar c = glyph.character;
-        const bool isUnicode = glyph.isUnicode;
+        const FXChar c = glyph.character.value;
         
         QMap<QString, QVariant> map;
         map["NAME"] = toQString(glyph.name);
-        map["CHAR"] = QUEncoding::charHexNotation(c, isUnicode);
+        map["CHAR"] = QUEncoding::charHexNotation(glyph.character);
         map["ID"] = glyph.gid;
 
         // Metrics
@@ -32,7 +31,7 @@ namespace {
         map["VERT_BEARING_Y"] = glyph.metrics.vertBearingY;
 
         // Unicode
-        bool isDefined = isUnicode && FXUnicode::defined(c);
+        bool isDefined = glyph.character.isUnicode() && FXUnicode::defined(c);
         map["UNICODE_NAME"] = isDefined? toQString(FXUnicode::name(c)): QString();
         map["UNICODE_BLOCK"] = isDefined? toQString(FXUnicode::block(c).name): QString();
         map["UNICODE_SCRIPT"] = isDefined? toQString(FXUnicode::script(c)) : QString();
@@ -42,8 +41,8 @@ namespace {
         QStringList decompositionLinks;
         for (FXChar d : FXUnicode::decomposition(c)) {
             decompositionLinks << QString("<a href=\"%1\">%2</a>")
-                .arg(QUEncoding::charHexLink(d).toDisplayString())
-                .arg(QUEncoding::charHexNotation(d));
+                .arg(QUEncoding::charHexLink({FXGCharTypeUnicode, d}).toDisplayString())
+                .arg(QUEncoding::charHexNotation({FXGCharTypeUnicode, d}));
         }
         
         map["UNICODE_DECOMPOSITION"] = isDefined? decompositionLinks.join(", "): QString();
@@ -66,9 +65,7 @@ namespace {
 QUGlyphInfoWidget::QUGlyphInfoWidget(QWidget *parent)
     : QTextBrowser(parent)
     , document_(nullptr)
-    , gid_(0)
-    , char_(0) {
-
+    , char_{FXGCharTypeNone, 0} {
     connect(this, &QTextBrowser::anchorClicked,
             this, &QUGlyphInfoWidget::onLinkClicked);
     setOpenLinks(false);
@@ -85,33 +82,15 @@ QUGlyphInfoWidget::setQUDocument(QUDocument * document) {
 }
 
 void
-QUGlyphInfoWidget::setGlyph(FXGlyphID gid) {
-    gid_ = gid;
-    char_ = FXCharInvalid;
-    
-    loadGlyph();
-}
-
-void
-QUGlyphInfoWidget::setChar(FXChar c) {
+QUGlyphInfoWidget::setChar(FXGChar c) {
     char_ = c;
-    gid_ = FXGIDNotDef;
     loadGlyph();
-}
-
-FXGlyphID
-QUGlyphInfoWidget::glyph() const {
-    return gid_;
 }
 
 void
 QUGlyphInfoWidget::loadGlyph() {
     
-    FXGlyph glyph;
-    if (char_ != FXCharInvalid)
-        glyph = document_->face()->glyph(char_, false);
-    else
-        glyph = document_->face()->glyph(gid_, true);
+    FXGlyph glyph = document_->face()->glyph(char_);
     
     QTextDocument * qdoc = new QTextDocument;
     qdoc->addResource(QTextDocument::ImageResource,
@@ -125,7 +104,7 @@ QUGlyphInfoWidget::loadGlyph() {
     
 void
 QUGlyphInfoWidget::onLinkClicked(const QUrl & link) {
-    FXChar c = QUEncoding::charFromLink(link);
-    if (c != FXCharInvalid)
+    FXGChar c = QUEncoding::charFromLink(link);
+    if (c != FXGCharInvalid)
         emit charLinkClicked(c);
 }

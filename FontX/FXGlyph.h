@@ -29,8 +29,7 @@ struct FXGlyphMetrics {
 struct FXGlyph {
     FXGlyphID         gid;
     FXString          name;    
-    FXChar            character;
-    bool              isUnicode;
+    FXGChar           character; // either FXGCharUnicode or FXGCharOtherCode
     FXGlyphMetrics    metrics;
     FXBitmapARGB      bitmap;
 };

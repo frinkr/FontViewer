@@ -31,7 +31,7 @@ int main() {
 
         FXCMap cm = face->currentCMap();
         assert(cm.isUnicode());
-        for (FXPtr<FXCharBlock> block : cm.blocks()) {
+        for (FXPtr<FXGCharBlock> block : cm.blocks()) {
             std::cout << "BLOCK " << block->name() << ": " << block->size() << std::endl;
             size_t count = block->size();
             for (size_t i = 0; i < count; ++ i) {

@@ -12,11 +12,13 @@ namespace {
 }
 
 std::vector<FXCMapPlatform> FXCMapPlatform::platforms_;
-std::vector<FXPtr<FXCharBlock> > FXCMapPlatform::unicodeBlocks_;
+std::vector<FXPtr<FXGCharBlock> > FXCMapPlatform::unicodeBlocks_;
 
 bool
-FXCharArrayBlock::contains(FXChar c) const {
-    return std::binary_search(chs_.begin(), chs_.end(), c);
+FXCharArrayBlock::contains(const FXGChar & c) const {
+    return std::binary_search(chs_.begin(), chs_.end(), c, [](const FXGChar & v, const FXGChar & c) {
+        return (v.type == c.type) && (v.value < c.value);
+    });
 }
 
 const std::vector<FXCMapPlatform> &
@@ -40,14 +42,14 @@ FXCMapPlatform::get(uint16_t platformID) {
     return get(TT_PLATFORM_APPLE_UNICODE);
 }
 
-const std::vector<FXPtr<FXCharBlock> > &
+const std::vector<FXPtr<FXGCharBlock> > &
 FXCMapPlatform::blocks(uint16_t encodingID) const {
     auto itr = blocksMap_.find(encodingID);
     if (itr != blocksMap_.end())
         return itr->second;
 
 
-    static std::vector<FXPtr<FXCharBlock> > empty;
+    static std::vector<FXPtr<FXGCharBlock> > empty;
     return empty;
 }
 
@@ -84,7 +86,7 @@ FXCMapPlatform::initUnicodeEncoding() {
 
 void
 FXCMapPlatform::initMacintoshEncoding() {
-    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Mac Roman", false));
+    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Mac Roman"));
 }
 
 void
@@ -96,18 +98,18 @@ void
 FXCMapPlatform::initMicrosoftEncoding() {
     blocksMap_[TT_MS_ID_UNICODE_CS] = getUnicodeBlocks();
     blocksMap_[TT_MS_ID_UCS_4] = getUnicodeBlocks();
-    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF, "Windows Symbol"));
+    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF, FXGCharTypeUnicode, "Windows Symbol"));
 }
 
 void
 FXCMapPlatform::initAdobeEncoding() {
-    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Standard", false));
-    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Expert", false));
-    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Custom", false));
-    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXCharRangeBlock>(0, 255, "Latin 1", false));
+    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Standard"));
+    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Expert"));
+    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Custom"));
+    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Latin 1"));
 }
 
-const std::vector<FXPtr<FXCharBlock> > &
+const std::vector<FXPtr<FXGCharBlock> > &
 FXCMapPlatform::getUnicodeBlocks() {
     if (unicodeBlocks_.size())
         return unicodeBlocks_;
@@ -116,8 +118,8 @@ FXCMapPlatform::getUnicodeBlocks() {
         unicodeBlocks_.push_back(std::make_shared<FXCharRangeBlock>(
                                      ucdBlock.from,
                                      ucdBlock.to,
-                                     ucdBlock.name,
-                                     true));
+                                     FXGCharTypeUnicode,
+                                     ucdBlock.name));
     return unicodeBlocks_;
 }
 
@@ -178,7 +180,7 @@ FXCMap::isUnicode() const {
         ;
 }
 
-const FXVector<FXPtr<FXCharBlock> > & 
+const FXVector<FXPtr<FXGCharBlock> > & 
 FXCMap::blocks() const {
     if (blocks_.empty())
         const_cast<FXCMap*>(this)->initBlocks();
@@ -226,7 +228,7 @@ void
 FXCMap::initBlocks() {
     auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
     if (fullBlocks.empty()) {
-        FXPtr<FXCharBlock> nilBlock(new FXNullCharBlock("NIL", true));
+        FXPtr<FXGCharBlock> nilBlock(new FXNullGCharBlock("NIL"));
         blocks_.push_back(nilBlock);
     } else if (!isUnicode()) {
         blocks_ = fullBlocks;
@@ -236,39 +238,39 @@ FXCMap::initBlocks() {
         charsForGlyph(0);
         
         FXVector<bool> charFound(face0()->num_glyphs);
-        FXVector<FXPtr<FXCharBlock> > uniCompactBlocks;
-        FXVector<FXChar> chs;
+        FXVector<FXPtr<FXGCharBlock> > uniCompactBlocks;
+        FXVector<FXGChar> chs;
         size_t currentUniBlockIndex = 0;
         
         for (const auto & it : charMap_) {
             charFound[it.g] = true;
-            
-            FXPtr<FXCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
-            if (currentUniBlock->contains(it.c)) {
-                chs.push_back(it.c);
+            FXGChar c {FXGCharTypeUnicode, it.c};
+            FXPtr<FXGCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
+            if (currentUniBlock->contains(c)) {
+                chs.push_back(c);
             }
             else {
                 if (chs.size()) {
-                    FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, false, currentUniBlock->name()));
+                    FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, currentUniBlock->name()));
                     uniCompactBlocks.push_back(newBlock);
                 }
                 // find next Unicode block
                 size_t uniBlockIndex = currentUniBlockIndex + 1;
-                while (uniBlockIndex < fullBlocks.size() && (!fullBlocks[uniBlockIndex]->contains(it.c)))
+                while (uniBlockIndex < fullBlocks.size() && (!fullBlocks[uniBlockIndex]->contains(c)))
                     ++ uniBlockIndex;
                 // can't find the next block
                 if (uniBlockIndex == fullBlocks.size())
                     break;
                 
                 chs.clear();
-                chs.push_back(it.c);
+                chs.push_back(c);
                 currentUniBlockIndex = uniBlockIndex;
             }
         }
 
         if (currentUniBlockIndex < fullBlocks.size() && chs.size()) {
-            FXPtr<FXCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
-            FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, false, currentUniBlock->name()));
+            FXPtr<FXGCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
+            FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, currentUniBlock->name()));
             uniCompactBlocks.push_back(newBlock);
         }
 
@@ -276,9 +278,9 @@ FXCMap::initBlocks() {
         chs.clear();
         for (size_t gid = 0; gid < charFound.size(); ++ gid) {
             if (!charFound[gid])
-                chs.push_back(gid);
+                chs.push_back({FXGCharTypeGlyphID, (FXChar)gid});
         }
-        FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, true, "Unassigned"));
+        FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, "Unassigned"));
         uniCompactBlocks.push_back(newBlock); 
 
         blocks_ = uniCompactBlocks;

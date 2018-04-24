@@ -38,7 +38,7 @@ public:
     const FXCMap &
     currentCMap() const;
     
-    FXPtr<FXCharBlock>
+    FXPtr<FXGCharBlock>
     currentBlock() const;
 
     QSize
@@ -59,8 +59,8 @@ public:
     void 
     setGlyphLabel(QUGlyphLabel label);
 
-    FXChar
-    charAt(const QModelIndex & index, bool & isGID) const;
+    FXGChar
+    charAt(const QModelIndex & index) const;
 public:
     int
     rowCount(const QModelIndex &) const;
@@ -70,7 +70,7 @@ public:
 
 protected:
     FXPtr<FXFace>    face_;
-    FXPtr<FXCharBlock> fullGlyphsBlock_;
+    FXPtr<FXGCharBlock> fullGlyphsBlock_;
     size_t           blockIndex_;
 
     QImage           dummyImage_;

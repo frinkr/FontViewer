@@ -5,18 +5,18 @@
 
 struct QUEncoding {
     static QString
-    charHexNotation(FXChar c, bool unicode = true);
+    charHexNotation(FXGChar c);
 
-    static FXChar
-    charFromHexNotation(const QString & str, bool * unicode = nullptr);
+    static FXGChar
+    charFromHexNotation(const QString & str);
     
     static QUrl
-    charHexLink(FXChar c, bool unicode = true);
+    charHexLink(FXGChar c);
 
     static bool
     isCharHexLink(const QUrl & link);
     
-    static FXChar
+    static FXGChar
     charFromLink(const QUrl & link);
 
     static FXVector<unsigned char>

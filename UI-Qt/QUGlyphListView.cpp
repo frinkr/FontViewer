@@ -41,12 +41,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     // draw the icon
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
-        QImage image;
-        if (g.gid || !model->charMode() || !g.isUnicode)
-            image = placeImage(toQImage(g.bitmap), emSize);
-        else
-            image = charImage(g.character, emSize);
-    
+        QImage image = placeImage(toQImage(g.bitmap), emSize);
         QIcon icon(QPixmap::fromImage(image));
         if (opt.state & QStyle::State_Selected)
             mode = QIcon::Selected;
@@ -55,7 +50,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 
     // draw the text
     if (true) {
-        const QString charCode = QUEncoding::charHexNotation(g.character, g.isUnicode);
+        const QString charCode = QUEncoding::charHexNotation(g.character);
 
         QString text;
         switch (model->glyphLabel()) {
@@ -88,7 +83,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     : QAbstractListModel(parent)
     , face_(face)
-    , fullGlyphsBlock_(new FXCharRangeBlock(0, face->glyphCount(), "All Glyphs", true, false))
+    , fullGlyphsBlock_(new FXCharRangeBlock(0, face->glyphCount(), FXGCharTypeGlyphID, "All Glyphs"))
     , blockIndex_(0)
     , dummyImage_(glyphEmSize(), QImage::Format_ARGB32)
     , charMode_(true)
@@ -102,7 +97,7 @@ QUGlyphListModel::currentCMap() const {
     return face_->currentCMap();
 }
     
-FXPtr<FXCharBlock>
+FXPtr<FXGCharBlock>
 QUGlyphListModel::currentBlock() const {
     if (charMode_)
         return currentCMap().blocks()[blockIndex_];
@@ -124,7 +119,7 @@ QUGlyphListModel::data(const QModelIndex & index, int role) const {
         return QVariant();
 
     if (role == QUGlyphRole) {
-        FXGlyph g = face_->glyph(currentBlock()->get(index.row()), currentBlock()->isGID());
+        FXGlyph g = face_->glyph(currentBlock()->get(index.row()));
         QVariant v;
         v.setValue(QUGlyph(g));
         return v;
@@ -173,9 +168,8 @@ QUGlyphListModel::setGlyphLabel(QUGlyphLabel label) {
     endResetModel();
 }
 
-FXChar
-QUGlyphListModel::charAt(const QModelIndex & index, bool & isGID) const {
-    isGID = currentBlock()->isGID();
+FXGChar
+QUGlyphListModel::charAt(const QModelIndex & index) const {
     return currentBlock()->get(index.row());
 }
 
