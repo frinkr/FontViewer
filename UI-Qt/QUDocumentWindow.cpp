@@ -75,7 +75,7 @@ QUDocumentWindow::initToolBar() {
     blockAction_ = toolBar->addWidget(new QUToolBarWidget(blockCombobox_, tr("Character Blocks")));
     reloadBlocks();
     
-    ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph.png"));
+    ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph_d.png"));
     
     toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
     toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));

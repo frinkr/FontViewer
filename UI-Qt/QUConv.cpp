@@ -34,14 +34,14 @@ glyphEmSize() {
 
 QImage
 placeImage(const QImage & image, const QSize & emSize) {
+
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());
     
     QImage out(emSize, image.isNull()?QImage::Format_ARGB32 : image.format());
-
+//    out.fill(qRgba(0, 0, 0, 0));
+    out.fill(Qt::white);
     QPainter p(&out);
-    QPen pen;
-    p.fillRect(emRect, Qt::white);
 
     const double r = 0.8;
     QRect outRect((1 - r) / 2 * emSize.width(),

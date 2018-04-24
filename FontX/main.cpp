@@ -35,9 +35,9 @@ int main() {
             std::cout << "BLOCK " << block->name() << ": " << block->size() << std::endl;
             size_t count = block->size();
             for (size_t i = 0; i < count; ++ i) {
-                FXChar c = block->get(i);
+                FXGChar c = block->get(i);
                 FXGlyph glyph = face->glyph(c);
-                std::cout << " - char " << std::hex << c << std::dec
+                std::cout << " - char " << std::hex << c.value << std::dec
                           << ": id " << glyph.gid
                           << ", lsb: " << glyph.metrics.lsb()
                           << ", rsb: " << glyph.metrics.rsb()
