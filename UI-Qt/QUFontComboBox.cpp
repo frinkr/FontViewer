@@ -1,5 +1,11 @@
+#include <QAbstractItemView>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QFocusEvent>
+#include <QApplication>
 #include <QFileInfo>
 #include <QLineEdit>
+#include <QTimer>
 #include <QSortFilterProxyModel>
 #include "FontX/FXFaceDatabase.h"
 #include "QUFontManager.h"
@@ -60,7 +66,17 @@ QUSortFilterFontListModel::lessThan(const QModelIndex & left, const QModelIndex 
 
 bool
 QUSortFilterFontListModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const {
-    return true;
+    if (filter_.isEmpty())
+        return true;
+    QModelIndex sourceIndex = fontListModel()->index(sourceRow, 0);
+    QVariant d = fontListModel()->data(sourceIndex, Qt::DisplayRole);
+    return d.toString().contains(filter_,  Qt::CaseInsensitive);
+}
+
+void
+QUSortFilterFontListModel::filter(const QString & text) {
+    filter_ = text;
+    invalidateFilter();
 }
 
 QUFontListModel *
@@ -75,10 +91,16 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     setModel(proxy);
     proxy->sort(0);
     setEditable(true);
+    setCompleter(nullptr);
+    setMaxVisibleItems(20);
+    
     connect(this, QOverload<int>::of(&QComboBox::activated),
             this, &QUFontComboBox::onFontSelected);
 
-    //setDuplicatesEnabled(true);
+    connect(lineEdit(), &QLineEdit::textEdited,
+            this, &QUFontComboBox::onLineEdited);
+
+    view()->installEventFilter(this);
 }
 
 QUFontURI
@@ -91,6 +113,11 @@ QUFontComboBox::selectedFont() const {
     return uri;
 }
 
+QUSortFilterFontListModel *
+QUFontComboBox::proxyModel() const {
+    return qobject_cast<QUSortFilterFontListModel*>(model());
+}
+
 QModelIndex
 QUFontComboBox::currentProxyIndex() const {
     return model()->index(currentIndex(), modelColumn());   
@@ -98,8 +125,25 @@ QUFontComboBox::currentProxyIndex() const {
     
 QModelIndex
 QUFontComboBox::currentSourceIndex() const {
-    QSortFilterProxyModel * m = qobject_cast<QSortFilterProxyModel*>(model());
-    return m->mapToSource(currentProxyIndex());
+    return proxyModel()->mapToSource(currentProxyIndex());
+}
+
+bool
+QUFontComboBox::eventFilter(QObject *watched, QEvent *event) {
+    if (event->type() == QEvent::KeyPress) {
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+        QKeyEvent* newEvent = new QKeyEvent(keyEvent->type(),
+                                            keyEvent->key(),
+                                            keyEvent->modifiers(), 
+                                            keyEvent->text(),
+                                            keyEvent->isAutoRepeat(),
+                                            keyEvent->count());
+
+        QFocusEvent* focusEvent = new QFocusEvent(QEvent::FocusIn, Qt::OtherFocusReason);
+        QCoreApplication::postEvent(lineEdit(), focusEvent);
+        QCoreApplication::postEvent(lineEdit(), newEvent);
+    }
+    return false;
 }
 
 void
@@ -107,4 +151,11 @@ QUFontComboBox::onFontSelected(int ) {
     QModelIndex index = currentProxyIndex();
     QVariant data = model()->data(index, Qt::DisplayRole);
     lineEdit()->setText(data.toString());
+}
+
+void
+QUFontComboBox::onLineEdited(const QString & text) {
+    proxyModel()->filter(text);
+    lineEdit()->setText(text);
+    showPopup();
 }

@@ -37,9 +37,16 @@ public:
     bool
     filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const;
 
+public:
+    void
+    filter(const QString & text);
+    
 protected:
     QUFontListModel *
     fontListModel() const;
+protected:
+    QString  filter_;
+    
 };
 
 class QUFontComboBox : public QComboBox {
@@ -50,14 +57,24 @@ public:
     QUFontURI
     selectedFont() const;
 protected:
+    QUSortFilterFontListModel *
+    proxyModel() const;
+    
     QModelIndex
     currentProxyIndex() const;
     
     QModelIndex
     currentSourceIndex() const;
-
+    
+protected:
+    virtual bool
+    eventFilter(QObject *watched, QEvent *event);
+                                                
 private slots:
     void
     onFontSelected(int index);
+
+    void
+    onLineEdited(const QString & text);
 };
 
