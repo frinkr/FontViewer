@@ -35,12 +35,25 @@ public:
 
     void
     setPostscriptName(const FXString & name);
+
+    FXMap<FXString, FXString>
+    localizedFamilyNames() const;
+
+    FXMap<FXString, FXString>
+    localizedStyleNames() const;
+
+    FXMap<FXString, FXString>
+    localizedPostscriptNames() const;
+
+    FXMap<FXString, FXString>
+    findSFNTNames(const FXVector<int> & nameIds) const;
+    
 protected:
     FXString
     findSFNTName(const FXVector<int> & nameIds,
                  const FXVector<FXString> & languages,
                  const FXString & defaultName = FXString()) const;
-
+    
     FXString     familyName_;
     FXString     styleName_;
     FXString     postscriptName_;

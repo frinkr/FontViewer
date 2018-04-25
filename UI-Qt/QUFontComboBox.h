@@ -15,6 +15,9 @@ public:
     
     QVariant
     data(const QModelIndex & index, int role) const;
+
+    bool
+    acceptRow(const QString & filter, int row) const;
 protected:
     FXPtr<FXFaceDatabase>
     db() const;

@@ -67,6 +67,21 @@ FXFaceNames::postscriptName() const {
                         postscriptName_);
 }
 
+FXMap<FXString, FXString>
+FXFaceNames::localizedFamilyNames() const {
+    return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY});
+}
+
+FXMap<FXString, FXString>
+FXFaceNames::localizedStyleNames() const {
+    return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY});
+}
+
+FXMap<FXString, FXString>
+FXFaceNames::localizedPostscriptNames() const {
+    return findSFNTNames({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME});
+}
+
 void
 FXFaceNames::setFamilyName(const FXString & name) {
     familyName_ = name;
@@ -80,6 +95,21 @@ FXFaceNames::setStyleName(const FXString & name) {
 void
 FXFaceNames::setPostscriptName(const FXString & name) {
     postscriptName_ = name;
+}
+
+FXMap<FXString, FXString>
+FXFaceNames::findSFNTNames(const FXVector<int> & nameIds) const {
+    FXMap<FXString, FXString> map;
+    for (auto itr = cbegin(); itr != cend(); ++ itr) {
+        if (itr->value.empty())
+            continue;
+        for (int nameId : nameIds) {
+            if (itr->nameId == nameId) {
+                map[itr->language] = itr->value;
+            }
+        }
+    }
+    return map;
 }
 
 FXString

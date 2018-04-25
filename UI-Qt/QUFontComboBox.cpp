@@ -34,6 +34,29 @@ QUFontListModel::data(const QModelIndex & index, int role) const {
     
 }
 
+bool
+QUFontListModel::acceptRow(const QString & filter, int row) const {
+    if (filter.isEmpty())
+        return true;
+    
+    if (displayName(row).contains(filter, Qt::CaseInsensitive))
+        return true;
+
+    auto const & atts = attributes(row);
+
+    auto searchInNames = [](const FXMap<FXString, FXString> & names, const QString & name) {
+        for (const auto it : names) {
+            if (toQString(it.second).contains(name, Qt::CaseInsensitive))
+                return true;
+        }
+        return false;
+    };
+
+    return searchInNames(atts.names.localizedFamilyNames(), filter) ||
+        searchInNames(atts.names.localizedStyleNames(), filter) ||
+        searchInNames(atts.names.localizedPostscriptNames(), filter);
+}
+
 const FXFaceAttributes &
 QUFontListModel::attributes(size_t index) const {
     return db()->faceAttributes(index);
@@ -68,9 +91,7 @@ bool
 QUSortFilterFontListModel::filterAcceptsRow(int sourceRow, const QModelIndex & sourceParent) const {
     if (filter_.isEmpty())
         return true;
-    QModelIndex sourceIndex = fontListModel()->index(sourceRow, 0);
-    QVariant d = fontListModel()->data(sourceIndex, Qt::DisplayRole);
-    return d.toString().contains(filter_,  Qt::CaseInsensitive);
+    return fontListModel()->acceptRow(filter_, sourceRow);
 }
 
 void
