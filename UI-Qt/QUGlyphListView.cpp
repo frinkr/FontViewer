@@ -115,9 +115,6 @@ QUGlyphListModel::data(const QModelIndex & index, int role) const {
     if (!index.isValid())
         return QVariant();
 
-    if (index.row() >= face_->glyphCount())
-        return QVariant();
-
     if (role == QUGlyphRole) {
         FXGlyph g = face_->glyph(currentBlock()->get(index.row()));
         QVariant v;
