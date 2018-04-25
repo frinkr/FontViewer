@@ -42,7 +42,8 @@ placeImage(const QImage & image, const QSize & emSize) {
 //    out.fill(qRgba(0, 0, 0, 0));
     out.fill(Qt::white);
     QPainter p(&out);
-
+    p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+    
     const double r = 0.8;
     QRect outRect((1 - r) / 2 * emSize.width(),
                   (1 - r) / 2 * emSize.height(),
