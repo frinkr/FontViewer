@@ -524,6 +524,10 @@ QPushButton {
     outline: none;
 }
 
+QPushButton:flat {
+    border: none;
+}
+
 QPushButton:disabled {
     background-color: #31363b;
     border-width: 1px;

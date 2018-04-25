@@ -11,9 +11,12 @@
     <file alias="images/table_d.png">../Resources/Images/table_d.png</file>
     <file alias="images/info.png">../Resources/Images/info.png</file>
     <file alias="images/info_d.png">../Resources/Images/info_d.png</file>
-    
     <file alias="images/undefined.png">../Resources/Images/undefined.png</file>
     <file alias="images/undefined_d.png">../Resources/Images/undefined_d.png</file>
+    <file alias="images/filter.png">../Resources/Images/filter.png</file>
+    <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
+    <file alias="images/open_d.svg">../Resources/Images/open_d.svg</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
+    <file alias="images/ok.png">../Resources/Images/OK.png</file>
 </qresource>
 </RCC>

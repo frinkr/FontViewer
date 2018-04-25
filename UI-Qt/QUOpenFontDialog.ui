@@ -6,64 +6,105 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>594</width>
-    <height>347</height>
+    <width>558</width>
+    <height>62</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Select Font</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>Font:</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QUFontComboBox" name="fontComboBox">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton">
-       <property name="text">
-        <string>Filter</string>
-       </property>
-       <property name="autoDefault">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="browseButton">
-       <property name="text">
-        <string>Browse</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="okButton">
-       <property name="text">
-        <string>OK</string>
-       </property>
-       <property name="default">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Font:</string>
+     </property>
+    </widget>
    </item>
    <item>
-    <widget class="QTextEdit" name="textEdit"/>
+    <widget class="QUFontComboBox" name="fontComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="browseButton">
+     <property name="toolTip">
+      <string>Open File</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="QUApplication.qrc">
+       <normaloff>:/images/open_d.svg</normaloff>:/images/open_d.svg</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>22</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="toolTip">
+      <string>Filter</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="QUApplication.qrc">
+       <normaloff>:/images/filter_d.png</normaloff>:/images/filter_d.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>22</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="autoDefault">
+      <bool>false</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="okButton">
+     <property name="toolTip">
+      <string>OK</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="QUApplication.qrc">
+       <normaloff>:/images/ok.png</normaloff>:/images/ok.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>22</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="default">
+      <bool>true</bool>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
    </item>
   </layout>
   <action name="actionOpen">
@@ -109,7 +150,9 @@
    <header>QUFontComboBox.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="QUApplication.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>okButton</sender>
