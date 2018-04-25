@@ -574,7 +574,7 @@ QTreeView:hover {
     color: #eff0f1;
 }
 
-QComboBox:on {
+QComboBox:!editable:on {
     padding-top: 3px;
     padding-left: 4px;
     selection-background-color: #4a4a4a;

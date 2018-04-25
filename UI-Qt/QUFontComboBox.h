@@ -67,6 +67,9 @@ protected:
     currentSourceIndex() const;
     
 protected:
+    virtual void
+    showPopup();
+    
     virtual bool
     eventFilter(QObject *watched, QEvent *event);
                                                 

@@ -128,6 +128,14 @@ QUFontComboBox::currentSourceIndex() const {
     return proxyModel()->mapToSource(currentProxyIndex());
 }
 
+void
+QUFontComboBox::showPopup() {
+    QComboBox::showPopup();
+    qreal y = mapToGlobal(rect().topLeft()).y();
+    QWidget *popup = this->findChild<QFrame*>(); 
+    popup->move(popup->x(),popup->y() + (popup->y() > y? 8 : -4));
+}
+
 bool
 QUFontComboBox::eventFilter(QObject *watched, QEvent *event) {
     if (event->type() == QEvent::KeyPress) {
