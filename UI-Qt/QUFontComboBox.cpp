@@ -1,4 +1,5 @@
 #include <QFileInfo>
+#include <QLineEdit>
 #include <QSortFilterProxyModel>
 #include "FontX/FXFaceDatabase.h"
 #include "QUFontManager.h"
@@ -73,13 +74,16 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     proxy->setSourceModel(new QUFontListModel(this));
     setModel(proxy);
     proxy->sort(0);
-    //setEditable(true);
+    setEditable(true);
+    connect(this, QOverload<int>::of(&QComboBox::activated),
+            this, &QUFontComboBox::onFontSelected);
+
     //setDuplicatesEnabled(true);
 }
 
 QUFontURI
 QUFontComboBox::selectedFont() const {
-    int row = currentSourceRow();
+    int row = currentSourceIndex().row();
     auto desc = QUFontManager::get().db()->faceDescriptor(row);
     auto atts = QUFontManager::get().db()->faceAttributes(row);
     atts.names.familyName();
@@ -87,11 +91,20 @@ QUFontComboBox::selectedFont() const {
     return uri;
 }
 
-int
-QUFontComboBox::currentSourceRow() const {
-    QSortFilterProxyModel * m = qobject_cast<QSortFilterProxyModel*>(model());
-    QModelIndex index = m->index(currentIndex(), modelColumn());
+QModelIndex
+QUFontComboBox::currentProxyIndex() const {
+    return model()->index(currentIndex(), modelColumn());   
+}
     
-    QModelIndex srcIndex = m->mapToSource(index);
-    return srcIndex.row();
+QModelIndex
+QUFontComboBox::currentSourceIndex() const {
+    QSortFilterProxyModel * m = qobject_cast<QSortFilterProxyModel*>(model());
+    return m->mapToSource(currentProxyIndex());
+}
+
+void
+QUFontComboBox::onFontSelected(int ) {
+    QModelIndex index = currentProxyIndex();
+    QVariant data = model()->data(index, Qt::DisplayRole);
+    lineEdit()->setText(data.toString());
 }

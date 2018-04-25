@@ -49,9 +49,15 @@ public:
 
     QUFontURI
     selectedFont() const;
-
 protected:
-    int
-    currentSourceRow() const;
+    QModelIndex
+    currentProxyIndex() const;
+    
+    QModelIndex
+    currentSourceIndex() const;
+
+private slots:
+    void
+    onFontSelected(int index);
 };
 
