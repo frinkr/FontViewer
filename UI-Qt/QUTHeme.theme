@@ -1,8 +1,0 @@
-[Icon Theme]
-Name=FontViewerLight
-Comment=FontViewer Light icons
-
-Directories=app
-
-[app]
-Type=Fixed

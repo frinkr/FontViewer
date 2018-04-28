@@ -1,6 +1,7 @@
 #pragma once
 
-#include <QWidget.h>
+#include <QWidget>
+
 class QBoxLayout;
 
 enum QUPopoverEdge {
