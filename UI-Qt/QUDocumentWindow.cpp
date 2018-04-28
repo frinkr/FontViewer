@@ -66,29 +66,12 @@ void
 QUDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
 
-    // cmap Combobox
-    cmapCombobox_ = new QComboBox;
-    cmapCombobox_->setFixedWidth(150);
-    cmapAction_ = toolBar->addWidget(new QUToolBarWidget(cmapCombobox_, tr("Character Maps")));
-    for (const auto & cmap : document_->face()->cmaps())
-        cmapCombobox_->addItem(toQString(cmap.description()));
-
-    blockCombobox_ = new QComboBox;
-    blockCombobox_->setFixedWidth(200);
-    blockAction_ = toolBar->addWidget(new QUToolBarWidget(blockCombobox_, tr("Character Blocks")));
-    reloadBlocks();
-    
     ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph_d.png"));
 
     cmapBlockAction_ = toolBar->addAction(
         QIcon(":/images/variant_d.png"),tr("CMap && Blocks"), 
         this, &QUDocumentWindow::onCMapBlockAction);
 
-    QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(toolBar->widgetForAction(cmapBlockAction_));
-    if (cmapBlockToolButton) {
-        //cmapBlockToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);    
-    }
-    
     QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
     QAction* shape = toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
     QAction* table = toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
@@ -143,15 +126,6 @@ QUDocumentWindow::initGlyphInfoView() {
     
 void
 QUDocumentWindow::connectSingals() {
-    connect(cmapCombobox_, QOverload<int>::of(&QComboBox::activated),
-            document_, &QUDocument::selectCMap);
-    
-    connect(document_, &QUDocument::cmapActivated,
-            this, &QUDocumentWindow::reloadBlocks);
-
-    connect(blockCombobox_, QOverload<int>::of(&QComboBox::activated),
-            document_->model(), &QUGlyphListModel::selectBlock);
-    
     connect(ui_->actionFull_Glyph_List, &QAction::toggled,
             this, &QUDocumentWindow::showFullGlyphList);
 
@@ -166,18 +140,7 @@ QUDocumentWindow::connectSingals() {
 }
 
 void
-QUDocumentWindow::reloadBlocks() {
-    blockCombobox_->clear();
-        
-    FXCMap cmap = document_->face()->currentCMap();
-    for (const auto & block: cmap.blocks()) 
-        blockCombobox_->addItem(toQString(block->name()));
-}
-
-void
 QUDocumentWindow::showFullGlyphList(bool state) {
-    cmapAction_->setEnabled(!state);
-    blockAction_->setEnabled(!state);
     document_->model()->setCharMode(!state);
 }
 
@@ -217,7 +180,9 @@ void
 QUDocumentWindow::onCMapBlockAction() {
     if (!cmapBlockWindow_) {
         cmapBlockWindow_ = new QUPopoverWindow(this);
-        cmapBlockWindow_->setWidget(new QUCMapBlockWidget);
+        QUCMapBlockWidget * widget = new QUCMapBlockWidget;
+        widget->setDocument(document_);
+        cmapBlockWindow_->setWidget(widget);
     }
     QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(cmapBlockAction_));
     cmapBlockWindow_->showRelativeTo(cmapBlockToolButton);

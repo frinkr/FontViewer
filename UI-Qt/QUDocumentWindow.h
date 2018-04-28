@@ -61,9 +61,6 @@ private:
 
 private slots:
     void
-    reloadBlocks();
-
-    void
     showFullGlyphList(bool state);
 
     void
@@ -88,14 +85,8 @@ private:
     Ui::QUDocumentWindow * ui_;
     QDockWidget          * infoDockWidget_;
 
-    QUPopoverWindow * cmapBlockWindow_;
     QAction    * cmapBlockAction_;
-
-    
-    QComboBox  * cmapCombobox_;
-    QAction    * cmapAction_;
-    QComboBox  * blockCombobox_;
-    QAction    * blockAction_;
+    QUPopoverWindow * cmapBlockWindow_;
     QLineEdit  * searchEdit_;
     QAction    * searchAction_;
 
