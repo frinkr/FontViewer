@@ -64,7 +64,6 @@ QUCMapBlockWidget::reloadBlocks() {
         ui_->blockComboBox->addItem(toQString(block->name()));
 }
 
-
 void
 QUCMapBlockWidget::showFullGlyphList(bool state) {
     document_->model()->setCharMode(!state);

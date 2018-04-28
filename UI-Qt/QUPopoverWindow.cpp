@@ -33,20 +33,7 @@ QUPopoverWindow::edge() const {
 
 void
 QUPopoverWindow::showRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
-    setEdge(QUPopoverBottom);
-    // FIXME: find the edge
-#if 0
-    QList<QUPopoverEdge> edges;
-    if (preferedEgdes & QUPopoverBottom) edges.append(QUPopoverBottom); // prefer bottom
-    if (preferedEgdes & QUPopoverRight) edges.append(QUPopoverRight);
-    if (preferedEgdes & QUPopoverLeft) edges.append(QUPopoverLeft);
-    if (preferedEgdes & QUPopoverTop) edges.append(QUPopoverTop);
-    
-    QList<QRect> geometries;
-    foreach(QUPopoverEdge edge, edges) 
-        geometries.append(geometryRelativeTo(rect, edge));
-#endif
-    
+    setEdge(edgeRelativeTo(rect, preferedEgdes));
     move(geometryRelativeTo(rect, edge_).topLeft());
     show();
 }
@@ -89,8 +76,8 @@ QUPopoverWindow::setEdge(QUPopoverEdge edge) {
     if (!widget_)
         return;
 
-    if (layout_)
-        layout_->deleteLater();
+    if (layout()) 
+        delete layout();
 
     layout_ = new QBoxLayout(isHorizontal(edge)? QBoxLayout::LeftToRight: QBoxLayout::TopToBottom);
     bool addSpacingBefore = (edge == QUPopoverRight) || (edge == QUPopoverBottom);
@@ -104,6 +91,25 @@ QUPopoverWindow::setEdge(QUPopoverEdge edge) {
     layout_->setContentsMargins(0, 0, 0, 0);
     setLayout(layout_);
 }
+
+QUPopoverEdge
+QUPopoverWindow::edgeRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
+    QVector<QUPopoverEdge> edges;
+    if (preferedEgdes & QUPopoverBottom) edges.append(QUPopoverBottom); // prefer bottom
+    if (preferedEgdes & QUPopoverRight) edges.append(QUPopoverRight);
+    if (preferedEgdes & QUPopoverLeft) edges.append(QUPopoverLeft);
+    if (preferedEgdes & QUPopoverTop) edges.append(QUPopoverTop);
+
+    if (edges.count() == 1)
+        return edges[0];
+
+    // FIXME: find the edge
+    QList<QRect> geometries;
+    foreach(QUPopoverEdge edge, edges) 
+        geometries.append(geometryRelativeTo(rect, edge));
+    return QUPopoverBottom;
+}
+    
 
 QRect
 QUPopoverWindow::geometryRelativeTo(const QRect & rect, QUPopoverEdge edge) {

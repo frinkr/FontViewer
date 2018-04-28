@@ -49,7 +49,10 @@ public:
 protected:
     void
     setEdge(QUPopoverEdge edge);
-    
+
+    QUPopoverEdge
+    edgeRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes);
+        
     QRect
     geometryRelativeTo(const QRect & rect, QUPopoverEdge edge);
 

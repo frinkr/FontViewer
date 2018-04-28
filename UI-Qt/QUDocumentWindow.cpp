@@ -185,7 +185,7 @@ QUDocumentWindow::onCMapBlockAction() {
         cmapBlockWindow_->setWidget(widget);
     }
     QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(cmapBlockAction_));
-    cmapBlockWindow_->showRelativeTo(cmapBlockToolButton);
+    cmapBlockWindow_->showRelativeTo(cmapBlockToolButton, QUPopoverRight);
 }
     
 void
