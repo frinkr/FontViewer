@@ -10,7 +10,7 @@ namespace {
 }
 
 QUPopoverWindow::QUPopoverWindow(QWidget * parent)
-    : QWidget(parent,  Qt::Popup)
+    : QWidget(parent, Qt::Popup)
     , edge_(QUPopoverBottom)      
     , widget_(nullptr)
     , layout_(nullptr) {

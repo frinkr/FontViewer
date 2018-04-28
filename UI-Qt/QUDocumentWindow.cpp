@@ -69,7 +69,7 @@ QUDocumentWindow::initToolBar() {
     ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph_d.png"));
 
     cmapBlockAction_ = toolBar->addAction(
-        QIcon(":/images/variant_d.png"),tr("CMap && Blocks"), 
+        QIcon(":/images/glyph_d.png"),tr("Glyphs"), 
         this, &QUDocumentWindow::onCMapBlockAction);
 
     QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
