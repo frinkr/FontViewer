@@ -17,7 +17,7 @@ class QStringListModel;
 class QUDocumentWindowManager;
 class QUDocument;
 class QUFontInfoWindow;
-class QUCMapBlockWindow;
+class QUPopoverWindow;
 
 namespace Ui {
     class QUDocumentWindow;
@@ -88,7 +88,7 @@ private:
     Ui::QUDocumentWindow * ui_;
     QDockWidget          * infoDockWidget_;
 
-    QUCMapBlockWindow * cmapBlockWindow_;
+    QUPopoverWindow * cmapBlockWindow_;
     QAction    * cmapBlockAction_;
 
     

@@ -28,7 +28,7 @@ set(UI
   QUDocumentWindow.ui
   QUOpenFontDialog.ui
   QUFontInfoWidget.ui
-  QUCMapBlockWindow.ui)
+  QUCMapBlockWidget.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -68,8 +68,8 @@ set(SHARED_SOURCES
   QUFontInfoWidget.cpp
   QUResource.h
   QUResource.cpp
-  QUCMapBlockWindow.h
-  QUCMapBlockWindow.cpp
+  QUCMapBlockWidget.h
+  QUCMapBlockWidget.cpp
   QUPopoverWindow.h
   QUPopoverWindow.cpp
   )

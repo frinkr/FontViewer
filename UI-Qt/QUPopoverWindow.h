@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget.h>
+class QBoxLayout;
 
 enum QUPopoverEdge {
     QUPopoverLeft    = 0x00,
@@ -23,6 +24,9 @@ public:
     QWidget *
     widget() const;
 
+    QUPopoverEdge
+    edge() const;
+    
     void
     showRelativeTo(const QRect & rect,
                    QUPopoverEdges preferedEgdes = QUPopoverAnyEdge);
@@ -31,6 +35,7 @@ public:
     showRelativeTo(QWidget * widget,
                    QUPopoverEdges preferedEgdes = QUPopoverAnyEdge);
 
+    
 public:
     virtual QSize
     sizeHint() const;
@@ -42,7 +47,9 @@ public:
     resizeEvent(QResizeEvent * event);
     
 protected:
-        
+    void
+    setEdge(QUPopoverEdge edge);
+    
     QRect
     geometryRelativeTo(const QRect & rect, QUPopoverEdge edge);
 
@@ -54,4 +61,5 @@ protected:
     QUPopoverEdge edge_;
 
     QWidget * widget_;
+    QBoxLayout * layout_;
 };

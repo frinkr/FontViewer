@@ -4,10 +4,11 @@
 #include <QWidgetAction>
 #include <QActionGroup>
 #include "QUConv.h"
-#include "QUCMapBlockWindow.h"
+#include "QUCMapBlockWidget.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
 #include "QUFontInfoWidget.h"
+#include "QUPopoverWindow.h"
 #include "QUGlyphListView.h"
 #include "QUToolBarWidget.h"
 #include "ui_QUDocumentWindow.h"
@@ -215,7 +216,8 @@ QUDocumentWindow::onCharLinkClicked(FXGChar c) {
 void
 QUDocumentWindow::onCMapBlockAction() {
     if (!cmapBlockWindow_) {
-        cmapBlockWindow_ = new QUCMapBlockWindow(this);
+        cmapBlockWindow_ = new QUPopoverWindow(this);
+        cmapBlockWindow_->setWidget(new QUCMapBlockWidget);
     }
     QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(cmapBlockAction_));
     cmapBlockWindow_->showRelativeTo(cmapBlockToolButton);

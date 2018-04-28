@@ -1,3 +1,4 @@
+#include <QBoxLayout>
 #include "QUPopoverWindow.h"
 
 namespace {
@@ -10,8 +11,9 @@ namespace {
 
 QUPopoverWindow::QUPopoverWindow(QWidget * parent)
     : QWidget(parent,  Qt::Popup)
+    , edge_(QUPopoverBottom)      
     , widget_(nullptr)
-    , edge_(QUPopoverBottom) {
+    , layout_(nullptr) {
 }
 
 void
@@ -23,10 +25,15 @@ QWidget *
 QUPopoverWindow::widget() const {
     return widget_;
 }
-    
+
+QUPopoverEdge
+QUPopoverWindow::edge() const {
+    return edge_;
+}
+
 void
 QUPopoverWindow::showRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
-    edge_ = QUPopoverBottom;
+    setEdge(QUPopoverBottom);
     // FIXME: find the edge
 #if 0
     QList<QUPopoverEdge> edges;
@@ -50,6 +57,52 @@ QUPopoverWindow::showRelativeTo(QWidget * widget, QUPopoverEdges preferedEdges) 
     QPoint rightBottom = widget->mapToGlobal(QPoint(widget->frameGeometry().width(), widget->frameGeometry().height()));
 
     return showRelativeTo(QRect(leftTop, rightBottom), preferedEdges);
+}
+
+QSize
+QUPopoverWindow::sizeHint() const {
+    if (!widget_)
+        return QWidget::sizeHint();
+    return widget_->sizeHint() + QSize(
+        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
+        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
+}
+
+QSize
+QUPopoverWindow::minimumSizeHint() const {
+    if (!widget_)
+        return QWidget::minimumSizeHint();
+    return widget_->minimumSizeHint() + QSize(
+        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
+        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
+}
+
+void
+QUPopoverWindow::resizeEvent(QResizeEvent * event) {
+    setMask(localRegion());
+    QWidget::resizeEvent(event);
+}
+
+void
+QUPopoverWindow::setEdge(QUPopoverEdge edge) {
+    edge_ = edge;
+    if (!widget_)
+        return;
+
+    if (layout_)
+        layout_->deleteLater();
+
+    layout_ = new QBoxLayout(isHorizontal(edge)? QBoxLayout::LeftToRight: QBoxLayout::TopToBottom);
+    bool addSpacingBefore = (edge == QUPopoverRight) || (edge == QUPopoverBottom);
+    if (addSpacingBefore)
+        layout_->addSpacing(POPOVER_DISTANCE);
+    layout_->addWidget(widget_);
+    if (!addSpacingBefore)
+        layout_->addSpacing(POPOVER_DISTANCE);
+
+    layout_->setSpacing(0);
+    layout_->setContentsMargins(0, 0, 0, 0);
+    setLayout(layout_);
 }
 
 QRect
@@ -84,29 +137,6 @@ QUPopoverWindow::geometryRelativeTo(const QRect & rect, QUPopoverEdge edge) {
     QRect box = QRect(center - QPoint(width / 2, height / 2),
                       center + QPoint(width / 2, height / 2));
     return box;
-}
-QSize
-QUPopoverWindow::sizeHint() const {
-    if (!widget_)
-        return QWidget::sizeHint();
-    return widget_->sizeHint() + QSize(
-        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
-        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
-}
-
-QSize
-QUPopoverWindow::minimumSizeHint() const {
-    if (!widget_)
-        return QWidget::minimumSizeHint();
-    return widget_->minimumSizeHint() + QSize(
-        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
-        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
-}
-
-void
-QUPopoverWindow::resizeEvent(QResizeEvent * event) {
-    setMask(localRegion());
-    QWidget::resizeEvent(event);
 }
 
 QRegion
