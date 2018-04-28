@@ -27,7 +27,8 @@ endif()
 set(UI
   QUDocumentWindow.ui
   QUOpenFontDialog.ui
-  QUFontInfoWidget.ui)
+  QUFontInfoWidget.ui
+  QUCMapBlockWindow.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -67,6 +68,10 @@ set(SHARED_SOURCES
   QUFontInfoWidget.cpp
   QUResource.h
   QUResource.cpp
+  QUCMapBlockWindow.h
+  QUCMapBlockWindow.cpp
+  QUPopoverWindow.h
+  QUPopoverWindow.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

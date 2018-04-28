@@ -17,6 +17,7 @@ class QStringListModel;
 class QUDocumentWindowManager;
 class QUDocument;
 class QUFontInfoWindow;
+class QUCMapBlockWindow;
 
 namespace Ui {
     class QUDocumentWindow;
@@ -78,11 +79,19 @@ private slots:
     onCharLinkClicked(FXGChar c);
 
     void
+    onCMapBlockAction();
+    
+    void
     onFontInfoAction();
     
 private:
     Ui::QUDocumentWindow * ui_;
     QDockWidget          * infoDockWidget_;
+
+    QUCMapBlockWindow * cmapBlockWindow_;
+    QAction    * cmapBlockAction_;
+
+    
     QComboBox  * cmapCombobox_;
     QAction    * cmapAction_;
     QComboBox  * blockCombobox_;

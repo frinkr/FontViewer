@@ -4,6 +4,7 @@
 #include <QWidgetAction>
 #include <QActionGroup>
 #include "QUConv.h"
+#include "QUCMapBlockWindow.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
 #include "QUFontInfoWidget.h"
@@ -15,6 +16,7 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::QUDocumentWindow)
     , infoDockWidget_(nullptr)
+    , cmapBlockWindow_(nullptr)
     , document_(document)
 {
     ui_->setupUi(this);
@@ -76,12 +78,46 @@ QUDocumentWindow::initToolBar() {
     reloadBlocks();
     
     ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph_d.png"));
+
+    cmapBlockAction_ = toolBar->addAction(
+        QIcon(":/images/variant_d.png"),tr("CMap && Blocks"), 
+        this, &QUDocumentWindow::onCMapBlockAction);
+
+    QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(toolBar->widgetForAction(cmapBlockAction_));
+    if (cmapBlockToolButton) {
+        //cmapBlockToolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);    
+    }
     
-    toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
-    toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
-    toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
-    toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
-    toolBar->addAction(QIcon(":/images/info_d.png"), tr("Info"), this, &QUDocumentWindow::onFontInfoAction);
+    QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
+    QAction* shape = toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
+    QAction* table = toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
+    QAction* search = toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
+    
+    QAction* info = toolBar->addAction(
+        QIcon(":/images/info_d.png"), tr("Info"),
+        this, &QUDocumentWindow::onFontInfoAction);
+    
+
+    QMenu *menu = new QMenu();
+    QAction *testAction = new QAction("test menu item", this);
+    testAction->setIcon(QIcon(":/images/info_d.png"));
+    menu->addAction(testAction);
+    menu->addAction(variant);
+    menu->addAction(shape);
+    menu->addAction(table);
+    menu->addAction(search);
+    menu->addAction(info);
+
+    QToolButton* toolButton = new QToolButton();
+    toolButton->setText("Unicode 2.0, BMP Only");
+    toolButton->setIcon(QIcon(":/images/search_d.png"));
+    toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    toolButton->setMenu(menu);
+//    toolButton->setDefaultAction(shape);
+    toolButton->setPopupMode(QToolButton::InstantPopup);
+    QAction * action = toolBar->addWidget(toolButton);
+//    action->setIcon(QIcon(":/images/search_d.png"));
+    
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
@@ -176,6 +212,15 @@ QUDocumentWindow::onCharLinkClicked(FXGChar c) {
     //ui_->listView->selectChar(c);
 }
 
+void
+QUDocumentWindow::onCMapBlockAction() {
+    if (!cmapBlockWindow_) {
+        cmapBlockWindow_ = new QUCMapBlockWindow(this);
+    }
+    QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(cmapBlockAction_));
+    cmapBlockWindow_->showRelativeTo(cmapBlockToolButton);
+}
+    
 void
 QUDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
