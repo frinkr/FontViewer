@@ -35,9 +35,11 @@ using FXHBFont    = struct hb_font_t *;
 using FXChar      = uint32_t;
 using FXGlyphID   = uint32_t;
 
-constexpr FXChar    FXUnicodeMax     = 0x10FFFF;
-constexpr FXChar    FXCharInvalid    = (FXChar)-1;
-constexpr FXGlyphID FXGIDNotDef      = 0;
+constexpr FXChar    FXUnicodeMax       = 0x10FFFF;
+constexpr FXChar    FXCharInvalidBegin = FXChar(-1) - 0x100; // let's reserve some (256) codepoints
+constexpr FXChar    FXCharInvalidEnd   = FXChar(-1);
+constexpr FXChar    FXCharInvalid      = FXCharInvalidBegin;
+constexpr FXGlyphID FXGIDNotDef        = 0;
 
 /**
  * A closed range

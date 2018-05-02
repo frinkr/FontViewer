@@ -83,7 +83,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 QUGlyphListModel::QUGlyphListModel(FXPtr<FXFace> face, QObject * parent)
     : QAbstractListModel(parent)
     , face_(face)
-    , fullGlyphsBlock_(new FXCharRangeBlock(0, face->glyphCount(), FXGCharTypeGlyphID, "All Glyphs"))
+    , fullGlyphsBlock_(new FXCharRangeBlock(0, FXChar(face->glyphCount()), FXGCharTypeGlyphID, "All Glyphs"))
     , blockIndex_(0)
     , dummyImage_(glyphEmSize(), QImage::Format_ARGB32)
     , charMode_(true)

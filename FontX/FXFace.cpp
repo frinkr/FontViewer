@@ -10,7 +10,7 @@ namespace {
         for (size_t y = 0; y < ftBm.rows; ++ y) {
             for (size_t x = 0; x < ftBm.width; ++ x) {
                 unsigned char * p = ftBm.buffer + (y * ftBm.pitch + x * pixelSize);
-                func(x, y, p);
+                func(int(x), int(y), p);
             }
         }
     }
