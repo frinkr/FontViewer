@@ -13,6 +13,7 @@ class QAction;
 class QFileDialog;
 class QMessageBox;
 class QStringListModel;
+class QToolButton;
 
 class QUDocumentWindowManager;
 class QUDocument;
@@ -59,6 +60,9 @@ private:
     void
     connectSingals();
 
+    QToolButton *
+    senderToolButton();
+                      
 private slots:
     void
     showFullGlyphList(bool state);
@@ -80,15 +84,18 @@ private slots:
     
     void
     onFontInfoAction();
+
+    void
+    onSearchAction();
     
 private:
     Ui::QUDocumentWindow * ui_;
     QDockWidget          * infoDockWidget_;
 
-    QAction    * cmapBlockAction_;
+    QAction         * cmapBlockAction_;
     QUPopoverWindow * cmapBlockWindow_;
-    QLineEdit  * searchEdit_;
-    QAction    * searchAction_;
-
-    QUDocument * document_;
+    QAction         * searchAction_;
+    QUPopoverWindow * searchWindow_;
+    
+    QUDocument      * document_;
 };

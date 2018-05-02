@@ -11,6 +11,7 @@
 #include "QUPopoverWindow.h"
 #include "QUGlyphListView.h"
 #include "QUToolBarWidget.h"
+#include "QUSearchWidget.h"
 #include "ui_QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
@@ -18,6 +19,7 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     , ui_(new Ui::QUDocumentWindow)
     , infoDockWidget_(nullptr)
     , cmapBlockWindow_(nullptr)
+    , searchWindow_(nullptr)
     , document_(document)
 {
     ui_->setupUi(this);
@@ -75,40 +77,20 @@ QUDocumentWindow::initToolBar() {
     QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
     QAction* shape = toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
     QAction* table = toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
-    QAction* search = toolBar->addAction(QIcon(":/images/search_d.png"), tr("Search"));
+
     
     QAction* info = toolBar->addAction(
         QIcon(":/images/info_d.png"), tr("Info"),
         this, &QUDocumentWindow::onFontInfoAction);
-    
 
-    QMenu *menu = new QMenu();
-    QAction *testAction = new QAction("test menu item", this);
-    testAction->setIcon(QIcon(":/images/info_d.png"));
-    menu->addAction(testAction);
-    menu->addAction(variant);
-    menu->addAction(shape);
-    menu->addAction(table);
-    menu->addAction(search);
-    menu->addAction(info);
-
-    QToolButton* toolButton = new QToolButton();
-    toolButton->setText("Unicode 2.0, BMP Only");
-    toolButton->setIcon(QIcon(":/images/search_d.png"));
-    toolButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    toolButton->setMenu(menu);
-//    toolButton->setDefaultAction(shape);
-    toolButton->setPopupMode(QToolButton::InstantPopup);
-    QAction * action = toolBar->addWidget(toolButton);
-//    action->setIcon(QIcon(":/images/search_d.png"));
-    
+    searchAction_ = toolBar->addAction(
+        QIcon(":/images/search_d.png"), tr("Search"),
+        this, &QUDocumentWindow::onSearchAction);
+    searchAction_->setShortcut(QKeySequence("Ctrl+F"));
+        
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
-    
-    searchEdit_ = new QLineEdit;
-    searchEdit_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    searchAction_ = toolBar->addWidget(new QUToolBarWidget(searchEdit_, tr("Search")));
     
     this->setUnifiedTitleAndToolBarOnMac(true);
 }
@@ -137,6 +119,15 @@ QUDocumentWindow::connectSingals() {
 
     connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
             this, &QUDocumentWindow::onCharLinkClicked);
+}
+
+QToolButton *
+QUDocumentWindow::senderToolButton() {
+    QAction * action = qobject_cast<QAction*>(sender());
+    if (action) 
+        return qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(action));
+    
+    return qobject_cast<QToolButton *>(sender());
 }
 
 void
@@ -184,8 +175,7 @@ QUDocumentWindow::onCMapBlockAction() {
         widget->setDocument(document_);
         cmapBlockWindow_->setWidget(widget);
     }
-    QToolButton * cmapBlockToolButton = qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(cmapBlockAction_));
-    cmapBlockWindow_->showRelativeTo(cmapBlockToolButton, QUPopoverRight);
+    cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverRight);
 }
     
 void
@@ -202,4 +192,13 @@ QUDocumentWindow::onFontInfoAction() {
         infoDockWidget_->show();
         infoDockWidget_->raise();
     }
+}
+
+void
+QUDocumentWindow::onSearchAction() {
+    if (!searchWindow_) {
+        searchWindow_ = new QUPopoverWindow;
+        searchWindow_->setWidget(new QUSearchWidget);
+    }
+    searchWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom);
 }

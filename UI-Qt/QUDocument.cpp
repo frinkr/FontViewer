@@ -1,3 +1,4 @@
+#include "QUGlyphListModel.h"
 #include "QUGlyphListView.h"
 #include "QUConv.h"
 #include "QUDocument.h"
@@ -66,4 +67,9 @@ QUDocument::selectCMap(size_t index) {
         model_->selectBlock(0);
         emit cmapActivated(int(index));
     }
+}
+
+void
+QUDocument::search(const QString & text) {
+    
 }

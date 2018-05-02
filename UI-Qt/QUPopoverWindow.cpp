@@ -20,6 +20,7 @@ QUPopoverWindow::QUPopoverWindow(QWidget * parent)
 void
 QUPopoverWindow::setWidget(QWidget * widget) {
     widget_ = widget;
+    setFocusProxy(widget_);
 }
 
 QWidget *
@@ -35,6 +36,7 @@ QUPopoverWindow::edge() const {
 void
 QUPopoverWindow::showRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
     setEdge(edgeRelativeTo(rect, preferedEgdes));
+    setFocus(Qt::ActiveWindowFocusReason);
     move(geometryRelativeTo(rect, edge_).topLeft());
     show();
 }

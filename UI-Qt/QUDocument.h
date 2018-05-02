@@ -74,6 +74,9 @@ public slots:
     void
     selectCMap(size_t index);
 
+    void
+    search(const QString & text);
+    
 private:
     QUDocument(const QUFontURI & uri, QObject * parent);
 
