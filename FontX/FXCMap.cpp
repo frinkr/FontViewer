@@ -188,6 +188,12 @@ FXCMap::blocks() const {
     return blocks_;
 }
 
+const FXVector<FXPtr<FXGCharBlock> > &
+FXCMap::unicodeBlocks() const {
+    assert(isUnicode());
+    return FXCMapPlatform::get(platformID_).blocks(encodingID_);
+}
+    
 FXVector<FXChar>
 FXCMap::charsForGlyph(FXGlyphID gid) const {
     FXVector<FXChar> ret;

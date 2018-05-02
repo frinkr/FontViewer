@@ -46,6 +46,9 @@ public:
     
     virtual void
     resizeEvent(QResizeEvent * event);
+
+    virtual void
+    paintEvent(QPaintEvent * event);
     
 protected:
     void
@@ -58,7 +61,10 @@ protected:
     geometryRelativeTo(const QRect & rect, QUPopoverEdge edge);
 
     QRegion
-    localRegion();
+    localRegion(int border = 0);
+
+    QPolygonF
+    localPolygon(int border = 0);
     
 protected:
     QRegion   mask_;

@@ -181,6 +181,9 @@ public:
     const FXVector<FXPtr<FXGCharBlock> > &
     blocks() const;
 
+    const FXVector<FXPtr<FXGCharBlock> > &
+    unicodeBlocks() const;
+    
     FXVector<FXChar> 
     charsForGlyph(FXGlyphID gid) const;
 
