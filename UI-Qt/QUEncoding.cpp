@@ -19,7 +19,7 @@ FXGChar
 QUEncoding::charFromHexNotation(const QString & str) {
     QString code = str;
     bool ok = false;
-    if (code.indexOf("U+") == 0 || code.indexOf("0x") == 0) {
+    if (code.indexOf("U+") == 0 || code.indexOf("0x") == 0 || code.indexOf("\\u") == 0) {
         code.remove(0, 2);
         FXChar c = code.toUInt(&ok, 16);
         return ok? FXGChar(FXGCharTypeUnicode, c): FXGCharInvalid;

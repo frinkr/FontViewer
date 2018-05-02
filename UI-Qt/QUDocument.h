@@ -5,6 +5,7 @@
 
 class QUGlyphItemDelegate;
 class QUGlyphListModel;
+struct QUGlyphSearchResult;
 
 struct QUFontURI
 {
@@ -69,7 +70,13 @@ public:
 signals:
     void
     cmapActivated(int index);
-        
+
+    void
+    searchFound(const QUGlyphSearchResult & result, const QString & text);
+    
+    void
+    searchNotFound(const QString & text);
+                
 public slots:
     void
     selectCMap(size_t index);

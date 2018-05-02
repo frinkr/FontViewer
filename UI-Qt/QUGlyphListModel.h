@@ -26,6 +26,9 @@ public:
     FXPtr<FXGCharBlock>
     currentBlock() const;
 
+    size_t
+    currentBlockIndex() const;
+    
     QSize
     iconSize() const;
 

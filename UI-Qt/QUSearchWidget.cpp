@@ -1,3 +1,4 @@
+#include <QTimer>
 #include "QUDocument.h"
 #include "QUSearchWidget.h"
 #include "ui_QUSearchWidget.h"
@@ -10,6 +11,10 @@ QUSearchWidget::QUSearchWidget(QWidget *parent)
 
     connect(ui_->lineEdit, &QLineEdit::returnPressed,
             this, &QUSearchWidget::doSearch);
+    connect(ui_->lineEdit, &QLineEdit::textChanged,
+            this, &QUSearchWidget::onSearchTextChanged);
+
+    labelText_ = ui_->label->text();
 }
 
 QUSearchWidget::~QUSearchWidget() {
@@ -19,6 +24,8 @@ QUSearchWidget::~QUSearchWidget() {
 void
 QUSearchWidget::setDocument(QUDocument * document) {
     document_ = document;
+    connect(document_, &QUDocument::searchNotFound,
+            this, &QUSearchWidget::onSearchNotFound);
 }
 
 void
@@ -33,4 +40,13 @@ QUSearchWidget::doSearch() {
     if (document_)
         document_->search(ui_->lineEdit->text());
 }
-    
+
+void
+QUSearchWidget::onSearchNotFound(const QString & text) {
+    ui_->label->setText(tr("No glyph matches \"%1\"").arg(text));
+}
+
+void
+QUSearchWidget::onSearchTextChanged(const QString & text) {
+    ui_->label->setText(labelText_);
+}

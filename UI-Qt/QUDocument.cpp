@@ -1,5 +1,6 @@
 #include "QUGlyphListModel.h"
 #include "QUGlyphListView.h"
+#include "QUGlyphSearchEngine.h"
 #include "QUConv.h"
 #include "QUDocument.h"
 
@@ -71,5 +72,10 @@ QUDocument::selectCMap(size_t index) {
 
 void
 QUDocument::search(const QString & text) {
-    
+    QUGlyphSearchEngine * s = new QUGlyphSearchEngine(model(), this);
+    QUGlyphSearchResult result = s->search(text);
+    if (result.found)
+        emit searchFound(result, text);
+    else
+        emit searchNotFound(text);
 }

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>224</width>
-    <height>83</height>
+    <width>297</width>
+    <height>68</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -31,7 +31,7 @@
       <string>Search glyph by name, codepoint or index</string>
      </property>
      <property name="wordWrap">
-      <bool>true</bool>
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -39,7 +39,7 @@
     <widget class="QLineEdit" name="lineEdit">
      <property name="minimumSize">
       <size>
-       <width>200</width>
+       <width>275</width>
        <height>0</height>
       </size>
      </property>

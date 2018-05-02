@@ -14,11 +14,14 @@ namespace {
 std::vector<FXCMapPlatform> FXCMapPlatform::platforms_;
 std::vector<FXPtr<FXGCharBlock> > FXCMapPlatform::unicodeBlocks_;
 
-bool
-FXCharArrayBlock::contains(const FXGChar & c) const {
-    return std::binary_search(chs_.begin(), chs_.end(), c, [](const FXGChar & v, const FXGChar & c) {
+size_t
+FXCharArrayBlock::index(const FXGChar & c) const {
+    auto itr = std::lower_bound(chs_.begin(), chs_.end(), c, [](const FXGChar & v, const FXGChar & c) {
         return (v.type == c.type) && (v.value < c.value);
     });
+    if (itr != chs_.end() && itr->type == c.type && itr->value == c.value)
+        return std::distance(chs_.begin(), itr);
+    return -1;
 }
 
 const std::vector<FXCMapPlatform> &

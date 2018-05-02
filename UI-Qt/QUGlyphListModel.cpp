@@ -33,6 +33,14 @@ QUGlyphListModel::currentBlock() const {
         return fullGlyphsBlock_;
 }
 
+size_t
+QUGlyphListModel::currentBlockIndex() const {
+    if (charMode_)
+        return blockIndex_;
+    else
+        return 0;
+}
+    
 int
 QUGlyphListModel::rowCount(const QModelIndex & index) const {
     return int(currentBlock()->size());
@@ -60,7 +68,7 @@ QUGlyphListModel::data(const QModelIndex & index, int role) const {
 void
 QUGlyphListModel::selectBlock(size_t index) {
     beginResetModel();
-    blockIndex_ = index;
+    blockIndex_ = charMode_? index : 0;
     endResetModel();
 }
 

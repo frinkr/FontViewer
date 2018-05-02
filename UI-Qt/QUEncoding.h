@@ -9,7 +9,7 @@ struct QUEncoding {
 
     static FXGChar
     charFromHexNotation(const QString & str);
-    
+
     static QUrl
     charHexLink(FXGChar c);
 

@@ -26,8 +26,17 @@ public slots:
 protected:
     virtual void
     focusInEvent(QFocusEvent *event);
-private:
+
+protected slots:
+    void
+    onSearchNotFound(const QString & text);
+    
+    void
+    onSearchTextChanged(const QString & text);
+
+protected:
     Ui::QUSearchWidget * ui_;
     QUDocument         * document_;
+    QString              labelText_;
 };
 

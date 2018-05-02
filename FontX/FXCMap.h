@@ -21,8 +21,13 @@ public:
     get(size_t index) const = 0;
 
     virtual bool
-    contains(const FXGChar & c) const = 0;
+    contains(const FXGChar & c) const {
+        return index(c) != -1;
+    }
 
+    virtual size_t
+    index(const FXGChar & c) const = 0;
+    
 protected:
     FXString   name_;
 };
@@ -39,10 +44,10 @@ public:
     get(size_t) const {
         return FXGCharInvalid;
     }
-    
-    virtual bool
-    contains(const FXGChar & ) const {
-        return false;
+
+    virtual size_t
+    index(const FXGChar &) const {
+        return -1;
     }
 };
 
@@ -62,14 +67,16 @@ public:
     get(size_t index) const {
         return {type_, static_cast<FXChar>(index + range_.from)};
     }
-    
-    virtual bool
-    contains(const FXGChar & c) const {
+
+    size_t
+    index(const FXGChar & c) const {
         if (c.type != type_)
-            return false;
-        return c.value >= range_.from && c.value <= range_.to;
+            return -1;
+        if (c.value >= range_.from && c.value <= range_.to)
+            return c.value - range_.from;
+        return -1;
     }
-    
+
     const FXCharRange &
     range() const {
         return range_;
@@ -96,8 +103,8 @@ public:
         return chs_[index];
     }
 
-    virtual bool
-    contains(const FXGChar & c) const;
+    virtual size_t
+    index(const FXGChar & c) const;
 
 protected:
     FXVector<FXGChar>  chs_;

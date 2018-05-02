@@ -198,7 +198,9 @@ void
 QUDocumentWindow::onSearchAction() {
     if (!searchWindow_) {
         searchWindow_ = new QUPopoverWindow;
-        searchWindow_->setWidget(new QUSearchWidget);
+        QUSearchWidget * widget = new QUSearchWidget;
+        widget->setDocument(document_);
+        searchWindow_->setWidget(widget);
     }
     searchWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom);
 }
