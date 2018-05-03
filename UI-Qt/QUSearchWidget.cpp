@@ -1,4 +1,4 @@
-#include <QTimer>
+#include "QUSearchEngine.h"
 #include "QUDocument.h"
 #include "QUSearchWidget.h"
 #include "ui_QUSearchWidget.h"
@@ -24,8 +24,8 @@ QUSearchWidget::~QUSearchWidget() {
 void
 QUSearchWidget::setDocument(QUDocument * document) {
     document_ = document;
-    connect(document_, &QUDocument::searchNotFound,
-            this, &QUSearchWidget::onSearchNotFound);
+    connect(document_, &QUDocument::searchDone,
+            this, &QUSearchWidget::onSearchResult);
 }
 
 void
@@ -42,8 +42,9 @@ QUSearchWidget::doSearch() {
 }
 
 void
-QUSearchWidget::onSearchNotFound(const QString & text) {
-    ui_->label->setText(tr("No glyph matches \"%1\"").arg(text));
+QUSearchWidget::onSearchResult(const QUSearchResult & result, const QString & text) {
+    if (!result.found)
+        ui_->label->setText(tr("No glyph matches \"%1\"").arg(text));
 }
 
 void

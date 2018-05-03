@@ -1,14 +1,14 @@
 #include "QUEncoding.h"
-#include "QUGlyphSearchEngine.h"
+#include "QUSearchEngine.h"
 
-QUGlyphSearchExpressionParser::QUGlyphSearchExpressionParser(QObject * parent)
+QUSearchExpressionParser::QUSearchExpressionParser(QObject * parent)
     : QObject(parent) {}
 
-QUGlyphSearch
-QUGlyphSearchExpressionParser::parse(const QString & text) {
+QUSearch
+QUSearchExpressionParser::parse(const QString & text) {
     const FXGChar gchar = QUEncoding::charFromHexNotation(text);
 
-    QUGlyphSearch search;
+    QUSearch search;
     
     // check codepoint notation
     if (gchar.isChar()) {
@@ -41,18 +41,18 @@ QUGlyphSearchExpressionParser::parse(const QString & text) {
     return search;
 }
 
-QUGlyphSearchEngine::QUGlyphSearchEngine(QUDocument * document_)
+QUSearchEngine::QUSearchEngine(QUDocument * document_)
     : QObject(document_)
     , document_(document_) {}
 
-QUGlyphSearchResult
-QUGlyphSearchEngine::search(const QString & expression) const {
-    QUGlyphSearchExpressionParser parser;
+QUSearchResult
+QUSearchEngine::search(const QString & expression) const {
+    QUSearchExpressionParser parser;
     return search(parser.parse(expression));
 }
 
-QUGlyphSearchResult
-QUGlyphSearchEngine::search(const QUGlyphSearch & expression) const {
+QUSearchResult
+QUSearchEngine::search(const QUSearch & expression) const {
     if (expression.gchar.isValid()) {
         if (expression.gchar.isChar()) 
             return searchChar(expression.gchar);
@@ -63,9 +63,9 @@ QUGlyphSearchEngine::search(const QUGlyphSearch & expression) const {
         return searchName(expression.name);
 }
 
-QUGlyphSearchResult
-QUGlyphSearchEngine::searchChar(FXGChar c) const {
-    QUGlyphSearchResult result;
+QUSearchResult
+QUSearchEngine::searchChar(FXGChar c) const {
+    QUSearchResult result;
     if (document_->charMode()) {
         size_t blockIndex = -1;
         size_t charIndex = -1;
@@ -102,9 +102,9 @@ QUGlyphSearchEngine::searchChar(FXGChar c) const {
     return result;
 }
 
-QUGlyphSearchResult
-QUGlyphSearchEngine::searchGlyph(FXGlyphID g) const {
-    QUGlyphSearchResult result;
+QUSearchResult
+QUSearchEngine::searchGlyph(FXGlyphID g) const {
+    QUSearchResult result;
     if (g < document_->face()->glyphCount()) {
         result.found    = true;
         result.charMode = false;
@@ -113,8 +113,8 @@ QUGlyphSearchEngine::searchGlyph(FXGlyphID g) const {
     return result;
 }
 
-QUGlyphSearchResult
-QUGlyphSearchEngine::searchName(const QString & name) const {
-    QUGlyphSearchResult result;
+QUSearchResult
+QUSearchEngine::searchName(const QString & name) const {
+    QUSearchResult result;
     return result;
 }

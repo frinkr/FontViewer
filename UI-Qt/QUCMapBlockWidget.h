@@ -29,8 +29,11 @@ private slots:
     reloadBlocks();
 
     void
-    showFullGlyphList(bool state);
+    onGlyphMode(bool state);
 
+    void
+    onCharMode(bool state);
+    
 private:
     Ui::QUCMapBlockWidget * ui_;
     QUDocument * document_;

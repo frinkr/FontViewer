@@ -89,7 +89,7 @@ private slots:
     onSearchAction();
 
     void
-    onSearchFound(const QUGlyphSearchResult & result, const QString & text);
+    onSearchResult(const QUSearchResult & result, const QString & text);
         
 private:
     Ui::QUDocumentWindow * ui_;

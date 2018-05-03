@@ -40,10 +40,16 @@ QUCMapBlockWidget::setDocument(QUDocument * document) {
     
     connect(ui_->blockComboBox, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectBlock);
+    
+    connect(document_, &QUDocument::blockSelected,
+            ui_->blockComboBox, &QComboBox::setCurrentIndex);
 
     connect(ui_->glyphCheckBox, &QCheckBox::stateChanged,
-            this, &QUCMapBlockWidget::showFullGlyphList);
-    
+            this, &QUCMapBlockWidget::onGlyphMode);
+
+    connect(document_, &QUDocument::charModeActivated,
+            this, &QUCMapBlockWidget::onCharMode);
+
     reloadCMaps();
 }
 
@@ -65,12 +71,19 @@ QUCMapBlockWidget::reloadBlocks() {
 }
 
 void
-QUCMapBlockWidget::showFullGlyphList(bool state) {
-    document_->setCharMode(!state);
+QUCMapBlockWidget::onGlyphMode(bool state) {
+    const bool charMode = !state;
+    document_->setCharMode(charMode);
     foreach (QObject * obj, children()) {
         QWidget * widget = qobject_cast<QWidget*>(obj);
         if (widget && widget != ui_->glyphCheckBox) {
-            widget->setEnabled(!state);
+            widget->setEnabled(charMode);
         }
     }
 }
+
+void
+QUCMapBlockWidget::onCharMode(bool charMode) {
+    ui_->glyphCheckBox->setCheckState(charMode? Qt::Unchecked: Qt::Checked);
+}
+    

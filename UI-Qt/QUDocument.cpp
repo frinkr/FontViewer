@@ -1,5 +1,5 @@
 #include "QUConv.h"
-#include "QUGlyphSearchEngine.h"
+#include "QUSearchEngine.h"
 #include "QUDocument.h"
 
 QUGlyph::QUGlyph(const FXGlyph & glyph, QObject * parent)
@@ -46,19 +46,21 @@ QUDocument::selectCMap(size_t index) {
 
 void
 QUDocument::selectBlock(size_t index) {
+    if (blockIndex_ == index)
+        return;
+    
     beginResetModel();
     blockIndex_ = charMode_? index : 0;
     endResetModel();
+
+    emit blockSelected(blockIndex_);
 }
 
 void
 QUDocument::search(const QString & text) {
-    QUGlyphSearchEngine * s = new QUGlyphSearchEngine(this);
-    QUGlyphSearchResult result = s->search(text);
-    if (result.found)
-        emit searchFound(result, text);
-    else
-        emit searchNotFound(text);
+    QUSearchEngine * s = new QUSearchEngine(this);
+    QUSearchResult result = s->search(text);
+    emit searchDone(result, text);
 }
 
 const FXCMap &
@@ -89,9 +91,14 @@ QUDocument::charMode() const {
 
 void
 QUDocument::setCharMode(bool state) {
+    if (charMode_ == state)
+        return;
+    
     beginResetModel();
     charMode_ = state;
     endResetModel();
+
+    emit charModeActivated(charMode_);
 }
 
 QUGlyphLabel

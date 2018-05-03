@@ -3,7 +3,7 @@
 #include <QImage>
 #include "FontX/FXFace.h"
 
-struct QUGlyphSearchResult;
+struct QUSearchResult;
 
 struct QUFontURI
 {
@@ -114,11 +114,14 @@ signals:
     cmapActivated(int index);
 
     void
-    searchFound(const QUGlyphSearchResult & result, const QString & text);
+    blockSelected(int index);
+
+    void
+    charModeActivated(bool state);
     
     void
-    searchNotFound(const QString & text);
-                
+    searchDone(const QUSearchResult & result, const QString & text);
+
 protected:
     QUDocument(const QUFontURI & uri, QObject * parent);
 

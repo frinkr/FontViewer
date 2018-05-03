@@ -75,8 +75,8 @@ set(SHARED_SOURCES
   QUPopoverWindow.cpp
   QUSearchWidget.h
   QUSearchWidget.cpp
-  QUGlyphSearchEngine.h
-  QUGlyphSearchEngine.cpp
+  QUSearchEngine.h
+  QUSearchEngine.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

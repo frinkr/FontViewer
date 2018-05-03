@@ -1,7 +1,7 @@
 #pragma once
 #include "QUDocument.h"
     
-struct QUGlyphSearchResult {
+struct QUSearchResult {
     bool    found    {false};
     bool    charMode {false};
     size_t  block    {0};  
@@ -11,39 +11,39 @@ struct QUGlyphSearchResult {
 /**
  * A search is either char/gid or name searching
  */
-struct QUGlyphSearch {
+struct QUSearch {
     FXGChar      gchar;
     QString      name;
 };
 
-class QUGlyphSearchExpressionParser : public QObject {
+class QUSearchExpressionParser : public QObject {
     Q_OBJECT
 public:
-    explicit QUGlyphSearchExpressionParser(QObject * parent = nullptr);
+    explicit QUSearchExpressionParser(QObject * parent = nullptr);
 
-    QUGlyphSearch
+    QUSearch
     parse(const QString & text);
 };
 
-class QUGlyphSearchEngine : public QObject {
+class QUSearchEngine : public QObject {
     Q_OBJECT
 public:
-    QUGlyphSearchEngine(QUDocument * document);
+    QUSearchEngine(QUDocument * document);
 
-    QUGlyphSearchResult
+    QUSearchResult
     search(const QString & expression) const;
 
-    QUGlyphSearchResult
-    search(const QUGlyphSearch & expression) const;
+    QUSearchResult
+    search(const QUSearch & expression) const;
 
 protected:
-    QUGlyphSearchResult
+    QUSearchResult
     searchChar(FXGChar c) const;
 
-    QUGlyphSearchResult
+    QUSearchResult
     searchGlyph(FXGlyphID g) const;
 
-    QUGlyphSearchResult
+    QUSearchResult
     searchName(const QString & name) const;
 
 protected:

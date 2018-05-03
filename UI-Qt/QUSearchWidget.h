@@ -29,7 +29,7 @@ protected:
 
 protected slots:
     void
-    onSearchNotFound(const QString & text);
+    onSearchResult(const QUSearchResult & result, const QString & text);
     
     void
     onSearchTextChanged(const QString & text);

@@ -12,6 +12,7 @@
 #include "QUGlyphListView.h"
 #include "QUToolBarWidget.h"
 #include "QUSearchWidget.h"
+#include "QUSearchEngine.h"
 #include "ui_QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
@@ -98,8 +99,7 @@ QUDocumentWindow::initToolBar() {
 void
 QUDocumentWindow::initListView() {
     ui_->listView->setModel(document_);
-    ui_->listView->setItemDelegate(new QUGlyphItemDelegate(this));
-    
+    ui_->listView->setItemDelegate(new QUGlyphItemDelegate(this));    
 }
 
 void
@@ -121,8 +121,8 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
             this, &QUDocumentWindow::onCharLinkClicked);
 
-    connect(document_, &QUDocument::searchFound,
-            this, &QUDocumentWindow::onSearchFound);
+    connect(document_, &QUDocument::searchDone,
+            this, &QUDocumentWindow::onSearchResult);
 }
 
 QToolButton *
@@ -210,7 +210,13 @@ QUDocumentWindow::onSearchAction() {
 }
 
 void
-QUDocumentWindow::onSearchFound(const QUGlyphSearchResult & result, const QString & text) {
-    //
-    // TOOD: navigate to the result
+QUDocumentWindow::onSearchResult(const QUSearchResult & result, const QString & text) {
+    if (!result.found)
+        return;
+    document_->setCharMode(result.charMode);
+    document_->selectBlock(result.block);
+    
+    QModelIndex index = document_->index(result.index, 0);
+    ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
+    ui_->listView->scrollTo(index);
 }
