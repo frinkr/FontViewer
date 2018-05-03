@@ -87,7 +87,10 @@ private slots:
 
     void
     onSearchAction();
-    
+
+    void
+    onSearchFound(const QUGlyphSearchResult & result, const QString & text);
+        
 private:
     Ui::QUDocumentWindow * ui_;
     QDockWidget          * infoDockWidget_;

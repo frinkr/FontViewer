@@ -20,6 +20,9 @@ public:
                               QObject * parent = nullptr);
 
 public:
+    FXPtr<FXFace>
+    face() const;
+    
     const FXCMap &
     currentCMap() const;
     

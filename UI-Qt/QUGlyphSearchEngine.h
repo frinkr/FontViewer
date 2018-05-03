@@ -31,10 +31,20 @@ public:
     QUGlyphSearchEngine(QUGlyphListModel * model, QObject * parent = nullptr);
 
     QUGlyphSearchResult
-    search(const QString & expression);
+    search(const QString & expression) const;
 
     QUGlyphSearchResult
-    search(const QUGlyphSearch & expression);
+    search(const QUGlyphSearch & expression) const;
+
+protected:
+    QUGlyphSearchResult
+    searchChar(FXGChar c) const;
+
+    QUGlyphSearchResult
+    searchGlyph(FXGlyphID g) const;
+
+    QUGlyphSearchResult
+    searchName(const QString & name) const;
 
 protected:
     QUGlyphListModel * model_;

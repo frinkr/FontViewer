@@ -119,6 +119,9 @@ QUDocumentWindow::connectSingals() {
 
     connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
             this, &QUDocumentWindow::onCharLinkClicked);
+
+    connect(document_, &QUDocument::searchFound,
+            this, &QUDocumentWindow::onSearchFound);
 }
 
 QToolButton *
@@ -203,4 +206,10 @@ QUDocumentWindow::onSearchAction() {
         searchWindow_->setWidget(widget);
     }
     searchWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom);
+}
+
+void
+QUDocumentWindow::onSearchFound(const QUGlyphSearchResult & result, const QString & text) {
+    //
+    // TOOD: navigate to the result
 }
