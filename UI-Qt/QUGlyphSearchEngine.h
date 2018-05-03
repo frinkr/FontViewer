@@ -1,5 +1,5 @@
 #pragma once
-#include "QUGlyphListModel.h"
+#include "QUDocument.h"
     
 struct QUGlyphSearchResult {
     bool    found    {false};
@@ -28,7 +28,7 @@ public:
 class QUGlyphSearchEngine : public QObject {
     Q_OBJECT
 public:
-    QUGlyphSearchEngine(QUGlyphListModel * model, QObject * parent = nullptr);
+    QUGlyphSearchEngine(QUDocument * document);
 
     QUGlyphSearchResult
     search(const QString & expression) const;
@@ -47,5 +47,5 @@ protected:
     searchName(const QString & name) const;
 
 protected:
-    QUGlyphListModel * model_;
+    QUDocument * document_;
 };

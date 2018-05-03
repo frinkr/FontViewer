@@ -2,8 +2,6 @@
 #include <QListView>
 #include <QStyledItemDelegate>
 
-#include "QUGlyphListModel.h"
-
 class QUGlyphItemDelegate : public QStyledItemDelegate {
     Q_OBJECT
 public:

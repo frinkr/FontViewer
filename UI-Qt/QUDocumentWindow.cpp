@@ -97,8 +97,9 @@ QUDocumentWindow::initToolBar() {
 
 void
 QUDocumentWindow::initListView() {
-    ui_->listView->setModel(document_->model());
-    ui_->listView->setItemDelegate(document_->delegate());
+    ui_->listView->setModel(document_);
+    ui_->listView->setItemDelegate(new QUGlyphItemDelegate(this));
+    
 }
 
 void
@@ -135,7 +136,7 @@ QUDocumentWindow::senderToolButton() {
 
 void
 QUDocumentWindow::showFullGlyphList(bool state) {
-    document_->model()->setCharMode(!state);
+    document_->setCharMode(!state);
 }
 
 void
@@ -149,18 +150,18 @@ QUDocumentWindow::onToggleFullScreen(bool state) {
 void
 QUDocumentWindow::onSwitchGlyphLabel() {
     if (ui_->actionCharacter_Code->isChecked())
-        document_->model()->setGlyphLabel(QUGlyphLabel::CharacterCode);
+        document_->setGlyphLabel(QUGlyphLabel::CharacterCode);
     else if (ui_->actionGlyph_ID->isChecked())
-        document_->model()->setGlyphLabel(QUGlyphLabel::GlyphID);
+        document_->setGlyphLabel(QUGlyphLabel::GlyphID);
     else
-        document_->model()->setGlyphLabel(QUGlyphLabel::GlyphName);
+        document_->setGlyphLabel(QUGlyphLabel::GlyphName);
 }
 
 void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
-        FXGChar c = document_->model()->charAt(index);
+        FXGChar c = document_->charAt(index);
         ui_->textBrowser->setChar(c);
     }
 }

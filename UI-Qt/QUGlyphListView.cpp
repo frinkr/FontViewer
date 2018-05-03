@@ -10,7 +10,7 @@
 void
 QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
 {
-    QUGlyphListModel * model = (QUGlyphListModel*)index.model();
+    QUDocument * model = (QUDocument*)index.model();
 
     QVariant v = index.data(QUGlyphRole);
     if (!v.canConvert<QUGlyph>())
@@ -22,7 +22,6 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     initStyleOption(&opt, index);
     
     painter->save();
-
     
     const QWidget * widget = opt.widget;
     QStyle * style = widget ? widget->style() : QApplication::style();

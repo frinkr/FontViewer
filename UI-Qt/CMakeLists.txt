@@ -55,8 +55,6 @@ set(SHARED_SOURCES
   QUEncoding.cpp
   QUGlyphListView.h
   QUGlyphListView.cpp
-  QUGlyphListModel.h
-  QUGlyphListModel.cpp
   QUGlyphInfoWidget.h
   QUGlyphInfoWidget.cpp
   QUToolBarWidget.cpp

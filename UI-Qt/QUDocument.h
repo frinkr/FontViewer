@@ -1,10 +1,8 @@
 #pragma once
-#include <QObject>
-#include <QSharedPointer>
+#include <QAbstractListModel>
+#include <QImage>
 #include "FontX/FXFace.h"
 
-class QUGlyphItemDelegate;
-class QUGlyphListModel;
 struct QUGlyphSearchResult;
 
 struct QUFontURI
@@ -40,9 +38,17 @@ protected:
     FXGlyph  g_;
 };
 
+constexpr int QUGlyphRole= Qt::UserRole + 1;
+
+enum class QUGlyphLabel {
+    CharacterCode,
+    GlyphID,
+    GlyphName
+};
+
 Q_DECLARE_METATYPE(QUGlyph);
 
-class QUDocument : public QObject
+class QUDocument : public QAbstractListModel
 {
     Q_OBJECT
 public:
@@ -62,11 +68,47 @@ public:
     FXPtr<FXFace>
     face() const;
 
-    QUGlyphListModel *
-    model() const;
+public slots:
+    void
+    selectCMap(size_t index);
+    
+    void
+    selectBlock(size_t index);
 
-    QUGlyphItemDelegate *
-    delegate() const;
+    void
+    search(const QString & text);
+
+public:    
+    const FXCMap &
+    currentCMap() const;
+
+    FXPtr<FXGCharBlock>
+    currentBlock() const;
+
+    size_t
+    currentBlockIndex() const;
+    
+    bool
+    charMode() const;
+
+    void
+    setCharMode(bool state);
+    
+    QUGlyphLabel
+    glyphLabel() const;
+
+    void 
+    setGlyphLabel(QUGlyphLabel label);
+
+    FXGChar
+    charAt(const QModelIndex & index) const;
+
+    int
+    rowCount(const QModelIndex &) const;
+    
+    QVariant
+    data(const QModelIndex &, int) const;
+    
 signals:
     void
     cmapActivated(int index);
@@ -77,23 +119,20 @@ signals:
     void
     searchNotFound(const QString & text);
                 
-public slots:
-    void
-    selectCMap(size_t index);
-
-    void
-    search(const QString & text);
-    
-private:
+protected:
     QUDocument(const QUFontURI & uri, QObject * parent);
 
     bool
     load();
 
-private:
+protected:
     QUFontURI        uri_;
     FXPtr<FXFace>    face_;
 
-    QSharedPointer<QUGlyphListModel>    model_;
-    QSharedPointer<QUGlyphItemDelegate> delegate_;
+    FXPtr<FXGCharBlock> fullGlyphsBlock_;
+    size_t           blockIndex_;
+    QImage           dummyImage_;
+    bool             charMode_;
+    QUGlyphLabel     glyphLabel_;
+    
 };

@@ -26,8 +26,8 @@ void
 QUCMapBlockWidget::setDocument(QUDocument * document) {
     if (document_) {
         ui_->cmapComboBox->disconnect(document_);
+        ui_->blockComboBox->disconnect(document_);
         document_->disconnect(this);
-        ui_->blockComboBox->disconnect(document_->model());
     }
         
     document_ = document;
@@ -39,7 +39,7 @@ QUCMapBlockWidget::setDocument(QUDocument * document) {
             this, &QUCMapBlockWidget::reloadBlocks);
     
     connect(ui_->blockComboBox, QOverload<int>::of(&QComboBox::activated),
-            document_->model(), &QUGlyphListModel::selectBlock);
+            document_, &QUDocument::selectBlock);
 
     connect(ui_->glyphCheckBox, &QCheckBox::stateChanged,
             this, &QUCMapBlockWidget::showFullGlyphList);
@@ -66,7 +66,7 @@ QUCMapBlockWidget::reloadBlocks() {
 
 void
 QUCMapBlockWidget::showFullGlyphList(bool state) {
-    document_->model()->setCharMode(!state);
+    document_->setCharMode(!state);
     foreach (QObject * obj, children()) {
         QWidget * widget = qobject_cast<QWidget*>(obj);
         if (widget && widget != ui_->glyphCheckBox) {

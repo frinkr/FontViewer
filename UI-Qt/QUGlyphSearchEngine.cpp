@@ -41,9 +41,9 @@ QUGlyphSearchExpressionParser::parse(const QString & text) {
     return search;
 }
 
-QUGlyphSearchEngine::QUGlyphSearchEngine(QUGlyphListModel * model, QObject * parent)
-    : QObject(parent)
-    , model_(model) {}
+QUGlyphSearchEngine::QUGlyphSearchEngine(QUDocument * document_)
+    : QObject(document_)
+    , document_(document_) {}
 
 QUGlyphSearchResult
 QUGlyphSearchEngine::search(const QString & expression) const {
@@ -66,17 +66,17 @@ QUGlyphSearchEngine::search(const QUGlyphSearch & expression) const {
 QUGlyphSearchResult
 QUGlyphSearchEngine::searchChar(FXGChar c) const {
     QUGlyphSearchResult result;
-    if (model_->charMode()) {
+    if (document_->charMode()) {
         size_t blockIndex = -1;
         size_t charIndex = -1;
             
-        auto currentBlock = model_->currentBlock();
+        auto currentBlock = document_->currentBlock();
         charIndex = currentBlock->index(c);
         if (charIndex != -1)
-            blockIndex = model_->currentBlockIndex();
+            blockIndex = document_->currentBlockIndex();
 
         if (blockIndex == -1) {
-            const FXCMap & cmap = model_->currentCMap();
+            const FXCMap & cmap = document_->currentCMap();
             auto blocks = cmap.blocks();
             for (size_t i = 0; i < blocks.size(); ++ i) {
                 charIndex = blocks[i]->index(c);
@@ -95,7 +95,7 @@ QUGlyphSearchEngine::searchChar(FXGChar c) const {
     }
     else {
         // let's convert char to glyph and search in glyph mode
-        FXGlyphID gid = model_->currentCMap().glyphForChar(c.value);
+        FXGlyphID gid = document_->currentCMap().glyphForChar(c.value);
         if (gid)
             return searchGlyph(gid);
     }
@@ -105,7 +105,7 @@ QUGlyphSearchEngine::searchChar(FXGChar c) const {
 QUGlyphSearchResult
 QUGlyphSearchEngine::searchGlyph(FXGlyphID g) const {
     QUGlyphSearchResult result;
-    if (g < model_->face()->glyphCount()) {
+    if (g < document_->face()->glyphCount()) {
         result.found    = true;
         result.charMode = false;
         result.index    = g;
