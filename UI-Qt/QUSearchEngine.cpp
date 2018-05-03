@@ -66,32 +66,31 @@ QUSearchEngine::search(const QUSearch & expression) const {
 QUSearchResult
 QUSearchEngine::searchChar(FXGChar c) const {
     QUSearchResult result;
-    if (document_->charMode()) {
-        size_t blockIndex = -1;
-        size_t charIndex = -1;
-            
-        auto currentBlock = document_->currentBlock();
-        charIndex = currentBlock->index(c);
-        if (charIndex != -1)
-            blockIndex = document_->currentBlockIndex();
 
-        if (blockIndex == -1) {
-            const FXCMap & cmap = document_->currentCMap();
-            auto blocks = cmap.blocks();
-            for (size_t i = 0; i < blocks.size(); ++ i) {
-                charIndex = blocks[i]->index(c);
-                if (charIndex != -1) {
-                    blockIndex = i;
-                    break;
-                }
+    size_t blockIndex = -1;
+    size_t charIndex = -1;
+            
+    auto currentBlock = document_->currentBlock();
+    charIndex = currentBlock->index(c);
+    if (charIndex != -1)
+        blockIndex = document_->currentBlockIndex();
+
+    if (blockIndex == -1) {
+        const FXCMap & cmap = document_->currentCMap();
+        auto blocks = cmap.blocks();
+        for (size_t i = 0; i < blocks.size(); ++ i) {
+            charIndex = blocks[i]->index(c);
+            if (charIndex != -1) {
+                blockIndex = i;
+                break;
             }
         }
-        if (blockIndex != -1) {
-            result.found    = true;
-            result.charMode = true;
-            result.block    = blockIndex;
-            result.index    = charIndex;
-        }
+    }
+    if (blockIndex != -1) {
+        result.found    = true;
+        result.charMode = true;
+        result.block    = blockIndex;
+        result.index    = charIndex;
     }
     else {
         // let's convert char to glyph and search in glyph mode

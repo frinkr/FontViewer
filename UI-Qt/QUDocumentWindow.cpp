@@ -150,7 +150,7 @@ QUDocumentWindow::onToggleFullScreen(bool state) {
 void
 QUDocumentWindow::onSwitchGlyphLabel() {
     if (ui_->actionCharacter_Code->isChecked())
-        document_->setGlyphLabel(QUGlyphLabel::CharacterCode);
+        document_->setGlyphLabel(QUGlyphLabel::CharCode);
     else if (ui_->actionGlyph_ID->isChecked())
         document_->setGlyphLabel(QUGlyphLabel::GlyphID);
     else
@@ -215,8 +215,10 @@ QUDocumentWindow::onSearchResult(const QUSearchResult & result, const QString & 
         return;
     document_->setCharMode(result.charMode);
     document_->selectBlock(result.block);
-    
+
     QModelIndex index = document_->index(result.index, 0);
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);
+    
+    searchWindow_->hide();
 }

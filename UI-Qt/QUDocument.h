@@ -41,7 +41,7 @@ protected:
 constexpr int QUGlyphRole= Qt::UserRole + 1;
 
 enum class QUGlyphLabel {
-    CharacterCode,
+    CharCode,
     GlyphID,
     GlyphName
 };

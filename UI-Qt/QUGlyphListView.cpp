@@ -51,7 +51,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 
         QString text;
         switch (model->glyphLabel()) {
-        case QUGlyphLabel::CharacterCode:
+        case QUGlyphLabel::CharCode:
             text = charCode;
             break;
         case QUGlyphLabel::GlyphID:
