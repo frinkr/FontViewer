@@ -37,8 +37,8 @@ void
 QUPopoverWindow::showRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
     setEdge(edgeRelativeTo(rect, preferedEgdes));
     setFocus(Qt::ActiveWindowFocusReason);
-    move(geometryRelativeTo(rect, edge_).topLeft());
     show();
+    move(geometryRelativeTo(rect, edge_).topLeft());
 }
 
 void
