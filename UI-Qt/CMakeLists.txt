@@ -29,7 +29,8 @@ set(UI
   QUOpenFontDialog.ui
   QUFontInfoWidget.ui
   QUCMapBlockWidget.ui
-  QUSearchWidget.ui)
+  QUSearchWidget.ui
+  QUGlyphTableWidget.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -77,6 +78,8 @@ set(SHARED_SOURCES
   QUSearchWidget.cpp
   QUSearchEngine.h
   QUSearchEngine.cpp
+  QUGlyphTableWidget.h
+  QUGlyphTableWidget.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

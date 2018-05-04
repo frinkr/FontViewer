@@ -81,6 +81,9 @@ private slots:
 
     void
     onCMapBlockAction();
+
+    void
+    onTableAction();
     
     void
     onFontInfoAction();
@@ -90,13 +93,19 @@ private slots:
 
     void
     onSearchResult(const QUSearchResult & result, const QString & text);
-        
+
+private:
+    void
+    toggleDockWidget(QDockWidget * dockWidget);
+    
 private:
     Ui::QUDocumentWindow * ui_;
-    QDockWidget          * infoDockWidget_;
-
     QAction         * cmapBlockAction_;
     QUPopoverWindow * cmapBlockWindow_;
+    QAction         * tableAction_;
+    QDockWidget     * tableDockWidget_;
+    QAction         * infoAction_;
+    QDockWidget     * infoDockWidget_;
     QAction         * searchAction_;
     QUPopoverWindow * searchWindow_;
     

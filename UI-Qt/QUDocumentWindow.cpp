@@ -10,6 +10,7 @@
 #include "QUFontInfoWidget.h"
 #include "QUPopoverWindow.h"
 #include "QUGlyphListView.h"
+#include "QUGlyphTableWidget.h"
 #include "QUToolBarWidget.h"
 #include "QUSearchWidget.h"
 #include "QUSearchEngine.h"
@@ -18,8 +19,9 @@
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 
     : QMainWindow(parent)
     , ui_(new Ui::QUDocumentWindow)
-    , infoDockWidget_(nullptr)
     , cmapBlockWindow_(nullptr)
+    , tableDockWidget_(nullptr)
+    , infoDockWidget_(nullptr)
     , searchWindow_(nullptr)
     , document_(document)
 {
@@ -77,16 +79,19 @@ QUDocumentWindow::initToolBar() {
 
     QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
     QAction* shape = toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
-    QAction* table = toolBar->addAction(QIcon(":/images/table_d.png"), tr("Table"));
-
     
-    QAction* info = toolBar->addAction(
+    tableAction_ = toolBar->addAction(
+        QIcon(":/images/table_d.png"), tr("Table"),
+        this, &QUDocumentWindow::onTableAction);
+    
+    infoAction_ = toolBar->addAction(
         QIcon(":/images/info_d.png"), tr("Info"),
         this, &QUDocumentWindow::onFontInfoAction);
 
     searchAction_ = toolBar->addAction(
         QIcon(":/images/search_d.png"), tr("Search"),
         this, &QUDocumentWindow::onSearchAction);
+    
     searchAction_->setShortcut(QKeySequence("Ctrl+F"));
         
     QWidget * spacer = new QWidget;
@@ -181,7 +186,17 @@ QUDocumentWindow::onCMapBlockAction() {
     }
     cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverRight);
 }
-    
+
+void
+QUDocumentWindow::onTableAction() {
+    if (!tableDockWidget_) {
+        tableDockWidget_ = new QDockWidget(tr("Glyphs Table"), this);
+        tableDockWidget_->setWidget(new QUGlyphTableWidget(document_));
+        addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
+    }
+    toggleDockWidget(tableDockWidget_);
+}
+
 void
 QUDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
@@ -190,12 +205,7 @@ QUDocumentWindow::onFontInfoAction() {
         addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
     }
 
-    if (infoDockWidget_->isVisible())
-        infoDockWidget_->hide();
-    else {
-        infoDockWidget_->show();
-        infoDockWidget_->raise();
-    }
+    toggleDockWidget(infoDockWidget_);
 }
 
 void
@@ -222,3 +232,14 @@ QUDocumentWindow::onSearchResult(const QUSearchResult & result, const QString & 
     
     searchWindow_->hide();
 }
+
+void
+QUDocumentWindow::toggleDockWidget(QDockWidget * dockWidget) {
+    if (dockWidget->isVisible())
+        dockWidget->hide();
+    else {
+        dockWidget->show();
+        dockWidget->raise();
+    }
+}
+    
