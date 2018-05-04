@@ -9,38 +9,7 @@ namespace Ui {
     class QUGlyphTableWidget;
 }
 
-class QUGlyphTableModelColumn : public QObject {
-    Q_OBJECT
-public:
-    explicit QUGlyphTableModelColumn(const QString & name, QObject * parent = nullptr)
-        : QObject(parent)
-        , name_(name) {}
-        
-    virtual QVariant
-    header(int role) {
-        if (role == Qt::DisplayRole) 
-            return name();
-        return QVariant();;
-    }
-        
-    virtual QVariant
-    data(const FXGlyph & g, int role) {
-        if (role == Qt::DisplayRole) 
-            return value(g);
-        return QVariant();
-    }
-
-    virtual QString
-    name() const {
-        return name_;
-    };
-
-    virtual QVariant
-    value(const FXGlyph & g) = 0;
-            
-protected:
-    QString      name_;
-};
+class QUGlyphTableModelColumn;
 
 class QUGlyphTableModel : public QAbstractTableModel {
     Q_OBJECT
@@ -60,6 +29,10 @@ public:
 
     const QVector<QUGlyphTableModelColumn *> &
     columns() const;
+
+public slots:
+    void
+    reset();
     
 protected:
     QUDocument     * document_;
@@ -77,5 +50,3 @@ private:
     Ui::QUGlyphTableWidget * ui_;
     QUDocument             * document_;
 };
-
-

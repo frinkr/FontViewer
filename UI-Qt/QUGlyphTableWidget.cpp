@@ -1,8 +1,83 @@
+#include <QItemDelegate>
+#include <QStyledItemDelegate>
+#include <QPainter>
 #include "QUConv.h"
 #include "QUEncoding.h"
 #include "QUDocument.h"
 #include "QUGlyphTableWidget.h"
 #include "ui_QUGlyphTableWidget.h"
+
+class QUGlyphTableModelColumn : public QObject {
+public:
+    explicit QUGlyphTableModelColumn(const QString & name, QObject * parent = nullptr)
+        : QObject(parent)
+        , name_(name)
+        , useDecorationRole_(false) {}
+        
+    virtual QVariant
+    header(int role) const {
+        if (role == Qt::DisplayRole) 
+            return name();
+        return QVariant();;
+    }
+        
+    virtual QVariant
+    data(const FXGlyph & g, int role) const {
+        if (useDecorationRole_ && role == Qt::DecorationRole)
+            return value(g);
+        
+        if (role == Qt::DisplayRole) 
+            return value(g);
+        return QVariant();
+    }
+
+    virtual QString
+    name() const {
+        return name_;
+    };
+
+    virtual QVariant
+    value(const FXGlyph & g) const = 0;
+
+    QUGlyphTableModelColumn *
+    useDecorationRole(bool value = true) {
+        useDecorationRole_ = value;
+        return this;
+    }
+    
+protected:
+    QString      name_;
+    bool         useDecorationRole_;
+};
+
+class QUGlyphTableBitmapDelegate : public QItemDelegate {
+public:
+    using QItemDelegate::QItemDelegate;
+    void 
+    paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
+        QVariant d = index.data(Qt::DecorationRole);
+        QImage image = d.value<QImage>();
+
+        if (option.state & QStyle::State_Selected)
+            painter->fillRect(option.rect, option.palette.highlight());
+
+        const int size = qMin(option.rect.width(), option.rect.height());
+        
+        QRect outRect (QPoint(option.rect.x() + (option.rect.width() - size) / 2,
+                              option.rect.y() + (option.rect.height() - size) / 2),
+                       QSize(size, size));
+
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
+        
+        painter->drawImage(outRect,
+                           image,
+                           QRect(QPoint(0, 0), image.size())
+                           );
+        painter->restore();
+    }
+};
 
 namespace {
 
@@ -19,9 +94,16 @@ namespace {
 
     QVariant
     toVariant(const FXGChar & c) {
-        if (c.value == FXCharInvalid)
-            return QString();
-        return QUEncoding::charHexNotation(c);
+        if (c.isUnicode() && c.value != FXCharInvalid) {
+            char32_t i = c.value;
+            return QString::fromUcs4(&i, 1);
+        }
+        return QVariant();
+    }
+
+    QVariant
+    toVariant(const FXBitmapARGB & bm) {
+        return placeImage(toQImage(bm), glyphEmSize());
     }
     
     template <class PointerToMember>
@@ -29,10 +111,11 @@ namespace {
     public:
         QUGlyphBasicColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
             : QUGlyphTableModelColumn(name, parent)
-            , p_(p) {}
-
+            , p_(p)
+        {}
+        
         virtual QVariant
-        value(const FXGlyph & g) {
+        value(const FXGlyph & g) const {
             return toVariant(g.*p_);
         };
     protected:
@@ -47,13 +130,25 @@ namespace {
             , p_(p) {}
 
         virtual QVariant
-        value(const FXGlyph & g) {
+        value(const FXGlyph & g) const {
             return toVariant(g.metrics.*p_);
         };
     protected:
         PointerToMember p_;
     };
 
+    
+    class QUGlyphCodePointColumn : public QUGlyphTableModelColumn {
+    public:
+        using QUGlyphTableModelColumn::QUGlyphTableModelColumn;
+        QVariant
+        value(const FXGlyph & g) const {
+            if (g.character.value != FXCharInvalid)
+                return QUEncoding::charHexNotation(g.character);
+            return QVariant();
+        }
+    };
+    
     template <typename PointerToMember>
     QUGlyphBasicColumn<PointerToMember> *
     makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
@@ -66,6 +161,7 @@ namespace {
     makeMetricColumn(const QString & name, PointerToMember p, QObject * parent) {
         return new QUGlyphMetricColumn<PointerToMember>(name, p, parent);
     }
+
 }
 
 QUGlyphTableModel::QUGlyphTableModel(QUDocument * document, QObject * parent)
@@ -73,7 +169,9 @@ QUGlyphTableModel::QUGlyphTableModel(QUDocument * document, QObject * parent)
     , document_(document) {
 
     columns_.append(makeBasicColumn(tr("Index"), &FXGlyph::gid, this));
-    columns_.append(makeBasicColumn(tr("Code"), &FXGlyph::character, this));
+    columns_.append(makeBasicColumn(tr("Glyph"), &FXGlyph::bitmap, this)->useDecorationRole(true));
+    columns_.append(new QUGlyphCodePointColumn(tr("Codepoint"), this));
+    columns_.append(makeBasicColumn(tr("Char"), &FXGlyph::character, this));
     columns_.append(makeBasicColumn(tr("Name"), &FXGlyph::name, this));
     columns_.append(makeMetricColumn(tr("Width"), &FXGlyphMetrics::width, this));
     columns_.append(makeMetricColumn(tr("Height"), &FXGlyphMetrics::height, this));
@@ -83,7 +181,9 @@ QUGlyphTableModel::QUGlyphTableModel(QUDocument * document, QObject * parent)
     columns_.append(makeMetricColumn(tr("Vert Bearing X"), &FXGlyphMetrics::vertBearingX, this));
     columns_.append(makeMetricColumn(tr("Vert Bearing Y"), &FXGlyphMetrics::vertBearingY, this));
     columns_.append(makeMetricColumn(tr("Vert Advance"), &FXGlyphMetrics::vertAdvance, this));
-    
+
+    connect(document_, &QUDocument::cmapActivated,
+            this, &QUGlyphTableModel::reset);
 }
 
 int
@@ -116,6 +216,11 @@ QUGlyphTableModel::columns() const {
     return columns_;
 }
 
+void
+QUGlyphTableModel::reset() {
+    beginResetModel();
+    endResetModel();
+}
 
 QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     : QWidget(parent)
@@ -125,6 +230,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
 
     ui_->tableView->setModel(new QUGlyphTableModel(document, this));
     ui_->tableView->verticalHeader()->hide();
+    ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
 }
 
 QUGlyphTableWidget::~QUGlyphTableWidget() {
