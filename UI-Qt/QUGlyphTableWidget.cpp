@@ -1,5 +1,7 @@
 #include <QItemDelegate>
 #include <QStyledItemDelegate>
+#include <QStyleOptionProgressBar>
+#include <QStyleOptionFocusRect>
 #include <QPainter>
 #include "QUConv.h"
 #include "QUEncoding.h"
@@ -50,17 +52,15 @@ protected:
     bool         useDecorationRole_;
 };
 
-class QUGlyphTableBitmapDelegate : public QItemDelegate {
+class QUGlyphTableBitmapDelegate : public QStyledItemDelegate {
 public:
-    using QItemDelegate::QItemDelegate;
+    using QStyledItemDelegate::QStyledItemDelegate;
     void 
     paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
         QVariant d = index.data(Qt::DecorationRole);
         QImage image = d.value<QImage>();
 
-        if (option.state & QStyle::State_Selected)
-            painter->fillRect(option.rect, option.palette.highlight());
-
+        painter->fillRect(option.rect, Qt::white);
         const int size = qMin(option.rect.width(), option.rect.height());
         
         QRect outRect (QPoint(option.rect.x() + (option.rect.width() - size) / 2,
@@ -75,6 +75,23 @@ public:
                            image,
                            QRect(QPoint(0, 0), image.size())
                            );
+        
+        if (option.state & QStyle::State_Selected) {
+            /**
+            QStyleOptionProgressBar progressBarOption;
+            progressBarOption.rect = option.rect;
+            progressBarOption.minimum = 0;
+            progressBarOption.maximum = 100;
+            progressBarOption.progress = 60;
+            progressBarOption.text = QString::number(60) + "%";
+            progressBarOption.textVisible = true;
+
+            QApplication::style()->drawControl(QStyle::CE_ProgressBar,
+                                               &progressBarOption, painter);
+            */
+            painter->fillRect(option.rect, option.palette.highlight());
+        }
+//            painter->fillRect(option.rect, QColor(100, 20, 100, 128));
         painter->restore();
     }
 };
