@@ -1,27 +1,29 @@
 #include "QUConv.h"
+#include "QUEncoding.h"
 #include "QUDocument.h"
 #include "QUGlyphTableWidget.h"
 #include "ui_QUGlyphTableWidget.h"
 
 namespace {
-    class QUGlyphIndexColumn: public QUGlyphTableModelColumn {
-    public:
-        using QUGlyphTableModelColumn::QUGlyphTableModelColumn;
-        virtual QVariant
-        value(const FXGlyph & g) {
-            return g.gid;
-        };
-    };
 
-    class QUGlyphNameColumn: public QUGlyphTableModelColumn {
-    public:
-        using QUGlyphTableModelColumn::QUGlyphTableModelColumn;
-        virtual QVariant
-        value(const FXGlyph & g) {
-            return toQString(g.name);
-        };
-    };
+    template <typename T>
+    QVariant
+    toVariant(T value) {
+        return value;
+    }
 
+    QVariant
+    toVariant(const FXString & str) {
+        return toQString(str);
+    }
+
+    QVariant
+    toVariant(const FXGChar & c) {
+        if (c.value == FXCharInvalid)
+            return QString();
+        return QUEncoding::charHexNotation(c);
+    }
+    
     template <class PointerToMember>
     class QUGlyphBasicColumn : public QUGlyphTableModelColumn {
     public:
@@ -31,7 +33,22 @@ namespace {
 
         virtual QVariant
         value(const FXGlyph & g) {
-            return g.*p_;
+            return toVariant(g.*p_);
+        };
+    protected:
+        PointerToMember p_;
+    };
+    
+    template <class PointerToMember>
+    class QUGlyphMetricColumn : public QUGlyphTableModelColumn {
+    public:
+        QUGlyphMetricColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
+            : QUGlyphTableModelColumn(name, parent)
+            , p_(p) {}
+
+        virtual QVariant
+        value(const FXGlyph & g) {
+            return toVariant(g.metrics.*p_);
         };
     protected:
         PointerToMember p_;
@@ -39,8 +56,15 @@ namespace {
 
     template <typename PointerToMember>
     QUGlyphBasicColumn<PointerToMember> *
-    makeColumn(const QString & name, PointerToMember p, QObject * parent) {
+    makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
         return new QUGlyphBasicColumn<PointerToMember>(name, p, parent);
+    }
+
+    
+    template <typename PointerToMember>
+    QUGlyphMetricColumn<PointerToMember> *
+    makeMetricColumn(const QString & name, PointerToMember p, QObject * parent) {
+        return new QUGlyphMetricColumn<PointerToMember>(name, p, parent);
     }
 }
 
@@ -48,8 +72,17 @@ QUGlyphTableModel::QUGlyphTableModel(QUDocument * document, QObject * parent)
     : QAbstractTableModel(parent)
     , document_(document) {
 
-    columns_.append(makeColumn(tr("Index"), &FXGlyph::gid, this));
-    columns_.append(new QUGlyphNameColumn(tr("Name"), this));
+    columns_.append(makeBasicColumn(tr("Index"), &FXGlyph::gid, this));
+    columns_.append(makeBasicColumn(tr("Code"), &FXGlyph::character, this));
+    columns_.append(makeBasicColumn(tr("Name"), &FXGlyph::name, this));
+    columns_.append(makeMetricColumn(tr("Width"), &FXGlyphMetrics::width, this));
+    columns_.append(makeMetricColumn(tr("Height"), &FXGlyphMetrics::height, this));
+    columns_.append(makeMetricColumn(tr("Hori Bearing X"), &FXGlyphMetrics::horiBearingX, this));
+    columns_.append(makeMetricColumn(tr("Hori Bearing Y"), &FXGlyphMetrics::horiBearingY, this));
+    columns_.append(makeMetricColumn(tr("Hori Advance"), &FXGlyphMetrics::horiAdvance, this));
+    columns_.append(makeMetricColumn(tr("Vert Bearing X"), &FXGlyphMetrics::vertBearingX, this));
+    columns_.append(makeMetricColumn(tr("Vert Bearing Y"), &FXGlyphMetrics::vertBearingY, this));
+    columns_.append(makeMetricColumn(tr("Vert Advance"), &FXGlyphMetrics::vertAdvance, this));
     
 }
 
