@@ -33,6 +33,9 @@ public:
 public slots:
     void
     reset();
+
+    bool
+    exportToFile(const QString & filePath) const;
     
 protected:
     QUDocument     * document_;

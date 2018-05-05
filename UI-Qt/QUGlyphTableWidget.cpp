@@ -2,6 +2,8 @@
 #include <QStyledItemDelegate>
 #include <QStyleOptionProgressBar>
 #include <QStyleOptionFocusRect>
+#include <QFile>
+#include <QTextStream>
 #include <QPainter>
 #include "QUConv.h"
 #include "QUEncoding.h"
@@ -57,41 +59,29 @@ public:
     using QStyledItemDelegate::QStyledItemDelegate;
     void 
     paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
-        QVariant d = index.data(Qt::DecorationRole);
-        QImage image = d.value<QImage>();
-
-        painter->fillRect(option.rect, Qt::white);
-        const int size = qMin(option.rect.width(), option.rect.height());
-        
-        QRect outRect (QPoint(option.rect.x() + (option.rect.width() - size) / 2,
-                              option.rect.y() + (option.rect.height() - size) / 2),
-                       QSize(size, size));
-
+        //return QStyledItemDelegate::paint(painter, option, index);
         painter->save();
+        
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform, true);
-        
-        painter->drawImage(outRect,
-                           image,
-                           QRect(QPoint(0, 0), image.size())
-                           );
-        
-        if (option.state & QStyle::State_Selected) {
-            /**
-            QStyleOptionProgressBar progressBarOption;
-            progressBarOption.rect = option.rect;
-            progressBarOption.minimum = 0;
-            progressBarOption.maximum = 100;
-            progressBarOption.progress = 60;
-            progressBarOption.text = QString::number(60) + "%";
-            progressBarOption.textVisible = true;
 
-            QApplication::style()->drawControl(QStyle::CE_ProgressBar,
-                                               &progressBarOption, painter);
-            */
-            painter->fillRect(option.rect, option.palette.highlight());
-        }
-//            painter->fillRect(option.rect, QColor(100, 20, 100, 128));
+        QStyleOptionViewItem opt = option;
+        initStyleOption(&opt, index);
+
+        QIcon::Mode mode = QIcon::Normal;
+        if (!(opt.state & QStyle::State_Enabled))
+            mode = QIcon::Disabled;
+        else if (opt.state & QStyle::State_Selected)
+            mode = QIcon::Selected;
+        QIcon::State state = opt.state & QStyle::State_Open ? QIcon::On : QIcon::Off;
+        
+        QPixmap bk(opt.rect.size());
+        bk.fill(Qt::white);
+        QIcon bkIcon(bk);
+        bkIcon.paint(painter, opt.rect, Qt::AlignHCenter, mode, state);
+        
+        opt.icon.paint(painter, opt.rect, Qt::AlignHCenter, mode, state);
+
         painter->restore();
     }
 };
@@ -237,6 +227,31 @@ void
 QUGlyphTableModel::reset() {
     beginResetModel();
     endResetModel();
+}
+
+bool
+QUGlyphTableModel::exportToFile(const QString & filePath) const {
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return false;
+
+    QTextStream ts(&file);
+    for (int i = 0; i < columns_.size(); ++ i) {
+        if (i == 1) continue; // skip the glyph image column
+        ts << columns_[i]->name() << ", ";
+    }
+
+    for (size_t i = 0; i < document_->face()->glyphCount(); ++ i) {
+        FXGChar gc(FXGCharTypeGlyphID, i);
+        FXGlyph g = document_->face()->glyph(gc);
+        for (int i = 0; i < columns_.size(); ++ i) {
+            if (i == 1) continue;
+            QVariant v = columns_[i]->data(g, Qt::DisplayRole);
+            ts << v.toString() << ", ";
+        }
+        ts << "\n";
+    }
+    return true;
 }
 
 QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
