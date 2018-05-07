@@ -3,7 +3,9 @@
 #include <QStyleOptionProgressBar>
 #include <QStyleOptionFocusRect>
 #include <QFile>
+#include <QStandardPaths>
 #include <QTextStream>
+#include <QFileDialog>
 #include <QPainter>
 #include "QUConv.h"
 #include "QUEncoding.h"
@@ -59,7 +61,6 @@ public:
     using QStyledItemDelegate::QStyledItemDelegate;
     void 
     paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
-        //return QStyledItemDelegate::paint(painter, option, index);
         painter->save();
         
         painter->setRenderHint(QPainter::Antialiasing, true);
@@ -240,7 +241,7 @@ QUGlyphTableModel::exportToFile(const QString & filePath) const {
         if (i == 1) continue; // skip the glyph image column
         ts << columns_[i]->name() << ", ";
     }
-
+    ts << "\n";
     for (size_t i = 0; i < document_->face()->glyphCount(); ++ i) {
         FXGChar gc(FXGCharTypeGlyphID, i);
         FXGlyph g = document_->face()->glyph(gc);
@@ -259,12 +260,29 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     , ui_(new Ui::QUGlyphTableWidget)
     , document_(document) {
     ui_->setupUi(this);
-
-    ui_->tableView->setModel(new QUGlyphTableModel(document, this));
+    model_ = new QUGlyphTableModel(document, this);
+    
+    ui_->tableView->setModel(model_);
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
+
+    connect(ui_->pushButton, &QPushButton::clicked,
+            this, &QUGlyphTableWidget::exportToFile);
 }
 
 QUGlyphTableWidget::~QUGlyphTableWidget() {
     delete ui_;
 }
+
+void
+QUGlyphTableWidget::exportToFile() {
+    QString file = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/" + toQString(document_->face()->postscriptName());
+    QString fileName = QFileDialog::getSaveFileName(
+        this,
+        tr("Export"), file,
+        tr("CSV (*.csv);;All Files (*)"));
+
+    if (!fileName.isEmpty())
+        model_->exportToFile(fileName);
+}
+    

@@ -48,8 +48,13 @@ class QUGlyphTableWidget : public QWidget {
 public:
     explicit QUGlyphTableWidget(QUDocument * document, QWidget *parent = nullptr);
     ~QUGlyphTableWidget();
-
+                         
+public slots:
+    void
+    exportToFile();
+    
 private:
     Ui::QUGlyphTableWidget * ui_;
     QUDocument             * document_;
+    QUGlyphTableModel      * model_;
 };
