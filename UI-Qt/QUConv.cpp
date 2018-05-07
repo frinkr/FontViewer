@@ -3,6 +3,12 @@
 #include "FontX/FXFace.h"
 #include "FontX/FXUnicode.h"
 
+namespace {
+    void
+    deleteFXBitmapARGB(void * bm) {
+        delete (FXBitmapARGB*)bm;
+    }
+}
 QString
 toQString(const std::string & str) {
     return QString::fromStdString(str);
@@ -15,6 +21,7 @@ toStdString(const QString & str) {
 
 QImage
 toQImage(const FXBitmapARGB & bm) {
+#if QU_IMAGE_NO_OPTIMIZE
     QImage image(bm.width, bm.height, QImage::Format_ARGB32);
     image.setDevicePixelRatio(2);
     for (int y = 0; y < bm.height; ++ y) {
@@ -23,6 +30,15 @@ toQImage(const FXBitmapARGB & bm) {
             image.setPixel(x, y, color);
         }
     }
+#else
+    FXBitmapARGB * ref = new FXBitmapARGB(bm); // make a new ref
+    QImage image((uchar*)bm.buffer,
+                 bm.width,
+                 bm.height,
+                 QImage::Format_ARGB32,
+                 deleteFXBitmapARGB,
+                 ref);
+#endif
     return image;
 }
 

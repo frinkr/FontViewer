@@ -16,6 +16,8 @@ namespace {
         QStringList ret;
         while ((dir = FcStrListNext(fcDirs))) 
             ret.append(toQString(std::string((const char*)dir)));
+        FcStrListDone(fcDirs);
+        FcConfigDestroy(fc);
         return ret;
 #else
         return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
