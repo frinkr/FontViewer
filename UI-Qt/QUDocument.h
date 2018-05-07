@@ -4,6 +4,7 @@
 #include "FontX/FXFace.h"
 
 struct QUSearchResult;
+struct QUSearch;
 
 struct QUFontURI
 {
@@ -75,6 +76,9 @@ public slots:
     void
     selectBlock(size_t index);
 
+    void
+    search(const QUSearch & s);
+    
     void
     search(const QString & text);
 

@@ -52,7 +52,6 @@ struct FXCharRange {
 using fu = short;  // font units
 
 enum FXGCharType {
-    FXGCharTypeInvalid,
     FXGCharTypeUnicode,
     FXGCharTypeGlyphID,
     FXGCharTypeOther,   // characters in other encoding
@@ -62,7 +61,7 @@ struct FXGChar {
     FXGCharType type;
     FXChar      value;
 
-    constexpr FXGChar(FXGCharType type = FXGCharTypeInvalid, FXChar value = FXCharInvalid)
+    constexpr FXGChar(FXGCharType type = FXGCharTypeUnicode, FXChar value = FXCharInvalid)
         : type(type)
         , value(value){}
 
@@ -98,8 +97,8 @@ struct FXGChar {
 
     constexpr bool
     isValid() const {
-        return type != FXGCharTypeInvalid;
+        return value != FXCharInvalid;
     }
 };
 
-constexpr FXGChar FXGCharInvalid(FXGCharTypeInvalid, FXCharInvalid);
+constexpr FXGChar FXGCharInvalid(FXGCharTypeUnicode, FXCharInvalid);

@@ -230,7 +230,8 @@ QUDocumentWindow::onSearchResult(const QUSearchResult & result, const QString & 
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);
     
-    searchWindow_->hide();
+    if (searchWindow_)
+        searchWindow_->hide();
 }
 
 void

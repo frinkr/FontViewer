@@ -12,6 +12,7 @@
 #include "QUEncoding.h"
 #include "QUDocument.h"
 #include "QUGlyphTableWidget.h"
+#include "QUSearchEngine.h"
 #include "ui_QUGlyphTableWidget.h"
 
 class QUGlyphTableModelColumn : public QObject {
@@ -103,7 +104,7 @@ namespace {
 
     QVariant
     toVariant(const FXGChar & c) {
-        if (c.isUnicode() && c.value != FXCharInvalid) {
+        if (c.isUnicode() && c.isValid()) {
             char32_t i = c.value;
             return QString::fromUcs4(&i, 1);
         }
@@ -152,7 +153,7 @@ namespace {
         using QUGlyphTableModelColumn::QUGlyphTableModelColumn;
         QVariant
         value(const FXGlyph & g) const {
-            if (g.character.value != FXCharInvalid)
+            if (g.character.isChar() && g.character.isValid())
                 return QUEncoding::charHexNotation(g.character);
             return QVariant();
         }
@@ -207,10 +208,7 @@ QUGlyphTableModel::columnCount(const QModelIndex & parent) const {
     
 QVariant
 QUGlyphTableModel::data(const QModelIndex & index, int role) const {
-    int gid = index.row();
-    FXGChar gc(FXGCharTypeGlyphID, gid);
-    FXGlyph g = document_->face()->glyph(gc);
-    return columns_[index.column()]->data(g, role);
+    return columns_[index.column()]->data(glyphAt(index.row()), role);
 }
 
 QVariant
@@ -223,6 +221,12 @@ QUGlyphTableModel::headerData(int section, Qt::Orientation orientation, int role
 const QVector<QUGlyphTableModelColumn *> &
 QUGlyphTableModel::columns() const {
     return columns_;
+}
+
+FXGlyph
+QUGlyphTableModel::glyphAt(int row) const {
+    FXGChar gc(FXGCharTypeGlyphID, row);
+    return document_->face()->glyph(gc);
 }
 
 void
@@ -270,8 +274,12 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
     ui_->tableView->setSortingEnabled(true);
+    
     connect(ui_->pushButton, &QPushButton::clicked,
             this, &QUGlyphTableWidget::exportToFile);
+
+    connect(ui_->tableView, &QTableView::doubleClicked,
+            this, &QUGlyphTableWidget::gotoGlyphAtIndex);
 }
 
 QUGlyphTableWidget::~QUGlyphTableWidget() {
@@ -289,4 +297,19 @@ QUGlyphTableWidget::exportToFile() {
     if (!fileName.isEmpty())
         model_->exportToFile(fileName);
 }
-    
+
+void
+QUGlyphTableWidget::gotoGlyphAtIndex(const QModelIndex & index) {
+    const QSortFilterProxyModel * proxyModel = qobject_cast<const QSortFilterProxyModel *>(index.model());
+    QModelIndex sourceIndex = proxyModel->mapToSource(index);
+
+    FXGlyph g = model_->glyphAt(sourceIndex.row());
+    FXGChar gc = g.character;
+    if (!gc.isChar() || !gc.isValid())
+        gc = FXGChar(FXGCharTypeGlyphID, g.gid);
+
+    QUSearch s;
+    s.gchar = gc;
+
+    document_->search(s);
+}

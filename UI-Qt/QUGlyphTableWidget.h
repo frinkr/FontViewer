@@ -30,6 +30,8 @@ public:
     const QVector<QUGlyphTableModelColumn *> &
     columns() const;
 
+    FXGlyph
+    glyphAt(int row) const;
 public slots:
     void
     reset();
@@ -52,7 +54,10 @@ public:
 public slots:
     void
     exportToFile();
-    
+
+private slots:
+    void
+    gotoGlyphAtIndex(const QModelIndex & index);
 private:
     Ui::QUGlyphTableWidget * ui_;
     QUDocument             * document_;

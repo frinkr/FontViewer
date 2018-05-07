@@ -57,9 +57,16 @@ QUDocument::selectBlock(size_t index) {
 }
 
 void
+QUDocument::search(const QUSearch & s) {
+    QUSearchEngine * se = new QUSearchEngine(this);
+    QUSearchResult result = se->search(s);
+    emit searchDone(result, "");
+}
+
+void
 QUDocument::search(const QString & text) {
-    QUSearchEngine * s = new QUSearchEngine(this);
-    QUSearchResult result = s->search(text);
+    QUSearchEngine * se = new QUSearchEngine(this);
+    QUSearchResult result = se->search(text);
     emit searchDone(result, text);
 }
 
