@@ -3,6 +3,8 @@
 #include "FXCMap.h"
 #include "FXGlyph.h"
 
+class FXGlyphCache;
+
 struct FXFaceDescriptor {
     FXString  filePath;
     size_t    index;
@@ -155,4 +157,5 @@ protected:
     FXFTFace             face_;
     FXFaceAttributes     atts_;
     std::vector<FXCMap>  cmaps_;
+    FXPtr<FXGlyphCache>  cache_;
 };

@@ -1,5 +1,6 @@
 #include "FXFace.h"
 #include "FXLib.h"
+#include "FXGlyphCache.h"
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"
 #include "FXBoostPrivate.h"
@@ -253,6 +254,14 @@ FXFace::glyph(FXGChar gc) {
     else {
         gid = FT_Get_Char_Index(face_, c);
     }
+
+    // lookup in cache
+    if (cache_->has(gid)) {
+        FXGlyph glyph = cache_->get(gid);
+        glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
+        return glyph;
+    }
+    
     FXGlyph glyph;
     glyph.gid = gid;
     glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
@@ -275,6 +284,9 @@ FXFace::glyph(FXGChar gc) {
     // let's render pixmap
     FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
     glyph.bitmap = loadBitmap(face_->glyph->bitmap);
+
+    // put into cache
+    cache_->put(gid, glyph);
     return glyph;
 }
 
@@ -293,6 +305,8 @@ FXFace::init() {
         FT_UInt(FXDefaultFontSize * 64),
         FT_UInt(FXDefaultDPI),
         FT_UInt(FXDefaultDPI));
+
+    cache_.reset(new FXGlyphCache);
     return initAttributes() && initCMap();
 }
 

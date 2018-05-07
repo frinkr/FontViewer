@@ -1,12 +1,13 @@
-#include <QItemDelegate>
-#include <QStyledItemDelegate>
-#include <QStyleOptionProgressBar>
-#include <QStyleOptionFocusRect>
 #include <QFile>
-#include <QStandardPaths>
-#include <QTextStream>
 #include <QFileDialog>
+#include <QItemDelegate>
 #include <QPainter>
+#include <QSortFilterProxyModel>
+#include <QStandardPaths>
+#include <QStyleOptionFocusRect>
+#include <QStyledItemDelegate>
+#include <QTextStream>
+
 #include "QUConv.h"
 #include "QUEncoding.h"
 #include "QUDocument.h"
@@ -262,10 +263,13 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     ui_->setupUi(this);
     model_ = new QUGlyphTableModel(document, this);
     
-    ui_->tableView->setModel(model_);
+    QSortFilterProxyModel * proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(model_);
+    ui_->tableView->setModel(proxyModel);
+    
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
-
+    ui_->tableView->setSortingEnabled(true);
     connect(ui_->pushButton, &QPushButton::clicked,
             this, &QUGlyphTableWidget::exportToFile);
 }
