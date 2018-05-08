@@ -71,6 +71,9 @@ public:
             mode = QIcon::Disabled;
         else if (opt.state & QStyle::State_Selected)
             mode = QIcon::Selected;
+        else if (opt.state & QStyle::State_MouseOver)
+            mode = QIcon::Selected;
+        
         QIcon::State state = opt.state & QStyle::State_Open ? QIcon::On : QIcon::Off;
         
         QPixmap bk(opt.rect.size());
@@ -275,6 +278,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
     ui_->tableView->setSortingEnabled(true);
+    ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     
     connect(ui_->pushButton, &QPushButton::clicked,
             this, &QUGlyphTableWidget::exportToFile);
