@@ -263,6 +263,7 @@ FXFace::glyph(FXGChar gc) {
     }
     
     FXGlyph glyph;
+    glyph.face = this;
     glyph.gid = gid;
     glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
     FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
@@ -281,15 +282,17 @@ FXFace::glyph(FXGChar gc) {
     if (!FT_Get_Glyph_Name(face_, gid, glyphName, sizeof(glyphName))) 
         glyph.name = glyphName;
 
-    // let's render pixmap
-    FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
-    glyph.bitmap = loadBitmap(face_->glyph->bitmap);
-
     // put into cache
     cache_->put(gid, glyph);
     return glyph;
 }
 
+FXBitmapARGB
+FXFace::glyphImage(FXGlyphID gid) {
+    FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
+    return loadBitmap(face_->glyph->bitmap);
+}
+    
 FXVector<FXChar>
 FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);

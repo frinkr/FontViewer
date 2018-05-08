@@ -20,7 +20,7 @@ public:
     explicit QUGlyphTableModelColumn(const QString & name, QObject * parent = nullptr)
         : QObject(parent)
         , name_(name)
-        , useDecorationRole_(false) {}
+    {}
         
     virtual QVariant
     header(int role) const {
@@ -31,9 +31,6 @@ public:
         
     virtual QVariant
     data(const FXGlyph & g, int role) const {
-        if (useDecorationRole_ && role == Qt::DecorationRole)
-            return value(g);
-        
         if (role == Qt::DisplayRole) 
             return value(g);
         return QVariant();
@@ -47,15 +44,8 @@ public:
     virtual QVariant
     value(const FXGlyph & g) const = 0;
 
-    QUGlyphTableModelColumn *
-    useDecorationRole(bool value = true) {
-        useDecorationRole_ = value;
-        return this;
-    }
-    
 protected:
     QString      name_;
-    bool         useDecorationRole_;
 };
 
 class QUGlyphTableBitmapDelegate : public QStyledItemDelegate {
@@ -71,6 +61,11 @@ public:
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
 
+        const QUGlyph ug = qvariant_cast<QUGlyph>(index.data());
+        const FXGlyph & g = ug.g();
+
+        QIcon icon(QPixmap::fromImage(placeImage(toQImage(g.bitmap()), glyphEmSize())));
+                   
         QIcon::Mode mode = QIcon::Normal;
         if (!(opt.state & QStyle::State_Enabled))
             mode = QIcon::Disabled;
@@ -83,7 +78,7 @@ public:
         QIcon bkIcon(bk);
         bkIcon.paint(painter, opt.rect, Qt::AlignHCenter, mode, state);
         
-        opt.icon.paint(painter, opt.rect, Qt::AlignHCenter, mode, state);
+        icon.paint(painter, opt.rect, Qt::AlignHCenter, mode, state);
 
         painter->restore();
     }
@@ -109,11 +104,6 @@ namespace {
             return QString::fromUcs4(&i, 1);
         }
         return QVariant();
-    }
-
-    QVariant
-    toVariant(const FXBitmapARGB & bm) {
-        return placeImage(toQImage(bm), glyphEmSize());
     }
     
     template <class PointerToMember>
@@ -158,7 +148,18 @@ namespace {
             return QVariant();
         }
     };
-    
+
+    class QUGlyphImageColumn : public QUGlyphTableModelColumn {
+    public:
+        using QUGlyphTableModelColumn::QUGlyphTableModelColumn;
+        QVariant
+        value(const FXGlyph & g) const {
+            QVariant v;
+            v.setValue(QUGlyph(g));
+            return v;
+        }
+    };
+
     template <typename PointerToMember>
     QUGlyphBasicColumn<PointerToMember> *
     makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
@@ -179,7 +180,7 @@ QUGlyphTableModel::QUGlyphTableModel(QUDocument * document, QObject * parent)
     , document_(document) {
 
     columns_.append(makeBasicColumn(tr("Index"), &FXGlyph::gid, this));
-    columns_.append(makeBasicColumn(tr("Glyph"), &FXGlyph::bitmap, this)->useDecorationRole(true));
+    columns_.append(new QUGlyphImageColumn(tr("Glyph"), this));
     columns_.append(new QUGlyphCodePointColumn(tr("Codepoint"), this));
     columns_.append(makeBasicColumn(tr("Char"), &FXGlyph::character, this));
     columns_.append(makeBasicColumn(tr("Name"), &FXGlyph::name, this));

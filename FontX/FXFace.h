@@ -129,6 +129,9 @@ public:
     FXGlyph
     glyph(FXGChar c);
 
+    FXBitmapARGB
+    glyphImage(FXGlyphID gid);
+    
     /**
      * return the chars which maps to the gid in current cmap
      */

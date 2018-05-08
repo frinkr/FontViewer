@@ -38,7 +38,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     // draw the icon
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
-        QImage image = placeImage(toQImage(g.bitmap), emSize);
+        QImage image = placeImage(toQImage(g.bitmap()), emSize);
         QIcon icon(QPixmap::fromImage(image));
         if (opt.state & QStyle::State_Selected)
             mode = QIcon::Selected;

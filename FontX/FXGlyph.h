@@ -2,6 +2,8 @@
 #include "FX.h"
 #include "FXBitmap.h"
 
+class FXFace;
+
 struct FXGlyphMetrics {
     using value_type = fu;
 
@@ -27,9 +29,12 @@ struct FXGlyphMetrics {
 };
 
 struct FXGlyph {
+    FXFace          * face;
     FXGlyphID         gid;
     FXString          name;    
     FXGChar           character; // isChar() returns true
     FXGlyphMetrics    metrics;
-    FXBitmapARGB      bitmap;
+    
+    FXBitmapARGB
+    bitmap() const;
 };
