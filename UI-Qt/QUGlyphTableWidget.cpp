@@ -279,6 +279,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QUDocument * document, QWidget *parent)
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
     ui_->tableView->setSortingEnabled(true);
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
     
     connect(ui_->pushButton, &QPushButton::clicked,
             this, &QUGlyphTableWidget::exportToFile);

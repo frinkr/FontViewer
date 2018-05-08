@@ -20,9 +20,29 @@ public:
     void
     rescan();
 
+public:
+    struct FaceItem {
+        FXFaceDescriptor desc;
+        FXFaceAttributes atts;   
+    };
+
+protected:
+    bool
+    save();
+    
+    bool
+    load();
+
+    bool
+    checkUpdate() const;
+    
 protected:
     FXVector<FXString> folders_;
     FXString           dbPath_;
-    FXVector<FXFaceDescriptor>  faces_;
-    FXVector<FXFaceAttributes>  attrs_;
+
+    FXVector<FaceItem> faces_;
+    size_t             hash_;
+
+    //FXVector<FXFaceDescriptor>  faces_;
+    //FXVector<FXFaceAttributes>  attrs_;
 };

@@ -32,7 +32,9 @@ namespace BFS {
     foreachFile(const FXString & directory,
                 bool recursive,
                 std::function<bool(const FXString &)> handler);
-    
+
+    size_t
+    fileSize(const FXString & file);
 }
 
 

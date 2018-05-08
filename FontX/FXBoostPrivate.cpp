@@ -63,4 +63,9 @@ namespace BFS {
         }
         return true;
     }
+    
+    size_t
+    fileSize(const FXString & file) {
+        return fs::file_size(fs::path(file, UTF8Cvt));
+    }
 }

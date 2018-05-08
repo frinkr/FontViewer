@@ -319,7 +319,6 @@ FXFace::initAttributes() {
     atts_.desc = desc_;
     atts_.upem = face_->units_per_EM;       
     atts_.glyphCount = face_->num_glyphs;
-    atts_.fileName = BFS::fileName(desc_.filePath);
 
     const char * format = FT_Get_Font_Format(face_);
     if (format)

@@ -49,7 +49,15 @@ public:
 
     FXMap<FXString, FXString>
     findSFNTNames(const FXVector<int> & nameIds) const;
-    
+
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version) {
+        FXVector<FXSFNTName> & vec = *this;
+        ar & vec;
+        ar & familyName_;
+        ar & styleName_;
+        ar & postscriptName_;
+    }
 protected:
     FXString
     findSFNTName(const FXVector<int> & nameIds,
@@ -67,7 +75,6 @@ struct FXFaceAttributes {
     size_t           upem { 0 };
     FXString         format;
     size_t           glyphCount { 0 };
-    FXString         fileName;
     FXFaceNames      names;
 };
 
