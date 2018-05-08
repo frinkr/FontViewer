@@ -70,7 +70,7 @@ public:
     face() const;
 
 public slots:
-    void
+    bool
     selectCMap(size_t index);
     
     void

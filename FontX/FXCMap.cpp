@@ -128,11 +128,12 @@ FXCMapPlatform::getUnicodeBlocks() {
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //            FXCMAP
-FXCMap::FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index)
+FXCMap::FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index, bool valid)
     : face_(face)
     , index_(index)
     , platformID_(platformID)
-    , encodingID_(encodingID) {
+    , encodingID_(encodingID)
+    , valid_(valid) {
     glyphMap_.push_back(NOT_INIT_MARK);
 }
 
@@ -149,6 +150,11 @@ FXCMap::encodingID() const {
 size_t
 FXCMap::index() const {
     return index_;
+}
+
+bool
+FXCMap::isValid() const {
+    return valid_;
 }
 
 bool
@@ -206,6 +212,10 @@ FXCMap::charsForGlyph(FXGlyphID gid) const {
             return ret;
     }
 
+    // can't init glyph map, invalid cmap?
+    if (glyphMap_.empty())
+        return ret;
+    
     FXChar c = glyphMap_[gid];
     if (c == UNDEFINED_CHAR_MARK)
         return ret;

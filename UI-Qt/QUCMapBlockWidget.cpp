@@ -1,3 +1,4 @@
+#include <QStandardItemModel>
 #include "QUConv.h"
 #include "QUDocument.h"
 #include "QUCMapBlockWidget.h"
@@ -56,7 +57,18 @@ QUCMapBlockWidget::setDocument(QUDocument * document) {
 void
 QUCMapBlockWidget::reloadCMaps() {
     for (const auto & cmap : document_->face()->cmaps())
-        ui_->cmapComboBox->addItem(toQString(cmap.description()));
+        ui_->cmapComboBox->addItem(toQString(cmap.description()), cmap.isValid());
+    
+    ui_->cmapComboBox->setCurrentIndex(document_->face()->currentCMapIndex());
+
+    // disable invalid cmaps
+    QStandardItemModel * model = qobject_cast<QStandardItemModel*>(ui_->cmapComboBox->model());
+    for (int i = 0; i < ui_->cmapComboBox->count(); ++ i) {
+        QStandardItem* item= model->item(i);
+        bool isValid = ui_->cmapComboBox->itemData(i).toBool();
+        if (!isValid) 
+            item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
+    }
 
     reloadBlocks();
 }

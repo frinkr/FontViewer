@@ -156,7 +156,7 @@ private:
 
 class FXCMap {
 public:
-    FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index);
+    FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index, bool valid = true);
 
     uint16_t
     platformID() const;
@@ -167,6 +167,9 @@ public:
     size_t
     index() const;
 
+    bool
+    isValid() const;
+    
     bool
     isCurrent() const;
 
@@ -221,6 +224,7 @@ private:
     size_t             index_;
     uint16_t           platformID_;
     uint16_t           encodingID_;
+    bool               valid_;
     FXVector<FXChar>   glyphMap_;
     FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
     FXVector<FXCharMapItem> charMap_;

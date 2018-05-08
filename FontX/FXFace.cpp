@@ -226,7 +226,8 @@ FXFace::currentCMap() const {
 
 size_t
 FXFace::currentCMapIndex() const {
-	return FT_Get_Charmap_Index(face_->charmap);
+    size_t i = FT_Get_Charmap_Index(face_->charmap);
+    return i;
 }
 
 bool
@@ -355,11 +356,10 @@ bool
 FXFace::initCMap() {
     size_t current = currentCMapIndex();
     for (FT_Int i = 0; i < face_->num_charmaps; ++ i)  {
-        if (!selectCMap(i))
-            continue;
+        const bool isValid = selectCMap(i);
         
         const FT_CharMap & cm = face_->charmaps[i];
-        FXCMap fxcm(this, cm->platform_id, cm->encoding_id, i);
+        FXCMap fxcm(this, cm->platform_id, cm->encoding_id, i, isValid);
         cmaps_.push_back(fxcm);
     }
     

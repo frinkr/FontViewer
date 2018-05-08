@@ -36,12 +36,14 @@ QUDocument::face() const {
     return face_;
 }
 
-void
+bool
 QUDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {
         selectBlock(0);
         emit cmapActivated(int(index));
+        return true;
     }
+    return false;
 }
 
 void
