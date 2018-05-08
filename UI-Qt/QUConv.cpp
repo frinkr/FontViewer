@@ -5,8 +5,8 @@
 
 namespace {
     void
-    deleteFXBitmapARGB(void * bm) {
-        delete (FXBitmapARGB*)bm;
+    deleteFXPixmapARGB(void * bm) {
+        delete (FXPixmapARGB*)bm;
     }
 }
 QString
@@ -20,7 +20,7 @@ toStdString(const QString & str) {
 }
 
 QImage
-toQImage(const FXBitmapARGB & bm) {
+toQImage(const FXPixmapARGB & bm) {
 #if QU_IMAGE_NO_OPTIMIZE
     QImage image(bm.width, bm.height, QImage::Format_ARGB32);
     image.setDevicePixelRatio(2);
@@ -31,12 +31,12 @@ toQImage(const FXBitmapARGB & bm) {
         }
     }
 #else
-    FXBitmapARGB * ref = new FXBitmapARGB(bm); // make a new ref
+    FXPixmapARGB * ref = new FXPixmapARGB(bm); // make a new ref
     QImage image((uchar*)bm.buffer,
                  bm.width,
                  bm.height,
                  QImage::Format_ARGB32,
-                 deleteFXBitmapARGB,
+                 deleteFXPixmapARGB,
                  ref);
 #endif
     return image;

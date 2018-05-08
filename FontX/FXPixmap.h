@@ -6,21 +6,21 @@ using FXARGB = uint32_t;
 using FXGray = uint8_t;
 
 template <typename COLOR = FXARGB, typename POSITION = int>
-class FXBitmap {
+class FXPixmap {
         
 public:
     using ColorType  = COLOR;
     using PosType    = POSITION;
     
 public:
-    FXBitmap()
+    FXPixmap()
         : width(0)
         , height(0)
         , pitch(0)
         , buffer(nullptr)
         , ref(0){}
 
-    FXBitmap(PosType w, PosType h)
+    FXPixmap(PosType w, PosType h)
         : width(w)
         , height(h)
         , buffer(nullptr)
@@ -34,7 +34,7 @@ public:
         }
     }
 
-    FXBitmap(const FXBitmap & other)
+    FXPixmap(const FXPixmap & other)
         : width(other.width)
         , height(other.height)
         , pitch(other.pitch)
@@ -45,7 +45,7 @@ public:
             ++ *ref;
     }
 
-    FXBitmap(FXBitmap && other)
+    FXPixmap(FXPixmap && other)
         : width(other.width)
         , height(other.height)
         , pitch(other.pitch)
@@ -56,7 +56,7 @@ public:
         other.buffer = nullptr;
     }
         
-    ~FXBitmap() {
+    ~FXPixmap() {
         if (!ref)
             return;
 
@@ -67,18 +67,18 @@ public:
         }
     }
 
-    FXBitmap & operator=(FXBitmap && other) {
-        FXBitmap m(std::move(other));
+    FXPixmap & operator=(FXPixmap && other) {
+        FXPixmap m(std::move(other));
         return swap(m);
     }
     
-    FXBitmap & operator=(const FXBitmap & other) {
-        FXBitmap m(other);
+    FXPixmap & operator=(const FXPixmap & other) {
+        FXPixmap m(other);
         return swap(m);
     }
 
-    FXBitmap &
-    swap(FXBitmap & other) {
+    FXPixmap &
+    swap(FXPixmap & other) {
         std::swap(width, other.width);
         std::swap(height, other.height);
         std::swap(pitch, other.pitch);
@@ -151,7 +151,7 @@ makeRGB(uint8_t r, uint8_t g, uint8_t b) {
 }
 
 inline  void
-get_argb(FXARGB argb, uint8_t &a, uint8_t &r, uint8_t &g, uint8_t &b) {
+getARGB(FXARGB argb, uint8_t &a, uint8_t &r, uint8_t &g, uint8_t &b) {
     a = (0xff000000 & argb) >> 24;
     r = (0x00ff0000 & argb) >> 16;
     g = (0x0000ff00 & argb) >> 8;
@@ -164,4 +164,4 @@ constexpr FXARGB FXBlue   = makeRGB(0, 0, 0xff);
 constexpr FXARGB FXBlack  = makeRGB(0, 0, 0);
 constexpr FXARGB FXWhite  = makeRGB(0xff, 0xff, 0xff);
 
-using FXBitmapARGB = FXBitmap<FXARGB>;
+using FXPixmapARGB = FXPixmap<FXARGB>;

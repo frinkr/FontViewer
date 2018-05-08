@@ -32,8 +32,8 @@ add_library(FontX
   FXUnicode.cpp
   FXGlyph.h
   FXGlyph.cpp
-  FXBitmap.h
-  FXBitmap.cpp
+  FXPixmap.h
+  FXPixmap.cpp
   FXFaceDatabase.h
   FXFaceDatabase.cpp
   FXGlyphCache.h

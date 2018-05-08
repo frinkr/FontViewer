@@ -1,6 +1,6 @@
 #pragma once
 #include "FX.h"
-#include "FXBitmap.h"
+#include "FXPixmap.h"
 
 class FXFace;
 
@@ -35,6 +35,6 @@ struct FXGlyph {
     FXGChar           character; // isChar() returns true
     FXGlyphMetrics    metrics;
     
-    FXBitmapARGB
-    bitmap() const;
+    FXPixmapARGB
+    pixmap() const;
 };

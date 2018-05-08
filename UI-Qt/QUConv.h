@@ -3,7 +3,7 @@
 #include <QString>
 #include <string>
 
-#include "FontX/FXBitmap.h"
+#include "FontX/FXPixmap.h"
 
 QString
 toQString(const std::string & str);
@@ -12,7 +12,7 @@ std::string
 toStdString(const QString & str);
 
 QImage
-toQImage(const FXBitmapARGB & bm);
+toQImage(const FXPixmapARGB & bm);
 
 QSize
 glyphEmSize();

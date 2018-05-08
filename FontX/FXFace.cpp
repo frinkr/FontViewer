@@ -16,9 +16,9 @@ namespace {
         }
     }
     
-    FXBitmapARGB
+    FXPixmapARGB
     loadBitmap(FT_Bitmap ftBm) {
-        FXBitmapARGB bm(ftBm.width, ftBm.rows);
+        FXPixmapARGB bm(ftBm.width, ftBm.rows);
 
         
         if (ftBm.pixel_mode == FT_PIXEL_MODE_GRAY) {
@@ -287,8 +287,8 @@ FXFace::glyph(FXGChar gc) {
     return glyph;
 }
 
-FXBitmapARGB
-FXFace::glyphImage(FXGlyphID gid) {
+FXPixmapARGB
+FXFace::pixmap(FXGlyphID gid) {
     FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
     return loadBitmap(face_->glyph->bitmap);
 }
