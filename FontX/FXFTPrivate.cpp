@@ -1,6 +1,12 @@
 #include "FXFTPrivate.h"
 #include "FXBoostPrivate.h"
 
+#if BOOST_COMP_MSVC
+#include <stdio.h>
+#include <locale>
+#include <codecvt>
+#endif
+
 namespace {
 #if BOOST_COMP_MSVC
     // adapted from freetype/ftsystem.c
@@ -42,7 +48,9 @@ namespace {
     
     FT_Error
     streamFromUTF8FilePath(const char * filePath, FT_Stream stream) {
-        FILE * file = fopen_utf8(filePath, "rb");
+        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+        std::wstring wFilePath = convert.from_bytes(filePath);
+        FILE * file = _wfopen(wFilePath.c_str(), L"rb");
 
         if (!file)
             return FT_Err_Cannot_Open_Resource;
