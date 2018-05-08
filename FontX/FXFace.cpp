@@ -158,7 +158,7 @@ FXFace::createFace(FXFTFace face) {
 FXFace::FXFace(const FXFaceDescriptor & descriptor)
 : desc_(descriptor)
 , face_(nullptr) {
-    if (FT_New_Face(FXLib::get(), desc_.filePath.c_str(), FT_Long(desc_.index), &face_))
+    if (FXFTOpenFace(FXLib::get(), desc_.filePath, desc_.index, &face_))
         return;
     init();
 }

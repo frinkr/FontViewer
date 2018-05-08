@@ -15,3 +15,9 @@ FT_Error
 FXFTEnumurateFaces(FXFTLibrary lib,
                    const FXString & filePath,
                    std::function<bool(FXFTFace face, size_t index)> callback);
+
+FT_Error
+FXFTOpenFace(FXFTLibrary lib,
+             const FXString & filePath,
+             size_t index,
+             FXFTFace * face);

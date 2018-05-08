@@ -1,6 +1,7 @@
 #pragma once
 #include "FX.h"
 
+#include <boost/predef.h>
 #include <boost/range/algorithm/binary_search.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string/split.hpp>
