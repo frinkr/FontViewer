@@ -21,6 +21,7 @@ endif()
 
 add_library(FontX
   FX.h
+  FXTag.h
   FXFT.h
   FXLib.h
   FXLib.cpp
@@ -38,6 +39,10 @@ add_library(FontX
   FXFaceDatabase.cpp
   FXGlyphCache.h
   FXGlyphCache.cpp
+  FXShaper.h
+  FXShaper.cpp
+  FXInspector.h
+  FXInspector.cpp
   
   FXFTPrivate.h
   FXFTPrivate.cpp

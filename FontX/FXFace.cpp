@@ -2,6 +2,7 @@
 #include "FXLib.h"
 #include "FXGlyphCache.h"
 #include "FXFTNames.h"
+#include "FXInspector.h"
 #include "FXFTPrivate.h"
 #include "FXBoostPrivate.h"
 
@@ -297,6 +298,13 @@ FXFace::pixmap(FXGlyphID gid) {
 FXVector<FXChar>
 FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);
+}
+
+FXPtr<FXInspector>
+FXFace::inspector() {
+    if (!inspector_)
+        inspector_.reset(new FXInspector(this));
+    return inspector_;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

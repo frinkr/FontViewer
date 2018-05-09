@@ -4,6 +4,7 @@
 #include "FXGlyph.h"
 
 class FXGlyphCache;
+class FXInspector;
 
 struct FXFaceDescriptor {
     FXString  filePath;
@@ -144,7 +145,11 @@ public:
      */
     FXVector<FXChar>
     charsForGlyph(FXGlyphID gid) const;
-    
+
+public:
+    FXPtr<FXInspector>
+    inspector();
+
 private:
     explicit FXFace(const FXFaceDescriptor & descriptor);
     explicit FXFace(FXFTFace face);
@@ -168,4 +173,5 @@ protected:
     FXFaceAttributes     atts_;
     std::vector<FXCMap>  cmaps_;
     FXPtr<FXGlyphCache>  cache_;
+    FXPtr<FXInspector>   inspector_;
 };

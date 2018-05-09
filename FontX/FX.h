@@ -102,3 +102,18 @@ struct FXGChar {
 };
 
 constexpr FXGChar FXGCharInvalid(FXGCharTypeUnicode, FXCharInvalid);
+
+template <typename T>
+struct FXVec2d {
+    T x = {0};
+    T y = {0};
+};
+
+template <typename T>
+constexpr FXVec2d<T>
+FXMakeVec2d(T x, T y) {
+    FXVec2d<T> v;
+    v.x = x;
+    v.y = y;
+    return v;
+}
