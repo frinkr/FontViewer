@@ -9,6 +9,7 @@
 #include "QUDocumentWindow.h"
 #include "QUFontInfoWidget.h"
 #include "QUPopoverWindow.h"
+#include "QUShapingWidget.h"
 #include "QUGlyphListView.h"
 #include "QUGlyphTableWidget.h"
 #include "QUToolBarWidget.h"
@@ -20,6 +21,7 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     : QMainWindow(parent)
     , ui_(new Ui::QUDocumentWindow)
     , cmapBlockWindow_(nullptr)
+    , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
     , searchWindow_(nullptr)
@@ -78,7 +80,9 @@ QUDocumentWindow::initToolBar() {
         this, &QUDocumentWindow::onCMapBlockAction);
 
     QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
-    QAction* shape = toolBar->addAction(QIcon(":/images/shape_d.png"), tr("Shape"));
+    shapingAction_ = toolBar->addAction(
+        QIcon(":/images/shape_d.png"), tr("Shape"),
+        this, &QUDocumentWindow::onShapingAction);
     
     tableAction_ = toolBar->addAction(
         QIcon(":/images/table_d.png"), tr("Table"),
@@ -195,6 +199,16 @@ QUDocumentWindow::onTableAction() {
         addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
     }
     toggleDockWidget(tableDockWidget_);
+}
+
+void
+QUDocumentWindow::onShapingAction() {
+    if (!shapingDockWidget_) {
+        shapingDockWidget_ = new QDockWidget(tr("Shape"), this);
+        shapingDockWidget_->setWidget(new QUShapingWidget(this));
+        addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
+    }
+    toggleDockWidget(shapingDockWidget_);
 }
 
 void

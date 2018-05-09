@@ -30,7 +30,8 @@ set(UI
   QUFontInfoWidget.ui
   QUCMapBlockWidget.ui
   QUSearchWidget.ui
-  QUGlyphTableWidget.ui)
+  QUGlyphTableWidget.ui
+  QUShapingWidget.ui)
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -80,6 +81,8 @@ set(SHARED_SOURCES
   QUSearchEngine.cpp
   QUGlyphTableWidget.h
   QUGlyphTableWidget.cpp
+  QUShapingWidget.h
+  QUShapingWidget.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

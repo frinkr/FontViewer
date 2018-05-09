@@ -83,6 +83,9 @@ private slots:
     onCMapBlockAction();
 
     void
+    onShapingAction();
+
+    void
     onTableAction();
     
     void
@@ -102,6 +105,8 @@ private:
     Ui::QUDocumentWindow * ui_;
     QAction         * cmapBlockAction_;
     QUPopoverWindow * cmapBlockWindow_;
+    QAction         * shapingAction_;
+    QDockWidget     * shapingDockWidget_;
     QAction         * tableAction_;
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
