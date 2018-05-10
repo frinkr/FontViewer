@@ -6,23 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>675</width>
-    <height>459</height>
+    <width>916</width>
+    <height>567</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QComboBox" name="langSysComboBox"/>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="lineEdit"/>
-   </item>
-   <item row="0" column="2">
-    <widget class="QComboBox" name="fontSizeComboBox"/>
-   </item>
    <item row="0" column="3">
     <widget class="QPushButton" name="copyButton">
      <property name="text">
@@ -30,8 +21,22 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QListWidget" name="featureListWidget"/>
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="text">
+      <string>MAY THE FORCE BE WITH YOU!</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="QComboBox" name="langSysComboBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Ignored" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+    </widget>
    </item>
    <item row="1" column="1" colspan="3">
     <widget class="QScrollArea" name="scrollArea">
@@ -43,8 +48,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>383</width>
-        <height>398</height>
+        <width>730</width>
+        <height>506</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -61,10 +66,30 @@
         <number>0</number>
        </property>
        <item>
-        <widget class="QUShapingGlyphView" name="glyphView" native="true"/>
+        <widget class="QUShapingGlyphView" name="glyphView" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QComboBox" name="fontSizeComboBox"/>
+   </item>
+   <item row="1" column="0">
+    <widget class="QListWidget" name="featureListWidget">
+     <property name="maximumSize">
+      <size>
+       <width>150</width>
+       <height>16777215</height>
+      </size>
+     </property>
     </widget>
    </item>
   </layout>

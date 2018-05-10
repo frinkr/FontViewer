@@ -9,6 +9,7 @@ namespace Ui {
     class QUShapingWidget;
 }
 
+class QPaintEvent;
 class FXInspector;
 class FXShaper;
 class QUDocument;
@@ -21,7 +22,13 @@ public:
     explicit QUShapingGlyphView(QWidget * parent = nullptr);
 
     void
-    update(FXShaper * shaper);
+    setShaper(FXShaper * shaper);
+
+    void
+    paintEvent(QPaintEvent * event);
+    
+protected:
+    FXShaper * shaper_;
 };
 
 class QUShapingWidget : public QWidget {
@@ -47,6 +54,13 @@ public slots:
 private:
     FXPtr<FXInspector>
     inspector();
+
+    FXVector<FXTag>
+    onFeatures() const;
+
+    FXVector<FXTag>
+    offFeatures() const;
+    
 private:
     Ui::QUShapingWidget * ui_;
     QUDocument   * document_;

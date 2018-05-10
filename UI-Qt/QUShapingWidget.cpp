@@ -1,4 +1,4 @@
-#include <QPair>
+#include <QPainter>
 
 #include "FontX/FXInspector.h"
 #include "FontX/FXShaper.h"
@@ -24,9 +24,22 @@ namespace {
 }
 
 QUShapingGlyphView::QUShapingGlyphView(QWidget * parent)
-    : QWidget(parent) {}
+    : QWidget(parent)
+    , shaper_(nullptr) {}
 
+void
+QUShapingGlyphView::setShaper(FXShaper * shaper) {
+    shaper_ = shaper;
+}
 
+void
+QUShapingGlyphView::paintEvent(QPaintEvent * event) {
+    QPainter p(this);
+    QRect bounds = rect();
+    p.fillRect(bounds, Qt::white);
+}
+
+    
 QUShapingWidget::QUShapingWidget(QWidget *parent)
     : QWidget(parent)
     , ui_(new Ui::QUShapingWidget)
@@ -55,6 +68,8 @@ QUShapingWidget::setDocument(QUDocument * document) {
     delete shaper_;
     shaper_ = new FXShaper(document_->face().get());
 
+    ui_->glyphView->setShaper(shaper_);
+    
     reloadScriptList();
 }
 
@@ -87,18 +102,57 @@ QUShapingWidget::reloadFeatureList() {
     const FXVector<FXTag> features =inspector()->otFeatures(script, language);
     
     ui_->featureListWidget->clear();
-    for (FXTag feature : features) 
-        ui_->featureListWidget->addItem(toQString(FXTag2Str(feature)));
+    for (FXTag feature : features) {
+        QListWidgetItem * item = new QListWidgetItem(toQString(FXTag2Str(feature)));
+        item->setData(Qt::UserRole, feature);
+        ui_->featureListWidget->addItem(item); 
+    }
 
     doShape();
 }
 
 void
 QUShapingWidget::doShape() {
-    
+    if (!shaper_)
+        return;
+
+    FXTag script, language;
+    variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
+
+    shaper_->shape(toStdString(ui_->lineEdit->text()),
+                   script,
+                   language,
+                   FXShappingLTR,
+                   onFeatures(),
+                   offFeatures());
+
+    ui_->glyphView->update();
 }
 
 FXPtr<FXInspector>
 QUShapingWidget::inspector() {
     return document_->face()->inspector();
 }
+
+FXVector<FXTag>
+QUShapingWidget::onFeatures() const {
+    FXVector<FXTag> features;
+    for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
+        QListWidgetItem * item = ui_->featureListWidget->item(i);
+        if (item->isSelected()) 
+            features.push_back(item->data(Qt::UserRole).value<FXTag>());
+    }
+    return features;
+}
+
+FXVector<FXTag>
+QUShapingWidget::offFeatures() const {
+    FXVector<FXTag> features;
+    for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
+        QListWidgetItem * item = ui_->featureListWidget->item(i);
+        if (!item->isSelected()) 
+            features.push_back(item->data(Qt::UserRole).value<FXTag>());
+    }
+    return features;        
+}
+    
