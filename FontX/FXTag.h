@@ -20,3 +20,8 @@ constexpr FXTag FXTagGUSB = 'GSUB';
 constexpr FXTag FXTagGPOS = 'GPOS';
 constexpr FXTag FXTagGDEF = 'GDEF';
 
+constexpr FXTag FXTagOTDefaultScript   = 'DLFT';
+constexpr FXTag FXTagOTDefaultLanguage = 'dlft';
+
+
+
