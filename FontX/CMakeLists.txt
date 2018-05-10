@@ -52,6 +52,9 @@ add_library(FontX
   
   FXBoostPrivate.h
   FXBoostPrivate.cpp
+  
+  FXHBPrivate.h
+  FXHBPrivate.cpp
   )
 
 target_include_directories(FontX PUBLIC

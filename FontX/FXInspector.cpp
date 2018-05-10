@@ -1,10 +1,7 @@
-#include <hb.h>
-#include <hb-ft.h>
-#include <hb-ot.h>
-
 #include "FXFace.h"
 #include "FXInspector.h"
 #include "FXFTPrivate.h"
+#include "FXHBPrivate.h"
 
 namespace {
     struct FXOTLookup {
@@ -14,6 +11,7 @@ namespace {
     struct FXOTFeature {
         FXTag tag;
         int   index;
+        bool  isRequired;
         FXVector<FXOTLookup> lookups;
     };
 
@@ -32,6 +30,7 @@ namespace {
     struct FXOTTable {
         FXTag tag;
         FXVector<FXOTScript> scripts;
+        FXVector<FXTag> featureTags;
     };
 
     constexpr unsigned int FX_OT_LANGUAGE_DEFAUL_INDEX = 0xFFFFu;
@@ -48,19 +47,14 @@ struct FXInspectorImp {
     }
     void
     init() {
+
         FT_Face ftFace = face_->face();
         
-        // Create hb font and face
-
-        hb_font_t * hbFont = hb_ft_font_create_referenced(ftFace);
-        hb_face_t * hbFace = hb_font_get_face(hbFont);
+        hb_font_t * hbFont = nullptr;
+        hb_face_t * hbFace = nullptr;
         
-        hb_ot_font_set_funcs(hbFont);
-        unsigned int upem = hb_face_get_upem(hbFace);
-        hb_font_set_scale(hbFont, upem, upem);
-
+        FXHBCreateFontFace(face_, &hbFont, &hbFace);         
         loadOTTables(hbFace);
-        
         hb_font_destroy(hbFont);
     }
 
@@ -144,6 +138,7 @@ struct FXInspectorImp {
             FXOTFeature otFeature;
             otFeature.tag = featureTag;
             otFeature.index = featureIndex;
+            otFeature.isRequired = (featureTag == requiredFeatureTag);
             otFeature.lookups = loadLookups(hbFace, table, featureIndex);
             otFeatures.push_back(otFeature);
         }
@@ -222,7 +217,20 @@ struct FXInspectorImp {
         }
         return otScripts;
     }
-    
+
+    FXVector<FXTag>
+    loadFeatureTags(hb_face_t * hbFace, hb_tag_t table) {
+        unsigned int feature_count = hb_ot_layout_table_get_feature_tags(hbFace, table, 0, nullptr, nullptr);
+        std::vector<hb_tag_t> feature_tags(feature_count);
+        hb_ot_layout_table_get_feature_tags(hbFace, table, 0, &feature_count, &feature_tags[0]);
+
+        FXVector<FXTag> otFeatureTags;
+        for (hb_tag_t tag : feature_tags) 
+            otFeatureTags.push_back(tag);
+
+        return otFeatureTags;
+        
+    }
     void
     loadGSUBGPOS(hb_face_t * hbFace) {
         hb_tag_t tables [] = {HB_OT_TAG_GSUB, HB_OT_TAG_GPOS};
@@ -230,11 +238,13 @@ struct FXInspectorImp {
             FXOTTable otTable;
             otTable.tag = table;
             otTable.scripts = loadScripts(hbFace, table);
+            otTable.featureTags = loadFeatureTags(hbFace, table);
             otTables_.push_back(otTable);
         }
     }
 
     FXVector<FXOTTable> otTables_;
+    
     FXFace  * face_;
 };
 
