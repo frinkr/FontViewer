@@ -161,7 +161,7 @@ FXUCD::categories() const {
 
 FXString
 FXUCD::file(const FXString & name) const {
-    return BFS::pathJoin({root_, name});
+    return BST::pathJoin({root_, name});
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

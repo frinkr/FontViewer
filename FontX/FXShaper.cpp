@@ -49,7 +49,7 @@ struct FXShaperImp {
         
         // setup the buffer
         hbBuffer_ = hb_buffer_create();
-        if (script == FXTagOTDefaultScript)
+        if (script == FXOT::DEFAULT_SCRIPT)
             hb_buffer_set_script(hbBuffer_, HB_SCRIPT_COMMON);
         else
             hb_buffer_set_script(hbBuffer_, hb_ot_tag_to_script(script));

@@ -11,7 +11,7 @@ QUSearchExpressionParser::parse(const QString & text) {
     QUSearch search;
     
     // check codepoint notation
-    if (gchar.isChar()) {
+    if (gchar.isValid() && gchar.isChar()) {
         search.gchar = gchar;
         return search;
     }

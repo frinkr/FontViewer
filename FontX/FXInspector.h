@@ -1,24 +1,52 @@
 #pragma once
 #include "FX.h"
-#include "FXTag.h"
+#include "FXOT.h"
 
 class FXFace;
-
 struct FXInspectorImp;
 
-class FXInspector {
+struct FXInsOTLookup {
+    int index;
+};
 
+struct FXInsOTFeature {
+    FXTag tag;
+    int   index;
+    bool  isRequired;
+    FXVector<FXInsOTLookup> lookups;
+};
+
+struct FXInsOTLanguage {
+    FXTag tag;
+    int   index;
+    FXVector<FXInsOTFeature> features;
+};
+
+struct FXInsOTScript {
+    FXTag tag;
+    int   index;
+    FXVector<FXInsOTLanguage>  languages;    
+};
+
+struct FXInsOTTable {
+    FXTag tag;
+    FXVector<FXInsOTScript> scripts;
+    FXVector<FXTag> featureTags;
+};
+
+class FXInspector {
+    
 public:
     explicit FXInspector(FXFace * face);
 
-    const FXVector<FXTag>
-    scripts(FXTag table) const;
+    FXVector<FXTag>
+    otScripts(FXTag table = FXOT::MERGED_GSUBGPOS) const;
 
-    const FXVector<FXTag>
-    languages(FXTag table, FXTag script) const;
+    FXVector<FXTag>
+    otLanguages(FXTag script, FXTag table = FXOT::MERGED_GSUBGPOS) const;
 
-    const FXVector<FXTag>
-    features(FXTag table, FXTag script, FXTag language) const;
+    FXVector<FXTag>
+    otFeatures(FXTag script, FXTag language, FXTag table = FXOT::MERGED_GSUBGPOS) const;
 
 private:
     void

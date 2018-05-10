@@ -3,42 +3,6 @@
 #include "FXFTPrivate.h"
 #include "FXHBPrivate.h"
 
-namespace {
-    struct FXOTLookup {
-        int index;
-    };
-
-    struct FXOTFeature {
-        FXTag tag;
-        int   index;
-        bool  isRequired;
-        FXVector<FXOTLookup> lookups;
-    };
-
-    struct FXOTLanguage {
-        FXTag tag;
-        int   index;
-        FXVector<FXOTFeature> features;
-    };
-
-    struct FXOTScript {
-        FXTag tag;
-        int   index;
-        FXVector<FXOTLanguage>  languages;    
-    };
-
-    struct FXOTTable {
-        FXTag tag;
-        FXVector<FXOTScript> scripts;
-        FXVector<FXTag> featureTags;
-    };
-
-    constexpr unsigned int FX_OT_LANGUAGE_DEFAUL_INDEX = 0xFFFFu;
-    constexpr unsigned int FX_OT_LANGUAGE_MISSING_INDEX = -2;
-    
-    
-}
-
 struct FXInspectorImp {
 
     explicit FXInspectorImp(FXFace * face)
@@ -46,10 +10,7 @@ struct FXInspectorImp {
         init();
     }
     void
-    init() {
-
-        FT_Face ftFace = face_->face();
-        
+    init() {        
         hb_font_t * hbFont = nullptr;
         hb_face_t * hbFace = nullptr;
         
@@ -64,7 +25,7 @@ struct FXInspectorImp {
     }
 
 
-    FXVector<FXOTLookup>
+    FXVector<FXInsOTLookup>
     loadLookups(hb_face_t * hbFace, hb_tag_t tableTag, unsigned int featureIndex) {
         unsigned int lookupCount = hb_ot_layout_feature_get_lookups(
             hbFace,
@@ -78,19 +39,19 @@ struct FXInspectorImp {
             featureIndex,
             0, &lookupCount, &lookups[0]);
 
-        FXVector<FXOTLookup> otLookups;
+        FXVector<FXInsOTLookup> otLookups;
 
         for (size_t i = 0; i < lookups.size(); ++ i) {
             unsigned int lookup_index = lookups[i];
 
-            FXOTLookup lookup;
+            FXInsOTLookup lookup;
             lookup.index = lookup_index;
             otLookups.push_back(lookup);
         }
         return otLookups;
     }
     
-    FXVector<FXOTFeature>
+    FXVector<FXInsOTFeature>
     loadFeatures(hb_face_t * hbFace, hb_tag_t table, unsigned int scriptIndex, unsigned int languageIndex) {
         unsigned int featureCount = hb_ot_layout_language_get_feature_tags(
             hbFace,
@@ -129,13 +90,13 @@ struct FXInspectorImp {
                 &requiredFeatureTag))
             requiredFeatureIndex = 0xFFFF;
         
-        FXVector<FXOTFeature> otFeatures;
+        FXVector<FXInsOTFeature> otFeatures;
 
         for (unsigned int index = 0; index < featureCount; ++ index) {
             hb_tag_t featureTag = featureTags[index];
             unsigned int featureIndex = featureIndexes[index];
 
-            FXOTFeature otFeature;
+            FXInsOTFeature otFeature;
             otFeature.tag = featureTag;
             otFeature.index = featureIndex;
             otFeature.isRequired = (featureTag == requiredFeatureTag);
@@ -145,7 +106,7 @@ struct FXInspectorImp {
         return otFeatures;
     }
 
-    FXVector<FXOTLanguage>
+    FXVector<FXInsOTLanguage>
     loadLanguages(hb_face_t * hbFace, hb_tag_t table, unsigned int scriptIndex) {
         unsigned int languageCount = hb_ot_layout_script_get_language_tags(
             hbFace,
@@ -154,7 +115,7 @@ struct FXInspectorImp {
             0, nullptr, nullptr);
         
         std::vector<hb_tag_t> languageTags(languageCount + 1);
-        languageTags[0] = FXTagOTDefaultLanguage;
+        languageTags[0] = FXOT::DEFAULT_LANGUAGE;
         
         hb_ot_layout_script_get_language_tags(
             hbFace,
@@ -164,11 +125,11 @@ struct FXInspectorImp {
             &languageCount,
             &languageTags[1]);
         
-        FXVector<FXOTLanguage> otLanguages;
+        FXVector<FXInsOTLanguage> otLanguages;
         for (hb_tag_t langTag : languageTags) {
-            unsigned int langIndex = FX_OT_LANGUAGE_MISSING_INDEX;
-            if (langTag == FXTagOTDefaultLanguage)
-                langIndex = FX_OT_LANGUAGE_DEFAUL_INDEX;
+            unsigned int langIndex = 0;
+            if (langTag == FXOT::DEFAULT_LANGUAGE)
+                langIndex = FXOT::DEFAULT_LANGUAGE_INDEX;
             else if (!hb_ot_layout_script_find_language(
                          hbFace,
                          table,
@@ -177,7 +138,7 @@ struct FXInspectorImp {
                          &langIndex))
                 continue;
             
-            FXOTLanguage otLang;
+            FXInsOTLanguage otLang;
             otLang.tag = langTag;
             otLang.index = langIndex;
             otLang.features = loadFeatures(hbFace, table, scriptIndex, langIndex);
@@ -187,7 +148,7 @@ struct FXInspectorImp {
         return otLanguages;
     }
     
-    FXVector<FXOTScript>
+    FXVector<FXInsOTScript>
     loadScripts(hb_face_t * hbFace, hb_tag_t table) {
         unsigned int scriptCount = hb_ot_layout_table_get_script_tags(
             hbFace,
@@ -202,13 +163,13 @@ struct FXInspectorImp {
             &scriptCount,
             &scriptTags[0]);
 
-        FXVector<FXOTScript> otScripts;
+        FXVector<FXInsOTScript> otScripts;
         for (hb_tag_t scriptTag : scriptTags) {
             unsigned int scriptIndex = 0;
             if (!hb_ot_layout_table_find_script(hbFace, table, scriptTag, &scriptIndex))
                 continue;
             
-            FXOTScript otScript;
+            FXInsOTScript otScript;
             otScript.tag = scriptTag;
             otScript.index = scriptIndex;
             otScript.languages = loadLanguages(hbFace, table, scriptIndex);
@@ -235,7 +196,7 @@ struct FXInspectorImp {
     loadGSUBGPOS(hb_face_t * hbFace) {
         hb_tag_t tables [] = {HB_OT_TAG_GSUB, HB_OT_TAG_GPOS};
         for (hb_tag_t table : tables) {
-            FXOTTable otTable;
+            FXInsOTTable otTable;
             otTable.tag = table;
             otTable.scripts = loadScripts(hbFace, table);
             otTable.featureTags = loadFeatureTags(hbFace, table);
@@ -243,12 +204,80 @@ struct FXInspectorImp {
         }
     }
 
-    FXVector<FXOTTable> otTables_;
+
+    template <typename Func>
+    void enumurateTables(const FXVector<FXTag> & tableTags, Func f) const {
+        for (FXTag tag : tableTags) {
+            for (const FXInsOTTable & otTable: otTables_) {
+                if (otTable.tag == tag)
+                    f(otTable);
+            }
+        }
+    }
+
     
+    FXVector<FXInsOTTable> otTables_;
     FXFace  * face_;
 };
 
+namespace {
+    FXVector<FXTag>
+    getTables(FXTag tag) {
+        if (tag == FXOT::MERGED_GSUBGPOS) 
+            return {FXTableGUSB, FXTableGPOS};
+        else
+            return {tag};
+    }
+    
+    FXVector<FXTag> &
+    sortAndRemoveDuplicates(FXVector<FXTag> & tags) {
+        FXSet<FXTag> set(tags.begin(), tags.end());
+        tags.assign(set.begin(), set.end());
+        return tags;
+    }
+}
 FXInspector::FXInspector(FXFace * face)
     : imp_(new FXInspectorImp(face)) {
 }
 
+FXVector<FXTag>
+FXInspector::otScripts(FXTag table) const {
+    FXVector<FXTag> scripts;
+    const FXVector<FXTag> tables = getTables(table);
+    imp_->enumurateTables(tables, [&scripts](const FXInsOTTable & otTable) {
+        for (const FXInsOTScript & otScript : otTable.scripts)
+            scripts.push_back(otScript.tag);
+    });
+    return sortAndRemoveDuplicates(scripts);
+}
+
+FXVector<FXTag>
+FXInspector::otLanguages(FXTag script, FXTag table) const {
+    FXVector<FXTag> languages;
+    const FXVector<FXTag> tables = getTables(table);
+    imp_->enumurateTables(tables, [&](const FXInsOTTable & otTable) {
+        for (const FXInsOTScript & otScript : otTable.scripts) {
+            if (otScript.tag != script) continue;
+            for (const FXInsOTLanguage & otLang : otScript.languages)
+                languages.push_back(otLang.tag);
+        }
+    });
+    return sortAndRemoveDuplicates(languages);
+}
+
+FXVector<FXTag>
+FXInspector::otFeatures(FXTag script, FXTag language, FXTag table) const {
+    FXVector<FXTag> features;
+    const FXVector<FXTag> tables = getTables(table);
+    imp_->enumurateTables(tables, [&](const FXInsOTTable & otTable) {
+        for (const FXInsOTScript & otScript : otTable.scripts) {
+            if (otScript.tag != script) continue;
+            for (const FXInsOTLanguage & otLang : otScript.languages) {
+                if (otLang.tag != language) continue;
+                for (const FXInsOTFeature & otFeature : otLang.features) 
+                    features.push_back(otFeature.tag);
+            }
+        }
+    });
+    return sortAndRemoveDuplicates(features);
+}

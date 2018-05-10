@@ -205,7 +205,9 @@ void
 QUDocumentWindow::onShapingAction() {
     if (!shapingDockWidget_) {
         shapingDockWidget_ = new QDockWidget(tr("Shape"), this);
-        shapingDockWidget_->setWidget(new QUShapingWidget(this));
+        QUShapingWidget * widget = new QUShapingWidget(this);
+        widget->setDocument(document_);
+        shapingDockWidget_->setWidget(widget);
         addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
     }
     toggleDockWidget(shapingDockWidget_);

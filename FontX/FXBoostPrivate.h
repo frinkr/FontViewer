@@ -10,7 +10,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 
-namespace BFS {
+namespace BST {
     namespace fs = boost::filesystem;
     extern fs::detail::utf8_codecvt_facet UTF8Cvt;
 
@@ -36,6 +36,9 @@ namespace BFS {
 
     size_t
     fileSize(const FXString & file);
+
+    FXString
+    trim(const FXString & str);
 }
 
 

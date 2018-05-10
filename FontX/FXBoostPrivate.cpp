@@ -1,7 +1,7 @@
 #include <boost/foreach.hpp>
 #include "FXBoostPrivate.h"
 
-namespace BFS {
+namespace BST {
     fs::detail::utf8_codecvt_facet UTF8Cvt;
 
     FXString
@@ -67,5 +67,12 @@ namespace BFS {
     size_t
     fileSize(const FXString & file) {
         return fs::file_size(fs::path(file, UTF8Cvt));
+    }
+
+    FXString
+    trim(const FXString & str) {
+        FXString ret(str);
+        boost::algorithm::trim(ret);
+        return ret;
     }
 }

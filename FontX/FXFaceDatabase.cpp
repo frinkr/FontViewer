@@ -19,7 +19,7 @@ namespace {
         boost::hash_combine(hash, 0);
         for (const auto & f : files) {
             boost::hash_combine(hash, f);
-            boost::hash_combine(hash, BFS::fileSize(f));
+            boost::hash_combine(hash, BST::fileSize(f));
         }
         return hash;
     }
@@ -94,7 +94,7 @@ void
 FXFaceDatabase::rescan() {
     faces_.clear();
     for(const auto & folder : folders_) {
-        BFS::foreachFile(folder, true, [this](const FXString & file) {
+        BST::foreachFile(folder, true, [this](const FXString & file) {
             size_t count = 0;
             if (!FXFTCountFaces(FXLib::get(), file, count)) {
                 for (size_t i = 0; i < count; ++ i) {
@@ -158,7 +158,7 @@ bool
 FXFaceDatabase::checkUpdate() const {
     FXSet<FXString> files;
     for(const auto & folder : folders_) 
-        BFS::foreachFile(folder, true, [&files](const FXString & file) {
+        BST::foreachFile(folder, true, [&files](const FXString & file) {
             size_t count;
             if (!FXFTCountFaces(FXLib::get(), file, count)) 
                 files.insert(file);

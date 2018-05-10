@@ -31,14 +31,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QListWidget" name="featureListWidget">
-     <property name="maximumSize">
-      <size>
-       <width>120</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
+    <widget class="QListWidget" name="featureListWidget"/>
    </item>
    <item row="1" column="1" colspan="3">
     <widget class="QScrollArea" name="scrollArea">
@@ -50,15 +43,40 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>519</width>
+        <width>383</width>
         <height>398</height>
        </rect>
       </property>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QUShapingGlyphView" name="glyphView" native="true"/>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QUShapingGlyphView</class>
+   <extends>QWidget</extends>
+   <header>QUShapingWidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

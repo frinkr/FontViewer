@@ -1,6 +1,6 @@
 #pragma once
 #include "FX.h"
-#include "FXTag.h"
+#include "FXOT.h"
 
 class FXFace;
 struct FXShaperImp;
@@ -20,10 +20,10 @@ public:
     
     void
     shape(const FXString & text,
-          FXTag script,
-          FXTag language,
-          FXShapingDirection direction,
-          const FXVector<FXTag> & onFeatures,
+          FXTag script = FXOT::DEFAULT_SCRIPT,
+          FXTag language = FXOT::DEFAULT_LANGUAGE,
+          FXShapingDirection direction = FXShappingLTR,
+          const FXVector<FXTag> & onFeatures = FXVector<FXTag>(),
           const FXVector<FXTag> & offFeatures = FXVector<FXTag>());
 
     size_t

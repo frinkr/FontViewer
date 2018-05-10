@@ -44,6 +44,8 @@ add_library(FontX
   FXShaper.cpp
   FXInspector.h
   FXInspector.cpp
+  FXOT.h
+  FXOT.cpp
   
   FXFTPrivate.h
   FXFTPrivate.cpp
