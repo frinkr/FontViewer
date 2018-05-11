@@ -8,6 +8,8 @@ namespace FXOT {
     extern const FXTag MERGED_GSUBGPOS;
     
     extern const unsigned int DEFAULT_LANGUAGE_INDEX;
+
+    extern const FXSet<FXTag> autoFeatures; /** the features which are should be automatically turned on*/
     
     FXString
     scriptName(FXTag script);

@@ -25,6 +25,7 @@ namespace FXOT {
     const FXTag MERGED_GSUBGPOS = 'GSGP';
     
     const unsigned int DEFAULT_LANGUAGE_INDEX = 0xFFFFu;
+    const FXSet<FXTag> autoFeatures = {'liga', 'kern'};
     
     FXString
     scriptName(FXTag script) {

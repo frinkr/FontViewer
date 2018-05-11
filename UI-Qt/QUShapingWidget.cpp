@@ -27,12 +27,12 @@ namespace {
     constexpr int QU_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
     constexpr int QU_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
 
-    constexpr double QU_SHAPINGVIEW_FONTSIZE = 100;
 }
 
 QUShapingGlyphView::QUShapingGlyphView(QWidget * parent)
     : QWidget(parent)
     , selectedIndex_(-1)
+    , fontSize_(100)
     , shaper_(nullptr) {}
 
 void
@@ -50,7 +50,7 @@ QUShapingGlyphView::sizeHint() const {
     if (!shaper_)
         return QWidget::sizeHint();
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, QU_SHAPINGVIEW_FONTSIZE);
+    FXFace::AutoFontSize autoFontSize(face, fontSize_);
     
     const int baselineY = baseLinePosition().y();
     const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QU_SHAPINGVIEW_MARGIN;
@@ -61,11 +61,7 @@ QUShapingGlyphView::sizeHint() const {
 void
 QUShapingGlyphView::paintEvent(QPaintEvent * event) {
     QPainter p(this);
-    QRect bounds = rect();
-    QLinearGradient gradient(bounds.topLeft(), bounds.bottomRight());
-    gradient.setColorAt(0, Qt::blue);
-    gradient.setColorAt(1, Qt::red);
-    p.fillRect(bounds, Qt::white);
+    p.fillRect(rect(), Qt::white);
 
     if (!shaper_)
         return ;
@@ -95,23 +91,17 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
       | 
     */
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, QU_SHAPINGVIEW_FONTSIZE);
+    FXFace::AutoFontSize autoFontSize(face, fontSize_);
 
     // draw baseline
     const int baseLineY = baseLinePosition().y();
     const int baseLineX = baseLinePosition().x();
-    {
-        p.setPen(baseLinePen);
-        p.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
-    }
 
     // draw selected glyph background
     {
         int penX = baseLineX;
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
-            const FXGlyphID gid = shaper_->glyph(i);
             const FXVec2d<fu> adv = shaper_->advance(i);
-            const FXVec2d<fu> off = shaper_->offset(i);
 
             // draw background for selected
             if (selectedIndex_ == i) {
@@ -169,6 +159,12 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
             penX += fu2px(adv.x);
         }
     }
+
+    // draw baseline
+    {
+        p.setPen(baseLinePen);
+        p.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
+    }
         
     // draw grid
     {
@@ -211,7 +207,7 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
 void
 QUShapingGlyphView::mousePressEvent(QMouseEvent *event) {
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, QU_SHAPINGVIEW_FONTSIZE);
+    FXFace::AutoFontSize autoFontSize(face, fontSize_);
 
     int index = glyphAtPoint(event->pos());
     if (selectedIndex_ != index) {
@@ -223,11 +219,14 @@ QUShapingGlyphView::mousePressEvent(QMouseEvent *event) {
 void
 QUShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
     mousePressEvent(event);
-
     if (selectedIndex_ != -1)
         emit glyphDoubleClicked(shaper_->glyph(selectedIndex_));
 }
-    
+
+void
+QUShapingGlyphView::setFontSize(double fontSize) {
+    fontSize_ = fontSize;
+}
 
 QPoint
 QUShapingGlyphView::baseLinePosition() const {
@@ -307,6 +306,8 @@ QUShapingWidget::QUShapingWidget(QWidget *parent)
             this, &QUShapingWidget::doShape);
     connect(ui_->lineEdit, &QLineEdit::textEdited,
             this, &QUShapingWidget::doShape);
+    connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
+            this, &QUShapingWidget::doShape);
     connect(ui_->glyphView, &QUShapingGlyphView::glyphDoubleClicked,
             this, &QUShapingWidget::gotoGlyph);
 }
@@ -359,7 +360,10 @@ QUShapingWidget::reloadFeatureList() {
     for (FXTag feature : features) {
         QListWidgetItem * item = new QListWidgetItem(toQString(FXTag2Str(feature)));
         item->setData(Qt::UserRole, feature);
+        item->setData(Qt::ToolTipRole, toQString(FXOT::featureName(feature)));
         ui_->featureListWidget->addItem(item);
+        if (FXOT::autoFeatures.find(feature) != FXOT::autoFeatures.end())
+            item->setSelected(true);
     }
 
     doShape();
@@ -380,6 +384,12 @@ QUShapingWidget::doShape() {
                    onFeatures(),
                    offFeatures());
 
+    bool ok = false;
+    double fontSize = ui_->fontSizeComboBox->currentText().toDouble(&ok);
+    if (!ok)
+        fontSize = 100;
+    
+    ui_->glyphView->setFontSize(fontSize);
     ui_->glyphView->updateGeometry();
     ui_->glyphView->update();
 }

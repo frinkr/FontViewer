@@ -39,6 +39,8 @@ public:
     void
     mouseDoubleClickEvent(QMouseEvent *event);
 
+    void
+    setFontSize(double fontSize);
 signals:
     void
     glyphDoubleClicked(FXGlyphID gid) const;
@@ -66,7 +68,9 @@ protected:
     double
     fu2px(fu f) const;
 
+protected:
     int selectedIndex_;
+    double fontSize_;    
     FXShaper * shaper_;
 };
 
