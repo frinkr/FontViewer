@@ -191,12 +191,15 @@ struct FXInspectorImp {
 
     FXVector<FXTag>
     loadFeatureTags(hb_face_t * hbFace, hb_tag_t table) {
-        unsigned int feature_count = hb_ot_layout_table_get_feature_tags(hbFace, table, 0, nullptr, nullptr);
-        std::vector<hb_tag_t> feature_tags(feature_count);
-        hb_ot_layout_table_get_feature_tags(hbFace, table, 0, &feature_count, &feature_tags[0]);
+        unsigned int featureCount = hb_ot_layout_table_get_feature_tags(hbFace, table, 0, nullptr, nullptr);
+        if (!featureCount)
+            return FXVector<FXTag>();
+        
+        std::vector<hb_tag_t> featureTags(featureCount);
+        hb_ot_layout_table_get_feature_tags(hbFace, table, 0, &featureCount, &featureTags[0]);
 
         FXVector<FXTag> otFeatureTags;
-        for (hb_tag_t tag : feature_tags) 
+        for (hb_tag_t tag : featureTags) 
             otFeatureTags.push_back(tag);
 
         return otFeatureTags;
