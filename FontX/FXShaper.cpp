@@ -74,17 +74,23 @@ struct FXShaperImp {
         // shape
         const char ** shappers = hb_shape_list_shapers();
     
+        hb_feature_t * features = nullptr;
+        unsigned int featuresCount = 0;
+        if (featuresVec.size()) {
+            features = &featuresVec[0];
+            featuresCount = featuresVec.size();
+        }
         hbPlan_ = hb_shape_plan_create_cached(hbFace_,
                                               &segment_props,
-                                              &featuresVec[0],
-                                              featuresVec.size(),
+                                              features,
+                                              featuresCount,
                                               shappers);
     
         hb_shape_plan_execute(hbPlan_,
                               hbFont_,
                               hbBuffer_,
-                              &featuresVec[0],
-                              featuresVec.size());
+                              features,
+                              featuresCount);
     
 
         // get result
