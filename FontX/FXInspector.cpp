@@ -32,6 +32,9 @@ struct FXInspectorImp {
             tableTag,
             featureIndex,
             0, nullptr, nullptr);
+        if (!lookupCount)
+            return FXVector<FXInsOTLookup>();
+        
         std::vector<unsigned int> lookups(lookupCount);
         hb_ot_layout_feature_get_lookups(
             hbFace,
@@ -59,6 +62,8 @@ struct FXInspectorImp {
             scriptIndex,
             languageIndex,
             0, nullptr, nullptr);
+        if (!featureCount)
+            return FXVector<FXInsOTFeature>();
         
         std::vector<hb_tag_t> featureTags(featureCount);
         std::vector<unsigned int> featureIndexes(featureCount);
@@ -113,6 +118,8 @@ struct FXInspectorImp {
             table,
             scriptIndex,
             0, nullptr, nullptr);
+        if (!languageCount)
+            return FXVector<FXInsOTLanguage>();
         
         std::vector<hb_tag_t> languageTags(languageCount + 1);
         languageTags[0] = FXOT::DEFAULT_LANGUAGE;
@@ -154,6 +161,9 @@ struct FXInspectorImp {
             hbFace,
             table,
             0, nullptr, nullptr);
+
+        if (!scriptCount)
+            return FXVector<FXInsOTScript>();
         
         FXVector<hb_tag_t> scriptTags(scriptCount);
         hb_ot_layout_table_get_script_tags(
