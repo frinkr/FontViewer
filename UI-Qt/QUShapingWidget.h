@@ -24,10 +24,32 @@ public:
     void
     setShaper(FXShaper * shaper);
 
+    QSize
+    minimumSizeHint() const;
+    
+    QSize
+    sizeHint() const;
+    
     void
     paintEvent(QPaintEvent * event);
     
 protected:
+    
+    QPoint
+    baseLinePosition() const ;
+
+    int
+    cellBottom(int row /*start from bottom*/, int col = 0) const;
+
+    int
+    cellLeft(int row, int col /*start from first glyph*/) const;
+
+    QRect
+    cellRect(int row, int col) const;
+
+    double
+    fu2px(fu f) const;
+    
     FXShaper * shaper_;
 };
 

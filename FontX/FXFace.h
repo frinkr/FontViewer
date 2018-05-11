@@ -77,10 +77,11 @@ struct FXFaceAttributes {
     FXString         format;
     size_t           glyphCount { 0 };
     FXFaceNames      names;
+    fu               ascender;
+    fu               descender;
+    FXRect<fu>       bbox;
 };
 
-constexpr double FXDefaultFontSize = 200;
-constexpr double FXDefaultDPI      = 72;
 
 double
 pt2px(double p, double dpi = FXDefaultDPI);
@@ -134,12 +135,37 @@ public:
     selectCMap(const FXCMap & cmap);
 
 public:
+    struct AutoFontSize {
+        AutoFontSize(FXFace * face, double fontSize);
+        ~AutoFontSize();
+    private:
+        FXFace * face_;
+        FXFTSize oldSize_;
+        FXFTSize newSize_;
+    };
+    
+    double
+    fontSize() const;
+
+    bool
+    isScalable() const;
+
+    double
+    bmScale() const;
+
+    /**
+     * Set new font size, the returned font size may be different to required size
+     */
+    double
+    selectFontSize(double fontSize);
+
+public:
     FXGlyph
     glyph(FXGChar c);
 
     FXPixmapARGB
-    pixmap(FXGlyphID gid);
-    
+    pixmap(FXGlyphID gid, FXVec2d<int> * offset = nullptr);
+
     /**
      * return the chars which maps to the gid in current cmap
      */
@@ -170,6 +196,12 @@ private:
 protected:
     FXFaceDescriptor     desc_;
     FXFTFace             face_;
+
+    double               fontSize_;
+    bool                 scalable_;
+    double               bmScale_;
+    int                  bmStrikeIndex_;
+    
     FXFaceAttributes     atts_;
     std::vector<FXCMap>  cmaps_;
     FXPtr<FXGlyphCache>  cache_;

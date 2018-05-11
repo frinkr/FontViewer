@@ -18,7 +18,7 @@ namespace {
     }
     
     FXPixmapARGB
-    loadBitmap(FT_Bitmap ftBm) {
+    loadPixmap(FT_Bitmap ftBm) {
         FXPixmapARGB bm(ftBm.width, ftBm.rows);
 
         
@@ -239,6 +239,75 @@ FXFace::selectCMap(size_t cmapIndex) {
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+//                     SIZE
+//
+
+FXFace::AutoFontSize::AutoFontSize(FXFace * face, double fontSize)
+    : face_(face) {
+    oldSize_ = face_->face()->size;
+    FT_New_Size(face_->face(), &newSize_);
+    FT_Activate_Size(newSize_);
+    
+    face_->selectFontSize(fontSize);
+}
+    
+FXFace::AutoFontSize::~AutoFontSize() {
+    FT_Activate_Size(oldSize_);
+    FT_Done_Size(newSize_);
+}
+
+
+double
+FXFace::fontSize() const {
+    return fontSize_;
+}
+
+bool
+FXFace::isScalable() const {
+    return scalable_;
+}
+
+double
+FXFace::bmScale() const {
+    return bmScale_;
+}
+    
+double
+FXFace::selectFontSize(double fontSize) {
+    fontSize_ = fontSize;
+    bmScale_ = 1;
+    bmStrikeIndex_ = 0;
+    
+    if (scalable_) {
+        FT_Set_Char_Size(face_, 0/*same as height*/, fontSize * 64, FXDefaultDPI, FXDefaultDPI);
+    }
+    else {
+        if (face_->num_fixed_sizes) {
+            // select the strike which is closest to required size
+            const double pixSize = pt2px(fontSize_);
+            int strikeIndex = 0;
+            double diff = fabs(pixSize - face_->available_sizes[0].width);
+            for (int i = 1; i < face_->num_fixed_sizes; ++i) {
+                double ndiff = fabs(pixSize - face_->available_sizes[i].width);
+                if (ndiff < diff) {
+                    strikeIndex = i;
+                    diff = ndiff;
+                }
+            }
+            FT_Select_Size(face_, strikeIndex);
+            
+            bmScale_ = pixSize * 64 / face_->available_sizes[strikeIndex].x_ppem;;
+            bmStrikeIndex_ = strikeIndex;
+            fontSize_ /= bmScale_;
+        }
+        else {
+            FT_Set_Char_Size(face_, 0/*same as height*/, fontSize * 64, FXDefaultDPI, FXDefaultDPI);
+        }
+    }
+    return fontSize_;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 //                     GLYPH
 //
 
@@ -290,11 +359,15 @@ FXFace::glyph(FXGChar gc) {
 }
 
 FXPixmapARGB
-FXFace::pixmap(FXGlyphID gid) {
+FXFace::pixmap(FXGlyphID gid, FXVec2d<int> * offset) {
     FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
-    return loadBitmap(face_->glyph->bitmap);
+    if (offset) {
+        offset->x = face_->glyph->bitmap_left;
+        offset->y = face_->glyph->bitmap_top - face_->glyph->bitmap.rows;
+    }
+    return loadPixmap(face_->glyph->bitmap);
 }
-    
+
 FXVector<FXChar>
 FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);
@@ -312,12 +385,8 @@ FXFace::inspector() {
 //
 bool
 FXFace::init() {
-    FT_Set_Char_Size(face_, 
-        FT_UInt(FXDefaultFontSize * 64), 
-        FT_UInt(FXDefaultFontSize * 64),
-        FT_UInt(FXDefaultDPI),
-        FT_UInt(FXDefaultDPI));
-
+    scalable_ = FT_IS_SCALABLE(face_);
+    selectFontSize(FXDefaultFontSize);
     cache_.reset(new FXGlyphCache);
     return initAttributes() && initCMap();
 }
@@ -327,11 +396,14 @@ FXFace::initAttributes() {
     atts_.desc = desc_;
     atts_.upem = face_->units_per_EM;       
     atts_.glyphCount = face_->num_glyphs;
-
+    atts_.bbox = FXMakeRect<fu>(face_->bbox.xMin, face_->bbox.yMax, face_->bbox.xMax, face_->bbox.yMin);
+    atts_.ascender = face_->ascender;
+    atts_.descender = face_->descender;
     const char * format = FT_Get_Font_Format(face_);
     if (format)
         atts_.format = format;
-    
+
+    // names
     if (face_->family_name)
         atts_.names.setFamilyName(face_->family_name);
     if (face_->style_name)

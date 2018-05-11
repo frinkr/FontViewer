@@ -131,14 +131,20 @@ FXShaper::glyph(size_t index) const {
 FXVec2d<fu>
 FXShaper::advance(size_t index) const {
     return FXMakeVec2d<fu>(
-        imp_->hbGlyphPositions_[index].y_advance,
-        imp_->hbGlyphPositions_[index].x_advance);
+        imp_->hbGlyphPositions_[index].x_advance,
+        imp_->hbGlyphPositions_[index].y_advance);
 }
 
 FXVec2d<fu>
 FXShaper::offset(size_t index) const {
     return FXMakeVec2d<fu>(
-        imp_->hbGlyphPositions_[index].y_offset,
-        imp_->hbGlyphPositions_[index].x_offset);
+        imp_->hbGlyphPositions_[index].x_offset,
+        imp_->hbGlyphPositions_[index].y_offset);
 
 }
+
+FXFace *
+FXShaper::face() const {
+    return imp_->face_;
+}
+    

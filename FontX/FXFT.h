@@ -10,5 +10,5 @@
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
 #include FT_FONT_FORMATS_H
-
+#include FT_SIZES_H
 #include "FX.h"

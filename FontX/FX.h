@@ -29,6 +29,7 @@ struct hb_font_t;
 
 using FXFTLibrary = struct FT_LibraryRec_ *;
 using FXFTFace    = struct FT_FaceRec_ *;
+using FXFTSize    = struct FT_SizeRec_ *;
 using FXHBFace    = struct hb_face_t *;
 using FXHBFont    = struct hb_font_t *;
 
@@ -40,6 +41,9 @@ constexpr FXChar    FXCharInvalidBegin = FXChar(-1) - 0x100; // let's reserve so
 constexpr FXChar    FXCharInvalidEnd   = FXChar(-1);
 constexpr FXChar    FXCharInvalid      = FXCharInvalidBegin;
 constexpr FXGlyphID FXGIDNotDef        = 0;
+
+constexpr double    FXDefaultFontSize  = 200;
+constexpr double    FXDefaultDPI       = 72;
 
 /**
  * A closed range
@@ -116,4 +120,33 @@ FXMakeVec2d(T x, T y) {
     v.x = x;
     v.y = y;
     return v;
+}
+
+template <typename T>
+struct FXRect {
+    T left = {0};
+    T right = {0};
+    T top = {0};
+    T bottom = {0};
+
+    T
+    width() const {
+        return right - left;
+    }
+
+    T
+    height() const {
+        return top - bottom;
+    }
+};
+
+template <typename T>
+constexpr FXRect<T>
+FXMakeRect(T left, T top, T right, T bottom) {
+    FXRect<T> rect;
+    rect.left = left;
+    rect.right = right;
+    rect.top = top;
+    rect.bottom = bottom;
+    return rect;
 }

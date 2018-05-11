@@ -38,6 +38,9 @@ public:
     FXVec2d<fu>
     offset(size_t index) const;
 
+    FXFace *
+    face() const;
+    
 private:
     FXPtr<FXShaperImp>  imp_;
 };
