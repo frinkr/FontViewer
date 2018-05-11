@@ -263,7 +263,7 @@ FXCMap::initBlocks() {
         
         for (const auto & it : charMap_) {
             charFound[it.g] = true;
-            FXGChar c {FXGCharTypeUnicode, it.c};
+            FXGChar c {it.c, FXGCharTypeUnicode};
             FXPtr<FXGCharBlock> currentUniBlock = fullBlocks[currentUniBlockIndex];
             if (currentUniBlock->contains(c)) {
                 chs.push_back(c);
@@ -297,7 +297,7 @@ FXCMap::initBlocks() {
         chs.clear();
         for (size_t gid = 0; gid < charFound.size(); ++ gid) {
             if (!charFound[gid])
-                chs.push_back({FXGCharTypeGlyphID, (FXChar)gid});
+                chs.push_back({(FXChar)gid, FXGCharTypeGlyphID});
         }
         FXPtr<FXCharArrayBlock> newBlock(new FXCharArrayBlock(chs, "Unassigned"));
         uniCompactBlocks.push_back(newBlock); 

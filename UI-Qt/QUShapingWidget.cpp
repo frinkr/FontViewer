@@ -197,7 +197,7 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             FXGlyphID gid = shaper_->glyph(i);
             FXVec2d<fu> adv = shaper_->advance(i);
-            FXGlyph g = face->glyph(FXGChar(FXGCharTypeGlyphID, gid));
+            FXGlyph g = face->glyph(FXGChar(gid, FXGCharTypeGlyphID));
             fu kern = adv.x - g.metrics.horiAdvance;
             
             p.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
@@ -387,9 +387,7 @@ QUShapingWidget::doShape() {
 void
 QUShapingWidget::gotoGlyph(FXGlyphID gid) {
     QUSearch s;
-    FXGChar gc = FXGChar(FXGCharTypeGlyphID, gid);
-    gc = document_->face()->glyph(gc).character;
-    s.gchar = gc;
+    s.gchar = FXGChar(gid, FXGCharTypeGlyphID);
     document_->search(s);
 }
     

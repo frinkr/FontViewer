@@ -65,7 +65,7 @@ public:
 
     virtual FXGChar
     get(size_t index) const {
-        return {type_, static_cast<FXChar>(index + range_.from)};
+        return {static_cast<FXChar>(index + range_.from), type_};
     }
 
     size_t

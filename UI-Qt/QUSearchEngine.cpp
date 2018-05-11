@@ -23,7 +23,7 @@ QUSearchExpressionParser::parse(const QString & text) {
         code.remove(0, 2);
         FXGlyphID gid = code.toUInt(&ok);
         if (ok) {
-            search.gchar = FXGChar(FXGCharTypeGlyphID, gid);
+            search.gchar = FXGChar(gid, FXGCharTypeGlyphID);
             return search;
         }
     }
@@ -32,7 +32,7 @@ QUSearchExpressionParser::parse(const QString & text) {
     code = text;
     const QVector<uint> ucs4 = code.toUcs4();
     if (ucs4.size() == 1) {
-        search.gchar = FXGChar(FXGCharTypeUnicode, ucs4[0]);
+        search.gchar = FXGChar(ucs4[0], FXGCharTypeUnicode);
         return search;
     }
 
@@ -104,7 +104,14 @@ QUSearchEngine::searchChar(FXGChar c) const {
 QUSearchResult
 QUSearchEngine::searchGlyph(FXGlyphID g) const {
     QUSearchResult result;
-    if (g < document_->face()->glyphCount()) {
+
+    const auto & cm = document_->face()->currentCMap();
+    const FXVector<FXChar> chs = cm.charsForGlyph(g);
+
+    if (chs.size()) {
+        return searchChar(FXGChar(chs[0], cm.isUnicode()?FXGCharTypeUnicode:FXGCharTypeOther));
+    }
+    else if (g < document_->face()->glyphCount()) {
         result.found    = true;
         result.charMode = false;
         result.index    = g;

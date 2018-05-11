@@ -22,12 +22,12 @@ QUEncoding::charFromHexNotation(const QString & str) {
     if (code.indexOf("U+") == 0 || code.indexOf("0x") == 0 || code.indexOf("\\u") == 0) {
         code.remove(0, 2);
         FXChar c = code.toUInt(&ok, 16);
-        return ok? FXGChar(FXGCharTypeUnicode, c): FXGCharInvalid;
+        return ok? FXGChar(c, FXGCharTypeUnicode): FXGCharInvalid;
     }
     else if (code.indexOf("gid") == 0){
         code.remove(0, 3);
         FXChar c = code.toUInt(&ok);
-        return ok? FXGChar(FXGCharTypeGlyphID, c): FXGCharInvalid;
+        return ok? FXGChar(c, FXGCharTypeGlyphID): FXGCharInvalid;
     }
     return FXGCharInvalid;
 }

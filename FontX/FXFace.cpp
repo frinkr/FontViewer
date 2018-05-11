@@ -329,14 +329,14 @@ FXFace::glyph(FXGChar gc) {
     // lookup in cache
     if (cache_->has(gid)) {
         FXGlyph glyph = cache_->get(gid);
-        glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
+        glyph.character = {c, currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther};
         return glyph;
     }
     
     FXGlyph glyph;
     glyph.face = this;
     glyph.gid = gid;
-    glyph.character = {currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther, c};
+    glyph.character = {c, currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther};
     FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 

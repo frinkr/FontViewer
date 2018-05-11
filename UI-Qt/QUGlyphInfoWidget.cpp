@@ -41,8 +41,8 @@ namespace {
         QStringList decompositionLinks;
         for (FXChar d : FXUnicode::decomposition(c)) {
             decompositionLinks << QString("<a href=\"%1\">%2</a>")
-                .arg(QUEncoding::charHexLink({FXGCharTypeUnicode, d}).toDisplayString())
-                .arg(QUEncoding::charHexNotation({FXGCharTypeUnicode, d}));
+                .arg(QUEncoding::charHexLink({d, FXGCharTypeUnicode}).toDisplayString())
+                .arg(QUEncoding::charHexNotation({d, FXGCharTypeUnicode}));
         }
         
         map["UNICODE_DECOMPOSITION"] = isDefined? decompositionLinks.join(", "): QString();

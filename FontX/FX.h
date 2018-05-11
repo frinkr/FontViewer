@@ -65,7 +65,7 @@ struct FXGChar {
     FXGCharType type;
     FXChar      value;
 
-    constexpr FXGChar(FXGCharType type = FXGCharTypeUnicode, FXChar value = FXCharInvalid)
+    constexpr FXGChar(FXChar value = FXCharInvalid, FXGCharType type = FXGCharTypeUnicode)
         : type(type)
         , value(value){}
 
@@ -105,7 +105,7 @@ struct FXGChar {
     }
 };
 
-constexpr FXGChar FXGCharInvalid(FXGCharTypeUnicode, FXCharInvalid);
+constexpr FXGChar FXGCharInvalid;
 
 template <typename T>
 struct FXVec2d {

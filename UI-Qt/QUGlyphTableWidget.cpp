@@ -229,7 +229,7 @@ QUGlyphTableModel::columns() const {
 
 FXGlyph
 QUGlyphTableModel::glyphAt(int row) const {
-    FXGChar gc(FXGCharTypeGlyphID, row);
+    FXGChar gc(row, FXGCharTypeGlyphID);
     return document_->face()->glyph(gc);
 }
 
@@ -252,7 +252,7 @@ QUGlyphTableModel::exportToFile(const QString & filePath) const {
     }
     ts << "\n";
     for (size_t i = 0; i < document_->face()->glyphCount(); ++ i) {
-        FXGChar gc(FXGCharTypeGlyphID, i);
+        FXGChar gc(i, FXGCharTypeGlyphID);
         FXGlyph g = document_->face()->glyph(gc);
         for (int i = 0; i < columns_.size(); ++ i) {
             if (i == 1) continue;
@@ -312,7 +312,7 @@ QUGlyphTableWidget::gotoGlyphAtIndex(const QModelIndex & index) {
     FXGlyph g = model_->glyphAt(sourceIndex.row());
     FXGChar gc = g.character;
     if (!gc.isChar() || !gc.isValid())
-        gc = FXGChar(FXGCharTypeGlyphID, g.gid);
+        gc = FXGChar(g.gid, FXGCharTypeGlyphID);
 
     QUSearch s;
     s.gchar = gc;
