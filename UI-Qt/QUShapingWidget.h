@@ -32,6 +32,16 @@ public:
     
     void
     paintEvent(QPaintEvent * event);
+
+    void
+    mousePressEvent(QMouseEvent *event);
+
+    void
+    mouseDoubleClickEvent(QMouseEvent *event);
+
+signals:
+    void
+    glyphDoubleClicked(FXGlyphID gid) const;
     
 protected:
     
@@ -39,17 +49,24 @@ protected:
     baseLinePosition() const ;
 
     int
-    cellBottom(int row /*start from bottom*/, int col = 0) const;
+    gridCellBottom(int row /*start from bottom*/, int col = 0) const;
 
     int
-    cellLeft(int row, int col /*start from first glyph*/) const;
+    gridCellLeft(int row, int col /*start from first glyph*/) const;
 
     QRect
-    cellRect(int row, int col) const;
+    gridCellRect(int row, int col) const;
 
+    QRect
+    glyphInteractionRect(int index) const;
+
+    int
+    glyphAtPoint(const QPoint & point) const;
+    
     double
     fu2px(fu f) const;
-    
+
+    int selectedIndex_;
     FXShaper * shaper_;
 };
 
@@ -73,6 +90,9 @@ public slots:
     void
     doShape();
 
+    void
+    gotoGlyph(FXGlyphID gid);
+    
 private:
     FXPtr<FXInspector>
     inspector();

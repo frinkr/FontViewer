@@ -1,10 +1,11 @@
 #include <QPainter>
-
+#include <QMouseEvent>
 #include "FontX/FXInspector.h"
 #include "FontX/FXShaper.h"
 
 #include "QUConv.h"
 #include "QUDocument.h"
+#include "QUSearchEngine.h"
 #include "QUShapingWidget.h"
 #include "ui_QUShapingWidget.h"
 
@@ -24,13 +25,14 @@ namespace {
 
     constexpr int QU_SHAPINGVIEW_MARGIN = 20;
     constexpr int QU_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
-    constexpr int QU_SHAPINGVIEW_GRID_HEAD_WIDTH = 120;
+    constexpr int QU_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
 
     constexpr double QU_SHAPINGVIEW_FONTSIZE = 100;
 }
 
 QUShapingGlyphView::QUShapingGlyphView(QWidget * parent)
     : QWidget(parent)
+    , selectedIndex_(-1)
     , shaper_(nullptr) {}
 
 void
@@ -53,7 +55,7 @@ QUShapingGlyphView::sizeHint() const {
     const int baselineY = baseLinePosition().y();
     const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QU_SHAPINGVIEW_MARGIN;
     
-    return QSize(cellLeft(5, shaper_->glyphCount()) + QU_SHAPINGVIEW_MARGIN, height);
+    return QSize(gridCellLeft(5, shaper_->glyphCount()) + QU_SHAPINGVIEW_MARGIN, height);
 }
 
 void
@@ -100,7 +102,25 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
     const int baseLineX = baseLinePosition().x();
     {
         p.setPen(baseLinePen);
-        p.drawLine(cellLeft(6, -1), baseLineY, rect().right(), baseLineY);
+        p.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
+    }
+
+    // draw selected glyph background
+    {
+        int penX = baseLineX;
+        for (int i = 0; i < shaper_->glyphCount(); ++ i) {
+            const FXGlyphID gid = shaper_->glyph(i);
+            const FXVec2d<fu> adv = shaper_->advance(i);
+            const FXVec2d<fu> off = shaper_->offset(i);
+
+            // draw background for selected
+            if (selectedIndex_ == i) {
+                QRect rect(penX, 0, fu2px(adv.x), gridCellBottom(1));
+                p.fillRect(rect, QColor(179, 216, 253));
+            }
+            
+            penX += fu2px(adv.x);
+        }  
     }
     
     // draw glyphs
@@ -112,7 +132,7 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
             const FXGlyphID gid = shaper_->glyph(i);
             const FXVec2d<fu> adv = shaper_->advance(i);
             const FXVec2d<fu> off = shaper_->offset(i);
-            
+
             const double bmScale = face->bmScale();
             FXVec2d<int> bmOffset;
             
@@ -141,7 +161,7 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
 
             p.setPen(boundaryPen);
-            p.drawLine(penX, 0, penX, cellBottom(4, i));
+            p.drawLine(penX, 0, penX, gridCellBottom(4, i));
             
             if (i == shaper_->glyphCount())
                 break;
@@ -156,22 +176,22 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
 
         // row lines
         for (int i = 0; i < 5; ++ i) 
-            p.drawLine(QU_SHAPINGVIEW_MARGIN, cellBottom(i),
-                       rect().right(), cellBottom(i));
+            p.drawLine(QU_SHAPINGVIEW_MARGIN, gridCellBottom(i),
+                       rect().right(), gridCellBottom(i));
         // column lines
         for (int i = 0; i <= shaper_->glyphCount(); ++ i)  {
-            p.drawLine(cellLeft(4, i), cellBottom(4),
-                       cellLeft(1, i), cellBottom(1));
-            p.drawLine(cellLeft(0, i), cellBottom(1),
-                       cellLeft(0, i), cellBottom(0));
+            p.drawLine(gridCellLeft(4, i), gridCellBottom(4),
+                       gridCellLeft(1, i), gridCellBottom(1));
+            p.drawLine(gridCellLeft(0, i), gridCellBottom(1),
+                       gridCellLeft(0, i), gridCellBottom(0));
         }
         
         // headers
         p.setPen(textPen);
-        p.drawText(cellRect(1, -1).translated(0, QU_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
-        p.drawText(cellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
-        p.drawText(cellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
-        p.drawText(cellRect(3, -1), Qt::AlignRight, tr("GID "));
+        p.drawText(gridCellRect(1, -1).translated(0, QU_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
+        p.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
+        p.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
+        p.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
 
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
@@ -180,33 +200,54 @@ QUShapingGlyphView::paintEvent(QPaintEvent * event) {
             FXGlyph g = face->glyph(FXGChar(FXGCharTypeGlyphID, gid));
             fu kern = adv.x - g.metrics.horiAdvance;
             
-            p.drawText(cellRect(0, i), Qt::AlignCenter, QString::number(kern));
-            p.drawText(cellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
-            p.drawText(cellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
-            p.drawText(cellRect(3, i), Qt::AlignCenter, QString::number(gid));
+            p.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
+            p.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
+            p.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
+            p.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(gid));
         }
     }
 }
 
+void
+QUShapingGlyphView::mousePressEvent(QMouseEvent *event) {
+    FXFace * face = shaper_->face();
+    FXFace::AutoFontSize autoFontSize(face, QU_SHAPINGVIEW_FONTSIZE);
+
+    int index = glyphAtPoint(event->pos());
+    if (selectedIndex_ != index) {
+        selectedIndex_ = index;
+        update();
+    }
+}
+
+void
+QUShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
+    mousePressEvent(event);
+
+    if (selectedIndex_ != -1)
+        emit glyphDoubleClicked(shaper_->glyph(selectedIndex_));
+}
+    
+
 QPoint
 QUShapingGlyphView::baseLinePosition() const {
-    return QPoint(cellLeft(5, 0),
-                  cellBottom(5, 0) + fu2px(shaper_->face()->attributes().descender));
+    return QPoint(gridCellLeft(5, 0),
+                  gridCellBottom(5, 0) + fu2px(shaper_->face()->attributes().descender));
 }
 
 int
-QUShapingGlyphView::cellBottom(int row, int col) const {
+QUShapingGlyphView::gridCellBottom(int row, int col) const {
     return rect().height() - QU_SHAPINGVIEW_MARGIN - QU_SHAPINGVIEW_GRID_ROW_HEIGHT * row;
 }
 
 int
-QUShapingGlyphView::cellLeft(int row, int col) const {
+QUShapingGlyphView::gridCellLeft(int row, int col) const {
     // col == -1: header
     // col == shaper_->glyphCount : last glyph right
     if (col < 0)
         return QU_SHAPINGVIEW_MARGIN;
     if (row == 0) 
-        return (cellLeft(1, col) + cellLeft(1, col + 1)) / 2;
+        return (gridCellLeft(1, col) + gridCellLeft(1, col + 1)) / 2;
 
     int adv = 0;
     for (int i = 0; i < std::min<int>(col, shaper_->glyphCount()); ++ i) 
@@ -216,13 +257,34 @@ QUShapingGlyphView::cellLeft(int row, int col) const {
 }
 
 QRect
-QUShapingGlyphView::cellRect(int row, int col) const {
-    int x0 = cellLeft(row, col);
-    int x1 = cellLeft(row, col + 1);
-    int y0 = cellBottom(row + 1);
-    int y1 = cellBottom(row);
+QUShapingGlyphView::gridCellRect(int row, int col) const {
+    int x0 = gridCellLeft(row, col);
+    int x1 = gridCellLeft(row, col + 1);
+    int y0 = gridCellBottom(row + 1);
+    int y1 = gridCellBottom(row);
     return QRect(QPoint(x0, y0), QPoint(x1, y1));
 }
+
+QRect
+QUShapingGlyphView::glyphInteractionRect(int index) const {
+    int x0 = gridCellLeft(1, index);
+    int x1 = gridCellLeft(1, index + 1);
+    int y0 = 0;
+    int y1 = gridCellBottom(1);
+    return QRect(QPoint(x0, y0), QPoint(x1, y1));
+}
+
+int
+QUShapingGlyphView::glyphAtPoint(const QPoint & point) const {
+    if (!shaper_) return -1;
+    for (int i = 0; i < shaper_->glyphCount(); ++ i) {
+        QRect rect = glyphInteractionRect(i);
+        if (rect.contains(point))
+            return i;
+    }
+    return -1;
+}
+    
 
 double
 QUShapingGlyphView::fu2px(fu f) const {
@@ -245,6 +307,8 @@ QUShapingWidget::QUShapingWidget(QWidget *parent)
             this, &QUShapingWidget::doShape);
     connect(ui_->lineEdit, &QLineEdit::textEdited,
             this, &QUShapingWidget::doShape);
+    connect(ui_->glyphView, &QUShapingGlyphView::glyphDoubleClicked,
+            this, &QUShapingWidget::gotoGlyph);
 }
 
 QUShapingWidget::~QUShapingWidget() {
@@ -320,6 +384,15 @@ QUShapingWidget::doShape() {
     ui_->glyphView->update();
 }
 
+void
+QUShapingWidget::gotoGlyph(FXGlyphID gid) {
+    QUSearch s;
+    FXGChar gc = FXGChar(FXGCharTypeGlyphID, gid);
+    gc = document_->face()->glyph(gc).character;
+    s.gchar = gc;
+    document_->search(s);
+}
+    
 FXPtr<FXInspector>
 QUShapingWidget::inspector() {
     return document_->face()->inspector();
