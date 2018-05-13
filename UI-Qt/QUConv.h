@@ -4,6 +4,8 @@
 #include <string>
 
 #include "FontX/FXPixmap.h"
+#include "FontX/FXFace.h"
+#include "FontX/FXGlyph.h"
 
 QString
 toQString(const std::string & str);
@@ -18,7 +20,7 @@ QSize
 glyphEmSize();
 
 QImage
-placeImage(const QImage & image, const QSize & emSize);
+placeGlyphImage(const FXGlyph & g, const QSize & emSize);
 
 QImage
 unicodeCharImage(FXChar c, const QSize & emSize);

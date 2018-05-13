@@ -49,7 +49,8 @@ glyphEmSize() {
 }
 
 QImage
-placeImage(const QImage & image, const QSize & emSize) {
+placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
+    QImage image = toQImage(g.pixmap());
 
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());
@@ -57,20 +58,36 @@ placeImage(const QImage & image, const QSize & emSize) {
     QImage out(emSize, image.isNull()?QImage::Format_ARGB32 : image.format());
 //    out.fill(qRgba(0, 0, 0, 0));
     out.fill(Qt::white);
-    QPainter p(&out);
-    p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+    if (image.isNull())
+        return out;
     
-    const double r = 0.8;
-    QRect outRect((1 - r) / 2 * emSize.width(),
-                  (1 - r) / 2 * emSize.height(),
-                  emSize.width() * r,
-                  emSize.height() * r);
+    QPainter p(&out);
+    if (g.face->isScalable())
+        p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
 
-    if ((outRect.width() > imageRect.width()) || (outRect.height() > imageRect.height()))
-        outRect = QRect((emSize.width() - imageRect.width()) / 2,
-                        (emSize.height() - imageRect.height()) / 2,
-                        imageRect.width(),
-                        imageRect.height());
+    const double r = g.face->isScalable()? 0.8: 0.618;
+    double wr = r, hr = r;
+    if (image.width() > image.height()) {
+        wr = r;
+        hr = image.height() * wr / image.width();
+    }
+    else {
+        hr = r;
+        wr = image.width() * hr / image.height();
+    }
+    // proportional scaling no larger than 0.8 EM    
+    QRect outRect((1 - wr) / 2 * emSize.width(),
+                  (1 - hr) / 2 * emSize.height(),
+                  emSize.width() * wr,
+                  emSize.height() * hr);
+    if (g.face->isScalable()) {
+        // if the image is too small to full-fill outRect, let's keep the orignal size
+        if ((outRect.width() > imageRect.width()) && (outRect.height() > imageRect.height()))
+            outRect = QRect((emSize.width() - imageRect.width()) / 2,
+                            (emSize.height() - imageRect.height()) / 2,
+                            imageRect.width(),
+                            imageRect.height());
+    }
     p.drawImage(outRect, image, imageRect);
 
     out.setDevicePixelRatio(2);

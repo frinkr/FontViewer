@@ -94,7 +94,7 @@ QUGlyphInfoWidget::loadGlyph() {
     
     QTextDocument * qdoc = new QTextDocument;
     qdoc->addResource(QTextDocument::ImageResource,
-                      QUrl("fv://glyph.png"), QVariant(placeImage(toQImage(glyph.pixmap()), glyphEmSize())));
+                      QUrl("fv://glyph.png"), QVariant(placeGlyphImage(glyph, glyphEmSize())));
     
     setDocument(qdoc);
     
