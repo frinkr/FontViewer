@@ -14,3 +14,4 @@ add_definitions(
 add_subdirectory(FontX)
 add_subdirectory(UI-Qt)
 add_subdirectory(App)
+add_subdirectory(UI-QtQuick)

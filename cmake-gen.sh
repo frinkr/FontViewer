@@ -14,7 +14,7 @@ fi
 cd "$DIR/$BUILD"
 
 if [ "$(uname)" == "Darwin" ]; then
-    cmake -G Xcode .. -DCMAKE_PREFIX_PATH="/usr/local/Cellar/qt/5.10.0/"
+    cmake -G Xcode .. -DCMAKE_PREFIX_PATH="/usr/local/Cellar/qt/5.11.2/"
 else
     cmake -G "Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_ECLIPSE_VERSION=4.7 ../FontViewer
 fi
