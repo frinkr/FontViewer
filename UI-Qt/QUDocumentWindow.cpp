@@ -102,6 +102,8 @@ QUDocumentWindow::initToolBar() {
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
     
+    toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
+
     this->setUnifiedTitleAndToolBarOnMac(true);
 }
 

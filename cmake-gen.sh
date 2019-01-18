@@ -1,12 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 CURRENT=$PWD
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-if [ "$(uname)" == "Darwin" ]; then
-    BUILD=build
-else
-    BUILD=../fvbuild
-fi
+BUILD=build
 
 [ "$1" = "clean" ] && rm -rf "$DIR/$BUILD"
 [ ! -d "$DIR/$BUILD" ] &&  mkdir -p "$DIR/$BUILD"
@@ -14,7 +11,7 @@ fi
 cd "$DIR/$BUILD"
 
 if [ "$(uname)" == "Darwin" ]; then
-    cmake -G Xcode .. -DCMAKE_PREFIX_PATH="/usr/local/Cellar/qt/5.11.2/"
+    cmake -G Xcode .. -DCMAKE_PREFIX_PATH=`brew --prefix qt`
 else
     cmake -G "Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_ECLIPSE_VERSION=4.7 ../FontViewer
 fi

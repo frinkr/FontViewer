@@ -39,15 +39,15 @@ int quMain(int argc, char *argv[])
         anotherInstanceExists |= app.sendMessage(arguments.at(i).toUtf8());
 
     // Assume another instance of this application exists if *any* of the messages sent was handled.
-    if (anotherInstanceExists)
-        return 0;
+    //if (anotherInstanceExists)
+    //    return 0;
 
     // load the dark style
     QFile f(":qdarkstyle/style.qss");
     if (f.exists()) {
         f.open(QFile::ReadOnly | QFile::Text);
         QTextStream ts(&f);
-        app.setStyleSheet(ts.readAll());
+        //app.setStyleSheet(ts.readAll());
     }
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     
