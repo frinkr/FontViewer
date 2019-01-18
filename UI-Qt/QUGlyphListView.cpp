@@ -23,7 +23,8 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     initStyleOption(&opt, index);
     
     painter->save();
-    
+    painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+
     const QWidget * widget = opt.widget;
     QStyle * style = widget ? widget->style() : QApplication::style();
     
@@ -33,30 +34,12 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     QSize emSize = glyphEmSize();
     QRect emRect(0, 0, emSize.width(), emSize.height());
         
-    // draw the background
-    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &opt, painter, widget);
-
-    // draw the icon
-    if (true) {
-        QIcon::Mode mode = QIcon::Normal;
-        QImage image = placeGlyphImage(g, emSize);
-        QPixmap pixmap = QPixmap::fromImage(image);
-        QBitmap roundedMask(pixmap.size());
-        roundedMask.fill(Qt::color0);
-        QPainter maskPainter(&roundedMask);
-        maskPainter.setBrush(Qt::color1);
-        maskPainter.drawRoundedRect(QRectF(0, 0, pixmap.width(), pixmap.height()), 40, 40);
-        pixmap.setMask(roundedMask);
-
-        QIcon icon(pixmap);
-        if (opt.state & QStyle::State_Selected)
-            mode = QIcon::Selected;
-        icon.paint(painter, iconRect, opt.decorationAlignment, mode, QIcon::On);
-    }
+    // draw the background & focus
+    style->drawPrimitive(QStyle::PE_PanelItemViewRow, &opt, painter, widget);
 
     // draw the text
     if (true) {
-        const QString charCode = QUEncoding::charHexNotation(g.character);
+        const QString charCode = g.character == FXCharInvalid? "N/A": QUEncoding::charHexNotation(g.character);
 
         QString text;
         switch (model->glyphLabel()) {
@@ -79,9 +62,18 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
                 painter->setPen(opt.palette.color(QPalette::Normal, QPalette::HighlightedText));
             else
                 painter->setPen(opt.palette.color(QPalette::Normal, QPalette::Text));
-            style->drawItemText(painter, textRect, Qt::AlignHCenter, opt.palette, true, text);
+            textRect = QRect(iconRect.left() , textRect.top() - textRect.height(), iconRect.width(), textRect.height() * 2);
+            painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWrapAnywhere, text);
         }
     }
+    
+    if (true) {
+        QImage image = placeGlyphImage(g, emSize);
+        image.invertPixels();
+        QPixmap pixmap = QPixmap::fromImage(image);
+        painter->drawImage(iconRect, image, QRectF(0, 0, image.width(), image.height()));
+    }
+
     
     painter->restore();
 }

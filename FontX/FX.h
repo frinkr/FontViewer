@@ -42,7 +42,7 @@ constexpr FXChar    FXCharInvalidEnd   = FXChar(-1);
 constexpr FXChar    FXCharInvalid      = FXCharInvalidBegin;
 constexpr FXGlyphID FXGIDNotDef        = 0;
 
-constexpr double    FXDefaultFontSize  = 200;
+constexpr double    FXDefaultFontSize  = 150;
 constexpr double    FXDefaultDPI       = 72;
 
 /**

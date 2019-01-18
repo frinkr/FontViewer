@@ -56,8 +56,8 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
     QRect emRect(0, 0, emSize.width(), emSize.height());
     
     QImage out(emSize, image.isNull()?QImage::Format_ARGB32 : image.format());
-//    out.fill(qRgba(0, 0, 0, 0));
-    out.fill(Qt::white);
+    out.fill(qRgba(0, 0, 0, 0));
+//    out.fill(Qt::white);
     if (image.isNull())
         return out;
     
@@ -76,7 +76,7 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
         wr = image.width() * hr / image.height();
     }
     // proportional scaling no larger than 0.8 EM    
-    QRect outRect((1 - wr) / 2 * emSize.width(),
+    QRectF outRect((1 - wr) / 2 * emSize.width(),
                   (1 - hr) / 2 * emSize.height(),
                   emSize.width() * wr,
                   emSize.height() * hr);

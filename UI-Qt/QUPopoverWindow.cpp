@@ -168,11 +168,11 @@ QPolygonF
 QUPopoverWindow::localPolygon(int border) {
 
     QVector<QPointF> points;
-    const float width = size().width() - (isHorizontal(edge_)? POPOVER_DISTANCE : 0);
-    const float height = size().height() - (isHorizontal(edge_)? 0: POPOVER_DISTANCE);
+    const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_DISTANCE : 0);
+    const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_DISTANCE);
     
-    const float dirHeight = POPOVER_DISTANCE;
-    const float dirWidth =  POPOVER_DISTANCE * 2.5;
+    const qreal dirHeight = POPOVER_DISTANCE;
+    const qreal dirWidth =  POPOVER_DISTANCE * 2.5;
 
     const QPointF topLeft(-width/2, -height/2);
     const QPointF topRight(width/2 - border, -height/2);
