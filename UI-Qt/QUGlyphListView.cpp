@@ -35,7 +35,16 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     QRect emRect(0, 0, emSize.width(), emSize.height());
         
     // draw the background & focus
-    style->drawPrimitive(QStyle::PE_PanelItemViewRow, &opt, painter, widget);
+    if (true) {
+#ifdef Q_OS_MACOS
+        style->drawPrimitive(QStyle::PE_PanelItemViewRow, &opt, painter, widget);
+#else
+        if (opt.state & QStyle::State_Selected) {
+            QRect bgRect = textRect.united(iconRect);
+            painter->fillRect(bgRect, opt.palette.color(QPalette::Active, QPalette::Highlight));
+        }
+#endif
+    }
 
     // draw the text
     if (true) {
@@ -69,7 +78,8 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     if (true) {
         QImage image = placeGlyphImage(g, emSize);
-        image.invertPixels();
+        if (opt.state & QStyle::State_Selected)
+            image.invertPixels();
         QPixmap pixmap = QPixmap::fromImage(image);
         painter->drawImage(iconRect, image, QRectF(0, 0, image.width(), image.height()));
     }

@@ -12,7 +12,7 @@
 namespace {
     QVariant
     langSysToVariant(FXTag script, FXTag language) {
-        return (uint64_t(script) << 32) + language;
+        return (qulonglong(script) << 32) + language;
     }
 
     bool
