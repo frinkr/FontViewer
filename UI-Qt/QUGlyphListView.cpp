@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QIcon>
+#include <QBitmap>
 #include <QPainter>
 
 #include "QUConv.h"
@@ -39,7 +40,15 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     if (true) {
         QIcon::Mode mode = QIcon::Normal;
         QImage image = placeGlyphImage(g, emSize);
-        QIcon icon(QPixmap::fromImage(image));
+        QPixmap pixmap = QPixmap::fromImage(image);
+        QBitmap roundedMask(pixmap.size());
+        roundedMask.fill(Qt::color0);
+        QPainter maskPainter(&roundedMask);
+        maskPainter.setBrush(Qt::color1);
+        maskPainter.drawRoundedRect(QRectF(0, 0, pixmap.width(), pixmap.height()), 40, 40);
+        pixmap.setMask(roundedMask);
+
+        QIcon icon(pixmap);
         if (opt.state & QStyle::State_Selected)
             mode = QIcon::Selected;
         icon.paint(painter, iconRect, opt.decorationAlignment, mode, QIcon::On);
