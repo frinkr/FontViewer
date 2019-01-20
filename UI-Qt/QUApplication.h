@@ -11,6 +11,7 @@
 #ifndef QUAPPLICATION_H
 #define QUAPPLICATION_H
 
+#include <QIcon>
 #include "QUSingleApplication.h"
 
 class QEvent;
@@ -21,9 +22,17 @@ public:
     QUApplication(int &argc, char **argv);
     ~QUApplication();
 
+	bool
+	darkMode() const;
+
+	QIcon
+	loadIcon(const QString & path) const;
+
 #ifdef Q_OS_MAC
     bool event(QEvent *);
 #endif
 };
+
+extern QUApplication * quApp;
 
 #endif // QTDOCBASEDAPPLICATION_H

@@ -32,6 +32,7 @@ int quMain(int argc, char *argv[])
     
     QUApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
+	quApp = &app;
 
     QStringList arguments = app.arguments();
     bool anotherInstanceExists = false;

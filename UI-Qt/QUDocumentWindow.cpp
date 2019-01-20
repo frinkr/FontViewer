@@ -3,6 +3,7 @@
 #include <QToolButton>
 #include <QWidgetAction>
 #include <QActionGroup>
+#include "QUApplication.h"
 #include "QUConv.h"
 #include "QUCMapBlockWidget.h"
 #include "QUDocumentWindowManager.h"
@@ -73,27 +74,30 @@ void
 QUDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
 
-    ui_->actionFull_Glyph_List->setIcon(QIcon(":/images/glyph_d.png"));
+    ui_->actionFull_Glyph_List->setIcon(
+		quApp->loadIcon(":/images/glyph.png"));
 
     cmapBlockAction_ = toolBar->addAction(
-        QIcon(":/images/glyph_d.png"),tr("Glyphs"), 
+        quApp->loadIcon(":/images/glyph.png"),tr("Glyphs"), 
         this, &QUDocumentWindow::onCMapBlockAction);
 
-    QAction* variant = toolBar->addAction(QIcon(":/images/variant_d.png"), tr("Variant"));
+    QAction* variant = toolBar->addAction(
+		quApp->loadIcon(":/images/variant.png"), tr("Variant"));
+
     shapingAction_ = toolBar->addAction(
-        QIcon(":/images/shape_d.png"), tr("Shape"),
+		quApp->loadIcon(":/images/shape.png"), tr("Shape"),
         this, &QUDocumentWindow::onShapingAction);
     
     tableAction_ = toolBar->addAction(
-        QIcon(":/images/table_d.png"), tr("Table"),
+		quApp->loadIcon(":/images/table.png"), tr("Table"),
         this, &QUDocumentWindow::onTableAction);
     
     infoAction_ = toolBar->addAction(
-        QIcon(":/images/info_d.png"), tr("Info"),
+		quApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QUDocumentWindow::onFontInfoAction);
 
     searchAction_ = toolBar->addAction(
-        QIcon(":/images/search_d.png"), tr("Search"),
+		quApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QUDocumentWindow::onSearchAction);
     
     searchAction_->setShortcut(QKeySequence("Ctrl+F"));

@@ -11,12 +11,12 @@
 #include <QtGui>
 #include <QtDebug>
 #include <QMessageBox>
+#include <QFileInfo>
 
 #include "QUDocumentWindowManager.h"
 #include "QUApplication.h"
 
-QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc, argv)
-{
+QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");
@@ -24,6 +24,24 @@ QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc,
 #ifdef Q_OS_MAC
     setQuitOnLastWindowClosed(false);
 #endif
+}
+
+bool
+QUApplication::darkMode() const {
+	QColor textColor = palette().color(QPalette::Normal, QPalette::Text);
+	return textColor.toRgb().value() != 0;
+}
+
+QIcon
+QUApplication::loadIcon(const QString & path) const {
+	if (darkMode()) {
+		QFileInfo fi(path);
+		QString d = fi.dir().filePath(fi.baseName() + "_d." + fi.completeSuffix());
+		fi = QFileInfo(d);
+		if (fi.exists())
+			return QIcon(d);
+	}
+	return QIcon(path);
 }
 
 QUApplication::~QUApplication()
@@ -44,3 +62,5 @@ bool QUApplication::event(QEvent *event)
     return QApplication::event(event);
 }
 #endif
+
+QUApplication * quApp = nullptr;
