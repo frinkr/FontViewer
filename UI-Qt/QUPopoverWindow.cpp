@@ -77,7 +77,7 @@ void
 QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QWidget::paintEvent(event);
     QPainter p(this);
-    
+    p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
     QColor c = palette().color(QPalette::Disabled, QPalette::WindowText);
     QPolygonF poly = localPolygon(1);
     p.setPen(c);

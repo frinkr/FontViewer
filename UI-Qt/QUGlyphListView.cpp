@@ -3,6 +3,7 @@
 #include <QBitmap>
 #include <QPainter>
 
+#include "QUApplication.h"
 #include "QUConv.h"
 #include "QUEncoding.h"
 #include "QUDocument.h"
@@ -78,7 +79,7 @@ QUGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     if (true) {
         QImage image = placeGlyphImage(g, emSize);
-        if (opt.state & QStyle::State_Selected)
+        if ((opt.state & QStyle::State_Selected) || quApp->darkMode())
             image.invertPixels();
         QPixmap pixmap = QPixmap::fromImage(image);
         painter->drawImage(iconRect, image, QRectF(0, 0, image.width(), image.height()));

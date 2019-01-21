@@ -1,5 +1,6 @@
 #include "FontX/FXUnicode.h"
 
+#include "QUApplication.h"
 #include "QUGlyphInfoWidget.h"
 #include "QUConv.h"
 #include "QUHtmlTemplate.h"
@@ -92,9 +93,13 @@ QUGlyphInfoWidget::loadGlyph() {
     
     FXGlyph glyph = document_->face()->glyph(char_);
     
+    QImage image = placeGlyphImage(glyph, glyphEmSize());
+    if (quApp->darkMode())
+        image.invertPixels();
+    
     QTextDocument * qdoc = new QTextDocument;
     qdoc->addResource(QTextDocument::ImageResource,
-                      QUrl("fv://glyph.png"), QVariant(placeGlyphImage(glyph, glyphEmSize())));
+                      QUrl("fv://glyph.png"), QVariant(image));
     
     setDocument(qdoc);
     
