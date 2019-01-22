@@ -1,5 +1,6 @@
-#include <QPainter>
 #include <QBoxLayout>
+#include <QPainter>
+#include <QPropertyAnimation>
 #include "QUPopoverWindow.h"
 #include <QGraphicsDropShadowEffect>
 
@@ -92,6 +93,17 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QPolygonF poly = localPolygon(0);
     p.setPen(c);
     p.drawPolyline(poly);
+}
+
+void
+QUPopoverWindow::showEvent(QShowEvent * event) {
+    QWidget::showEvent(event);
+
+    QPropertyAnimation* anim = new QPropertyAnimation(this, "windowOpacity");
+    anim->setStartValue(0.0);
+    anim->setEndValue(1.0);
+    anim->setDuration(200);
+    anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void

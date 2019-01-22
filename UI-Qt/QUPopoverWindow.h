@@ -49,7 +49,10 @@ public:
 
     virtual void
     paintEvent(QPaintEvent * event);
-    
+
+    virtual void
+    showEvent(QShowEvent * event);
+
 protected:
     void
     setEdge(QUPopoverEdge edge);

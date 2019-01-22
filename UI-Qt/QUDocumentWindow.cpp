@@ -27,6 +27,8 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     , infoDockWidget_(nullptr)
     , glyphDockWidget_(nullptr)
     , searchWindow_(nullptr)
+    , glyphPopover_(nullptr)
+    , glyphWidget_(nullptr)
     , document_(document)
 {
     ui_->setupUi(this);
@@ -135,8 +137,11 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->action_Full_Screen, &QAction::toggled,
             this, &QUDocumentWindow::onToggleFullScreen);
     
-    connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
-            this, &QUDocumentWindow::onSelectionChanged);
+//    connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
+//            this, &QUDocumentWindow::onSelectionChanged);
+
+    connect(ui_->listView, &QListView::doubleClicked,
+            this, &QUDocumentWindow::onGlyphDoubleClicked);
 
     connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
             this, &QUDocumentWindow::onCharLinkClicked);
@@ -178,11 +183,46 @@ QUDocumentWindow::onSwitchGlyphLabel() {
 }
 
 void
+QUDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
+    if (glyphPopover_ == nullptr) {
+        glyphPopover_ = new QUPopoverWindow(this);
+        glyphWidget_  = new QUGlyphInfoWidget;
+        glyphWidget_->setMinimumSize(300, 400);
+        glyphPopover_->setWidget(glyphWidget_);
+        glyphWidget_->setQUDocument(document_);
+    }
+
+    FXGChar c = document_->charAt(index);
+    ui_->textBrowser->setChar(c);
+    glyphWidget_->setChar(c);
+
+    QRect rect = ui_->listView->visualRect(index);
+    QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
+                     ui_->listView->mapToGlobal(rect.bottomRight()));
+
+    glyphPopover_->showRelativeTo(globalRect, QUPopoverBottom);    
+}
+
+void
 QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    if (glyphPopover_ == nullptr) {
+        glyphPopover_ = new QUPopoverWindow(this);
+        glyphWidget_  = new QUGlyphInfoWidget;
+        glyphPopover_->setWidget(glyphWidget_);
+        glyphWidget_->setQUDocument(document_);
+    }
+
     if (selected.indexes().size()) {
         QModelIndex index = selected.indexes()[0];
         FXGChar c = document_->charAt(index);
         ui_->textBrowser->setChar(c);
+        glyphWidget_->setChar(c);
+
+        QRect rect = ui_->listView->visualRect(index);
+        QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
+                         ui_->listView->mapToGlobal(rect.bottomRight()));
+
+        glyphPopover_->showRelativeTo(globalRect, QUPopoverTop);
     }
 }
     
@@ -239,6 +279,7 @@ void
 QUDocumentWindow::onGlyphAction() {
     if (!glyphDockWidget_)
         glyphDockWidget_ = ui_->glyphDockWidget;
+    
     toggleDockWidget(glyphDockWidget_);
 }
 

@@ -19,6 +19,7 @@ class QUDocumentWindowManager;
 class QUDocument;
 class QUFontInfoWindow;
 class QUPopoverWindow;
+class QUGlyphInfoWidget;
 
 namespace Ui {
     class QUDocumentWindow;
@@ -74,6 +75,9 @@ private slots:
     onSwitchGlyphLabel();
 
     void
+    onGlyphDoubleClicked(const QModelIndex &index);
+
+    void
     onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
     void
@@ -118,6 +122,9 @@ private:
     QDockWidget     * glyphDockWidget_;
     QAction         * searchAction_;
     QUPopoverWindow * searchWindow_;
-    
+
+    QUPopoverWindow   * glyphPopover_;
+    QUGlyphInfoWidget * glyphWidget_;
+
     QUDocument      * document_;
 };
