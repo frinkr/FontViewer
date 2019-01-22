@@ -13,6 +13,7 @@ enum QUPopoverEdge {
 };
 
 Q_DECLARE_FLAGS(QUPopoverEdges, QUPopoverEdge);
+Q_DECLARE_OPERATORS_FOR_FLAGS(QUPopoverEdges);
 
 class QUPopoverWindow : public QWidget {
     Q_OBJECT

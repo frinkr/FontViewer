@@ -200,7 +200,7 @@ QUDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
     QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
                      ui_->listView->mapToGlobal(rect.bottomRight()));
 
-    glyphPopover_->showRelativeTo(globalRect, QUPopoverBottom);    
+    glyphPopover_->showRelativeTo(globalRect, QUPopoverTop);
 }
 
 void
@@ -239,7 +239,7 @@ QUDocumentWindow::onCMapBlockAction() {
         widget->setDocument(document_);
         cmapBlockWindow_->setWidget(widget);
     }
-    cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverRight);
+    cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom | QUPopoverRight);
 }
 
 void

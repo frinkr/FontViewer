@@ -1,6 +1,8 @@
 #include <QBoxLayout>
 #include <QPainter>
 #include <QPropertyAnimation>
+#include <QScreen>
+#include <QGUIApplication>
 #include "QUPopoverWindow.h"
 #include <QGraphicsDropShadowEffect>
 
@@ -130,20 +132,37 @@ QUPopoverWindow::setEdge(QUPopoverEdge edge) {
 
 QUPopoverEdge
 QUPopoverWindow::edgeRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes) {
+    QUPopoverEdges otherEdges = ~preferedEgdes;
+    
     QVector<QUPopoverEdge> edges;
-    if (preferedEgdes & QUPopoverBottom) edges.append(QUPopoverBottom); // prefer bottom
+    if (preferedEgdes & QUPopoverBottom) edges.append(QUPopoverBottom);
     if (preferedEgdes & QUPopoverRight) edges.append(QUPopoverRight);
     if (preferedEgdes & QUPopoverLeft) edges.append(QUPopoverLeft);
     if (preferedEgdes & QUPopoverTop) edges.append(QUPopoverTop);
-
+    if (otherEdges & QUPopoverBottom) edges.append(QUPopoverBottom);
+    if (otherEdges & QUPopoverRight) edges.append(QUPopoverRight);
+    if (otherEdges & QUPopoverLeft) edges.append(QUPopoverLeft);
+    if (otherEdges & QUPopoverTop) edges.append(QUPopoverTop);
+    
     if (edges.count() == 1)
         return edges[0];
 
-    // FIXME: find the edge
+    
     QList<QRect> geometries;
     foreach(QUPopoverEdge edge, edges) 
         geometries.append(geometryRelativeTo(rect, edge));
-    return QUPopoverBottom;
+
+    QScreen * screen = qApp->screenAt(rect.center());
+    if (!screen) screen = qApp->primaryScreen();
+    if (screen) {
+        auto screenRect = screen->availableGeometry();
+        for (size_t i = 0; i < edges.size(); ++ i) {
+            if (screenRect.contains(geometries[i]))
+                return edges[i];
+        }
+    }
+
+    return edges[0];
 }
     
 
