@@ -83,6 +83,8 @@ set(SHARED_SOURCES
   QUGlyphTableWidget.cpp
   QUShapingWidget.h
   QUShapingWidget.cpp
+  QUDockTitleBarWidget.h
+  QUDockTitleBarWidget.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

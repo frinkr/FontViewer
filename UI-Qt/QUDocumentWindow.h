@@ -78,9 +78,6 @@ private slots:
     onGlyphDoubleClicked(const QModelIndex &index);
 
     void
-    onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
-
-    void
     onCharLinkClicked(FXGChar c);
 
     void
@@ -95,9 +92,6 @@ private slots:
     void
     onFontInfoAction();
 
-    void
-    onGlyphAction();
-    
     void
     onSearchAction();
 
@@ -118,8 +112,6 @@ private:
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
-    QAction         * glyphAction_;
-    QDockWidget     * glyphDockWidget_;
     QAction         * searchAction_;
     QUPopoverWindow * searchWindow_;
 

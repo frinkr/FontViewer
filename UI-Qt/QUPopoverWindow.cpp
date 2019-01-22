@@ -83,18 +83,12 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QWidget::paintEvent(event);
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-    
-    // draw background
-    p.save();
-    p.setClipRegion(localRegion(0));
-    p.fillRect(QRectF(QPointF(0, 0), this->size()), palette().color(QPalette::Normal, QPalette::Window));
-    p.restore();
-    
-    // draw border
-    QColor c = palette().color(QPalette::Disabled, QPalette::WindowText);
-    QPolygonF poly = localPolygon(1);
-    p.setPen(c);
-    p.drawPolyline(poly);
+
+    auto poly = localPolygon();
+    auto color = palette().color(QPalette::Normal, QPalette::Window);
+    p.setBrush(color);
+    p.setPen(color);
+    p.drawConvexPolygon(poly);
 }
 
 void
@@ -201,12 +195,12 @@ QUPopoverWindow::geometryRelativeTo(const QRect & rect, QUPopoverEdge edge) {
 }
 
 QRegion
-QUPopoverWindow::localRegion(int border) {
-    return localPolygon(border).toPolygon();
+QUPopoverWindow::localRegion() {
+    return localPolygon().toPolygon();
 }
 
 QPolygonF
-QUPopoverWindow::localPolygon(int border) {
+QUPopoverWindow::localPolygon() {
     QVector<QPointF> points;
     const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_ARROW_SIZE : 0);
     const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_ARROW_SIZE);
@@ -215,14 +209,14 @@ QUPopoverWindow::localPolygon(int border) {
     const qreal arrowWidth  = POPOVER_ARROW_SIZE * 2.5;
 
     const QPointF topLeft(-width/2, -height/2);
-    const QPointF topRight(width/2 - border, -height/2);
-    const QPointF bottomLeft(-width/2, height/2 - border);
-    const QPointF bottomRight(width/2 - border, height/2 - border);
+    const QPointF topRight(width/2, -height/2);
+    const QPointF bottomLeft(-width/2, height/2);
+    const QPointF bottomRight(width/2, height/2);
 
     QVector<QPointF> arrowPoints;
-    arrowPoints.append(QPointF(-arrowWidth/2 + border, 0));
-    arrowPoints.append(QPointF(0, - arrowHeight + border));
-    arrowPoints.append(QPointF(arrowWidth/2 - border, 0));
+    arrowPoints.append(QPointF(-arrowWidth/2, 0));
+    arrowPoints.append(QPointF(0, - arrowHeight));
+    arrowPoints.append(QPointF(arrowWidth/2, 0));
 
     auto rotate = [](const QVector<QPointF> & points, const QPointF & translate, qreal rotate) {
         QTransform r, t, xform;

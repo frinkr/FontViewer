@@ -1,3 +1,4 @@
+#include <QDockWidget>
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QToolButton>
@@ -8,10 +9,12 @@
 #include "QUCMapBlockWidget.h"
 #include "QUDocumentWindowManager.h"
 #include "QUDocumentWindow.h"
+#include "QUDockTitleBarWidget.h"
 #include "QUFontInfoWidget.h"
 #include "QUPopoverWindow.h"
 #include "QUShapingWidget.h"
 #include "QUGlyphListView.h"
+#include "QUGlyphInfoWidget.h"
 #include "QUGlyphTableWidget.h"
 #include "QUToolBarWidget.h"
 #include "QUSearchWidget.h"
@@ -25,7 +28,6 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
-    , glyphDockWidget_(nullptr)
     , searchWindow_(nullptr)
     , glyphPopover_(nullptr)
     , glyphWidget_(nullptr)
@@ -103,10 +105,6 @@ QUDocumentWindow::initToolBar() {
 		quApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QUDocumentWindow::onSearchAction);
     
-    glyphAction_ = toolBar->addAction(
-        quApp->loadIcon(":/images/glyph.png"), tr("Glyph"),
-        this, &QUDocumentWindow::onGlyphAction);
-    
     searchAction_->setShortcut(QKeySequence("Ctrl+F"));
         
     QWidget * spacer = new QWidget;
@@ -126,7 +124,11 @@ QUDocumentWindow::initListView() {
 
 void
 QUDocumentWindow::initGlyphInfoView() {
-    ui_->textBrowser->setQUDocument(document_);
+    glyphPopover_ = new QUPopoverWindow(this);
+    glyphWidget_  = new QUGlyphInfoWidget;
+    glyphWidget_->setMinimumSize(300, 400);
+    glyphPopover_->setWidget(glyphWidget_);
+    glyphWidget_->setQUDocument(document_);
 }
     
 void
@@ -137,13 +139,10 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->action_Full_Screen, &QAction::toggled,
             this, &QUDocumentWindow::onToggleFullScreen);
     
-//    connect(ui_->listView->selectionModel(), &QItemSelectionModel::selectionChanged,
-//            this, &QUDocumentWindow::onSelectionChanged);
-
     connect(ui_->listView, &QListView::doubleClicked,
             this, &QUDocumentWindow::onGlyphDoubleClicked);
 
-    connect(ui_->textBrowser, &QUGlyphInfoWidget::charLinkClicked,
+    connect(glyphWidget_, &QUGlyphInfoWidget::charLinkClicked,
             this, &QUDocumentWindow::onCharLinkClicked);
 
     connect(document_, &QUDocument::searchDone,
@@ -184,16 +183,7 @@ QUDocumentWindow::onSwitchGlyphLabel() {
 
 void
 QUDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
-    if (glyphPopover_ == nullptr) {
-        glyphPopover_ = new QUPopoverWindow(this);
-        glyphWidget_  = new QUGlyphInfoWidget;
-        glyphWidget_->setMinimumSize(300, 400);
-        glyphPopover_->setWidget(glyphWidget_);
-        glyphWidget_->setQUDocument(document_);
-    }
-
     FXGChar c = document_->charAt(index);
-    ui_->textBrowser->setChar(c);
     glyphWidget_->setChar(c);
 
     QRect rect = ui_->listView->visualRect(index);
@@ -203,29 +193,6 @@ QUDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
     glyphPopover_->showRelativeTo(globalRect, QUPopoverTop);
 }
 
-void
-QUDocumentWindow::onSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
-    if (glyphPopover_ == nullptr) {
-        glyphPopover_ = new QUPopoverWindow(this);
-        glyphWidget_  = new QUGlyphInfoWidget;
-        glyphPopover_->setWidget(glyphWidget_);
-        glyphWidget_->setQUDocument(document_);
-    }
-
-    if (selected.indexes().size()) {
-        QModelIndex index = selected.indexes()[0];
-        FXGChar c = document_->charAt(index);
-        ui_->textBrowser->setChar(c);
-        glyphWidget_->setChar(c);
-
-        QRect rect = ui_->listView->visualRect(index);
-        QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
-                         ui_->listView->mapToGlobal(rect.bottomRight()));
-
-        glyphPopover_->showRelativeTo(globalRect, QUPopoverTop);
-    }
-}
-    
 void
 QUDocumentWindow::onCharLinkClicked(FXGChar c) {
     //ui_->listView->selectChar(c);
@@ -239,7 +206,7 @@ QUDocumentWindow::onCMapBlockAction() {
         widget->setDocument(document_);
         cmapBlockWindow_->setWidget(widget);
     }
-    cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom | QUPopoverRight);
+    cmapBlockWindow_->showRelativeTo(senderToolButton(), QUPopoverRight);
 }
 
 void
@@ -247,6 +214,7 @@ QUDocumentWindow::onTableAction() {
     if (!tableDockWidget_) {
         tableDockWidget_ = new QDockWidget(tr("Glyphs Table"), this);
         tableDockWidget_->setWidget(new QUGlyphTableWidget(document_));
+        tableDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
         addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
     }
     toggleDockWidget(tableDockWidget_);
@@ -259,6 +227,7 @@ QUDocumentWindow::onShapingAction() {
         QUShapingWidget * widget = new QUShapingWidget(this);
         widget->setDocument(document_);
         shapingDockWidget_->setWidget(widget);
+        shapingDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
         addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
     }
     toggleDockWidget(shapingDockWidget_);
@@ -269,18 +238,11 @@ QUDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
         infoDockWidget_ = new QDockWidget(tr("Info"), this);
         infoDockWidget_->setWidget(new QUFontInfoWidget(document_->face(), infoDockWidget_));
+        infoDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
         addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
     }
 
     toggleDockWidget(infoDockWidget_);
-}
-
-void
-QUDocumentWindow::onGlyphAction() {
-    if (!glyphDockWidget_)
-        glyphDockWidget_ = ui_->glyphDockWidget;
-    
-    toggleDockWidget(glyphDockWidget_);
 }
 
 void
@@ -291,7 +253,7 @@ QUDocumentWindow::onSearchAction() {
         widget->setDocument(document_);
         searchWindow_->setWidget(widget);
     }
-    searchWindow_->showRelativeTo(senderToolButton(), QUPopoverTop);
+    searchWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom);
 }
 
 void
