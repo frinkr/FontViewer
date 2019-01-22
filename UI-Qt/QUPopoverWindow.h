@@ -5,10 +5,10 @@
 class QBoxLayout;
 
 enum QUPopoverEdge {
-    QUPopoverLeft    = 0x00,
-    QUPopoverTop     = 0x01,
-    QUPopoverRight   = 0x02,
-    QUPopoverBottom  = 0x04,
+    QUPopoverLeft    = 0x01,
+    QUPopoverTop     = 0x02,
+    QUPopoverRight   = 0x04,
+    QUPopoverBottom  = 0x08,
     QUPopoverAnyEdge = 0xFF,
 };
 

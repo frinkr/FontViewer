@@ -7,7 +7,7 @@
 #include <QGraphicsDropShadowEffect>
 
 namespace {
-    constexpr int  POPOVER_DISTANCE = 10;
+    constexpr int  POPOVER_ARROW_SIZE = 10;
     bool
     isHorizontal(QUPopoverEdge edge) {
         return edge == QUPopoverLeft || edge == QUPopoverRight;
@@ -59,8 +59,8 @@ QUPopoverWindow::sizeHint() const {
     if (!widget_)
         return QWidget::sizeHint();
     return widget_->sizeHint() + QSize(
-        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
-        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
+        isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0);
 }
 
 QSize
@@ -68,8 +68,8 @@ QUPopoverWindow::minimumSizeHint() const {
     if (!widget_)
         return QWidget::minimumSizeHint();
     return widget_->minimumSizeHint() + QSize(
-        isHorizontal(edge_)? POPOVER_DISTANCE: 0,
-        !isHorizontal(edge_)? POPOVER_DISTANCE: 0);
+        isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0);
 }
 
 void
@@ -86,13 +86,13 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
     
     // draw background
     p.save();
-    p.setClipRegion(localRegion(-1));
+    p.setClipRegion(localRegion(0));
     p.fillRect(QRectF(QPointF(0, 0), this->size()), palette().color(QPalette::Normal, QPalette::Window));
     p.restore();
     
     // draw border
     QColor c = palette().color(QPalette::Disabled, QPalette::WindowText);
-    QPolygonF poly = localPolygon(0);
+    QPolygonF poly = localPolygon(1);
     p.setPen(c);
     p.drawPolyline(poly);
 }
@@ -120,10 +120,10 @@ QUPopoverWindow::setEdge(QUPopoverEdge edge) {
     layout_ = new QBoxLayout(isHorizontal(edge)? QBoxLayout::LeftToRight: QBoxLayout::TopToBottom);
     bool addSpacingBefore = (edge == QUPopoverRight) || (edge == QUPopoverBottom);
     if (addSpacingBefore)
-        layout_->addSpacing(POPOVER_DISTANCE);
+        layout_->addSpacing(POPOVER_ARROW_SIZE);
     layout_->addWidget(widget_);
     if (!addSpacingBefore)
-        layout_->addSpacing(POPOVER_DISTANCE);
+        layout_->addSpacing(POPOVER_ARROW_SIZE);
 
     layout_->setSpacing(0);
     layout_->setContentsMargins(0, 0, 0, 0);
@@ -207,23 +207,22 @@ QUPopoverWindow::localRegion(int border) {
 
 QPolygonF
 QUPopoverWindow::localPolygon(int border) {
-
     QVector<QPointF> points;
-    const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_DISTANCE : 0);
-    const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_DISTANCE);
+    const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_ARROW_SIZE : 0);
+    const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_ARROW_SIZE);
     
-    const qreal dirHeight = POPOVER_DISTANCE;
-    const qreal dirWidth =  POPOVER_DISTANCE * 2.5;
+    const qreal arrowHeight = POPOVER_ARROW_SIZE;
+    const qreal arrowWidth  = POPOVER_ARROW_SIZE * 2.5;
 
     const QPointF topLeft(-width/2, -height/2);
     const QPointF topRight(width/2 - border, -height/2);
     const QPointF bottomLeft(-width/2, height/2 - border);
     const QPointF bottomRight(width/2 - border, height/2 - border);
 
-    QVector<QPointF> dirPoints;
-    dirPoints.append(QPointF(-dirWidth/2 + border, 0));
-    dirPoints.append(QPointF(0, - dirHeight + border));
-    dirPoints.append(QPointF(dirWidth/2 - border, 0));
+    QVector<QPointF> arrowPoints;
+    arrowPoints.append(QPointF(-arrowWidth/2 + border, 0));
+    arrowPoints.append(QPointF(0, - arrowHeight + border));
+    arrowPoints.append(QPointF(arrowWidth/2 - border, 0));
 
     auto rotate = [](const QVector<QPointF> & points, const QPointF & translate, qreal rotate) {
         QTransform r, t, xform;
@@ -243,34 +242,34 @@ QUPopoverWindow::localPolygon(int border) {
         center = QPointF(width / 2, height / 2);
         points.append(topLeft);
         points.append(topRight);
-        points.append(rotate(dirPoints, QPointF(width / 2, 0), 90));
+        points.append(rotate(arrowPoints, QPointF(width / 2, 0), 90));
         points.append(bottomRight);
         points.append(bottomLeft);
         points.append(topLeft);
         break;
     case QUPopoverRight:
-        center = QPointF(width / 2 + POPOVER_DISTANCE, height / 2);
+        center = QPointF(width / 2 + POPOVER_ARROW_SIZE, height / 2);
         points.append(topLeft);
         points.append(topRight);
         points.append(bottomRight);
         points.append(bottomLeft);
-        points.append(rotate(dirPoints, QPointF(- width / 2, 0), -90));        
+        points.append(rotate(arrowPoints, QPointF(- width / 2, 0), -90));        
         points.append(topLeft);
         break;
     case QUPopoverTop:
-        center = QPointF(width/ 2, height / 2 - POPOVER_DISTANCE);
+        center = QPointF(width / 2, height / 2);
         points.append(topLeft);
         points.append(topRight);
         points.append(bottomRight);
-        points.append(rotate(dirPoints, QPointF(0, height / 2), 180));
+        points.append(rotate(arrowPoints, QPointF(0, height / 2), 180));
         points.append(bottomLeft);
         points.append(topLeft);
         break;
     case QUPopoverBottom:
     default:
-        center = QPointF(width/ 2, height / 2 + POPOVER_DISTANCE);
+        center = QPointF(width/ 2, height / 2 + POPOVER_ARROW_SIZE);
         points.append(topLeft);
-        points.append(rotate(dirPoints, QPointF(0, - height / 2), 0));
+        points.append(rotate(arrowPoints, QPointF(0, - height / 2), 0));
         points.append(topRight);
         points.append(bottomRight);
         points.append(bottomLeft);

@@ -291,7 +291,7 @@ QUDocumentWindow::onSearchAction() {
         widget->setDocument(document_);
         searchWindow_->setWidget(widget);
     }
-    searchWindow_->showRelativeTo(senderToolButton(), QUPopoverBottom);
+    searchWindow_->showRelativeTo(senderToolButton(), QUPopoverTop);
 }
 
 void
