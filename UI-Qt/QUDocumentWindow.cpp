@@ -78,7 +78,7 @@ QUDocumentWindow::initToolBar() {
 		quApp->loadIcon(":/images/glyph.png"));
 
     cmapBlockAction_ = toolBar->addAction(
-        quApp->loadIcon(":/images/glyph.png"),tr("Glyphs"), 
+        quApp->loadIcon(":/images/cmap.png"),tr("CMap"), 
         this, &QUDocumentWindow::onCMapBlockAction);
 
     QAction* variant = toolBar->addAction(

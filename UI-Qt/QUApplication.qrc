@@ -1,6 +1,8 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource>
     <file alias="images/app.png">../Resources/Images/app.png</file>
+    <file alias="images/cmap.png">../Resources/Images/cmap.png</file>
+    <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
     <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
     <file alias="images/glyph_d.png">../Resources/Images/glyph_d.png</file>
     <file alias="images/search.png">../Resources/Images/search.png</file>
