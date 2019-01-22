@@ -25,6 +25,7 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
+    , glyphDockWidget_(nullptr)
     , searchWindow_(nullptr)
     , document_(document)
 {
@@ -78,7 +79,7 @@ QUDocumentWindow::initToolBar() {
 		quApp->loadIcon(":/images/glyph.png"));
 
     cmapBlockAction_ = toolBar->addAction(
-        quApp->loadIcon(":/images/cmap.png"),tr("CMap"), 
+        quApp->loadIcon(":/images/cmap.png"),tr("CMap"),
         this, &QUDocumentWindow::onCMapBlockAction);
 
     QAction* variant = toolBar->addAction(
@@ -95,10 +96,14 @@ QUDocumentWindow::initToolBar() {
     infoAction_ = toolBar->addAction(
 		quApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QUDocumentWindow::onFontInfoAction);
-
+    
     searchAction_ = toolBar->addAction(
 		quApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QUDocumentWindow::onSearchAction);
+    
+    glyphAction_ = toolBar->addAction(
+        quApp->loadIcon(":/images/glyph.png"), tr("Glyph"),
+        this, &QUDocumentWindow::onGlyphAction);
     
     searchAction_->setShortcut(QKeySequence("Ctrl+F"));
         
@@ -228,6 +233,13 @@ QUDocumentWindow::onFontInfoAction() {
     }
 
     toggleDockWidget(infoDockWidget_);
+}
+
+void
+QUDocumentWindow::onGlyphAction() {
+    if (!glyphDockWidget_)
+        glyphDockWidget_ = ui_->glyphDockWidget;
+    toggleDockWidget(glyphDockWidget_);
 }
 
 void

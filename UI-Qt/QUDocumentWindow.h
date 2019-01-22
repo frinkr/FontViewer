@@ -92,6 +92,9 @@ private slots:
     onFontInfoAction();
 
     void
+    onGlyphAction();
+    
+    void
     onSearchAction();
 
     void
@@ -111,6 +114,8 @@ private:
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
+    QAction         * glyphAction_;
+    QDockWidget     * glyphDockWidget_;
     QAction         * searchAction_;
     QUPopoverWindow * searchWindow_;
     
