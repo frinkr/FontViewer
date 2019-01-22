@@ -1,6 +1,7 @@
 #include <QPainter>
 #include <QBoxLayout>
 #include "QUPopoverWindow.h"
+#include <QGraphicsDropShadowEffect>
 
 namespace {
     constexpr int  POPOVER_DISTANCE = 10;
@@ -15,6 +16,7 @@ QUPopoverWindow::QUPopoverWindow(QWidget * parent)
     , edge_(QUPopoverBottom)      
     , widget_(nullptr)
     , layout_(nullptr) {
+    setAttribute(Qt::WA_TranslucentBackground);
 }
 
 void
@@ -69,7 +71,7 @@ QUPopoverWindow::minimumSizeHint() const {
 
 void
 QUPopoverWindow::resizeEvent(QResizeEvent * event) {
-    setMask(localRegion());
+    //setMask(localRegion());
     QWidget::resizeEvent(event);
 }
 
@@ -77,9 +79,17 @@ void
 QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QWidget::paintEvent(event);
     QPainter p(this);
-    p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
+    p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
+    
+    // draw background
+    p.save();
+    p.setClipRegion(localRegion(-1));
+    p.fillRect(QRectF(QPointF(0, 0), this->size()), palette().color(QPalette::Normal, QPalette::Window));
+    p.restore();
+    
+    // draw border
     QColor c = palette().color(QPalette::Disabled, QPalette::WindowText);
-    QPolygonF poly = localPolygon(1);
+    QPolygonF poly = localPolygon(0);
     p.setPen(c);
     p.drawPolyline(poly);
 }
