@@ -1,3 +1,4 @@
+#include <QMouseEvent>
 #include <QDockWidget>
 #include <QPainter>
 #include <QStylePainter>
@@ -30,6 +31,8 @@ void
 QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     QPainter p(this);
 
+    p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    
     QRect rect(0, 0, width(), height());
     //p.fillRect(rect, palette().color(QPalette::Normal, QPalette::Window));
 
@@ -39,11 +42,32 @@ QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     p.fillRect(rect, brush);
 
     // close icon
-    QIcon icon = style()->standardIcon(QStyle::SP_TitleBarCloseButton, nullptr, this);
-    icon.paint(&p, 0, 0, TITLE_BAR_HEIGHT, TITLE_BAR_HEIGHT);
+    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    p.drawPixmap(closeIconRect(), closeIcon, closeIcon.rect());
 
     // title
     p.setPen(palette().color(QPalette::Normal, QPalette::Text));
     QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
     p.drawText(rect, Qt::AlignCenter, dockWidget->windowTitle());
+}
+
+void
+QUDockTitleBarWidget::mousePressEvent(QMouseEvent * event) {
+    QRectF rect = closeIconRect();
+    if (rect.contains(event->localPos())) {
+        QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
+        dockWidget->hide();
+        event->accept();
+        return;
+    }
+
+    QWidget::mousePressEvent(event);
+}
+
+QRectF
+QUDockTitleBarWidget::closeIconRect() {
+    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    qreal h = qMin(closeIcon.height(), height());
+    qreal w = h * closeIcon.width() / closeIcon.height();
+    return QRectF(5, (height() - h) / 2, w, h);
 }

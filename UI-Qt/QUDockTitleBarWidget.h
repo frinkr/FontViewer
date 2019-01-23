@@ -20,4 +20,10 @@ public:
 
     virtual void
     paintEvent(QPaintEvent * event);
+
+    virtual void
+    mousePressEvent(QMouseEvent * event);
+private:
+    QRectF
+    closeIconRect();
 };
