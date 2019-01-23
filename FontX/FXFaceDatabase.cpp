@@ -99,8 +99,11 @@ FXFaceDatabase::createFace(const FXFaceDescriptor & descriptor) const {
 void
 FXFaceDatabase::rescan() {
     faces_.clear();
+    FXSet<FXString> files;
     for(const auto & folder : folders_) {
-        BST::foreachFile(folder, true, [this](const FXString & file) {
+        BST::foreachFile(folder, true, [this, &files](const FXString & file) {
+            files.insert(file);
+            
             size_t count = 0;
             if (!FXFTCountFaces(FXLib::get(), file, count)) {
                 for (size_t i = 0; i < count; ++ i) {
@@ -114,10 +117,6 @@ FXFaceDatabase::rescan() {
         });
     }
 
-    // let's make hash by filenames
-    FXSet<FXString> files;
-    for (const auto & f : faces_)
-        files.insert(f.desc.filePath);
     hash_ = hashFiles(files);
 
     save();
@@ -165,8 +164,8 @@ FXFaceDatabase::checkUpdate() const {
     FXSet<FXString> files;
     for(const auto & folder : folders_) 
         BST::foreachFile(folder, true, [&files](const FXString & file) {
-            size_t count;
-            if (!FXFTCountFaces(FXLib::get(), file, count)) 
+            //size_t count;
+            //if (!FXFTCountFaces(FXLib::get(), file, count))
                 files.insert(file);
             return true;
         });
