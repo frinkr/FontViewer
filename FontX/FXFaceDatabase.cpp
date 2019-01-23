@@ -109,6 +109,8 @@ FXFaceDatabase::rescan() {
                 for (size_t i = 0; i < count; ++ i) {
                     FXFaceDescriptor desc = {file, i};
                     FXPtr<FXFace> face = FXFace::createFace(desc);
+					if (!face)
+						continue;
                     FaceItem item = {desc, face->attributes()};
                     faces_.push_back(item);
                 }

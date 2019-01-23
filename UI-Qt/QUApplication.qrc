@@ -20,7 +20,6 @@
     <file alias="images/open_d.svg">../Resources/Images/open_d.svg</file>
     <file alias="images/variant.png">../Resources/Images/variant.png</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
-    <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
     <file alias="images/ok.png">../Resources/Images/OK.png</file>
 </qresource>
 </RCC>

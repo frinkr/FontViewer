@@ -164,7 +164,10 @@ FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
 
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
-    return FXPtr<FXFace>(new FXFace(descriptor));
+	auto face = new FXFace(descriptor);
+	if (!face->face())
+		return FXPtr<FXFace>();
+	return FXPtr<FXFace>(face);
 }
     
 FXPtr<FXFace>
@@ -453,13 +456,17 @@ FXFace::initAttributes() {
 
     // cid
     FT_Bool isCID = false;
-    atts_.isCID = FT_IS_CID_KEYED(face_) || (!FT_Get_CID_Is_Internally_CID_Keyed(face_, &isCID) && isCID);
+    atts_.isCID = !!(FT_IS_CID_KEYED(face_) || (!FT_Get_CID_Is_Internally_CID_Keyed(face_, &isCID) && isCID));
     const char * registry = nullptr, *ordering = nullptr;
     FT_Int supplement = 0;
-    if (!FT_Get_CID_Registry_Ordering_Supplement(face_, &registry, &ordering, &supplement)) {
+    if (!FT_Get_CID_Registry_Ordering_Supplement(face_, &registry, &ordering, &supplement)) 
         atts_.cid = std::string(registry) + "-" + ordering + "-" + std::to_string(supplement);
-    }
+	
+#ifdef FT_FACE_FLAG_VARIATION
     atts_.isOTVariant = (FT_FACE_FLAG_VARIATION & face_->face_flags);
+#else
+	atts_.isOTVariant = false;
+#endif
     atts_.isMM = (FT_FACE_FLAG_MULTIPLE_MASTERS & face_->face_flags);
 
     return true;

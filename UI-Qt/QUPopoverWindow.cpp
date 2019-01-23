@@ -2,7 +2,7 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QScreen>
-#include <QGUIApplication>
+#include <QGuiApplication>
 #include "QUPopoverWindow.h"
 #include <QGraphicsDropShadowEffect>
 
@@ -74,7 +74,10 @@ QUPopoverWindow::minimumSizeHint() const {
 
 void
 QUPopoverWindow::resizeEvent(QResizeEvent * event) {
-    //setMask(localRegion());
+#ifdef Q_OS_WIN
+    setMask(localRegion());
+#endif
+
     QWidget::resizeEvent(event);
 }
 
@@ -83,11 +86,11 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QWidget::paintEvent(event);
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-
+	
     auto poly = localPolygon();
     auto color = palette().color(QPalette::Normal, QPalette::Window);
     p.setBrush(color);
-    p.setPen(color);
+    p.setPen(palette().color(QPalette::Normal, QPalette::WindowText));
     p.drawConvexPolygon(poly);
 }
 
@@ -120,7 +123,11 @@ QUPopoverWindow::setEdge(QUPopoverEdge edge) {
         layout_->addSpacing(POPOVER_ARROW_SIZE);
 
     layout_->setSpacing(0);
+#ifdef Q_OS_MACOS
     layout_->setContentsMargins(0, 0, 0, 0);
+#else
+	layout_->setContentsMargins(1, 1, 1, 1);
+#endif
     setLayout(layout_);
 }
 
