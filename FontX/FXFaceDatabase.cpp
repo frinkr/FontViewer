@@ -11,7 +11,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 1;
+    constexpr int FACE_DB_VERSION = 2;
 
     size_t
     hashFiles(const FXSet<FXString> & files) {
@@ -51,6 +51,12 @@ namespace boost {namespace serialization {
             ar & atts.format;
             ar & atts.glyphCount;
             ar & atts.names;
+            ar & atts.ascender;
+            ar & atts.descender;
+            ar & atts.isCID;
+            ar & atts.cid;
+            ar & atts.isOTVariant;
+            ar & atts.isMM;
         }
         
         template <class Archive>

@@ -51,6 +51,15 @@ public:
     FXMap<FXString, FXString>
     findSFNTNames(const FXVector<int> & nameIds) const;
 
+    FXString
+    getSFNTName(int nameId) const;
+
+    FXString
+    vendor() const;
+
+    FXString
+    version() const;
+
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
         FXVector<FXSFNTName> & vec = *this;
@@ -80,6 +89,11 @@ struct FXFaceAttributes {
     fu               ascender;
     fu               descender;
     FXRect<fu>       bbox;
+
+    bool             isCID;
+    FXString         cid;
+    bool             isOTVariant;
+    bool             isMM;  
 };
 
 

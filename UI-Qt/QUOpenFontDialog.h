@@ -23,7 +23,7 @@ private slots:
     slotBrowseFile();
 
     void
-    slotFontSelected(int index);
+    slotFontSelected(const QUFontURI & uri, size_t index);
         
 private:
     Ui::QUOpenFontDialog * ui_;

@@ -115,6 +115,28 @@ FXFaceNames::findSFNTNames(const FXVector<int> & nameIds) const {
 }
 
 FXString
+FXFaceNames::getSFNTName(int nameId) const {
+    auto names = findSFNTNames({nameId});
+    auto itr = names.find("en");
+    if (itr != names.end())
+        return itr->second;
+    if (names.size())
+        return names.begin()->second;
+    return FXString();
+}
+
+FXString
+FXFaceNames::vendor() const {
+    return getSFNTName(TT_NAME_ID_MANUFACTURER);
+}
+
+FXString
+FXFaceNames::version() const {
+    return getSFNTName(TT_NAME_ID_VERSION_STRING);
+}
+
+
+FXString
 FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
                           const FXVector<FXString> & languages,
                           const FXString & defaultName) const {
@@ -428,6 +450,18 @@ FXFace::initAttributes() {
 
         atts_.names.push_back(entry);
     }
+
+    // cid
+    FT_Bool isCID = false;
+    atts_.isCID = FT_IS_CID_KEYED(face_) || (!FT_Get_CID_Is_Internally_CID_Keyed(face_, &isCID) && isCID);
+    const char * registry = nullptr, *ordering = nullptr;
+    FT_Int supplement = 0;
+    if (!FT_Get_CID_Registry_Ordering_Supplement(face_, &registry, &ordering, &supplement)) {
+        atts_.cid = std::string(registry) + "-" + ordering + "-" + std::to_string(supplement);
+    }
+    atts_.isOTVariant = (FT_FACE_FLAG_VARIATION & face_->face_flags);
+    atts_.isMM = (FT_FACE_FLAG_MULTIPLE_MASTERS & face_->face_flags);
+
     return true;
 }
 

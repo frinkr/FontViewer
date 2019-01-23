@@ -124,9 +124,14 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     view()->installEventFilter(this);
 }
 
+size_t
+QUFontComboBox::selectedFontIndex() const {
+    return currentSourceIndex().row();
+}
+
 QUFontURI
 QUFontComboBox::selectedFont() const {
-    int row = currentSourceIndex().row();
+    int row = selectedFontIndex();
     auto desc = QUFontManager::get().db()->faceDescriptor(row);
     auto atts = QUFontManager::get().db()->faceAttributes(row);
     atts.names.familyName();
@@ -152,9 +157,9 @@ QUFontComboBox::currentSourceIndex() const {
 void
 QUFontComboBox::showPopup() {
     QComboBox::showPopup();
-    qreal y = mapToGlobal(rect().topLeft()).y();
-    QWidget *popup = this->findChild<QFrame*>(); 
-    popup->move(popup->x(),popup->y() + (popup->y() > y? 8 : -4));
+    //qreal y = mapToGlobal(rect().topLeft()).y();
+    //QWidget *popup = this->findChild<QFrame*>(); 
+    //popup->move(popup->x(),popup->y() + (popup->y() > y? 8 : -4));
 }
 
 bool
@@ -180,6 +185,8 @@ QUFontComboBox::onFontSelected(int ) {
     QModelIndex index = currentProxyIndex();
     QVariant data = model()->data(index, Qt::DisplayRole);
     lineEdit()->setText(data.toString());
+
+    emit fontSelected(selectedFont(), selectedFontIndex());
 }
 
 void

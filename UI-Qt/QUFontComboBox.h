@@ -57,8 +57,16 @@ class QUFontComboBox : public QComboBox {
 public:
     explicit QUFontComboBox(QWidget * parent = nullptr);
 
+    size_t
+    selectedFontIndex() const;
+
     QUFontURI
     selectedFont() const;
+
+signals:
+    void
+    fontSelected(const QUFontURI & fontURI, size_t index);
+
 protected:
     QUSortFilterFontListModel *
     proxyModel() const;
