@@ -80,7 +80,7 @@ QUPopoverWindow::minimumSizeHint() const {
 void
 QUPopoverWindow::resizeEvent(QResizeEvent * event) {
 #ifdef Q_OS_WIN
-    setMask(localRegion());
+    setMask(localRegion(0));
 #endif
 
     QWidget::resizeEvent(event);
@@ -92,7 +92,7 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
 	
-    auto poly = localPolygon();
+    auto poly = localPolygon(BORDER);
     auto color = palette().color(QPalette::Normal, QPalette::Window);
     QPen pen(palette().color(QPalette::Normal, QPalette::Shadow), BORDER);
     p.setBrush(color);
@@ -204,19 +204,18 @@ QUPopoverWindow::geometryRelativeTo(const QRect & rect, QUPopoverEdge edge) {
 }
 
 QRegion
-QUPopoverWindow::localRegion() {
-    return localPolygon().toPolygon();
+QUPopoverWindow::localRegion(qreal border) {
+    return localPolygon(border).toPolygon();
 }
 
 QPolygonF
-QUPopoverWindow::localPolygon() {
+QUPopoverWindow::localPolygon(qreal border) {
     QVector<QPointF> points;
     const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_ARROW_SIZE : 0);
     const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_ARROW_SIZE);
     
-    const qreal border = BORDER;
-    const qreal arrowHeight = POPOVER_ARROW_SIZE;
-    const qreal arrowWidth  = POPOVER_ARROW_SIZE * 2.5;
+    const qreal arrowHeight = POPOVER_ARROW_SIZE - border;
+    const qreal arrowWidth  = arrowHeight * 2.5;
 
     const QPointF topLeft((border-width)/2, (border-height)/2);
     const QPointF topRight((width-border)/2, (border-height)/2);

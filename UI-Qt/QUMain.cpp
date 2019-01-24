@@ -28,7 +28,6 @@ int quMain(int argc, char *argv[])
     //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
 
     Q_INIT_RESOURCE(QUApplication);
-    Q_INIT_RESOURCE(style);
     
     QUApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
@@ -44,12 +43,6 @@ int quMain(int argc, char *argv[])
     //    return 0;
 
     // load the dark style
-    QFile f(":qdarkstyle/style.qss");
-    if (f.exists()) {
-        f.open(QFile::ReadOnly | QFile::Text);
-        QTextStream ts(&f);
-        //app.setStyleSheet(ts.readAll());
-    }
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     
     // Otherwise start this instance.

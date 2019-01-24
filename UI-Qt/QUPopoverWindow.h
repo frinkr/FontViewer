@@ -65,10 +65,10 @@ protected:
     geometryRelativeTo(const QRect & rect, QUPopoverEdge edge);
 
     QRegion
-    localRegion();
+    localRegion(qreal border);
 
     QPolygonF
-    localPolygon();
+    localPolygon(qreal border);
     
 protected:
     QRegion   mask_;
