@@ -48,6 +48,16 @@ pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
 }
 
+bool
+FXFaceDescriptor::operator==(const FXFaceDescriptor & other) const {
+    return filePath == other.filePath && index == other.index;
+}
+
+bool
+FXFaceDescriptor::operator!=(const FXFaceDescriptor & other) const {
+    return !operator==(other);
+}
+
 FXString
 FXFaceNames::familyName() const {
     return findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},

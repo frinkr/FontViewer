@@ -20,20 +20,17 @@ QUDocumentWindowManager * QUDocumentWindowManager::instance_ = nullptr;
 
 QUDocumentWindowManager::QUDocumentWindowManager()
 {
-    QSettings settings;
-    recentFiles = settings.value("recentFiles").toStringList();
-
 #ifdef Q_OS_MAC
     // Create default menu bar.
     QMenuBar *mb = new QMenuBar;
 
     QMenu *fileMenu = mb->addMenu(tr("&File"));
-    fileMenu->addAction(tr("&Open..."), this, &QUDocumentWindowManager::slotOpenFont, QKeySequence::Open);
+    fileMenu->addAction(tr("&Open..."), this, &QUDocumentWindowManager::doOpenFontDialog, QKeySequence::Open);
     fileMenu->addAction(tr("Open &File..."), this, &QUDocumentWindowManager::slotOpenFile, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
 
     openRecentSubMenu = fileMenu->addMenu(tr("Open Recent"));
     connect(fileMenu, &QMenu::aboutToShow, this, &QUDocumentWindowManager::slotAboutToShowFileMenu);
-    slotAboutToShowFileMenu();
+    
     
     QMenu *helpMenu = mb->addMenu(tr("Help"));
     helpMenu->addAction(tr("&About"), this, &QUDocumentWindowManager::about);
@@ -55,7 +52,8 @@ QUDocumentWindowManager::instance() {
 
 void
 QUDocumentWindowManager::addDocument(QUDocument * document) {
-    documents_.append(document);
+    if (documents_.indexOf(document) == -1)        
+        documents_.append(document);
 }
 
 void
@@ -64,6 +62,11 @@ QUDocumentWindowManager::removeDocument(QUDocument * document) {
         if (documents_.at(i) == document)
             documents_.removeAt(i);
 
+}
+
+const QList<QPointer<QUDocument> > &
+QUDocumentWindowManager::documents() const {
+    return documents_;
 }
 
 QUDocument *
@@ -106,8 +109,13 @@ QUDocumentWindowManager::removeDocumentWindow(QUDocumentWindow * window)
             documentWindows_.removeAt(i);
 }
 
+const QList<QUFontURI> &
+QUDocumentWindowManager::recentFonts() const {
+    return recentFonts_;
+}
+
 void
-QUDocumentWindowManager::slotOpenFont()
+QUDocumentWindowManager::doOpenFontDialog()
 {
     QUOpenFontDialog openDialog(0);
     if (QDialog::Accepted == openDialog.exec()) {
@@ -126,6 +134,7 @@ QUDocumentWindowManager::slotOpenFont()
             document = QUDocument::openFromURI(fontURI, this);
             if (document) {
                 addDocument(document);
+                addToRecents(fontURI);
                 QUDocumentWindow * window = createDocumentWindow(document);
                 window->show();
             }
@@ -140,100 +149,20 @@ QUDocumentWindowManager::slotDocumentWindowDestroyed(QObject * obj) {
     QUDocumentWindow * window = (QUDocumentWindow*)obj;
     removeDocumentWindow(window);
     removeDocument(window->document());
+
+    // show Open Font dialog if no document open
+    if (documents_.empty())
+        doOpenFontDialog();
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
-void QUDocumentWindowManager::addRecentFilesMenuActions(QMenu *recentFilesMenu)
-{
-    removeNonExistingRecentFiles();
-    QStringList displayNames = recentFileDisplayNames();
 
-#ifndef Q_OS_MAC
-    for (int i = 0; i < recentFiles.count(); i++)
-        displayNames[i] = QString("&%1. %2").arg(i + 1).arg(displayNames.at(i));
-#endif
-
-    for (int i = 0; i < recentFiles.count(); i++)
-    {
-        QAction *action = recentFilesMenu->addAction(displayNames.at(i), this, SLOT(slotOpenRecentFile()));
-        action->setData(recentFiles.at(i));
-    }
-}
-
-void QUDocumentWindowManager::addToRecentFiles(const QString &fn)
-{
-    recentFiles.removeAll(fn);
-    recentFiles.prepend(fn);
-
-    while (recentFiles.size() > kMaxRecentFiles)
-        recentFiles.removeLast();
-}
-
-void QUDocumentWindowManager::removeNonExistingRecentFiles()
-{
-    // Count down so indexes remain sane after deletions.
-    for (int i = recentFiles.count() - 1; i >= 0; i--)
-    {
-        QFileInfo fileInfo(recentFiles.at(i));
-
-        if (!fileInfo.exists())
-            recentFiles.removeAt(i);
-    }
-}
-
-// Only filenames are displayed as long as they're unique.  Identical filenames are suffixed with as much of the pathnames as necessary to distinguished them, starting the parent, then grandparent, etc.
-QStringList QUDocumentWindowManager::recentFileDisplayNames()
-{
-    QStringList filenames;
-    QList<QStringList> pathComponents;
-    QList<QDir> directories;
-    for (int i = 0; i < recentFiles.count(); i++)
-    {
-        QFileInfo fileInfo(recentFiles.at(i));
-
-        filenames.append(fileInfo.fileName());
-        pathComponents.append(QStringList());
-        directories.append(fileInfo.dir());
-    }
-
-    bool changed;
-    do
-    {
-        changed = false;
-        for (int i = 0; i < recentFiles.count() - 1; i++)
-        {
-            bool found = false;
-            for (int j = i + 1; j < recentFiles.count(); j++)
-            {
-                if (filenames.at(i) == filenames.at(j) && pathComponents.at(i) == pathComponents.at(j))
-                {
-                    found = true;
-                    pathComponents[j].prepend(directories.at(j).dirName());
-                    directories[j].cdUp();
-                }
-            }
-            if (found)
-            {
-                pathComponents[i].prepend(directories.at(i).dirName());
-                directories[i].cdUp();
-                changed = true;
-            }
-        }
-    }
-    while (changed);
-
-    QStringList result;
-
-    for (int i = 0; i < recentFiles.count(); i++)
-    {
-        QString displayName = filenames.at(i);
-        QStringList pathComponent = pathComponents.at(i);
-        if (!pathComponent.isEmpty())
-            displayName += tr(" — ") + pathComponent.join(tr(" ‣ "));
-        result.append(displayName);
-    }
-
-    return result;
+void
+QUDocumentWindowManager::addToRecents(const QUFontURI & uri) {
+    int index = recentFonts_.indexOf(uri);
+    if (index != -1)
+        recentFonts_.takeAt(index);
+    recentFonts_.insert(0, uri); // add or move to front
 }
 
 void QUDocumentWindowManager::slotOpenFile()
@@ -264,20 +193,10 @@ void QUDocumentWindowManager::help()
     QMessageBox::about(qApp->activeWindow(), tr("FontViewer Help"), tr("Help meeeeeeee!"));
 }
 
-// Handle selection of a file in the recent files menu.
-void QUDocumentWindowManager::slotOpenRecentFile()
-{
-    if (QAction *action = qobject_cast<QAction *>(sender()))
-    {
-        QVariant v = action->data();
-        if (v.canConvert<QString>())
-            openFile(qvariant_cast<QString>(v));
-    }
-}
-
 #ifdef Q_OS_MAC
 // Handle selection of a document window in the Window menu.
-void QUDocumentWindowManager::slotShowWindow()
+void
+QUDocumentWindowManager::slotShowWindow()
 {
     if (QAction *action = qobject_cast<QAction *>(sender()))
     {
@@ -293,22 +212,18 @@ void QUDocumentWindowManager::slotShowWindow()
         }
     }
 }
-#endif
 
-#ifdef Q_OS_MAC
-void QUDocumentWindowManager::slotAboutToShowFileMenu()
-{
-    openRecentSubMenu->clear();
-
-    addRecentFilesMenuActions(openRecentSubMenu);
+void
+QUDocumentWindowManager::slotAboutToShowFileMenu() {
+    
 }
-#endif
 
+#endif
 
 void QUDocumentWindowManager::saveRecentFilesSettings()
 {
     QSettings settings;
-    settings.setValue("recentFiles", recentFiles);
+//    settings.setValue("recentFiles", recentFonts_);
 }
 
 void QUDocumentWindowManager::closeAllDocumentsAndQuit()

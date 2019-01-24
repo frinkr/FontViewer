@@ -30,7 +30,10 @@ public:
 
     void
     removeDocument(QUDocument * document);
-    
+
+    const QList<QPointer<QUDocument> > &
+    documents() const;
+
     QUDocument *
     getDocument(const QUFontURI & fontURI) const;
     
@@ -40,15 +43,22 @@ public:
     QUDocumentWindow *
     createDocumentWindow(QUDocument * document);
 
+    const QList<QUFontURI> &
+    recentFonts() const;
 
 public slots:
     void
-    slotOpenFont();
-    
+    doOpenFontDialog();
+
+    void
+    closeAllDocumentsAndQuit();
+
+    void
+    openFile(const QString &fn);
+
+private slots:
     void
     slotDocumentWindowDestroyed(QObject * obj);
-
-    
 
 private:
     QList<QPointer<QUDocumentWindow> > documentWindows_;
@@ -57,28 +67,24 @@ private:
 
     //////////////////////////////////////////////////////////////////////////
     
-public:
-    void removeDocumentWindow(QUDocumentWindow *w);
-    void addRecentFilesMenuActions(QMenu *recentFilesMenu);
+protected:
+    void
+    removeDocumentWindow(QUDocumentWindow *w);
 
-    void addToRecentFiles(const QString &fn);
-    void removeNonExistingRecentFiles();
-    QStringList recentFileDisplayNames();
+protected:
+    void
+    addToRecents(const QUFontURI & uri);
 
-public slots:
+private slots:
     void slotOpenFile();
-    
-    void openFile(const QString &fn);
-    void closeAllDocumentsAndQuit();
 
     void about();
     void help();
 
 private slots:
-    void slotOpenRecentFile();
+    
 #ifdef Q_OS_MAC
     void slotShowWindow();
-
     void slotAboutToShowFileMenu();
 #endif
 
@@ -86,7 +92,7 @@ private slots:
 
 private:
     enum {kMaxRecentFiles = 8};
-    QStringList recentFiles;
+    QList<QUFontURI> recentFonts_;
 
 #ifdef Q_OS_MAC
     QMenu *openRecentSubMenu;

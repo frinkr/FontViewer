@@ -81,8 +81,17 @@ FXFaceDatabase::faceCount() const {
     return faces_.size();
 }
 
+size_t
+FXFaceDatabase::faceIndex(const FXFaceDescriptor & desc) const {
+    for (size_t i = 0; i < faces_.size(); ++ i) {
+        if (desc == faces_[i].desc)
+            return i;
+    }
+    return -1;
+}
+
 const FXFaceDescriptor &
-FXFaceDatabase::faceDescriptor(size_t index) {
+FXFaceDatabase::faceDescriptor(size_t index) const {
     return faces_[index].desc;
 }
 

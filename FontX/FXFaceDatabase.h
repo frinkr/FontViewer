@@ -8,8 +8,11 @@ public:
     size_t
     faceCount() const;
 
+    size_t
+    faceIndex(const FXFaceDescriptor & desc) const;
+
     const FXFaceDescriptor &
-    faceDescriptor(size_t index);
+    faceDescriptor(size_t index) const;
 
     const FXFaceAttributes &
     faceAttributes(size_t index) const;

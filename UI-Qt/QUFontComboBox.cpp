@@ -95,9 +95,14 @@ QUSortFilterFontListModel::filterAcceptsRow(int sourceRow, const QModelIndex & s
 }
 
 void
-QUSortFilterFontListModel::filter(const QString & text) {
+QUSortFilterFontListModel::setFilter(const QString & text) {
     filter_ = text;
     invalidateFilter();
+}
+
+void
+QUSortFilterFontListModel::clearFilter() {
+    setFilter(QString());
 }
 
 QUFontListModel *
@@ -137,6 +142,20 @@ QUFontComboBox::selectedFont() const {
     atts.names.familyName();
     QUFontURI uri{toQString(desc.filePath), desc.index};
     return uri;
+}
+
+void
+QUFontComboBox::selectFont(const QUFontURI & fontURI) {
+    proxyModel()->clearFilter();
+    int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
+    QModelIndex proxyIndex = proxyModel()->mapFromSource(sourceModel()->index(index));
+    setCurrentIndex(proxyIndex.row());
+    onFontSelected(proxyIndex.row());
+}
+
+QUFontListModel *
+QUFontComboBox::sourceModel() const {
+    return qobject_cast<QUFontListModel *>(proxyModel()->sourceModel());
 }
 
 QUSortFilterFontListModel *
@@ -191,7 +210,7 @@ QUFontComboBox::onFontSelected(int ) {
 
 void
 QUFontComboBox::onLineEdited(const QString & text) {
-    proxyModel()->filter(text);
+    proxyModel()->setFilter(text);
     lineEdit()->setText(text);
     showPopup();
 }

@@ -54,7 +54,7 @@ int quMain(int argc, char *argv[])
             QUDocumentWindowManager::instance()->openFile(arguments.at(i));
     }
     else
-        QUDocumentWindowManager::instance()->slotOpenFont();
+        QUDocumentWindowManager::instance()->doOpenFontDialog();
 
     return app.exec();
 }

@@ -18,7 +18,7 @@ public:
 
     bool
     acceptRow(const QString & filter, int row) const;
-protected:
+public:
     FXPtr<FXFaceDatabase>
     db() const;
 
@@ -42,8 +42,11 @@ public:
 
 public:
     void
-    filter(const QString & text);
-    
+    setFilter(const QString & text);
+
+    void
+    clearFilter();
+
 protected:
     QUFontListModel *
     fontListModel() const;
@@ -63,6 +66,9 @@ public:
     QUFontURI
     selectedFont() const;
 
+    void
+    selectFont(const QUFontURI & fontURI);
+
 signals:
     void
     fontSelected(const QUFontURI & fontURI, size_t index);
@@ -70,7 +76,10 @@ signals:
 protected:
     QUSortFilterFontListModel *
     proxyModel() const;
-    
+
+    QUFontListModel *
+    sourceModel() const;
+
     QModelIndex
     currentProxyIndex() const;
     

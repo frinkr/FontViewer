@@ -18,6 +18,9 @@ public:
     QUFontURI
     selectedFont();
 
+    virtual void
+    accept();
+            
 private slots:
     void
     slotBrowseFile();

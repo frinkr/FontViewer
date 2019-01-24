@@ -1,6 +1,8 @@
 #include <QFileDialog>
+#include <QSettings>
 
 #include "QUConv.h"
+#include "QUDocumentWindowManager.h"
 #include "QUHtmlTemplate.h"
 #include "QUFontManager.h"
 #include "QUResource.h"
@@ -50,6 +52,12 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
             this, &QUOpenFontDialog::slotFontSelected);
     
     QUFontManager::get();
+
+    if (QUDocumentWindowManager::instance()->recentFonts().size())
+        ui_->fontComboBox->selectFont(QUDocumentWindowManager::instance()->recentFonts()[0]);
+
+    slotFontSelected(ui_->fontComboBox->selectedFont(),
+                     ui_->fontComboBox->selectedFontIndex());
 }
 
 QUOpenFontDialog::~QUOpenFontDialog() {
@@ -59,6 +67,14 @@ QUOpenFontDialog::~QUOpenFontDialog() {
 QUFontURI
 QUOpenFontDialog::selectedFont() {
     return ui_->fontComboBox->selectedFont();
+}
+
+void
+QUOpenFontDialog::accept() {
+    QDialog::accept();
+
+    //QSettings settings;
+    //settings.setValue("")
 }
 
 void
