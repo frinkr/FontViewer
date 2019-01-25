@@ -116,7 +116,9 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     proxy->setSourceModel(new QUFontListModel(this));
     setModel(proxy);
     proxy->sort(0);
-    setEditable(true);
+    setEditable(false);
+    //setValidator(nullptr);
+    setDuplicatesEnabled(true);
     setCompleter(nullptr);
     setMaxVisibleItems(20);
     
@@ -137,6 +139,9 @@ QUFontComboBox::selectedFontIndex() const {
 QUFontURI
 QUFontComboBox::selectedFont() const {
     int row = selectedFontIndex();
+    if (row == -1)
+        return QUFontURI{};
+    
     auto desc = QUFontManager::get().db()->faceDescriptor(row);
     auto atts = QUFontManager::get().db()->faceAttributes(row);
     atts.names.familyName();
@@ -165,7 +170,8 @@ QUFontComboBox::proxyModel() const {
 
 QModelIndex
 QUFontComboBox::currentProxyIndex() const {
-    return model()->index(currentIndex(), modelColumn());   
+    QModelIndex index = model()->index(currentIndex(), modelColumn());
+    return index;
 }
     
 QModelIndex
@@ -203,7 +209,7 @@ void
 QUFontComboBox::onFontSelected(int ) {
     QModelIndex index = currentProxyIndex();
     QVariant data = model()->data(index, Qt::DisplayRole);
-    lineEdit()->setText(data.toString());
+    //lineEdit()->setText(data.toString());
 
     emit fontSelected(selectedFont(), selectedFontIndex());
 }

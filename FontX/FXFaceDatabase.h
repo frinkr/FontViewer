@@ -1,9 +1,13 @@
 #pragma once
 #include "FXFace.h"
 
+
+
 class FXFaceDatabase {
 public:
-    explicit FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath);
+    using ProgressCallback = std::function<bool(size_t current, size_t total, const FXString & file)>;
+public:
+    explicit FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath, ProgressCallback progressCallback = ProgressCallback{});
 
     size_t
     faceCount() const;
@@ -37,15 +41,17 @@ protected:
     load();
 
     bool
-    checkUpdate() const;
+    checkUpdate();
     
 protected:
     FXVector<FXString> folders_;
+    FXSet<FXString>    files_;
     FXString           dbPath_;
 
     FXVector<FaceItem> faces_;
     size_t             hash_;
 
+    ProgressCallback   progress_;
     //FXVector<FXFaceDescriptor>  faces_;
     //FXVector<FXFaceAttributes>  attrs_;
 };

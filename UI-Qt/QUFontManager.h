@@ -21,7 +21,7 @@ private:
     
     void
     scanDirectory(const QString & directory);
-    
+
     QStringList             directories_;
     FXPtr<FXFaceDatabase>   db_;
 };

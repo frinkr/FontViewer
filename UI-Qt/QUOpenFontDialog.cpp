@@ -89,6 +89,8 @@ QUOpenFontDialog::slotBrowseFile() {
 
 void
 QUOpenFontDialog::slotFontSelected(const QUFontURI & uri, size_t index) {
+    if (index == -1)
+        return;
     auto & desc = QUFontManager::get().db()->faceDescriptor(index);
     auto & atts = QUFontManager::get().db()->faceAttributes(index);
 

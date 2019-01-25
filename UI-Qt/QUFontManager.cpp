@@ -2,6 +2,8 @@
 #  include <fontconfig/fontconfig.h>
 #endif
 
+#include <QCoreApplication>
+#include <QLabel>
 #include <QStandardPaths>
 #include <QDir>
 #include "QUConv.h"
@@ -45,8 +47,19 @@ QUFontManager::QUFontManager() {
     QDir folder(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
     if (!folder.exists())
         folder.mkpath(".");
-    
+
+    QLabel * label = new QLabel(nullptr, Qt::FramelessWindowHint);
+    label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
+    label->setMinimumSize(300, 50);
     db_.reset(new FXFaceDatabase(dirs,
-                                 folder.filePath("FontViewer.db").toUtf8().constData()));
+                                 folder.filePath("FontViewer.db").toUtf8().constData(),
+                                 [this, label](size_t current, size_t total, const FXString & file) {
+                                     label->setText(QString("%1/%2 %3").arg(current).arg(total).arg(toQString(file)));
+                                     label->show();
+                                     qApp->processEvents();
+                                     return true;
+                                 }
+                  ));
+    label->deleteLater();
 }
 

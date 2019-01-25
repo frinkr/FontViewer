@@ -68,10 +68,11 @@ namespace boost {namespace serialization {
     }
 }
 
-FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath)
+FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath, ProgressCallback progressCallback)
     : folders_(folders)
     , dbPath_(dbPath)
-    , hash_(-1) {
+    , hash_(-1)
+    , progress_(progressCallback) {
     if (!load() || checkUpdate())
         rescan();
 }
@@ -108,28 +109,27 @@ FXFaceDatabase::createFace(const FXFaceDescriptor & descriptor) const {
 void
 FXFaceDatabase::rescan() {
     faces_.clear();
-    FXSet<FXString> files;
-    for(const auto & folder : folders_) {
-        BST::foreachFile(folder, true, [this, &files](const FXString & file) {
-            files.insert(file);
-            
-            size_t count = 0;
-            if (!FXFTCountFaces(FXLib::get(), file, count)) {
-                for (size_t i = 0; i < count; ++ i) {
-                    FXFaceDescriptor desc = {file, i};
-                    FXPtr<FXFace> face = FXFace::createFace(desc);
-					if (!face)
-						continue;
-                    FaceItem item = {desc, face->attributes()};
-                    faces_.push_back(item);
-                }
+
+    size_t current = 0;
+    for (auto & file: files_) {
+        ++ current;
+        if (progress_)
+            progress_(current, files_.size(), file);
+
+        size_t count = 0;
+        if (!FXFTCountFaces(FXLib::get(), file, count)) {
+            for (size_t i = 0; i < count; ++ i) {
+                FXFaceDescriptor desc = {file, i};
+                FXPtr<FXFace> face = FXFace::createFace(desc);
+                if (!face)
+                    continue;
+                FaceItem item = {desc, face->attributes()};
+                faces_.push_back(item);
             }
-            return true;
-        });
+        }
     }
 
-    hash_ = hashFiles(files);
-
+    hash_ = hashFiles(files_);
     save();
 }
 
@@ -151,6 +151,14 @@ FXFaceDatabase::save() {
     
 bool
 FXFaceDatabase::load() {
+    
+    for(const auto & folder : folders_)
+        BST::foreachFile(folder, true, [this](const FXString & file) {
+            files_.insert(file);
+            return true;
+        });
+
+    
     try {
         std::ifstream ifs(dbPath_);
         boost::archive::text_iarchive ia(ifs);
@@ -171,16 +179,7 @@ FXFaceDatabase::load() {
 }
 
 bool
-FXFaceDatabase::checkUpdate() const {
-    FXSet<FXString> files;
-    for(const auto & folder : folders_) 
-        BST::foreachFile(folder, true, [&files](const FXString & file) {
-            //size_t count;
-            //if (!FXFTCountFaces(FXLib::get(), file, count))
-                files.insert(file);
-            return true;
-        });
-
-    size_t hash = hashFiles(files);
+FXFaceDatabase::checkUpdate() {
+    size_t hash = hashFiles(files_);
     return hash != hash_;
 }
