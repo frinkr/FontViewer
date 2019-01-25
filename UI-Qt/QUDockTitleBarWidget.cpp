@@ -1,7 +1,10 @@
+#include <QHBoxLayout>
 #include <QMouseEvent>
 #include <QDockWidget>
 #include <QPainter>
+#include <QPushButton>
 #include <QStylePainter>
+#include <QSpacerItem>
 #include "QUDockTitleBarWidget.h"
 
 namespace {
@@ -9,7 +12,25 @@ namespace {
 }
 QUDockTitleBarWidget::QUDockTitleBarWidget(QWidget * parent)
     : QWidget(parent) {
-        this->setMinimumHeight(20);
+    this->setMinimumHeight(20);
+    QHBoxLayout * layout = new QHBoxLayout(this);
+    QSpacerItem * spacer = new QSpacerItem(10, TITLE_BAR_HEIGHT, QSizePolicy::Expanding, QSizePolicy::Minimum);
+    
+
+    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
+    closeButton->setFixedSize(closeIconRect().size().toSize());
+    closeButton->setFlat(true);
+    closeButton->setStyleSheet("boder:none;");
+    connect(closeButton, &QPushButton::clicked, this, [this]() {
+        QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
+        dockWidget->hide();
+    });
+
+    layout->addSpacing(5);
+    layout->addWidget(closeButton);
+    layout->addItem(spacer);
+    layout->setMargin(0);
 }
 
 QUDockTitleBarWidget::~QUDockTitleBarWidget() {
@@ -29,6 +50,7 @@ QUDockTitleBarWidget::minimumSizeHint() const {
 
 void
 QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
+    //return QWidget::paintEvent(event);
     QPainter p(this);
 
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
@@ -42,8 +64,8 @@ QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     p.fillRect(rect, brush);
 
     // close icon
-    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
-    p.drawPixmap(closeIconRect(), closeIcon, closeIcon.rect());
+    //QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    //p.drawPixmap(closeIconRect(), closeIcon, closeIcon.rect());
 
     // title
     p.setPen(palette().color(QPalette::Normal, QPalette::Text));
@@ -53,14 +75,6 @@ QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
 
 void
 QUDockTitleBarWidget::mousePressEvent(QMouseEvent * event) {
-    QRectF rect = closeIconRect();
-    if (rect.contains(event->localPos())) {
-        QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
-        dockWidget->hide();
-        event->accept();
-        return;
-    }
-
     QWidget::mousePressEvent(event);
 }
 
