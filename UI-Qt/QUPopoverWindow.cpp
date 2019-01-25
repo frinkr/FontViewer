@@ -96,7 +96,7 @@ QUPopoverWindow::paintEvent(QPaintEvent * event) {
 	
     auto poly = localPolygon(BORDER);
     auto color = palette().color(QPalette::Normal, QPalette::Window);
-    QPen pen(palette().color(QPalette::Normal, QPalette::Shadow), BORDER);
+    QPen pen(palette().color(QPalette::Normal, QPalette::Mid), BORDER);
     p.setBrush(color);
     p.setPen(pen);
     p.drawConvexPolygon(poly);
@@ -161,7 +161,7 @@ QUPopoverWindow::edgeRelativeTo(const QRect & rect, QUPopoverEdges preferedEgdes
     if (!screen) screen = qApp->primaryScreen();
     if (screen) {
         auto screenRect = screen->availableGeometry();
-        for (size_t i = 0; i < edges.size(); ++ i) {
+        for (int i = 0; i < edges.size(); ++ i) {
             if (screenRect.contains(geometries[i]))
                 return edges[i];
         }

@@ -16,10 +16,14 @@ QUDockTitleBarWidget::QUDockTitleBarWidget(QWidget * parent)
     QHBoxLayout * layout = new QHBoxLayout(this);
     QSpacerItem * spacer = new QSpacerItem(10, TITLE_BAR_HEIGHT, QSizePolicy::Expanding, QSizePolicy::Minimum);
     
-
+    int iconSize = TITLE_BAR_HEIGHT - 3;
     QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    //closeIcon = closeIcon.scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
-    closeButton->setFixedSize(closeIconRect().size().toSize());
+
+    closeButton->setMinimumSize(iconSize, iconSize);
+    closeButton->setMaximumSize(iconSize, iconSize);
+    closeButton->setIconSize(QSize(iconSize, iconSize));
     closeButton->setFlat(true);
     closeButton->setStyleSheet("boder:none;");
     connect(closeButton, &QPushButton::clicked, this, [this]() {
@@ -55,13 +59,13 @@ QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
 
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     
-    QRect rect(0, 0, width(), height());
+    //QRect rect(0, 0, width(), height());
     //p.fillRect(rect, palette().color(QPalette::Normal, QPalette::Window));
 
-    QColor color = palette().color(QPalette::Normal, QPalette::Window);
+    //QColor color = palette().color(QPalette::Normal, QPalette::Window);
     //color = color.darker();
-    QBrush brush(color, Qt::Dense2Pattern);
-    p.fillRect(rect, brush);
+    //QBrush brush(color, Qt::Dense2Pattern);
+    //p.fillRect(rect, brush);
 
     // close icon
     //QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
@@ -70,7 +74,7 @@ QUDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     // title
     p.setPen(palette().color(QPalette::Normal, QPalette::Text));
     QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
-    p.drawText(rect, Qt::AlignCenter, dockWidget->windowTitle());
+    p.drawText(rect(), Qt::AlignCenter, dockWidget->windowTitle());
 }
 
 void

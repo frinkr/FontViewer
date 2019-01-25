@@ -29,7 +29,8 @@ QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc,
 bool
 QUApplication::darkMode() const {
 	QColor textColor = palette().color(QPalette::Normal, QPalette::Text);
-	return textColor.toRgb().value() != 0;
+    QColor gray(55, 55, 55);
+    return textColor.toRgb().value() > gray.value();
 }
 
 QIcon
