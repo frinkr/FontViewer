@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QSettings>
 
+#include "QUApplication.h"
 #include "QUConv.h"
 #include "QUDocumentWindowManager.h"
 #include "QUHtmlTemplate.h"
@@ -46,6 +47,9 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
     , ui_(new Ui::QUOpenFontDialog) {
     ui_->setupUi(this);
     
+	ui_->browseButton->setIcon(quApp->loadIcon(":/images/filter.png"));
+	ui_->filterButton->setIcon(quApp->loadIcon(":/images/open.png"));
+
     connect(ui_->browseButton, &QPushButton::clicked,
             this, &QUOpenFontDialog::slotBrowseFile);
     connect(ui_->fontComboBox, &QUFontComboBox::fontSelected,
