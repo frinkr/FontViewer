@@ -2,6 +2,9 @@
 #include <QPainter>
 #include <QPropertyAnimation>
 #include <QScreen>
+#include <QImage>
+#include <QBitmap>
+#include <QPixmap>
 #include <QGuiApplication>
 #include "QUPopoverWindow.h"
 #include <QGraphicsDropShadowEffect>
@@ -20,7 +23,7 @@ namespace {
 }
 
 QUPopoverWindow::QUPopoverWindow(QWidget * parent)
-    : QWidget(parent, Qt::Popup)
+    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
     , edge_(QUPopoverBottom)      
     , widget_(nullptr)
     , layout_(nullptr) {
@@ -80,9 +83,8 @@ QUPopoverWindow::minimumSizeHint() const {
 void
 QUPopoverWindow::resizeEvent(QResizeEvent * event) {
 #ifdef Q_OS_WIN
-    setMask(localRegion(0));
+	setMask(localRegion(0));
 #endif
-
     QWidget::resizeEvent(event);
 }
 

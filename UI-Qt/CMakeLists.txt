@@ -40,7 +40,6 @@ set(SHARED_SOURCES
   QUApplication.h
   QUApplication.cpp
   QUApplication.qrc
-  qdarkstyle/style.qrc
   QUSingleApplication.h
   QUSingleApplication.cpp
   QUSingleApplication_p.h

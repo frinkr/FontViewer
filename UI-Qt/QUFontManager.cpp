@@ -2,9 +2,11 @@
 #  include <fontconfig/fontconfig.h>
 #endif
 
-#include <QCoreApplication>
+#include <QGuiApplication>
 #include <QLabel>
 #include <QStandardPaths>
+#include <QMessageBox>
+#include <QProgressDialog>
 #include <QDir>
 #include "QUConv.h"
 #include "QUFontManager.h"
@@ -25,6 +27,24 @@ namespace {
         return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
 #endif
     }
+
+	bool
+	checkResetDatabase() {
+		return (qApp->queryKeyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) == (Qt::ShiftModifier | Qt::ControlModifier);
+	}
+
+	QProgressDialog *
+	createProgressDialog() {
+		QProgressDialog * progress = new QProgressDialog(nullptr, Qt::Dialog);
+		progress->setWindowModality(Qt::WindowModal);
+		progress->setMinimumWidth(400);
+		progress->setMaximumWidth(400);
+		progress->setAutoReset(false);
+		progress->setCancelButton(nullptr);
+		progress->setWindowTitle("Rebuilding font database...");
+		return progress;
+	}
+
 }
 
 QUFontManager &
@@ -48,18 +68,29 @@ QUFontManager::QUFontManager() {
     if (!folder.exists())
         folder.mkpath(".");
 
-    QLabel * label = new QLabel(nullptr, Qt::FramelessWindowHint);
-    label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    label->setMinimumSize(300, 50);
-    db_.reset(new FXFaceDatabase(dirs,
-                                 folder.filePath("FontViewer.db").toUtf8().constData(),
-                                 [this, label](size_t current, size_t total, const FXString & file) {
-                                     label->setText(QString("%1/%2 %3").arg(current).arg(total).arg(toQString(file)));
-                                     label->show();
-                                     qApp->processEvents();
-                                     return true;
-                                 }
-                  ));
-    label->deleteLater();
+	// Check to reset database.
+	const QString dbPath = folder.filePath("FontViewer.db");
+	QFile dbFile(dbPath);
+	if (dbFile.exists() && checkResetDatabase()) {
+		if (QMessageBox::Yes == QMessageBox::question(nullptr,
+			tr("Reset font database"),
+			tr("Are you sure to reset the database? The font database will be deleted and rebuilt."),
+			QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)) {
+			dbFile.remove();
+		}
+	}
+
+	// Load database.
+	QProgressDialog * progress = createProgressDialog();
+    db_.reset(new FXFaceDatabase(dirs,			
+		dbPath.toUtf8().constData(),
+        [this, progress](size_t current, size_t total, const FXString & file) {
+			progress->setMaximum(total);
+			progress->setValue(current);
+			progress->setLabelText(toQString(file));
+            return true;
+        }
+    ));
+	progress->deleteLater();
 }
 
