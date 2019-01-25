@@ -242,4 +242,5 @@ void QUDocumentWindowManager::closeAllDocumentsAndQuit()
     }
     
     saveRecentFilesSettings();
+    qApp->quit();
 }

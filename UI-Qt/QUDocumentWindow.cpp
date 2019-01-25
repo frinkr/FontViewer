@@ -133,6 +133,18 @@ QUDocumentWindow::initGlyphInfoView() {
     
 void
 QUDocumentWindow::connectSingals() {
+    connect(ui_->action_Open, &QAction::triggered,
+            this, &QUDocumentWindow::onOpenFont);
+    
+    connect(ui_->actionOpen_From_File, &QAction::triggered,
+            this, &QUDocumentWindow::onOpenFontFile);
+
+    connect(ui_->action_Close, &QAction::triggered,
+            this, &QUDocumentWindow::onCloseAction);
+
+    connect(ui_->action_Quit, &QAction::triggered,
+            this, &QUDocumentWindow::onQuitAction);
+
     connect(ui_->actionFull_Glyph_List, &QAction::toggled,
             this, &QUDocumentWindow::showFullGlyphList);
 
@@ -156,6 +168,26 @@ QUDocumentWindow::senderToolButton() {
         return qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(action));
     
     return qobject_cast<QToolButton *>(sender());
+}
+
+void 
+QUDocumentWindow::onOpenFont() {
+    QUDocumentWindowManager::instance()->doOpenFontDialog();
+}
+
+void
+QUDocumentWindow::onOpenFontFile() {
+    QUDocumentWindowManager::instance()->slotOpenFile();
+}
+
+void
+QUDocumentWindow::onCloseAction() {
+    this->close();
+}
+
+void
+QUDocumentWindow::onQuitAction() {
+    QUDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
 }
 
 void

@@ -65,6 +65,19 @@ private:
     senderToolButton();
                       
 private slots:
+
+    void
+    onOpenFont();
+
+    void
+    onOpenFontFile();
+
+    void
+    onCloseAction();
+
+    void
+    onQuitAction();
+
     void
     showFullGlyphList(bool state);
 
