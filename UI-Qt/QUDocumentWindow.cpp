@@ -79,8 +79,8 @@ void
 QUDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
 
-    ui_->actionFull_Glyph_List->setIcon(
-		quApp->loadIcon(":/images/glyph.png"));
+    //ui_->actionFull_Glyph_List->setIcon(
+	//	quApp->loadIcon(":/images/glyph.png"));
 
     cmapBlockAction_ = toolBar->addAction(
         quApp->loadIcon(":/images/cmap.png"),tr("CMap"),

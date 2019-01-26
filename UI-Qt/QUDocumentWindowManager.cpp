@@ -150,9 +150,11 @@ QUDocumentWindowManager::slotDocumentWindowDestroyed(QObject * obj) {
     removeDocumentWindow(window);
     removeDocument(window->document());
 
+#ifdef Q_OS_MAC
     // show Open Font dialog if no document open
     if (documents_.empty())
         doOpenFontDialog();
+#endif
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

@@ -124,27 +124,13 @@
     <property name="title">
      <string>&amp;View</string>
     </property>
-    <widget class="QMenu" name="menuLabel">
-     <property name="title">
-      <string>Glyph &amp;Label</string>
-     </property>
-     <addaction name="actionCharacter_Code"/>
-     <addaction name="actionGlyph_Name"/>
-     <addaction name="actionGlyph_ID"/>
-    </widget>
-    <widget class="QMenu" name="menuPalettes">
-     <property name="title">
-      <string>&amp;Palettes</string>
-     </property>
-     <addaction name="actionGlyph_2"/>
-     <addaction name="actionProperties_2"/>
-    </widget>
     <addaction name="action_Full_Screen"/>
     <addaction name="separator"/>
-    <addaction name="actionFull_Glyph_List"/>
-    <addaction name="menuLabel"/>
+    <addaction name="actionGlyph_ID"/>
+    <addaction name="actionGlyph_Name"/>
+    <addaction name="actionCharacter_Code"/>
     <addaction name="separator"/>
-    <addaction name="menuPalettes"/>
+    <addaction name="actionFull_Glyph_List"/>
    </widget>
    <widget class="QMenu" name="menu_Window">
     <property name="title">
@@ -264,6 +250,9 @@
    </property>
    <property name="text">
     <string>Full &amp;Glyph List</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
   <action name="actionGlyph">
