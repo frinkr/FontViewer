@@ -17,7 +17,7 @@ QUDockTitleBarWidget::QUDockTitleBarWidget(QWidget * parent)
     QSpacerItem * spacer = new QSpacerItem(10, TITLE_BAR_HEIGHT, QSizePolicy::Expanding, QSizePolicy::Minimum);
     
     int iconSize = TITLE_BAR_HEIGHT - 3;
-    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
+    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_DockWidgetCloseButton, nullptr, this);
     //closeIcon = closeIcon.scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
     QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
 

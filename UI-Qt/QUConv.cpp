@@ -1,4 +1,6 @@
+#include <QDateTime>
 #include <QPainter>
+
 #include "QUConv.h"
 #include "FontX/FXFace.h"
 #include "FontX/FXUnicode.h"
@@ -120,5 +122,11 @@ unicodeCharImage(FXChar c, const QSize & emSize) {
     else {
         return QImage(":images/undefined_d.png");
     }
+}
 
+QString
+ftDateTimeToString(int64_t value) {
+    static QDateTime epoch(QDate(1904, 01, 01), QTime(0, 0, 0), Qt::UTC);
+
+    return epoch.addSecs(value).toString("yyyy-MM-dd HH:mm:ss t");
 }

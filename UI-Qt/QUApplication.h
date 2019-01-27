@@ -28,6 +28,11 @@ public:
 	QIcon
 	loadIcon(const QString & path) const;
 
+public slots:
+    void
+    about() const;
+
+private:
 #ifdef Q_OS_MAC
     bool event(QEvent *);
 #endif

@@ -24,3 +24,6 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize);
 
 QImage
 unicodeCharImage(FXChar c, const QSize & emSize);
+
+QString
+ftDateTimeToString(int64_t value);

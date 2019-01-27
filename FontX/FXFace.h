@@ -97,8 +97,8 @@ struct FXFaceAttributes {
 
     bool             isCID;
     FXString         cid;
-    bool             isOTVariant;
-    bool             isMM;  
+    bool             isOpenTypeVariable;
+    bool             isMultipleMaster;
 };
 
 

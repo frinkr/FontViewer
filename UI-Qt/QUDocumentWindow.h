@@ -88,6 +88,9 @@ private slots:
     onSwitchGlyphLabel();
 
     void
+    onAboutToShowWindowMenu();
+
+    void
     onGlyphDoubleClicked(const QModelIndex &index);
 
     void

@@ -1,4 +1,6 @@
 .DS_Store
 build/
 .vs/
+.idea/
+cmake-build-debug/
 CMakeLists.txt.user

@@ -46,6 +46,9 @@ public:
     const QList<QUFontURI> &
     recentFonts() const;
 
+    void
+    aboutToShowWindowMenu(QMenu * windowMenu);
+
 public slots:
     void
     doOpenFontDialog();

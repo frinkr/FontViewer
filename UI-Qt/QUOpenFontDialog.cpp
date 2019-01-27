@@ -36,8 +36,8 @@ namespace {
         map["FORMAT"]      = toQString(atts.format);
         map["IS_CID"]      = atts.isCID;
         map["CID"]         = toQString(atts.cid);
-        map["IS_OT_VARIANT"] = atts.isOTVariant;
-        map["IS_MM"]       = atts.isMM;
+        map["IS_OT_VARIANT"] = atts.isOpenTypeVariable;
+        map["IS_MM"]       = atts.isMultipleMaster;
         return map;
     }
 }

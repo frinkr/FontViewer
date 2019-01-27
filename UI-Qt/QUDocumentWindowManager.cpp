@@ -115,6 +115,19 @@ QUDocumentWindowManager::recentFonts() const {
 }
 
 void
+QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
+    menu->clear();
+    foreach(QUDocumentWindow * window, documentWindows_) {
+        QAction * action = new QAction(window->windowTitle(), menu);
+        connect(action, &QAction::triggered, this, [window]() {
+            window->show();
+            window->raise();
+        });
+        menu->addAction(action);
+    }
+}
+
+void
 QUDocumentWindowManager::doOpenFontDialog()
 {
     QUOpenFontDialog openDialog(0);

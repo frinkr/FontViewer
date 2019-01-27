@@ -55,8 +55,8 @@ namespace boost {namespace serialization {
             ar & atts.descender;
             ar & atts.isCID;
             ar & atts.cid;
-            ar & atts.isOTVariant;
-            ar & atts.isMM;
+            ar & atts.isOpenTypeVariable;
+            ar & atts.isMultipleMaster;
         }
         
         template <class Archive>

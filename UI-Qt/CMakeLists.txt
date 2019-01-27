@@ -31,7 +31,9 @@ set(UI
   QUCMapBlockWidget.ui
   QUSearchWidget.ui
   QUGlyphTableWidget.ui
-  QUShapingWidget.ui)
+  QUShapingWidget.ui
+  QUAboutDialog.ui
+  )
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
@@ -84,6 +86,8 @@ set(SHARED_SOURCES
   QUShapingWidget.cpp
   QUDockTitleBarWidget.h
   QUDockTitleBarWidget.cpp
+  QUAboutDialog.h
+  QUAboutDialog.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

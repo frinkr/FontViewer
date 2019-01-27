@@ -101,7 +101,7 @@
      <x>0</x>
      <y>0</y>
      <width>1094</width>
-     <height>21</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
@@ -109,7 +109,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="action_Open"/>
-    <addaction name="actionOpen_From_File"/>
+    <addaction name="action_Open_From_File"/>
     <addaction name="action_Close"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
@@ -142,7 +142,6 @@
      <string>&amp;Help</string>
     </property>
     <addaction name="action_About"/>
-    <addaction name="actionAbout_Qt"/>
    </widget>
    <addaction name="menu_File"/>
    <addaction name="menu_Edit"/>
@@ -174,7 +173,7 @@
     <string>Ctrl+O</string>
    </property>
   </action>
-  <action name="actionOpen_From_File">
+  <action name="action_Open_From_File">
    <property name="text">
     <string>Open From &amp;File</string>
    </property>

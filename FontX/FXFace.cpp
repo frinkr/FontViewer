@@ -473,11 +473,11 @@ FXFace::initAttributes() {
         atts_.cid = std::string(registry) + "-" + ordering + "-" + std::to_string(supplement);
 	
 #ifdef FT_FACE_FLAG_VARIATION
-    atts_.isOTVariant = (FT_FACE_FLAG_VARIATION & face_->face_flags);
+    atts_.isOpenTypeVariable = (FT_FACE_FLAG_VARIATION & face_->face_flags);
 #else
 	atts_.isOTVariant = false;
 #endif
-    atts_.isMM = (FT_FACE_FLAG_MULTIPLE_MASTERS & face_->face_flags);
+    atts_.isMultipleMaster = (FT_FACE_FLAG_MULTIPLE_MASTERS & face_->face_flags);
 
     return true;
 }

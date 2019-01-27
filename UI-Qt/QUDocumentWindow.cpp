@@ -73,6 +73,8 @@ QUDocumentWindow::initMenu() {
 
     connect(group, &QActionGroup::triggered,
             this, &QUDocumentWindow::onSwitchGlyphLabel);
+
+    ui_->action_Open_From_File->setIcon(style()->standardIcon(QStyle::SP_DirOpenIcon, nullptr, this));
 }
 
 void
@@ -136,7 +138,7 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->action_Open, &QAction::triggered,
             this, &QUDocumentWindow::onOpenFont);
     
-    connect(ui_->actionOpen_From_File, &QAction::triggered,
+    connect(ui_->action_Open_From_File, &QAction::triggered,
             this, &QUDocumentWindow::onOpenFontFile);
 
     connect(ui_->action_Close, &QAction::triggered,
@@ -150,7 +152,13 @@ QUDocumentWindow::connectSingals() {
 
     connect(ui_->action_Full_Screen, &QAction::toggled,
             this, &QUDocumentWindow::onToggleFullScreen);
+
+    connect(ui_->action_About, &QAction::triggered,
+            quApp, &QUApplication::about);
     
+    connect(ui_->menu_Window, &QMenu::aboutToShow,
+            this, &QUDocumentWindow::onAboutToShowWindowMenu);
+
     connect(ui_->listView, &QListView::doubleClicked,
             this, &QUDocumentWindow::onGlyphDoubleClicked);
 
@@ -201,6 +209,11 @@ QUDocumentWindow::onToggleFullScreen(bool state) {
         showFullScreen();
     else
         showNormal();
+}
+
+void
+QUDocumentWindow::onAboutToShowWindowMenu() {
+    QUDocumentWindowManager::instance()->aboutToShowWindowMenu(ui_->menu_Window);
 }
 
 void
