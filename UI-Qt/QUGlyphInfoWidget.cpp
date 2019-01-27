@@ -103,8 +103,9 @@ QUGlyphInfoWidget::loadGlyph() {
     
     setDocument(qdoc);
     
-    QUHtmlTemplate html(QUResource::path("/Html/GlyphInfoTemplate.html"));
-    setHtml(html.instantialize(templateValues(glyph)));
+    QUHtmlTemplate * html = QUHtmlTemplate::createFromFile(QUResource::path("/Html/GlyphInfoTemplate.html"));
+    setHtml(html->instantialize(templateValues(glyph)));
+    html->deleteLater();
 }
     
 void

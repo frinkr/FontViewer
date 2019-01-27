@@ -3,16 +3,23 @@
 
 #include "QUHtmlTemplate.h"
 
-QUHtmlTemplate::QUHtmlTemplate(const QString & file, QObject * parent)
-    : QObject(parent)
-    , file_(file)
-{
-};
-
-const QString &
-QUHtmlTemplate::file() const {
-    return file_;
+QUHtmlTemplate *
+QUHtmlTemplate::createFromFile(const QString & file, QObject * parent) {
+    QUHtmlTemplate * t = new QUHtmlTemplate(parent);
+    t->file_ = file;
+    return t;
 }
+
+QUHtmlTemplate *
+QUHtmlTemplate::createFromString(const QString & file, QObject * parent) {
+    QUHtmlTemplate * t = new QUHtmlTemplate(parent);
+    t->content_ = file;
+    return t;
+}
+
+QUHtmlTemplate::QUHtmlTemplate(QObject * parent)
+    : QObject(parent) {
+};
 
 QString
 QUHtmlTemplate::instantialize(const QMap<QString, QVariant> & variables) const {

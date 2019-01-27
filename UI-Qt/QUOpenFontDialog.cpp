@@ -98,6 +98,7 @@ QUOpenFontDialog::slotFontSelected(const QUFontURI & uri, size_t index) {
     auto & desc = QUFontManager::get().db()->faceDescriptor(index);
     auto & atts = QUFontManager::get().db()->faceAttributes(index);
 
-    QUHtmlTemplate html(QUResource::path("/Html/FontInfoTemplate.html"));
-    ui_->textBrowser->setHtml(html.instantialize(templateValues(desc, atts)));
+    QUHtmlTemplate * html = QUHtmlTemplate::createFromFile(QUResource::path("/Html/FontInfoTemplate.html"));
+    ui_->textBrowser->setHtml(html->instantialize(templateValues(desc, atts)));
+    html->deleteLater();
 }

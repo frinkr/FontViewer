@@ -38,7 +38,7 @@ namespace {
 
         QUFontHtmlTemplatePage(const QString & title, FXPtr<FXFace> face, QObject * parent = nullptr)
             : QUFontInfoPage(title, face, parent) {
-            htmlTemplate_ = new QUHtmlTemplate(QUResource::path("/Html/template.html"), this);
+            htmlTemplate_ = QUHtmlTemplate::createFromFile(QUResource::path("/Html/template.html"), this);
         }
         
         virtual QString html() {
