@@ -7,10 +7,22 @@
 #include <QLineEdit>
 #include <QTimer>
 #include <QSortFilterProxyModel>
+#include <QValidator>
 #include "FontX/FXFaceDatabase.h"
 #include "QUFontManager.h"
 #include "QUFontComboBox.h"
 #include "QUConv.h"
+
+namespace {
+    class QUFalseValidator : public QValidator {
+    public:
+        using QValidator::QValidator;
+        QValidator::State	
+        validate(QString &input, int &pos) const override {
+            return QValidator::Invalid;
+        }
+    };
+}
 
 QUFontListModel::QUFontListModel(QObject * parent)
     : QAbstractListModel(parent) {
@@ -116,8 +128,9 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     proxy->setSourceModel(new QUFontListModel(this));
     setModel(proxy);
     proxy->sort(0);
-    setEditable(false);
-    //setValidator(nullptr);
+    setEditable(true);
+    setInsertPolicy(QComboBox::NoInsert);
+    setValidator(new QUFalseValidator(this));
     setDuplicatesEnabled(true);
     setCompleter(nullptr);
     setMaxVisibleItems(20);
@@ -209,7 +222,7 @@ void
 QUFontComboBox::onFontSelected(int ) {
     QModelIndex index = currentProxyIndex();
     QVariant data = model()->data(index, Qt::DisplayRole);
-    //lineEdit()->setText(data.toString());
+    lineEdit()->setText(data.toString());
 
     emit fontSelected(selectedFont(), selectedFontIndex());
 }

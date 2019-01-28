@@ -122,6 +122,7 @@ QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
         connect(action, &QAction::triggered, this, [window]() {
             window->show();
             window->raise();
+            window->activateWindow();
         });
         menu->addAction(action);
     }

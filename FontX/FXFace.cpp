@@ -475,7 +475,7 @@ FXFace::initAttributes() {
 #ifdef FT_FACE_FLAG_VARIATION
     atts_.isOpenTypeVariable = (FT_FACE_FLAG_VARIATION & face_->face_flags);
 #else
-	atts_.isOTVariant = false;
+	atts_.isOpenTypeVariable = false;
 #endif
     atts_.isMultipleMaster = (FT_FACE_FLAG_MULTIPLE_MASTERS & face_->face_flags);
 
