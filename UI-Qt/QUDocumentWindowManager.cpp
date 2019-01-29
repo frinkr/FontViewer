@@ -12,6 +12,7 @@
 #  import "MacApplicationDelegate.h"
 #endif
 
+#include "QUApplication.h"
 #include "QUOpenFontDialog.h"
 #include "QUDocumentWindow.h"
 #include "QUDocumentWindowManager.h"
@@ -26,20 +27,18 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 
     QMenu *fileMenu = mb->addMenu(tr("&File"));
     fileMenu->addAction(tr("&Open..."), this, &QUDocumentWindowManager::doOpenFontDialog, QKeySequence::Open);
-    fileMenu->addAction(tr("Open &File..."), this, &QUDocumentWindowManager::slotOpenFile, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
+    fileMenu->addAction(tr("Open &File..."), this, &QUDocumentWindowManager::doOpenFontFromFile, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
 
     openRecentSubMenu = fileMenu->addMenu(tr("Open Recent"));
     connect(fileMenu, &QMenu::aboutToShow, this, &QUDocumentWindowManager::slotAboutToShowFileMenu);
     
     
     QMenu *helpMenu = mb->addMenu(tr("Help"));
-    helpMenu->addAction(tr("&About"), this, &QUDocumentWindowManager::about);
-    helpMenu->addAction(tr("About &Qt"), qApp, &QApplication::aboutQt);
+    helpMenu->addAction(tr("&About"), quApp, &QUApplication::about);
     
-    helpMenu->addAction(tr("FontViewer &Help"), this, &QUDocumentWindowManager::help);
 #endif
 
-    connect(qApp, SIGNAL(aboutToQuit()), this, SLOT(saveRecentFilesSettings()));
+    connect(quApp, &QUApplication::aboutToQuit, this, &QUDocumentWindowManager::saveRecentFilesSettings);
 }
 
 // Singleton
@@ -181,7 +180,7 @@ QUDocumentWindowManager::addToRecents(const QUFontURI & uri) {
     recentFonts_.insert(0, uri); // add or move to front
 }
 
-void QUDocumentWindowManager::slotOpenFile()
+void QUDocumentWindowManager::doOpenFontFromFile()
 {
     QFileDialog openFileDialog(0);
 
@@ -195,19 +194,8 @@ void QUDocumentWindowManager::slotOpenFile()
 void QUDocumentWindowManager::openFile(const QString &fn)
 {
 
-
 }
 
-
-void QUDocumentWindowManager::about()
-{
-    QMessageBox::about(qApp->activeWindow(), tr("About QtDocBasedApp"), tr("<h2>QtDocBasedApp 1.0</h2><p>Copyright &copy; 2009 Andrew Choi."));
-}
-
-void QUDocumentWindowManager::help()
-{
-    QMessageBox::about(qApp->activeWindow(), tr("FontViewer Help"), tr("Help meeeeeeee!"));
-}
 
 #ifdef Q_OS_MAC
 // Handle selection of a document window in the Window menu.

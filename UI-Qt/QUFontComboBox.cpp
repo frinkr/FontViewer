@@ -19,7 +19,7 @@ namespace {
         using QValidator::QValidator;
         QValidator::State	
         validate(QString &input, int &pos) const override {
-            return QValidator::Invalid;
+            return QValidator::Intermediate;
         }
     };
 }

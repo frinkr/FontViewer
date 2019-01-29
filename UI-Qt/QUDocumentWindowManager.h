@@ -56,7 +56,7 @@ public slots:
     void
     closeAllDocumentsAndQuit();
 
-    void slotOpenFile();
+    void doOpenFontFromFile();
 
     void
     openFile(const QString &fn);
@@ -79,12 +79,6 @@ protected:
 protected:
     void
     addToRecents(const QUFontURI & uri);
-
-private slots:
-    
-
-    void about();
-    void help();
 
 private slots:
     

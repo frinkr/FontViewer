@@ -185,7 +185,7 @@ QUDocumentWindow::onOpenFont() {
 
 void
 QUDocumentWindow::onOpenFontFile() {
-    QUDocumentWindowManager::instance()->slotOpenFile();
+    QUDocumentWindowManager::instance()->doOpenFontFromFile();
 }
 
 void
