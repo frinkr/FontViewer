@@ -15,6 +15,28 @@ class QUDocumentWindow;
 class QMenu;
 class QString;
 
+struct QURecentFontItem : public QUFontURI {
+    QString fullName;
+
+    friend QDataStream &
+    operator << (QDataStream & arch, const QURecentFontItem & item)
+    {
+        arch << static_cast<const QUFontURI&>(item);
+        arch << item.fullName;
+        return arch;
+    }
+
+    friend QDataStream &
+    operator >> (QDataStream & arch, QURecentFontItem & item)
+    {
+        arch >> static_cast<QUFontURI&>(item);
+        arch >> item.fullName;
+        return arch;
+    }
+};
+
+Q_DECLARE_METATYPE(QURecentFontItem);
+
 class QUDocumentWindowManager : public QObject
 {
     Q_OBJECT
@@ -43,11 +65,14 @@ public:
     QUDocumentWindow *
     createDocumentWindow(QUDocument * document);
 
-    const QList<QUFontURI> &
+    const QList<QURecentFontItem> &
     recentFonts() const;
 
     void
     aboutToShowWindowMenu(QMenu * windowMenu);
+
+    void
+    aboutToShowRecentMenu(QMenu * recentMenu);
 
 public slots:
     void
@@ -78,7 +103,7 @@ protected:
 
 protected:
     void
-    addToRecents(const QUFontURI & uri);
+    addToRecents(QUDocument * document);
 
 private slots:
     
@@ -94,7 +119,7 @@ private slots:
 
 private:
     enum {kMaxRecentFiles = 8};
-    QList<QUFontURI> recentFonts_;
+    QList<QURecentFontItem> recentFonts_;
 
 #ifdef Q_OS_MAC
     QMenu *openRecentSubMenu;

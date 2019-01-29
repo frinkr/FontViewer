@@ -163,6 +163,9 @@ QUDocumentWindow::connectSingals() {
     connect(ui_->menu_Window, &QMenu::aboutToShow,
             this, &QUDocumentWindow::onAboutToShowWindowMenu);
 
+    connect(ui_->menuRecent, &QMenu::aboutToShow,
+            this, &QUDocumentWindow::onAboutToShowRecentMenu);
+
     connect(ui_->listView, &QListView::doubleClicked,
             this, &QUDocumentWindow::onGlyphDoubleClicked);
 
@@ -218,6 +221,11 @@ QUDocumentWindow::onToggleFullScreen(bool state) {
 void
 QUDocumentWindow::onAboutToShowWindowMenu() {
     QUDocumentWindowManager::instance()->aboutToShowWindowMenu(ui_->menu_Window);
+}
+
+void
+QUDocumentWindow::onAboutToShowRecentMenu() {
+    QUDocumentWindowManager::instance()->aboutToShowRecentMenu(ui_->menuRecent);
 }
 
 void

@@ -91,6 +91,9 @@ private slots:
     onAboutToShowWindowMenu();
 
     void
+    onAboutToShowRecentMenu();
+    
+    void
     onGlyphDoubleClicked(const QModelIndex &index);
 
     void

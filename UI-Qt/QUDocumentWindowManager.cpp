@@ -13,6 +13,7 @@
 #  import "MacApplicationDelegate.h"
 #endif
 
+#include "QUConv.h"
 #include "QUApplication.h"
 #include "QUOpenFontDialog.h"
 #include "QUDocumentWindow.h"
@@ -112,7 +113,7 @@ QUDocumentWindowManager::removeDocumentWindow(QUDocumentWindow * window)
             documentWindows_.removeAt(i);
 }
 
-const QList<QUFontURI> &
+const QList<QURecentFontItem> &
 QUDocumentWindowManager::recentFonts() const {
     return recentFonts_;
 }
@@ -133,9 +134,16 @@ QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
 }
 
 void
-QUDocumentWindowManager::doOpenFontDialog()
-{
-    QUOpenFontDialog openDialog(0);
+QUDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
+    recentMenu->clear();
+    foreach(QURecentFontItem font, recentFonts_) {
+        recentMenu->addAction(font.fullName);
+    }
+}
+
+void
+QUDocumentWindowManager::doOpenFontDialog() {
+    QUOpenFontDialog openDialog(nullptr);
     if (QDialog::Accepted == openDialog.exec()) {
         const QUFontURI fontURI = openDialog.selectedFont();
 
@@ -152,7 +160,7 @@ QUDocumentWindowManager::doOpenFontDialog()
             document = QUDocument::openFromURI(fontURI, this);
             if (document) {
                 addDocument(document);
-                addToRecents(fontURI);
+                addToRecents(document);
                 QUDocumentWindow * window = createDocumentWindow(document);
                 window->show();
             }
@@ -164,7 +172,7 @@ QUDocumentWindowManager::doOpenFontDialog()
 void
 QUDocumentWindowManager::slotDocumentWindowDestroyed(QObject * obj) {
     // remove from list
-    QUDocumentWindow * window = (QUDocumentWindow*)obj;
+    QUDocumentWindow * window = qobject_cast<QUDocumentWindow*>(obj);
     removeDocumentWindow(window);
     removeDocument(window->document());
 
@@ -178,16 +186,29 @@ QUDocumentWindowManager::slotDocumentWindowDestroyed(QObject * obj) {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void
-QUDocumentWindowManager::addToRecents(const QUFontURI & uri) {
-    int index = recentFonts_.indexOf(uri);
+QUDocumentWindowManager::addToRecents(QUDocument * document) {
+    QString familyName = toQString(document->face()->attributes().names.familyName());
+    QString styleName = toQString(document->face()->attributes().names.styleName());
+
+    QString fullName;
+    if (!familyName.isEmpty())
+        fullName = QString("%1 - %2").arg(familyName, styleName);
+    else
+        fullName = QString("%1 - %2").arg(QFileInfo(document->uri().filePath).fileName()).arg(document->uri().faceIndex);
+
+    QURecentFontItem item;
+    item.filePath  = document->uri().filePath;
+    item.faceIndex = document->uri().faceIndex;
+    item.fullName  = fullName;
+
+    int index = recentFonts_.indexOf(item);
     if (index != -1)
         recentFonts_.takeAt(index);
-    recentFonts_.insert(0, uri); // add or move to front
+    recentFonts_.insert(0, item); // add or move to front
 }
 
-void QUDocumentWindowManager::doOpenFontFromFile()
-{
-    QFileDialog openFileDialog(0);
+void QUDocumentWindowManager::doOpenFontFromFile() {
+    QFileDialog openFileDialog(nullptr);
 
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
     openFileDialog.setNameFilter(tr("C files (*.c *.cc *.cpp *.h);;Text files (*.txt);;All Files (*)"));
@@ -196,8 +217,7 @@ void QUDocumentWindowManager::doOpenFontFromFile()
         openFile(openFileDialog.selectedFiles()[0]);
 }
 
-void QUDocumentWindowManager::openFile(const QString &fn)
-{
+void QUDocumentWindowManager::openFile(const QString & fn) {
 
 }
 
@@ -231,26 +251,26 @@ QUDocumentWindowManager::slotAboutToShowFileMenu() {
 
 void
 QUDocumentWindowManager::loadRecentFontSettings() {
-    qRegisterMetaTypeStreamOperators<QUFontURI>("QUFontURI");
+    qRegisterMetaTypeStreamOperators<QURecentFontItem>("QURecentFontItem");
 
     QSettings settings;
-    QList<QVariant> variantList = settings.value("recentFiles").toList();
+    QList<QVariant> variantList = settings.value("recentFonts").toList();
     foreach(QVariant v, variantList) {
-        if (v.canConvert<QUFontURI>())
-            recentFonts_.append(v.value<QUFontURI>());
+        if (v.canConvert<QURecentFontItem>())
+            recentFonts_.append(v.value<QURecentFontItem>());
     }
 }
 
 void
 QUDocumentWindowManager::saveRecentFontsSettings() {
-    qRegisterMetaTypeStreamOperators<QUFontURI>("QUFontURI");
+    qRegisterMetaTypeStreamOperators<QURecentFontItem>("QURecentFontItem");
 
     QSettings settings;
     QList<QVariant> variantList;
-    foreach(QUFontURI uri, recentFonts_)
+    foreach(QURecentFontItem uri, recentFonts_)
         variantList.append(QVariant::fromValue(uri));
 
-    settings.setValue("recentFiles", variantList);
+    settings.setValue("recentFonts", variantList);
 }
 
 void

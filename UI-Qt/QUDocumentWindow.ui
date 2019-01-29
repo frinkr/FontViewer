@@ -101,16 +101,22 @@
      <x>0</x>
      <y>0</y>
      <width>1094</width>
-     <height>22</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_File">
     <property name="title">
      <string>&amp;File</string>
     </property>
+    <widget class="QMenu" name="menuRecent">
+     <property name="title">
+      <string>Recent</string>
+     </property>
+    </widget>
     <addaction name="action_Open"/>
     <addaction name="action_Open_From_File"/>
     <addaction name="action_Close"/>
+    <addaction name="menuRecent"/>
     <addaction name="separator"/>
     <addaction name="action_Quit"/>
    </widget>
