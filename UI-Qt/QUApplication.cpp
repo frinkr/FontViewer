@@ -7,7 +7,7 @@
 #include "QUDocumentWindowManager.h"
 #include "QUApplication.h"
 
-QUApplication::QUApplication(int &argc, char **argv) : QUSingleApplication(argc, argv) {
+QUApplication::QUApplication(int & argc, char ** argv) : QUSingleApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");

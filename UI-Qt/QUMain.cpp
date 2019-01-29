@@ -7,6 +7,7 @@
 #include "QUApplication.h"
 #include "QUDocumentWindowManager.h"
 #include "QUMain.h"
+#include "QUFontManager.h"
 
 #if QU_MAIN
 int main(int argc, char * argv[])
@@ -24,30 +25,18 @@ int quMain(int argc, char *argv[])
     [pool release];
 #endif
 
-    // For use of fancy single and double quotes in dialog messages.
-    //QTextCodec::setCodecForTr(QTextCodec::codecForName("UTF-8"));
-
     Q_INIT_RESOURCE(QUApplication);
     
     QUApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
 	quApp = &app;
 
-    QStringList arguments = app.arguments();
-    bool anotherInstanceExists = false;
-    for (int i = 1; i < arguments.count(); i++)
-        anotherInstanceExists |= app.sendMessage(arguments.at(i).toUtf8());
-
-    // Assume another instance of this application exists if *any* of the messages sent was handled.
-    //if (anotherInstanceExists)
-    //    return 0;
-
-    // load the dark style
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
-    
-    // Otherwise start this instance.
-    QObject::connect(&app, SIGNAL(messageReceived(const QString &)), QUDocumentWindowManager::instance(), SLOT(openFile(const QString &)));
 
+    if (QUFontManager::checkResetDatabase())
+        QUFontManager::resetDatabase();
+
+    QStringList arguments = app.arguments();
     if (arguments.count() > 1)
     {
         for (int i = 1; i < arguments.count(); i++)

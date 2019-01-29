@@ -7,6 +7,15 @@
 class QUFontManager : public QObject {
     Q_OBJECT
 public:
+    static bool
+    checkResetDatabase();
+
+    static void
+    resetDatabase();
+
+    static QString
+    dbFilePath();
+
     static QUFontManager &
     get();
 

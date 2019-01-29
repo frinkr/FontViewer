@@ -46,7 +46,7 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 // Singleton
 QUDocumentWindowManager *
 QUDocumentWindowManager::instance() {
-    if (instance_ == 0)
+    if (instance_ == nullptr)
         instance_ = new QUDocumentWindowManager;
     return instance_;
 }
