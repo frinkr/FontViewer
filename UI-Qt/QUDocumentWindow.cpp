@@ -75,6 +75,10 @@ QUDocumentWindow::initMenu() {
             this, &QUDocumentWindow::onSwitchGlyphLabel);
 
     ui_->action_Open_From_File->setIcon(style()->standardIcon(QStyle::SP_DirOpenIcon, nullptr, this));
+
+#ifdef Q_OS_MAC
+    ui_->action_Full_Screen->setVisible(false);
+#endif
 }
 
 void

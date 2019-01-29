@@ -88,6 +88,8 @@ set(SHARED_SOURCES
   QUDockTitleBarWidget.cpp
   QUAboutDialog.h
   QUAboutDialog.cpp
+  QUMenuBar.h
+  QUMenuBar.cpp
   )
 set(APPLE_SOURCES
   MacMain.mm

@@ -16,6 +16,7 @@
 #include "QUOpenFontDialog.h"
 #include "QUDocumentWindow.h"
 #include "QUDocumentWindowManager.h"
+#include "QUMenuBar.h"
 
 QUDocumentWindowManager * QUDocumentWindowManager::instance_ = nullptr;
 
@@ -23,8 +24,9 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 {
 #ifdef Q_OS_MAC
     // Create default menu bar.
-    QMenuBar *mb = new QMenuBar;
-
+    QMenuBar *mb = new QUMenuBar();
+    
+#if 0
     QMenu *fileMenu = mb->addMenu(tr("&File"));
     fileMenu->addAction(tr("&Open..."), this, &QUDocumentWindowManager::doOpenFontDialog, QKeySequence::Open);
     fileMenu->addAction(tr("Open &File..."), this, &QUDocumentWindowManager::doOpenFontFromFile, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
@@ -35,7 +37,7 @@ QUDocumentWindowManager::QUDocumentWindowManager()
     
     QMenu *helpMenu = mb->addMenu(tr("Help"));
     helpMenu->addAction(tr("&About"), quApp, &QUApplication::about);
-    
+#endif
 #endif
 
     connect(quApp, &QUApplication::aboutToQuit, this, &QUDocumentWindowManager::saveRecentFilesSettings);
@@ -115,6 +117,7 @@ QUDocumentWindowManager::recentFonts() const {
 
 void
 QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
+    return;
     menu->clear();
     foreach(QUDocumentWindow * window, documentWindows_) {
         QAction * action = new QAction(window->windowTitle(), menu);
