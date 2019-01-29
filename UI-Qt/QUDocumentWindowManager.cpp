@@ -6,6 +6,7 @@
 #include <QApplication>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QMetaType>
 
 #ifdef Q_OS_MAC
 #  import <Cocoa/Cocoa.h>
@@ -40,7 +41,8 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 #endif
 #endif
 
-    connect(quApp, &QUApplication::aboutToQuit, this, &QUDocumentWindowManager::saveRecentFilesSettings);
+    loadRecentFontSettings();
+    connect(quApp, &QUApplication::aboutToQuit, this, &QUDocumentWindowManager::saveRecentFontsSettings);
 }
 
 // Singleton
@@ -227,13 +229,32 @@ QUDocumentWindowManager::slotAboutToShowFileMenu() {
 
 #endif
 
-void QUDocumentWindowManager::saveRecentFilesSettings()
-{
+void
+QUDocumentWindowManager::loadRecentFontSettings() {
+    qRegisterMetaTypeStreamOperators<QUFontURI>("QUFontURI");
+
     QSettings settings;
-//    settings.setValue("recentFiles", recentFonts_);
+    QList<QVariant> variantList = settings.value("recentFiles").toList();
+    foreach(QVariant v, variantList) {
+        if (v.canConvert<QUFontURI>())
+            recentFonts_.append(v.value<QUFontURI>());
+    }
 }
 
-void QUDocumentWindowManager::closeAllDocumentsAndQuit()
+void
+QUDocumentWindowManager::saveRecentFontsSettings() {
+    qRegisterMetaTypeStreamOperators<QUFontURI>("QUFontURI");
+
+    QSettings settings;
+    QList<QVariant> variantList;
+    foreach(QUFontURI uri, recentFonts_)
+        variantList.append(QVariant::fromValue(uri));
+
+    settings.setValue("recentFiles", variantList);
+}
+
+void
+QUDocumentWindowManager::closeAllDocumentsAndQuit()
 {
     bool found = false;
     for (int i = 0; i < documentWindows_.size(); i++)
@@ -248,6 +269,6 @@ void QUDocumentWindowManager::closeAllDocumentsAndQuit()
         }
     }
     
-    saveRecentFilesSettings();
+    saveRecentFontsSettings();
     qApp->quit();
 }

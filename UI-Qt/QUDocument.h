@@ -1,6 +1,7 @@
 #pragma once
 #include <QAbstractListModel>
 #include <QImage>
+
 #include "FontX/FXFace.h"
 
 struct QUSearchResult;
@@ -21,7 +22,27 @@ struct QUFontURI
     operator!=(const QUFontURI & other) const {
         return !(*this == other);
     }
+
+    friend QDataStream &
+    operator << (QDataStream & arch, const QUFontURI & uri)
+    {
+        arch << uri.filePath;
+        arch << static_cast<int>(uri.faceIndex);
+        return arch;
+    }
+
+    friend QDataStream &
+    operator >> (QDataStream & arch, QUFontURI & uri)
+    {
+        int index = 0;
+        arch >> uri.filePath;
+        arch >> index;
+        uri.faceIndex = static_cast<size_t>(index);
+        return arch;
+    }
 };
+
+Q_DECLARE_METATYPE(QUFontURI);
 
 class QUGlyph : public QObject {
     Q_OBJECT

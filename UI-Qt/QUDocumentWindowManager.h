@@ -86,8 +86,11 @@ private slots:
     void slotShowWindow();
     void slotAboutToShowFileMenu();
 #endif
+    void
+    loadRecentFontSettings();
 
-    void saveRecentFilesSettings();
+    void
+    saveRecentFontsSettings();
 
 private:
     enum {kMaxRecentFiles = 8};
