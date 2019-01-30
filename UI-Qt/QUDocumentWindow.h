@@ -20,6 +20,7 @@ class QUDocument;
 class QUFontInfoWindow;
 class QUPopoverWindow;
 class QUGlyphInfoWidget;
+class QUMenuBar;
 
 namespace Ui {
     class QUDocumentWindow;
@@ -74,33 +75,6 @@ private:
 private slots:
 
     void
-    onOpenFont();
-
-    void
-    onOpenFontFile();
-
-    void
-    onCloseAction();
-
-    void
-    onQuitAction();
-
-    void
-    showFullGlyphList(bool state);
-
-    void
-    onToggleFullScreen(bool state);
-    
-    void
-    onSwitchGlyphLabel();
-
-    void
-    onAboutToShowWindowMenu();
-
-    void
-    onAboutToShowRecentMenu();
-    
-    void
     onGlyphDoubleClicked(const QModelIndex &index);
 
     void
@@ -130,6 +104,8 @@ private:
     
 private:
     Ui::QUDocumentWindow * ui_;
+    QUMenuBar       * menuBar_;
+    
     QAction         * cmapBlockAction_;
     QUPopoverWindow * cmapBlockWindow_;
     QAction         * shapingAction_;

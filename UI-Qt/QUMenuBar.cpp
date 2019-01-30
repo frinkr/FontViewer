@@ -23,10 +23,21 @@ QUMenuBar::QUMenuBar(QWidget * parent)
         menuRecent = menuFile->addMenu(tr("Open &Recent"));
         connect(menuRecent, &QMenu::aboutToShow, [this]() {
             QUDocumentWindowManager::instance()->aboutToShowRecentMenu(menuRecent);
+            foreach (QAction * action, menuRecent->actions()) {
+                if (!action->isSeparator() && !action->menu()) {
+                    connect(action, &QAction::triggered, [action]() {
+                        QVariant data = action->data();
+                        if (data.canConvert<QUFontURI>()) {
+                            QUFontURI uri = data.value<QUFontURI>();
+                            QUDocumentWindowManager::instance()->openFont(uri);
+                        }
+                    });
+                }
+            }
         });
 
         actionQuit = menuFile->addAction(tr("&Quit"), []() {
-            qApp->quit();
+            QUDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
         }, QKeySequence(QKeySequence::Quit));
         actionQuit->setMenuRole(QAction::QuitRole);
     }

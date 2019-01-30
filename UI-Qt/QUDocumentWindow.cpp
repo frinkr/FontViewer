@@ -16,6 +16,7 @@
 #include "QUGlyphListView.h"
 #include "QUGlyphInfoWidget.h"
 #include "QUGlyphTableWidget.h"
+#include "QUMenuBar.h"
 #include "QUToolBarWidget.h"
 #include "QUSearchWidget.h"
 #include "QUSearchEngine.h"
@@ -64,30 +65,31 @@ QUDocumentWindow::initWindowTitle() {
 
 void
 QUDocumentWindow::initMenu() {
-    QActionGroup * group = new QActionGroup(this);
-    group->addAction(ui_->actionCharacter_Code);
-    group->addAction(ui_->actionGlyph_ID);
-    group->addAction(ui_->actionGlyph_Name);
-    group->setExclusive(true);
-    ui_->actionGlyph_Name->setChecked(true);
+    menuBar_ = new QUMenuBar(this);
 
+    connect(menuBar_, &QUMenuBar::copyActionTriggered, [this](QAction * action) {
+        
+    });
 
-    connect(group, &QActionGroup::triggered,
-            this, &QUDocumentWindow::onSwitchGlyphLabel);
+    connect(menuBar_, &QUMenuBar::glyphLabelActionTriggered, [this](QAction * action, QUGlyphLabel label) {
+        document_->setGlyphLabel(label);
+    });
 
-    ui_->action_Open_From_File->setIcon(style()->standardIcon(QStyle::SP_DirOpenIcon, nullptr, this));
+    connect(menuBar_, &QUMenuBar::showAllGlyphsActionTiggered, [this](QAction * action) {
+        document_->setCharMode(!action->isChecked());
+    });
 
-#ifdef Q_OS_MAC
-    ui_->action_Full_Screen->setVisible(false);
-#endif
+    connect(menuBar_, &QUMenuBar::fullScreenActionTriggered, [this](QAction * action) {
+        if (action->isChecked())
+            showFullScreen();
+        else
+            showNormal();
+    });
 }
 
 void
 QUDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
-
-    //ui_->actionFull_Glyph_List->setIcon(
-	//	quApp->loadIcon(":/images/glyph.png"));
 
     cmapBlockAction_ = toolBar->addAction(
         quApp->loadIcon(":/images/cmap.png"),tr("CMap"),
@@ -140,33 +142,6 @@ QUDocumentWindow::initGlyphInfoView() {
     
 void
 QUDocumentWindow::connectSingals() {
-    connect(ui_->action_Open, &QAction::triggered,
-            this, &QUDocumentWindow::onOpenFont);
-    
-    connect(ui_->action_Open_From_File, &QAction::triggered,
-            this, &QUDocumentWindow::onOpenFontFile);
-
-    connect(ui_->action_Close, &QAction::triggered,
-            this, &QUDocumentWindow::onCloseAction);
-
-    connect(ui_->action_Quit, &QAction::triggered,
-            this, &QUDocumentWindow::onQuitAction);
-
-    connect(ui_->actionFull_Glyph_List, &QAction::toggled,
-            this, &QUDocumentWindow::showFullGlyphList);
-
-    connect(ui_->action_Full_Screen, &QAction::toggled,
-            this, &QUDocumentWindow::onToggleFullScreen);
-
-    connect(ui_->action_About, &QAction::triggered,
-            quApp, &QUApplication::about);
-    
-    connect(ui_->menu_Window, &QMenu::aboutToShow,
-            this, &QUDocumentWindow::onAboutToShowWindowMenu);
-
-    connect(ui_->menuRecent, &QMenu::aboutToShow,
-            this, &QUDocumentWindow::onAboutToShowRecentMenu);
-
     connect(ui_->listView, &QListView::doubleClicked,
             this, &QUDocumentWindow::onGlyphDoubleClicked);
 
@@ -189,61 +164,7 @@ QUDocumentWindow::senderToolButton() {
 void
 QUDocumentWindow::closeEvent(QCloseEvent * event) {
     emit aboutToClose(this);
-
     QMainWindow::closeEvent(event);
-}
-
-void 
-QUDocumentWindow::onOpenFont() {
-    QUDocumentWindowManager::instance()->doOpenFontDialog();
-}
-
-void
-QUDocumentWindow::onOpenFontFile() {
-    QUDocumentWindowManager::instance()->doOpenFontFromFile();
-}
-
-void
-QUDocumentWindow::onCloseAction() {
-    this->close();
-}
-
-void
-QUDocumentWindow::onQuitAction() {
-    QUDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
-}
-
-void
-QUDocumentWindow::showFullGlyphList(bool state) {
-    document_->setCharMode(!state);
-}
-
-void
-QUDocumentWindow::onToggleFullScreen(bool state) {
-    if (state)
-        showFullScreen();
-    else
-        showNormal();
-}
-
-void
-QUDocumentWindow::onAboutToShowWindowMenu() {
-    QUDocumentWindowManager::instance()->aboutToShowWindowMenu(ui_->menu_Window);
-}
-
-void
-QUDocumentWindow::onAboutToShowRecentMenu() {
-    QUDocumentWindowManager::instance()->aboutToShowRecentMenu(ui_->menuRecent);
-}
-
-void
-QUDocumentWindow::onSwitchGlyphLabel() {
-    if (ui_->actionCharacter_Code->isChecked())
-        document_->setGlyphLabel(QUGlyphLabel::CharCode);
-    else if (ui_->actionGlyph_ID->isChecked())
-        document_->setGlyphLabel(QUGlyphLabel::GlyphID);
-    else
-        document_->setGlyphLabel(QUGlyphLabel::GlyphName);
 }
 
 void

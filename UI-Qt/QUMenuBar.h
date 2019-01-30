@@ -45,12 +45,16 @@ public:
     QUMenuBar(QWidget * parent = nullptr);
 
 signals:
+
+    void
+    recentFontActionTriggered(QAction * action, const QUFontURI & uri);
+
     void
     copyActionTriggered(QAction * action);
 
     void
     fullScreenActionTriggered(QAction * action);
-    
+
     void
     showAllGlyphsActionTiggered(QAction * action);
 

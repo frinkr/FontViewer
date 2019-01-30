@@ -84,7 +84,10 @@ public slots:
     void doOpenFontFromFile();
 
     void
-    openFile(const QString &fn);
+    openFile(const QString & filePath);
+
+    void
+    openFont(const QUFontURI & uri);
 
 private slots:
     void

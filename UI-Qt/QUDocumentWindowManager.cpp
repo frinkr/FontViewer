@@ -149,7 +149,8 @@ void
 QUDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
     recentMenu->clear();
     foreach(QURecentFontItem font, recentFonts_) {
-        recentMenu->addAction(font.fullName);
+        QAction * action = recentMenu->addAction(font.fullName);
+        action->setData(QVariant::fromValue<QUFontURI>(font));
     }
 }
 
@@ -158,25 +159,7 @@ QUDocumentWindowManager::doOpenFontDialog() {
     QUOpenFontDialog openDialog(nullptr);
     if (QDialog::Accepted == openDialog.exec()) {
         const QUFontURI fontURI = openDialog.selectedFont();
-
-        // check already open
-        QUDocument * document = getDocument(fontURI);
-        if (document) {
-            QUDocumentWindow * window = getDocumentWindow(document);
-            window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-            window->activateWindow();
-            window->raise();
-        }
-        else {
-            // or open new
-            document = QUDocument::openFromURI(fontURI, this);
-            if (document) {
-                addDocument(document);
-                addToRecents(document);
-                QUDocumentWindow * window = createDocumentWindow(document);
-                window->show();
-            }
-        }
+        openFont(fontURI);
     }
     return;
 }
@@ -197,8 +180,6 @@ QUDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
 #endif    
 }
 
-///////////////////////////////////////////////////////////////////////////////////////////
-
 void
 QUDocumentWindowManager::addToRecents(QUDocument * document) {
     QURecentFontItem item;
@@ -212,7 +193,8 @@ QUDocumentWindowManager::addToRecents(QUDocument * document) {
     recentFonts_.insert(0, item); // add or move to front
 }
 
-void QUDocumentWindowManager::doOpenFontFromFile() {
+void
+QUDocumentWindowManager::doOpenFontFromFile() {
     QFileDialog openFileDialog(nullptr);
 
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
@@ -222,8 +204,32 @@ void QUDocumentWindowManager::doOpenFontFromFile() {
         openFile(openFileDialog.selectedFiles()[0]);
 }
 
-void QUDocumentWindowManager::openFile(const QString & fn) {
+void
+QUDocumentWindowManager::openFile(const QString & filePath) {
+    QUFontURI uri {filePath, 0};
+    openFont(uri);
+}
 
+void
+QUDocumentWindowManager::openFont(const QUFontURI & uri) {
+    // check already open
+    QUDocument * document = getDocument(uri);
+    if (document) {
+        QUDocumentWindow * window = getDocumentWindow(document);
+        window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+        window->activateWindow();
+        window->raise();
+    }
+    else {
+        // or open new
+        document = QUDocument::openFromURI(uri, this);
+        if (document) {
+            addDocument(document);
+            addToRecents(document);
+            QUDocumentWindow * window = createDocumentWindow(document);
+            window->show();
+        }
+    }
 }
 
 
