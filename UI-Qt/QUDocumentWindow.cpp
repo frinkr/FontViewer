@@ -114,7 +114,7 @@ QUDocumentWindow::initToolBar() {
 		quApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QUDocumentWindow::onSearchAction);
     
-    searchAction_->setShortcut(QKeySequence("Ctrl+F"));
+    searchAction_->setShortcut(QKeySequence(QKeySequence::Find));
         
     QWidget * spacer = new QWidget;
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);

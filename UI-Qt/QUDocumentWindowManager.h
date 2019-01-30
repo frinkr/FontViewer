@@ -109,9 +109,6 @@ private slots:
 #ifdef Q_OS_MAC
     void
     slotShowWindow();
-
-    void
-    slotAboutToShowFileMenu();
 #endif
 
     void

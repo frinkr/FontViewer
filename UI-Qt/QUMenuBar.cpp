@@ -61,7 +61,7 @@ QUMenuBar::QUMenuBar(QWidget * parent)
 #ifndef Q_OS_MAC
         actionFullScreen = menuView->addAction(tr("&Full Screen"), [this]() {
             emit fullScreenActionTriggered(actionFullScreen);
-        });
+        }, QKeySequence::FullScreen);
         actionFullScreen->setCheckable(true);
 #else
         actionFullScreen = nullptr;
@@ -92,6 +92,24 @@ QUMenuBar::QUMenuBar(QWidget * parent)
         });
         
 
+    }
+
+    menuWindow = addMenu(tr("&Window")); {
+        actionMinimize = menuWindow->addAction(tr("&Minimize"), [parent]() {
+            if (parent)
+                parent->showMinimized();
+        }, QKeySequence(Qt::CTRL | Qt::Key_M));
+        
+        actionMaximize = menuWindow->addAction(tr("&Zoom"), [parent]() {
+            if (parent)
+                parent->showMaximized();
+        });
+
+        menuWindow->addSeparator();
+
+        connect(menuWindow, &QMenu::aboutToShow, [this]() {
+            QUDocumentWindowManager::instance()->aboutToShowWindowMenu(menuWindow);
+        });
     }
 
     menuHelp = addMenu(tr("&Help")); {

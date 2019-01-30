@@ -29,6 +29,7 @@ public:
 
     // Window menu
     QAction * actionMinimize;
+    QAction * actionMaximize;
     QAction * actionZoom;
 
     // Help menu

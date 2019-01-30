@@ -26,27 +26,7 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 {
 #ifdef Q_OS_MAC
     // Create default menu bar.
-    QMenuBar * mb = new QUMenuBar();
-    
-#if 0
-    QMenu *fileMenu = mb->addMenu(tr("&File"));
-    fileMenu->addAction(tr("&Open..."),
-                        this,
-                        &QUDocumentWindowManager::doOpenFontDialog,
-                        QKeySequence::Open);
-
-    fileMenu->addAction(tr("Open &File..."),
-                        this,
-                        &QUDocumentWindowManager::doOpenFontFromFile,
-                        QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
-
-    openRecentSubMenu = fileMenu->addMenu(tr("Open Recent"));
-    connect(fileMenu, &QMenu::aboutToShow, this, &QUDocumentWindowManager::slotAboutToShowFileMenu);
-    
-    
-    QMenu *helpMenu = mb->addMenu(tr("Help"));
-    helpMenu->addAction(tr("&About"), quApp, &QUApplication::about);
-#endif
+    new QUMenuBar();
 #endif
 
     loadRecentFontSettings();
@@ -132,8 +112,17 @@ QUDocumentWindowManager::recentFonts() const {
 
 void
 QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
-    return;
-    menu->clear();
+    QList<QAction *> actionsToRemove;
+    for (QAction * action: menu->actions()) {
+        QVariant data = action->data();
+        if (data.canConvert<QUFontURI>())
+            actionsToRemove.append(action);
+    }
+
+    for (QAction * action: actionsToRemove) {
+        menu->removeAction(action);
+    }
+
     foreach(QUDocumentWindow * window, documentWindows_) {
         QAction * action = new QAction(window->windowTitle(), menu);
         connect(action, &QAction::triggered, this, [window]() {
@@ -141,6 +130,17 @@ QUDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
             window->raise();
             window->activateWindow();
         });
+        action->setData(QVariant::fromValue<QUFontURI>(window->document()->uri()));
+
+        QWidget * parent = menu;
+        while ((parent = parent->parentWidget())) {
+            if (parent == window) {
+                action->setCheckable(true);
+                action->setChecked(true);
+                break;
+            }
+        }
+        
         menu->addAction(action);
     }
 }
@@ -251,11 +251,6 @@ QUDocumentWindowManager::slotShowWindow()
             w->activateWindow();
         }
     }
-}
-
-void
-QUDocumentWindowManager::slotAboutToShowFileMenu() {
-    
 }
 
 #endif
