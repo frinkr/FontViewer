@@ -1,26 +1,27 @@
 #pragma once
 
-#include <QMainWindow>
-#include <QComboBox>
-#include <QPushButton>
-#include <QCheckBox>
 #include <QAbstractListModel>
+#include <QCheckBox>
+#include <QComboBox>
 #include <QItemDelegate>
 #include <QItemSelection>
+#include <QMainWindow>
+#include <QPushButton>
 
-class QMenu;
 class QAction;
 class QFileDialog;
+class QMenu;
 class QMessageBox;
 class QStringListModel;
 class QToolButton;
 
-class QUDocumentWindowManager;
 class QUDocument;
+class QUDocumentWindowManager;
 class QUFontInfoWindow;
-class QUPopoverWindow;
 class QUGlyphInfoWidget;
 class QUMenuBar;
+class QUPopoverWindow;
+struct QUSearchResult;
 
 namespace Ui {
     class QUDocumentWindow;
@@ -70,7 +71,7 @@ private:
     senderToolButton();
 
     void
-    closeEvent(QCloseEvent *event);
+    closeEvent(QCloseEvent * event);
 
 private slots:
 

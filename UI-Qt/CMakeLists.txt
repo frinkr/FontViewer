@@ -46,6 +46,7 @@ set(SHARED_SOURCES
   QUSingleApplication.cpp
   QUSingleApplication_p.h
   QUDocumentWindowManager.h
+  QUDocumentWindowManager.cpp
   QUDocumentWindow.h
   QUDocumentWindow.cpp
   QUDocument.h
@@ -93,12 +94,12 @@ set(SHARED_SOURCES
   )
 set(APPLE_SOURCES
   MacMain.mm
-  MacQUDocumentWindowManager.mm
   MacApplicationDelegate.h
   MacApplicationDelegate.mm
+  MacHelper.h
+  MacHelper.mm
   )
 set(ALL_SOURCES
-  QUDocumentWindowManager.cpp
   QUMain.cpp
   )
 

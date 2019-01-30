@@ -1,25 +1,27 @@
+#include <QActionGroup>
 #include <QDockWidget>
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QToolButton>
 #include <QWidgetAction>
-#include <QActionGroup>
+
 #include "QUApplication.h"
-#include "QUConv.h"
 #include "QUCMapBlockWidget.h"
-#include "QUDocumentWindowManager.h"
-#include "QUDocumentWindow.h"
+#include "QUConv.h"
 #include "QUDockTitleBarWidget.h"
+#include "QUDocumentWindow.h"
+#include "QUDocumentWindowManager.h"
 #include "QUFontInfoWidget.h"
-#include "QUPopoverWindow.h"
-#include "QUShapingWidget.h"
-#include "QUGlyphListView.h"
 #include "QUGlyphInfoWidget.h"
+#include "QUGlyphListView.h"
 #include "QUGlyphTableWidget.h"
 #include "QUMenuBar.h"
-#include "QUToolBarWidget.h"
-#include "QUSearchWidget.h"
+#include "QUPopoverWindow.h"
 #include "QUSearchEngine.h"
+#include "QUSearchWidget.h"
+#include "QUShapingWidget.h"
+#include "QUToolBarWidget.h"
+
 #include "ui_QUDocumentWindow.h"
 
 QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent) 

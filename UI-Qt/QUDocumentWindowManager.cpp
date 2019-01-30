@@ -8,11 +8,6 @@
 #include <QFileDialog>
 #include <QMetaType>
 
-#ifdef Q_OS_MAC
-#  import <Cocoa/Cocoa.h>
-#  import "MacApplicationDelegate.h"
-#endif
-
 #include "QUConv.h"
 #include "QUApplication.h"
 #include "QUOpenFontDialog.h"

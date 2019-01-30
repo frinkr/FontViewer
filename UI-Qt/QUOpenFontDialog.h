@@ -27,7 +27,11 @@ private slots:
 
     void
     slotFontSelected(const QUFontURI & uri, size_t index);
-        
+
+private:
+    void
+    showEvent(QShowEvent * event);
+    
 private:
     Ui::QUOpenFontDialog * ui_;
     QMenu                * recentMenu_; 

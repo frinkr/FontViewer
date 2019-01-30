@@ -9,6 +9,11 @@
 #include "QUFontManager.h"
 #include "QUResource.h"
 #include "QUOpenFontDialog.h"
+
+#ifdef Q_OS_MAC
+#  include "MacHelper.h"
+#endif
+
 #include "ui_QUOpenFontDialog.h"
 
 namespace {
@@ -110,4 +115,13 @@ QUOpenFontDialog::slotFontSelected(const QUFontURI & uri, size_t index) {
     QUHtmlTemplate * html = QUHtmlTemplate::createFromFile(QUResource::path("/Html/FontInfoTemplate.html"));
     ui_->textBrowser->setHtml(html->instantialize(templateValues(desc, atts)));
     html->deleteLater();
+}
+
+
+void
+QUOpenFontDialog::showEvent(QShowEvent * event) {
+#ifdef Q_OS_MAC
+    MacHelper::hideTitleBar(this);
+#endif
+    QDialog::showEvent(event);
 }
