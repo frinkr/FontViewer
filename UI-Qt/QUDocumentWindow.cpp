@@ -87,6 +87,8 @@ QUDocumentWindow::initMenu() {
         else
             showNormal();
     });
+
+    setMenuBar(menuBar_);
 }
 
 void
