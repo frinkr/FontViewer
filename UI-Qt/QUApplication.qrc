@@ -19,6 +19,8 @@
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
     <file alias="images/open.png">../Resources/Images/open.png</file>
     <file alias="images/open_d.png">../Resources/Images/open_d.png</file>
+    <file alias="images/history.png">../Resources/Images/history.png</file>
+    <file alias="images/history_d.png">../Resources/Images/history_d.png</file>
     <file alias="images/variant.png">../Resources/Images/variant.png</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
     <file alias="images/ok.png">../Resources/Images/OK.png</file>

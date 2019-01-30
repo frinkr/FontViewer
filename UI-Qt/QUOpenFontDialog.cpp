@@ -1,4 +1,5 @@
 #include <QFileDialog>
+#include <QMenu>
 #include <QSettings>
 
 #include "QUApplication.h"
@@ -35,14 +36,13 @@ namespace {
 
 QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
     : QDialog(parent)
-    , ui_(new Ui::QUOpenFontDialog) {
+    , ui_(new Ui::QUOpenFontDialog)
+    , recentMenu_(nullptr) {
     ui_->setupUi(this);
-    
-	ui_->browseButton->setIcon(quApp->loadIcon(":/images/filter.png"));
-	ui_->filterButton->setIcon(quApp->loadIcon(":/images/open.png"));
+	ui_->filterButton->setIcon(quApp->loadIcon(":/images/filter.png"));
+    ui_->recentButton->setIcon(quApp->loadIcon(":/images/history.png"));
 
-    connect(ui_->browseButton, &QPushButton::clicked,
-            this, &QUOpenFontDialog::slotBrowseFile);
+    
     connect(ui_->fontComboBox, &QUFontComboBox::fontSelected,
             this, &QUOpenFontDialog::slotFontSelected);
     
@@ -53,6 +53,24 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
 
     slotFontSelected(ui_->fontComboBox->selectedFont(),
                      ui_->fontComboBox->selectedFontIndex());
+
+    recentMenu_ = new QMenu(ui_->recentButton);
+    ui_->recentButton->setMenu(recentMenu_);
+
+    connect(recentMenu_, &QMenu::aboutToShow, [this]() {
+        QUDocumentWindowManager::instance()->aboutToShowRecentMenu(recentMenu_);
+        foreach (QAction * action, recentMenu_->actions()) {
+            if (!action->isSeparator() && !action->menu()) {
+                connect(action, &QAction::triggered, [this, action]() {
+                    QVariant data = action->data();
+                    if (data.canConvert<QUFontURI>()) {
+                        QUFontURI uri = data.value<QUFontURI>();
+                        ui_->fontComboBox->selectFont(uri);
+                    }
+                });
+            }
+        }
+    });
 }
 
 QUOpenFontDialog::~QUOpenFontDialog() {

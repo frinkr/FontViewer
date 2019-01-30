@@ -30,6 +30,7 @@ private slots:
         
 private:
     Ui::QUOpenFontDialog * ui_;
+    QMenu                * recentMenu_; 
 };
 
 #endif

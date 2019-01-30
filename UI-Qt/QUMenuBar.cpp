@@ -99,7 +99,7 @@ QUMenuBar::QUMenuBar(QWidget * parent)
             if (parent)
                 parent->showMinimized();
         }, QKeySequence(Qt::CTRL | Qt::Key_M));
-        
+
         actionMaximize = menuWindow->addAction(tr("&Zoom"), [parent]() {
             if (parent)
                 parent->showMaximized();
