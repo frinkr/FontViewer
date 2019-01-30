@@ -180,7 +180,7 @@ QUDocumentWindowManager::addToRecents(QUDocument * document) {
     QURecentFontItem item;
     item.filePath  = document->uri().filePath;
     item.faceIndex = document->uri().faceIndex;
-    item.fullName  = QUDocument::faceGUIName(document->face()->attributes());
+    item.fullName  = QUDocument::faceDisplayName(document->face()->attributes());
 
     int index = recentFonts_.indexOf(item);
     if (index != -1)

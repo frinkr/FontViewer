@@ -27,6 +27,9 @@ public:
 
     QString
     displayName(size_t index) const;
+
+    QIcon
+    icon(size_t index) const;
 };
 
 class QUSortFilterFontListModel : public QSortFilterProxyModel {

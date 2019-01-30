@@ -21,7 +21,7 @@ namespace {
     templateValues(const FXFaceDescriptor & desc, const FXFaceAttributes & atts) {
         QMap<QString, QVariant> map;
 
-        map["FULL_NAME"]   = QUDocument::faceGUIName(atts);
+        map["FULL_NAME"]   = QUDocument::faceDisplayName(atts);
         map["PS_NAME"]     = toQString(atts.names.postscriptName());
         map["VENDOR"]      = toQString(atts.names.vendor());
         map["VERSION"]     = toQString(atts.names.version());

@@ -1,17 +1,19 @@
 #include <QAbstractItemView>
-#include <QEvent>
-#include <QKeyEvent>
-#include <QFocusEvent>
 #include <QApplication>
+#include <QEvent>
 #include <QFileInfo>
+#include <QFocusEvent>
+#include <QKeyEvent>
 #include <QLineEdit>
-#include <QTimer>
 #include <QSortFilterProxyModel>
+#include <QTimer>
 #include <QValidator>
+
 #include "FontX/FXFaceDatabase.h"
-#include "QUFontManager.h"
-#include "QUFontComboBox.h"
+#include "QUApplication.h"
 #include "QUConv.h"
+#include "QUFontComboBox.h"
+#include "QUFontManager.h"
 
 namespace {
     class QUFalseValidator : public QValidator {
@@ -41,6 +43,8 @@ QUFontListModel::data(const QModelIndex & index, int role) const {
         return QVariant();
     if (role == Qt::DisplayRole) 
         return displayName(index.row());
+    else if (role == Qt::DecorationRole)
+        return icon(index.row());
     else
         return QVariant();
     
@@ -77,13 +81,19 @@ QUFontListModel::attributes(size_t index) const {
 QString
 QUFontListModel::displayName(size_t index) const {
     auto const & attrs = attributes(index);
-    QString familyName = toQString(attrs.names.familyName());
-    QString styleName = toQString(attrs.names.styleName());
-    if (!familyName.isEmpty())
-        return QString("%1 - %2").arg(familyName, styleName);
-    else
-        return QFileInfo(toQString(attrs.desc.filePath)).fileName();
-    
+    return QUDocument::faceDisplayName(attrs);
+}
+
+QIcon
+QUFontListModel::icon(size_t index) const {
+    auto const & attrs = attributes(index);
+    if (attrs.format == "CFF")
+        return quApp->loadIcon(":/images/opentype.png");
+    if (attrs.format == "Type 1")
+        return quApp->loadIcon(":/images/postscript.png");
+    if (attrs.format == "TrueType")
+        return quApp->loadIcon(":/images/truetype.png");
+    return QIcon();
 }
 
 FXPtr<FXFaceDatabase>

@@ -25,15 +25,23 @@ QUApplication::darkMode() const {
 }
 
 QIcon
-QUApplication::loadIcon(const QString & path) const {
+QUApplication::loadIcon(const QString & path) {
+    auto itr = iconCache_.find(path);
+    if (itr != iconCache_.end())
+        return itr.value();
+
+    QIcon icon;
 	if (darkMode()) {
 		QFileInfo fi(path);
 		QString d = fi.dir().filePath(fi.baseName() + "_d." + fi.completeSuffix());
 		fi = QFileInfo(d);
 		if (fi.exists())
-			return QIcon(d);
+			icon = QIcon(d);
 	}
-	return QIcon(path);
+    if (icon.isNull())
+        icon = QIcon(path);
+    iconCache_.insert(path, icon);
+    return icon;
 }
 
 QUApplication::~QUApplication() {

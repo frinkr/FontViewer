@@ -16,7 +16,7 @@ public:
 	darkMode() const;
 
 	QIcon
-	loadIcon(const QString & path) const;
+	loadIcon(const QString & path);
 
 public slots:
     void
@@ -26,6 +26,9 @@ private:
 #ifdef Q_OS_MAC
     bool event(QEvent *);
 #endif
+
+private:
+    QMap<QString, QIcon> iconCache_;
 };
 
 extern QUApplication * quApp;

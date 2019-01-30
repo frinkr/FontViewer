@@ -24,5 +24,11 @@
     <file alias="images/variant.png">../Resources/Images/variant.png</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
     <file alias="images/ok.png">../Resources/Images/OK.png</file>
+    <file alias="images/truetype.png">../Resources/Images/truetype.png</file>
+    <file alias="images/truetype_d.png">../Resources/Images/truetype_d.png</file>
+    <file alias="images/opentype.png">../Resources/Images/opentype.png</file>
+    <file alias="images/opentype_d.png">../Resources/Images/opentype_d.png</file>
+    <file alias="images/postscript.png">../Resources/Images/postscript.png</file>
+    <file alias="images/postscript_d.png">../Resources/Images/postscript_d.png</file>
 </qresource>
 </RCC>

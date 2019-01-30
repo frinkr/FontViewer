@@ -33,7 +33,7 @@ QUDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * p
 }
 
 QString
-QUDocument::faceGUIName(const FXFaceAttributes & atts) {
+QUDocument::faceDisplayName(const FXFaceAttributes & atts) {
     QString familyName = toQString(atts.names.familyName());
     QString styleName = toQString(atts.names.styleName());
 
