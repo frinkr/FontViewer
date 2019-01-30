@@ -2,14 +2,17 @@
 #  include <fontconfig/fontconfig.h>
 #endif
 
+
+#include <QDir>
 #include <QGuiApplication>
 #include <QLabel>
-#include <QStandardPaths>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <QDir>
+#include <QStandardPaths>
+
 #include "QUConv.h"
 #include "QUFontManager.h"
+#include "QUProgressDialog.h"
 
 namespace {
     QStringList fontDirs() {
@@ -28,14 +31,10 @@ namespace {
 #endif
     }
 
-	QProgressDialog *
+    QUProgressDialog *
 	createProgressDialog() {
-		QProgressDialog * progress = new QProgressDialog(nullptr, Qt::Dialog);
+		QUProgressDialog * progress = new QUProgressDialog(nullptr);
 		progress->setWindowModality(Qt::WindowModal);
-		progress->setMinimumWidth(400);
-		progress->setMaximumWidth(400);
-		progress->setAutoReset(false);
-		progress->setCancelButton(nullptr);
 		progress->setWindowTitle("Rebuilding font database...");
 		return progress;
 	}
@@ -95,13 +94,11 @@ QUFontManager::QUFontManager() {
 	const QString dbPath = dbFilePath();
 
 	// Load database.
-	QProgressDialog * progress = createProgressDialog();
+	QUProgressDialog * progress = createProgressDialog();
     db_.reset(new FXFaceDatabase(dirs,			
 		dbPath.toUtf8().constData(),
         [progress](size_t current, size_t total, const FXString & file) {
-            progress->setMaximum(static_cast<int>(total));
-            progress->setValue(static_cast<int>(current));
-			progress->setLabelText(toQString(file));
+            progress->setProgress(current, total, toQString(file));
             return true;
         }
     ));
