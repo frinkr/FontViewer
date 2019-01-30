@@ -2,6 +2,8 @@
 
 #ifdef Q_OS_MAC
 #  include "MacHelper.h"
+#else
+#  include "QUTheme.h"
 #endif
 
 #include "QUApplication.h"
@@ -28,6 +30,10 @@ int quMain(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/app.png"));
 	quApp = &app;
 
+#ifdef Q_OS_WIN
+    QUTheme::applyDarkFusion();
+#endif
+    
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     if (QUFontManager::checkResetDatabase())

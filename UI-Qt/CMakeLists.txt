@@ -93,6 +93,8 @@ set(SHARED_SOURCES
   QUSingleApplication.cpp
   QUSingleApplication.h
   QUSingleApplication_p.h
+  QUTheme.h
+  QUTheme.cpp
   QUToolBarWidget.cpp
   QUToolBarWidget.h
   )
