@@ -34,13 +34,16 @@ int quMain(int argc, char *argv[])
         QUFontManager::resetDatabase();
 
     QStringList arguments = app.arguments();
-    if (arguments.count() > 1)
-    {
+    if (arguments.count() > 1) {
         for (int i = 1; i < arguments.count(); i++)
             QUDocumentWindowManager::instance()->openFile(arguments.at(i));
     }
-    else
+    else {
+#ifndef Q_OS_MAC
+        // For macOS, it's handled in MacApplicationDelegate
         QUDocumentWindowManager::instance()->doOpenFontDialog();
+#endif
+    }  
 
     return app.exec();
 }

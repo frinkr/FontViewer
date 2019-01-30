@@ -76,6 +76,17 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
             }
         }
     });
+
+    // Add actions
+    QAction * closeAction = new QAction(this);
+    connect(closeAction, &QAction::triggered, this, &QDialog::close);
+    closeAction->setShortcuts(QKeySequence::Close);
+    addAction(closeAction);
+
+    QAction * quitAction = new QAction(this);
+    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    quitAction->setShortcuts(QKeySequence::Quit);
+    addAction(quitAction);
 }
 
 QUOpenFontDialog::~QUOpenFontDialog() {
