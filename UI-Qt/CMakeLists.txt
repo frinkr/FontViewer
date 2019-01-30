@@ -25,82 +25,79 @@ if (UIQT_USE_FONTCONFIG)
 endif()
 
 set(UI
-  QUDocumentWindow.ui
-  QUOpenFontDialog.ui
-  QUFontInfoWidget.ui
-  QUCMapBlockWidget.ui
-  QUSearchWidget.ui
-  QUGlyphTableWidget.ui
-  QUShapingWidget.ui
   QUAboutDialog.ui
+  QUCMapBlockWidget.ui
+  QUDocumentWindow.ui
+  QUFontInfoWidget.ui
+  QUGlyphTableWidget.ui
+  QUOpenFontDialog.ui
+  QUSearchWidget.ui
+  QUShapingWidget.ui
   )
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
 set(SHARED_SOURCES 
-  QUMain.h
-  QUApplication.h
+  QUAboutDialog.cpp
+  QUAboutDialog.h
   QUApplication.cpp
+  QUApplication.h
   QUApplication.qrc
-  QUSingleApplication.h
-  QUSingleApplication.cpp
-  QUSingleApplication_p.h
-  QUDocumentWindowManager.h
-  QUDocumentWindowManager.cpp
-  QUDocumentWindow.h
-  QUDocumentWindow.cpp
-  QUDocument.h
-  QUDocument.cpp
-  QUOpenFontDialog.h
-  QUOpenFontDialog.cpp
-  QUConv.h
+  QUCMapBlockWidget.cpp
+  QUCMapBlockWidget.h
   QUConv.cpp
-  QUEncoding.h
+  QUConv.h
+  QUDockTitleBarWidget.cpp
+  QUDockTitleBarWidget.h
+  QUDocument.cpp
+  QUDocument.h
+  QUDocumentWindow.cpp
+  QUDocumentWindow.h
+  QUDocumentWindowManager.cpp
+  QUDocumentWindowManager.h
   QUEncoding.cpp
-  QUGlyphListView.h
-  QUGlyphListView.cpp
-  QUGlyphInfoWidget.h
+  QUEncoding.h
+  QUFontComboBox.cpp
+  QUFontComboBox.h
+  QUFontInfoWidget.cpp
+  QUFontInfoWidget.h
+  QUFontManager.cpp
+  QUFontManager.h
   QUGlyphInfoWidget.cpp
+  QUGlyphInfoWidget.h
+  QUGlyphListView.cpp
+  QUGlyphListView.h
+  QUGlyphTableWidget.cpp
+  QUGlyphTableWidget.h
+  QUHtmlTemplate.cpp
+  QUHtmlTemplate.h
+  QUMain.cpp
+  QUMain.h
+  QUMenuBar.cpp
+  QUMenuBar.h
+  QUOpenFontDialog.cpp
+  QUOpenFontDialog.h
+  QUPopoverWindow.cpp
+  QUPopoverWindow.h
+  QUResource.cpp
+  QUResource.h
+  QUSearchEngine.cpp
+  QUSearchEngine.h
+  QUSearchWidget.cpp
+  QUSearchWidget.h
+  QUShapingWidget.cpp
+  QUShapingWidget.h
+  QUSingleApplication.cpp
+  QUSingleApplication.h
+  QUSingleApplication_p.h
   QUToolBarWidget.cpp
   QUToolBarWidget.h
-  QUHtmlTemplate.h
-  QUHtmlTemplate.cpp
-  QUFontManager.h
-  QUFontManager.cpp
-  QUFontComboBox.h
-  QUFontComboBox.cpp
-  QUFontInfoWidget.h
-  QUFontInfoWidget.cpp
-  QUResource.h
-  QUResource.cpp
-  QUCMapBlockWidget.h
-  QUCMapBlockWidget.cpp
-  QUPopoverWindow.h
-  QUPopoverWindow.cpp
-  QUSearchWidget.h
-  QUSearchWidget.cpp
-  QUSearchEngine.h
-  QUSearchEngine.cpp
-  QUGlyphTableWidget.h
-  QUGlyphTableWidget.cpp
-  QUShapingWidget.h
-  QUShapingWidget.cpp
-  QUDockTitleBarWidget.h
-  QUDockTitleBarWidget.cpp
-  QUAboutDialog.h
-  QUAboutDialog.cpp
-  QUMenuBar.h
-  QUMenuBar.cpp
   )
 set(APPLE_SOURCES
-  MacMain.mm
   MacApplicationDelegate.h
   MacApplicationDelegate.mm
   MacHelper.h
   MacHelper.mm
-  )
-set(ALL_SOURCES
-  QUMain.cpp
   )
 
 if (APPLE)

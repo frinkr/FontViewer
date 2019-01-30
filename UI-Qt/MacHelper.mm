@@ -1,7 +1,9 @@
 #include <QWidget>
 
-#import "MacHelper.h"
 #import <AppKit/AppKit.h>
+#import "MacApplicationDelegate.h"
+#import "MacHelper.h"
+
 
 void
 MacHelper::hideTitleBar(QWidget * widget)
@@ -18,4 +20,12 @@ MacHelper::hideTitleBar(QWidget * widget)
     
     nativeWindow.titlebarAppearsTransparent = true;
     //nativeWindow.titleVisibility = NSWindowTitleHidden; // Hide window title name
+}
+
+
+void
+MacHelper::installNSApplicationDelegate() {
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    [[NSApplication sharedApplication] setDelegate:[[MacApplicationDelegate alloc] init]];
+    [pool release];
 }

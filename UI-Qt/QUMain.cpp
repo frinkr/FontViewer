@@ -1,7 +1,7 @@
 #include <QtGui>
 
 #ifdef Q_OS_MAC
-#import "MacApplicationDelegate.h"
+#  include "MacHelper.h"
 #endif
 
 #include "QUApplication.h"
@@ -19,10 +19,7 @@ int main(int argc, char * argv[])
 int quMain(int argc, char *argv[])
 {
 #ifdef Q_OS_MAC
-    // Initiate shared application and setup delegate so QApplication constructor (ancestor of QtDocBasedApplication) will pick that up as "reflection delegate" (see src/gui/kernel/qapplication_mac.mm)
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    [[NSApplication sharedApplication] setDelegate:[[MacApplicationDelegate alloc] init]];
-    [pool release];
+    MacHelper::installNSApplicationDelegate();
 #endif
 
     Q_INIT_RESOURCE(QUApplication);

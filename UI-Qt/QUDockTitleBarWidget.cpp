@@ -1,10 +1,12 @@
+#include <QDockWidget>
 #include <QHBoxLayout>
 #include <QMouseEvent>
-#include <QDockWidget>
 #include <QPainter>
 #include <QPushButton>
-#include <QStylePainter>
 #include <QSpacerItem>
+#include <QStylePainter>
+
+#include "QUApplication.h"
 #include "QUDockTitleBarWidget.h"
 
 namespace {
@@ -16,9 +18,8 @@ QUDockTitleBarWidget::QUDockTitleBarWidget(QWidget * parent)
     QHBoxLayout * layout = new QHBoxLayout(this);
     QSpacerItem * spacer = new QSpacerItem(10, TITLE_BAR_HEIGHT, QSizePolicy::Expanding, QSizePolicy::Minimum);
     
-    int iconSize = TITLE_BAR_HEIGHT - 3;
-    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_DockWidgetCloseButton, nullptr, this);
-    //closeIcon = closeIcon.scaled(iconSize, iconSize, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation);
+    int iconSize = TITLE_BAR_HEIGHT - 6;
+    QIcon closeIcon = quApp->loadIcon(":/images/close.png");
     QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
 
     closeButton->setMinimumSize(iconSize, iconSize);
