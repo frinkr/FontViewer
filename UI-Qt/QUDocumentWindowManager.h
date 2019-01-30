@@ -88,15 +88,11 @@ public slots:
 
 private slots:
     void
-    slotDocumentWindowDestroyed(QObject * obj);
+    onDocumentWindowAboutToClose(QUDocumentWindow * window);
 
-private:
-    QList<QPointer<QUDocumentWindow> > documentWindows_;
-    QList<QPointer<QUDocument> > documents_; 
-    static QUDocumentWindowManager * instance_;
+    void
+    onDocumentWindowDestroyed(QObject * obj);
 
-    //////////////////////////////////////////////////////////////////////////
-    
 protected:
     void
     removeDocumentWindow(QUDocumentWindow *w);
@@ -108,9 +104,13 @@ protected:
 private slots:
     
 #ifdef Q_OS_MAC
-    void slotShowWindow();
-    void slotAboutToShowFileMenu();
+    void
+    slotShowWindow();
+
+    void
+    slotAboutToShowFileMenu();
 #endif
+
     void
     loadRecentFontSettings();
 
@@ -119,11 +119,16 @@ private slots:
 
 private:
     enum {kMaxRecentFiles = 8};
+
     QList<QURecentFontItem> recentFonts_;
 
 #ifdef Q_OS_MAC
-    QMenu *openRecentSubMenu;
+    QMenu * openRecentSubMenu;
 #endif
+    QList<QPointer<QUDocumentWindow> > documentWindows_;
+    QList<QPointer<QUDocument> >       documents_;
+    bool                               quitRequested_ {false};
+    static QUDocumentWindowManager   * instance_;
 
 };
 

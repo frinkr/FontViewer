@@ -3,33 +3,57 @@
 #include <QtWidgets/QMenu>
 #include <QtWidgets/QMenuBar>
 
+#include "QUDocument.h"
+
 class QUMenuBar : public QMenuBar {
     Q_OBJECT
 public:
-    QAction *actionAbout;
+
     
+    // File menu
+    QAction * actionOpen;
+    QAction * actionOpenFromFile;
+    QAction * actionClose;
+    QAction * actionRecent;
+    QAction * actionQuit;
 
-    QAction *actionOpen;
-    QAction *actionOpenFromFile;
-    QAction *actionClose;
-    QAction *actionQuit;
+    // Edit menu
+    QAction * actionCopy;
 
-    QAction *actionCopy;
-    QAction *actionFullScreen;
-    QAction *actionCharacterCode;
-    QAction *actionGlyphName;
-    QAction *actionGlyphID;
-    QAction *actionFullGlyphList;
-    QAction *actionGlyph;
-    QAction *actionProperties;
-    QAction *actionMinimize;
-    QAction *actionZoom;
+    // View menu
+    QAction * actionCharacterCode;
+    QAction * actionGlyphName;
+    QAction * actionGlyphID;
+    QAction * actionFullScreen;
+    QAction * actionShowAllGlyphs;
 
-    QMenu *menuFile;
-    QMenu *menuEdit;
-    QMenu *menuView;
-    QMenu *menuWindow;
-    QMenu *menuHelp;
+    // Window menu
+    QAction * actionMinimize;
+    QAction * actionZoom;
 
-    QUMenuBar(QWidget *parent = nullptr);
+    // Help menu
+    QAction * actionAbout;
+
+
+    QMenu * menuFile;
+    QMenu * menuRecent;
+    QMenu * menuEdit;
+    QMenu * menuView;
+    QMenu * menuWindow;
+    QMenu * menuHelp;
+
+    QUMenuBar(QWidget * parent = nullptr);
+
+signals:
+    void
+    copyActionTriggered(QAction * action);
+
+    void
+    fullScreenActionTriggered(QAction * action);
+    
+    void
+    showAllGlyphsActionTiggered(QAction * action);
+
+    void
+    glyphLabelActionTriggered(QAction * action, QUGlyphLabel label);
 };

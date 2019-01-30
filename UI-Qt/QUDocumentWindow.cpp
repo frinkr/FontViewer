@@ -35,7 +35,8 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-
+    document->setParent(this);
+    
     initUI();
 }
 
@@ -183,6 +184,13 @@ QUDocumentWindow::senderToolButton() {
         return qobject_cast<QToolButton*>(ui_->toolBar->widgetForAction(action));
     
     return qobject_cast<QToolButton *>(sender());
+}
+
+void
+QUDocumentWindow::closeEvent(QCloseEvent * event) {
+    emit aboutToClose(this);
+
+    QMainWindow::closeEvent(event);
 }
 
 void 

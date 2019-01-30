@@ -1,3 +1,4 @@
+#include <QFileInfo>
 #include "QUConv.h"
 #include "QUSearchEngine.h"
 #include "QUDocument.h"
@@ -29,6 +30,19 @@ QUDocument *
 QUDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * parent) {
     QUFontURI uri{filePath, faceIndex};
     return openFromURI(uri, parent);
+}
+
+QString
+QUDocument::faceGUIName(const FXFaceAttributes & atts) {
+    QString familyName = toQString(atts.names.familyName());
+    QString styleName = toQString(atts.names.styleName());
+
+    QString fullName;
+    if (!familyName.isEmpty())
+        fullName = QString("%1 - %2").arg(familyName, styleName);
+    else
+        fullName = QString("%1 - %2").arg(QFileInfo(toQString(atts.desc.filePath)).fileName(), atts.desc.index);
+    return fullName;
 }
 
 FXPtr<FXFace>

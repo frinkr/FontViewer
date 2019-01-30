@@ -15,16 +15,7 @@ namespace {
     templateValues(const FXFaceDescriptor & desc, const FXFaceAttributes & atts) {
         QMap<QString, QVariant> map;
 
-        QString familyName = toQString(atts.names.familyName());
-        QString styleName = toQString(atts.names.styleName());
-
-        QString fullName;
-        if (!familyName.isEmpty())
-            fullName = QString("%1 - %2").arg(familyName, styleName);
-        else
-            fullName = QString("%1 - %2").arg(QFileInfo(toQString(desc.filePath)).fileName(), desc.index);
-
-        map["FULL_NAME"]   = fullName;
+        map["FULL_NAME"]   = QUDocument::faceGUIName(atts);
         map["PS_NAME"]     = toQString(atts.names.postscriptName());
         map["VENDOR"]      = toQString(atts.names.vendor());
         map["VERSION"]     = toQString(atts.names.version());

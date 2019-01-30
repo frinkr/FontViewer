@@ -83,6 +83,9 @@ public:
     static QUDocument *
     openFromFile(const QString & filePath, size_t faceIndex, QObject * parent = nullptr);
 
+    static QString
+    faceGUIName(const FXFaceAttributes & atts);
+
 public:
     const QUFontURI &
     uri() const { return uri_; }

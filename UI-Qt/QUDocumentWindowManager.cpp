@@ -26,12 +26,19 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 {
 #ifdef Q_OS_MAC
     // Create default menu bar.
-    QMenuBar *mb = new QUMenuBar();
+    QMenuBar * mb = new QUMenuBar();
     
 #if 0
     QMenu *fileMenu = mb->addMenu(tr("&File"));
-    fileMenu->addAction(tr("&Open..."), this, &QUDocumentWindowManager::doOpenFontDialog, QKeySequence::Open);
-    fileMenu->addAction(tr("Open &File..."), this, &QUDocumentWindowManager::doOpenFontFromFile, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
+    fileMenu->addAction(tr("&Open..."),
+                        this,
+                        &QUDocumentWindowManager::doOpenFontDialog,
+                        QKeySequence::Open);
+
+    fileMenu->addAction(tr("Open &File..."),
+                        this,
+                        &QUDocumentWindowManager::doOpenFontFromFile,
+                        QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
 
     openRecentSubMenu = fileMenu->addMenu(tr("Open Recent"));
     connect(fileMenu, &QMenu::aboutToShow, this, &QUDocumentWindowManager::slotAboutToShowFileMenu);
@@ -96,9 +103,14 @@ QUDocumentWindowManager::createDocumentWindow(QUDocument * document) {
     QUDocumentWindow * window = new QUDocumentWindow(document, nullptr);
 
     connect(window,
+            &QUDocumentWindow::aboutToClose,
+            this,
+            &QUDocumentWindowManager::onDocumentWindowAboutToClose);
+
+    connect(window,
             &QUDocumentWindow::destroyed,
             this,
-            &QUDocumentWindowManager::slotDocumentWindowDestroyed);
+            &QUDocumentWindowManager::onDocumentWindowDestroyed);
     
     documentWindows_.append(window);
     return window;            
@@ -170,36 +182,29 @@ QUDocumentWindowManager::doOpenFontDialog() {
 }
 
 void
-QUDocumentWindowManager::slotDocumentWindowDestroyed(QObject * obj) {
+QUDocumentWindowManager::onDocumentWindowAboutToClose(QUDocumentWindow * window) {
     // remove from list
-    QUDocumentWindow * window = qobject_cast<QUDocumentWindow*>(obj);
     removeDocumentWindow(window);
     removeDocument(window->document());
+}
 
+void
+QUDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
 #ifdef Q_OS_MAC
     // show Open Font dialog if no document open
-    if (documents_.empty())
+    if (!quitRequested_ && documents_.empty())
         doOpenFontDialog();
-#endif
+#endif    
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 void
 QUDocumentWindowManager::addToRecents(QUDocument * document) {
-    QString familyName = toQString(document->face()->attributes().names.familyName());
-    QString styleName = toQString(document->face()->attributes().names.styleName());
-
-    QString fullName;
-    if (!familyName.isEmpty())
-        fullName = QString("%1 - %2").arg(familyName, styleName);
-    else
-        fullName = QString("%1 - %2").arg(QFileInfo(document->uri().filePath).fileName()).arg(document->uri().faceIndex);
-
     QURecentFontItem item;
     item.filePath  = document->uri().filePath;
     item.faceIndex = document->uri().faceIndex;
-    item.fullName  = fullName;
+    item.fullName  = QUDocument::faceGUIName(document->face()->attributes());
 
     int index = recentFonts_.indexOf(item);
     if (index != -1)
@@ -274,21 +279,13 @@ QUDocumentWindowManager::saveRecentFontsSettings() {
 }
 
 void
-QUDocumentWindowManager::closeAllDocumentsAndQuit()
-{
-    bool found = false;
-    for (int i = 0; i < documentWindows_.size(); i++)
-    {
-        QUDocumentWindow *w = documentWindows_[i];
-        if (!w->isWindowModified())
-        {
-            connect(w, SIGNAL(destroyed()), this, SLOT(closeAllUnmodifiedDocsAndInitiateQuit()));
-            w->close();
-            found = true;
-            break;
-        }
+QUDocumentWindowManager::closeAllDocumentsAndQuit() {
+    for (int i = 0; i < documentWindows_.size(); i++) {
+        QUDocumentWindow * w = documentWindows_[i];
+        w->close();
     }
     
     saveRecentFontsSettings();
+    quitRequested_ = true;
     qApp->quit();
 }

@@ -39,6 +39,10 @@ public:
         return document_;
     }
 
+signals:
+    void
+    aboutToClose(QUDocumentWindow * window);
+
 private:
     void
     initUI();
@@ -63,7 +67,10 @@ private:
 
     QToolButton *
     senderToolButton();
-                      
+
+    void
+    closeEvent(QCloseEvent *event);
+
 private slots:
 
     void
