@@ -93,6 +93,8 @@ QUFontListModel::icon(size_t index) const {
         return quApp->loadIcon(":/images/postscript.png");
     if (attrs.format == "TrueType")
         return quApp->loadIcon(":/images/truetype.png");
+    if (attrs.format == "Windows FNT")
+        return quApp->loadIcon(":/images/windowsfnt.png");
     return QIcon();
 }
 

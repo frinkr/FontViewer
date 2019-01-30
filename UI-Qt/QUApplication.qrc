@@ -30,6 +30,7 @@
     <file alias="images/truetype_d.png">../Resources/Images/truetype_d.png</file>
     <file alias="images/undefined.png">../Resources/Images/undefined.png</file>
     <file alias="images/undefined_d.png">../Resources/Images/undefined_d.png</file>
+    <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
     <file alias="images/variant.png">../Resources/Images/variant.png</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
 </qresource>
