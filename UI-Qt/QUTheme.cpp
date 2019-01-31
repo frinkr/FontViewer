@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QPalette>
+#include <QMenuBar>
 #include <QStyleFactory>
 #include "QUTheme.h"
 
@@ -31,3 +32,13 @@ QUTheme::applyDarkFusion() {
     qApp->setPalette(darkPalette);
 }
 
+void
+QUTheme::applyDarkFusionOnMenuBar(QMenuBar * menuBar) {
+    QString style = QString("background-color:%1;").arg("#353535");
+    menuBar->setStyleSheet(style);
+    for (QAction * action : menuBar->actions()) {
+        if (QMenu * menu = action->menu()) {
+            menu->setStyleSheet(style);
+        }
+    }
+}
