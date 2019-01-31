@@ -4,6 +4,10 @@
 #include <QStyleFactory>
 #include "QUTheme.h"
 
+#ifdef Q_OS_WIN
+#  include <Windows.h>
+#endif
+
 void
 QUTheme::applyDarkFusion() {
     qApp->setStyle(QStyleFactory::create("Fusion"));
@@ -41,4 +45,20 @@ QUTheme::applyDarkFusionOnMenuBar(QMenuBar * menuBar) {
             menu->setStyleSheet(style);
         }
     }
+}
+
+void
+QUTheme::applyDarkFusionOnWindowTitleBar() {
+#ifdef Q_OS_WIN
+    int aElements[2] = { COLOR_INACTIVECAPTION, COLOR_ACTIVECAPTION };
+    DWORD aOldColors[2];
+    DWORD aNewColors[2];
+
+    aOldColors[0] = GetSysColor(aElements[0]);
+    aOldColors[1] = GetSysColor(aElements[1]);
+    aNewColors[0] = RGB(0x80, 0x80, 0x80);  // light gray 
+    aNewColors[1] = RGB(0x80, 0x00, 0x80);  // dark purple 
+
+    SetSysColors(2, aElements, aNewColors);
+#endif
 }

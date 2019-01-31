@@ -10,7 +10,7 @@
 #include "QUResource.h"
 #include "QUOpenFontDialog.h"
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
 #  include "MacHelper.h"
 #endif
 
@@ -131,7 +131,7 @@ QUOpenFontDialog::slotFontSelected(const QUFontURI & uri, size_t index) {
 
 void
 QUOpenFontDialog::showEvent(QShowEvent * event) {
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC)
     MacHelper::hideTitleBar(this);
 #endif
     QDialog::showEvent(event);

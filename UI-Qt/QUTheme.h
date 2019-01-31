@@ -8,4 +8,7 @@ public:
 
     static void
     applyDarkFusionOnMenuBar(QMenuBar * menuBar);
+
+    static void
+    applyDarkFusionOnWindowTitleBar();
 };
