@@ -37,7 +37,7 @@ QUCMapBlockWidget::setDocument(QUDocument * document) {
             document_, &QUDocument::selectCMap);
     
     connect(document_, &QUDocument::cmapActivated,
-            this, &QUCMapBlockWidget::reloadBlocks);
+            this, &QUCMapBlockWidget::reloadBlocksCombobox);
     
     connect(ui_->blockComboBox, QOverload<int>::of(&QComboBox::activated),
             document_, &QUDocument::selectBlock);
@@ -46,16 +46,17 @@ QUCMapBlockWidget::setDocument(QUDocument * document) {
             ui_->blockComboBox, &QComboBox::setCurrentIndex);
 
     connect(ui_->glyphCheckBox, &QCheckBox::stateChanged,
-            this, &QUCMapBlockWidget::onGlyphMode);
+            this, &QUCMapBlockWidget::onGlyphCheckBox);
 
-    connect(document_, &QUDocument::charModeActivated,
-            this, &QUCMapBlockWidget::onCharMode);
+    connect(document_, &QUDocument::charModeChanged,
+            this, &QUCMapBlockWidget::onDocumentCharModeChanged);
 
-    reloadCMaps();
+    reloadCMapsCombobox();
+    onDocumentCharModeChanged(document_->charMode());
 }
 
 void
-QUCMapBlockWidget::reloadCMaps() {
+QUCMapBlockWidget::reloadCMapsCombobox() {
     for (const auto & cmap : document_->face()->cmaps())
         ui_->cmapComboBox->addItem(toQString(cmap.description()), cmap.isValid());
     
@@ -70,11 +71,11 @@ QUCMapBlockWidget::reloadCMaps() {
             item->setFlags(item->flags() & ~Qt::ItemIsEnabled);
     }
 
-    reloadBlocks();
+    reloadBlocksCombobox();
 }
 
 void
-QUCMapBlockWidget::reloadBlocks() {
+QUCMapBlockWidget::reloadBlocksCombobox() {
     ui_->blockComboBox->clear();
         
     FXCMap cmap = document_->face()->currentCMap();
@@ -83,7 +84,7 @@ QUCMapBlockWidget::reloadBlocks() {
 }
 
 void
-QUCMapBlockWidget::onGlyphMode(bool state) {
+QUCMapBlockWidget::onGlyphCheckBox(bool state) {
     const bool charMode = !state;
     document_->setCharMode(charMode);
     foreach (QObject * obj, children()) {
@@ -95,7 +96,7 @@ QUCMapBlockWidget::onGlyphMode(bool state) {
 }
 
 void
-QUCMapBlockWidget::onCharMode(bool charMode) {
+QUCMapBlockWidget::onDocumentCharModeChanged(bool charMode) {
     ui_->glyphCheckBox->setCheckState(charMode? Qt::Unchecked: Qt::Checked);
 }
     

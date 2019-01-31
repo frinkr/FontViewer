@@ -38,9 +38,10 @@ QUDocumentWindow::QUDocumentWindow(QUDocument * document, QWidget *parent)
 {
     ui_->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-    document->setParent(this);
-    
     initUI();
+
+    document->setParent(this);
+    document_->setCharMode(false);
 }
 
 QUDocumentWindow::~QUDocumentWindow() {
@@ -79,6 +80,10 @@ QUDocumentWindow::initMenu() {
 
     connect(menuBar_, &QUMenuBar::showAllGlyphsActionTiggered, [this](QAction * action) {
         document_->setCharMode(!action->isChecked());
+    });
+
+    connect(document_, &QUDocument::charModeChanged, [this](bool activated) {
+        menuBar_->actionShowAllGlyphs->setChecked(!activated);
     });
 
     connect(menuBar_, &QUMenuBar::fullScreenActionTriggered, [this](QAction * action) {

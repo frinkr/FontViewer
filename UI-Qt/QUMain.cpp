@@ -10,6 +10,7 @@
 #include "QUDocumentWindowManager.h"
 #include "QUMain.h"
 #include "QUFontManager.h"
+#include "QUTheme.h"
 
 #if QU_MAIN
 int main(int argc, char * argv[])
@@ -30,7 +31,7 @@ int quMain(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/app.png"));
 	quApp = &app;
 
-#ifdef Q_OS_WIN
+#if !defined(Q_OS_MAC)
     QUTheme::applyDarkFusion();
 #endif
     

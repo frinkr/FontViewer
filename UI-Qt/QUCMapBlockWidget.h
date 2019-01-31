@@ -23,16 +23,16 @@ public:
 
 private slots:
     void
-    reloadCMaps();
+    reloadCMapsCombobox();
 
     void
-    reloadBlocks();
+    reloadBlocksCombobox();
 
     void
-    onGlyphMode(bool state);
+    onGlyphCheckBox(bool state);
 
     void
-    onCharMode(bool state);
+    onDocumentCharModeChanged(bool state);
     
 private:
     Ui::QUCMapBlockWidget * ui_;

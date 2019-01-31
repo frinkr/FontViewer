@@ -121,7 +121,7 @@ QUDocument::setCharMode(bool state) {
     charMode_ = state;
     endResetModel();
 
-    emit charModeActivated(charMode_);
+    emit charModeChanged(charMode_);
 }
 
 QUGlyphLabel
