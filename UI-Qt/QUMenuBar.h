@@ -15,6 +15,7 @@ public:
     QAction * actionOpenFromFile;
     QAction * actionClose;
     QAction * actionRecent;
+    QAction * actionPreferences;
     QAction * actionQuit;
 
     // Edit menu

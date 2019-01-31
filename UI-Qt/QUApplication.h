@@ -21,6 +21,9 @@ public slots:
     void
     about() const;
 
+    void
+    preferences() const;
+
 private:
 #ifdef Q_OS_MAC
     bool event(QEvent *);

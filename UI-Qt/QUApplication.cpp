@@ -1,11 +1,12 @@
-#include <QtGui>
-#include <QtDebug>
-#include <QMessageBox>
 #include <QFileInfo>
+#include <QMessageBox>
+#include <QtDebug>
+#include <QtGui>
 
 #include "QUAboutDialog.h"
-#include "QUDocumentWindowManager.h"
 #include "QUApplication.h"
+#include "QUDocumentWindowManager.h"
+#include "QUPreferencesDialog.h"
 
 QUApplication::QUApplication(int & argc, char ** argv) : QApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
@@ -50,6 +51,11 @@ QUApplication::~QUApplication() {
 void
 QUApplication::about() const {
     QUAboutDialog::showAbout();    
+}
+
+void
+QUApplication::preferences() const {
+    QUPreferencesDialog::showPreferences();
 }
 
 #ifdef Q_OS_MAC

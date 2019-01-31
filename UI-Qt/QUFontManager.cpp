@@ -15,7 +15,7 @@
 #include "QUProgressDialog.h"
 
 namespace {
-    QStringList fontDirs() {
+    QStringList _systemFontFolders() {
 #if UIQT_USE_FONTCONFIG
         FcConfig * fc = FcInitLoadConfig();
         FcStrList * fcDirs = FcConfigGetFontDirs(fc);
@@ -85,10 +85,25 @@ QUFontManager::db() const {
     return db_;
 }
 
+const QStringList &
+QUFontManager::systemFontFolders() const {
+    return systemFontFolders_;
+}
+
+const QStringList &
+QUFontManager::userFontFolders() const {
+    return userFontFolders_;
+}
+
+void
+QUFontManager::setUserFontFolders(const QStringList & folders) {
+    userFontFolders_ = folders;
+}
+
 QUFontManager::QUFontManager() {
-    directories_ = fontDirs();
+    systemFontFolders_ = _systemFontFolders();
     FXVector<FXString> dirs;
-    for (const auto & dir : directories_)
+    for (const auto & dir : systemFontFolders_)
         dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
 
 	const QString dbPath = dbFilePath();

@@ -22,6 +22,15 @@ public:
     FXPtr<FXFaceDatabase>
     db() const;
 
+    const QStringList &
+    systemFontFolders() const;
+
+    const QStringList &
+    userFontFolders() const;
+
+    void
+    setUserFontFolders(const QStringList & folders);
+
 private:
     QUFontManager();
 
@@ -31,6 +40,7 @@ private:
     void
     scanDirectory(const QString & directory);
 
-    QStringList             directories_;
+    QStringList             systemFontFolders_;
+    QStringList             userFontFolders_;
     FXPtr<FXFaceDatabase>   db_;
 };

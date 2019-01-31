@@ -31,6 +31,7 @@ set(UI
   QUFontInfoWidget.ui
   QUGlyphTableWidget.ui
   QUOpenFontDialog.ui
+  QUPreferencesDialog.ui
   QUProgressDialog.ui
   QUSearchWidget.ui
   QUShapingWidget.ui
@@ -78,10 +79,12 @@ set(SHARED_SOURCES
   QUMenuBar.h
   QUOpenFontDialog.cpp
   QUOpenFontDialog.h
-  QUProgressDialog.h
-  QUProgressDialog.cpp
   QUPopoverWindow.cpp
   QUPopoverWindow.h
+  QUPreferencesDialog.cpp
+  QUPreferencesDialog.h
+  QUProgressDialog.cpp
+  QUProgressDialog.h
   QUResource.cpp
   QUResource.h
   QUSearchEngine.cpp
@@ -90,8 +93,8 @@ set(SHARED_SOURCES
   QUSearchWidget.h
   QUShapingWidget.cpp
   QUShapingWidget.h
-  QUTheme.h
   QUTheme.cpp
+  QUTheme.h
   QUToolBarWidget.cpp
   QUToolBarWidget.h
   )

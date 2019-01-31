@@ -36,6 +36,10 @@ QUMenuBar::QUMenuBar(QWidget * parent)
             }
         });
 
+        actionPreferences = menuFile->addAction(tr("&Preferences"), []() {
+            quApp->preferences();
+        }, QKeySequence(QKeySequence::Preferences));
+
         actionQuit = menuFile->addAction(tr("&Quit"), []() {
             QUDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
         }, QKeySequence(QKeySequence::Quit));
