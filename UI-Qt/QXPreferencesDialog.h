@@ -6,6 +6,8 @@ namespace Ui {
     class QXPreferencesDialog;
 }
 
+class QListWidgetItem;
+
 class QXPreferencesDialog : public QDialog {
     Q_OBJECT
 
@@ -16,10 +18,16 @@ public:
     void
     accept();
 
+    QStringList
+    userFontFolders() const;
+
     static void
     showPreferences();
 
 private slots:
+    void
+    onCurrentDirItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
+
     void
     onAddButtonClicked();
 

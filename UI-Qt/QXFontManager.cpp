@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressDialog>
+#include <QSettings>
 #include <QStandardPaths>
 
 #include "QXConv.h"
@@ -29,6 +30,14 @@ namespace {
 #else
         return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
 #endif
+    }
+
+    QStringList _userFontFolders() {
+        QSettings settings;
+        QVariant  data = settings.value("userFontFolders");
+        if (data.canConvert<QStringList>())
+            return data.value<QStringList>();
+        return QStringList();
     }
 
     QXProgressDialog *
@@ -62,7 +71,7 @@ QXFontManager::resetDatabase() {
     QFile dbFile(dbFilePath());
     if (dbFile.exists())
         dbFile.remove();
-    get();
+    instance();
 }
 
 QString
@@ -75,7 +84,7 @@ QXFontManager::dbFilePath() {
 
 
 QXFontManager &
-QXFontManager::get() {
+QXFontManager::instance() {
     static QXFontManager inst;
     return inst;
 }
@@ -97,13 +106,18 @@ QXFontManager::userFontFolders() const {
 
 void
 QXFontManager::setUserFontFolders(const QStringList & folders) {
+    QSettings settings;
+    settings.setValue("userFontFolders", folders);
     userFontFolders_ = folders;
 }
 
 QXFontManager::QXFontManager() {
+    userFontFolders_ = _userFontFolders();
     systemFontFolders_ = _systemFontFolders();
     FXVector<FXString> dirs;
     for (const auto & dir : systemFontFolders_)
+        dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
+    for (const auto & dir : userFontFolders_)
         dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
 
 	const QString dbPath = dbFilePath();
@@ -113,7 +127,7 @@ QXFontManager::QXFontManager() {
     db_.reset(new FXFaceDatabase(dirs,			
 		dbPath.toUtf8().constData(),
         [progress](size_t current, size_t total, const FXString & file) {
-            progress->setProgress(current, total, toQString(file));
+            progress->setProgress(static_cast<int>(current), static_cast<int>(total), toQString(file));
             return true;
         }
     ));

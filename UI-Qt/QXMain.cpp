@@ -3,7 +3,7 @@
 #ifdef Q_OS_MAC
 #  include "MacHelper.h"
 #else
-#  include "QUTheme.h"
+#  include "QXTheme.h"
 #endif
 
 #include "QXApplication.h"
@@ -12,7 +12,7 @@
 #include "QXFontManager.h"
 #include "QXTheme.h"
 
-#if QU_MAIN
+#ifdef QU_MAIN
 int main(int argc, char * argv[])
 {
     return quMain(argc, argv);
@@ -32,7 +32,7 @@ int qxMain(int argc, char *argv[])
 	qxApp = &app;
 
 #if !defined(Q_OS_MAC)
-    QUTheme::applyDarkFusion();
+    QXTheme::applyDarkFusion();
 #endif
     
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
@@ -48,7 +48,7 @@ int qxMain(int argc, char *argv[])
     else {
 #ifndef Q_OS_MAC
         // For macOS, it's handled in MacApplicationDelegate
-        QUDocumentWindowManager::instance()->doOpenFontDialog();
+        QXDocumentWindowManager::instance()->doOpenFontDialog();
 #endif
     }  
 

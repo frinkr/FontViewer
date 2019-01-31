@@ -100,7 +100,7 @@ QXFontListModel::icon(size_t index) const {
 
 FXPtr<FXFaceDatabase>
 QXFontListModel::db() const {
-    return QXFontManager::get().db();
+    return QXFontManager::instance().db();
 }
 
 bool
@@ -167,8 +167,8 @@ QXFontComboBox::selectedFont() const {
     if (row == -1)
         return QXFontURI{};
     
-    auto desc = QXFontManager::get().db()->faceDescriptor(row);
-    auto atts = QXFontManager::get().db()->faceAttributes(row);
+    auto desc = QXFontManager::instance().db()->faceDescriptor(row);
+    auto atts = QXFontManager::instance().db()->faceAttributes(row);
     atts.names.familyName();
     QXFontURI uri{toQString(desc.filePath), desc.index};
     return uri;

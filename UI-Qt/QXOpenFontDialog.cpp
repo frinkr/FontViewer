@@ -52,7 +52,7 @@ QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
     connect(ui_->fontComboBox, &QXFontComboBox::fontSelected,
             this, &QXOpenFontDialog::slotFontSelected);
     
-    QXFontManager::get();
+    QXFontManager::instance();
 
     QXDocumentWindowManager * mgr = QXDocumentWindowManager::instance();
 
@@ -132,8 +132,8 @@ void
 QXOpenFontDialog::slotFontSelected(const QXFontURI & uri, size_t index) {
     if (index == -1)
         return;
-    auto & desc = QXFontManager::get().db()->faceDescriptor(index);
-    auto & atts = QXFontManager::get().db()->faceAttributes(index);
+    auto & desc = QXFontManager::instance().db()->faceDescriptor(index);
+    auto & atts = QXFontManager::instance().db()->faceAttributes(index);
 
     QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
     ui_->textBrowser->setHtml(html->instantialize(templateValues(desc, atts)));

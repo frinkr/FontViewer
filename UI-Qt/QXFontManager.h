@@ -17,7 +17,7 @@ public:
     dbFilePath();
 
     static QXFontManager &
-    get();
+    instance();
 
     FXPtr<FXFaceDatabase>
     db() const;
