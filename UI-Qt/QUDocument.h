@@ -145,7 +145,7 @@ signals:
     blockSelected(int index);
 
     void
-    charModeActivated(bool state);
+    charModeChanged(bool charMode);
     
     void
     searchDone(const QUSearchResult & result, const QString & text);
