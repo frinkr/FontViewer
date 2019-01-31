@@ -13,7 +13,7 @@
     <file alias="images/history_d.png">../Resources/Images/history_d.png</file>
     <file alias="images/info.png">../Resources/Images/info.png</file>
     <file alias="images/info_d.png">../Resources/Images/info_d.png</file>
-    <file alias="images/ok.png">../Resources/Images/OK.png</file>
+    <file alias="images/ok.png">../Resources/Images/ok.png</file>
     <file alias="images/open.png">../Resources/Images/open.png</file>
     <file alias="images/open_d.png">../Resources/Images/open_d.png</file>
     <file alias="images/opentype.png">../Resources/Images/opentype.png</file>
@@ -37,5 +37,6 @@
     <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
     <file alias="images/minus.png">../Resources/Images/minus.png</file>
     <file alias="images/minus_d.png">../Resources/Images/minus_d.png</file>
+    
 </qresource>
 </RCC>

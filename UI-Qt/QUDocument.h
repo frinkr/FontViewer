@@ -93,6 +93,8 @@ public:
     FXPtr<FXFace>
     face() const;
 
+    QString
+    displayName() const;
 public slots:
     bool
     selectCMap(size_t index);

@@ -50,6 +50,11 @@ QUDocument::face() const {
     return face_;
 }
 
+QString
+QUDocument::displayName() const {
+    return faceDisplayName(face_->attributes());
+}
+
 bool
 QUDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {

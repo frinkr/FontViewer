@@ -1,5 +1,6 @@
 #include <QActionGroup>
 #include <QDockWidget>
+#include <QFileIconProvider>
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QToolButton>
@@ -64,7 +65,12 @@ void
 QUDocumentWindow::initWindowTitle() {
     const QString & filePath = document_->uri().filePath;
     setWindowFilePath(filePath);
-    setWindowTitle(QFileInfo(filePath).fileName());
+    setWindowTitle(document_->displayName());
+
+#if defined (Q_OS_MAC)
+    QFileInfo fi(filePath);
+    setWindowIcon(QFileIconProvider().icon(fi));
+#endif
 }
 
 void
