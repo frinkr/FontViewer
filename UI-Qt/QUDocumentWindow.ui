@@ -69,7 +69,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QToolBar" name="toolBar">
+  <widget class="QUToolBar" name="toolBar">
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -101,6 +101,11 @@
    <class>QUGlyphListView</class>
    <extends>QListView</extends>
    <header>QUGlyphListView.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QUToolBar</class>
+   <extends>QToolBar</extends>
+   <header>QUToolBar.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

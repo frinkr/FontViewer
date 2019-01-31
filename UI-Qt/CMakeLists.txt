@@ -95,8 +95,8 @@ set(SHARED_SOURCES
   QUShapingWidget.h
   QUTheme.cpp
   QUTheme.h
-  QUToolBarWidget.cpp
-  QUToolBarWidget.h
+  QUToolBar.cpp
+  QUToolBar.h
   )
 set(APPLE_SOURCES
   MacApplicationDelegate.h

@@ -22,7 +22,6 @@
 #include "QUSearchWidget.h"
 #include "QUShapingWidget.h"
 #include "QUTheme.h"
-#include "QUToolBarWidget.h"
 
 #include "ui_QUDocumentWindow.h"
 
