@@ -1,20 +1,20 @@
 
 #import "MacApplicationDelegate.h"
-#include "QUDocumentWindowManager.h"
+#include "QXDocumentWindowManager.h"
 
 @implementation MacApplicationDelegate
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
     Q_UNUSED(sender);
 
-    QUDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
+    QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
 
     return NSTerminateNow;
 }
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
     Q_UNUSED(sender);
-    QUDocumentWindowManager::instance()->doOpenFontDialog();
+    QXDocumentWindowManager::instance()->doOpenFontDialog();
     return NO;
 }
 @end
