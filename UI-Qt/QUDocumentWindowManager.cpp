@@ -1,19 +1,21 @@
-#include <QtGui>
-#include <QtDebug>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QDockWidget>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
-#include <QDesktopWidget>
-#include <QApplication>
 #include <QMessageBox>
-#include <QFileDialog>
 #include <QMetaType>
+#include <QtDebug>
+#include <QtGui>
 
-#include "QUConv.h"
 #include "QUApplication.h"
-#include "QUOpenFontDialog.h"
+#include "QUConv.h"
+#include "QUDockTitleBarWidget.h"
 #include "QUDocumentWindow.h"
 #include "QUDocumentWindowManager.h"
 #include "QUMenuBar.h"
+#include "QUOpenFontDialog.h"
 
 QUDocumentWindowManager * QUDocumentWindowManager::instance_ = nullptr;
 
@@ -26,6 +28,25 @@ QUDocumentWindowManager::QUDocumentWindowManager()
 
     loadRecentFontSettings();
     connect(quApp, &QUApplication::aboutToQuit, this, &QUDocumentWindowManager::saveRecentFontsSettings);
+#if 0
+    connect(qApp, &QApplication::focusChanged, [](QWidget * oldWidget, QWidget * newWidget) {
+        QWidget * dockWidget = newWidget;
+        while (dockWidget && !qobject_cast<QDockWidget*>(dockWidget))
+            dockWidget = dockWidget->parentWidget();
+        
+        if (!dockWidget) {
+            QWidget * dockWidget = oldWidget;
+            while (dockWidget && !qobject_cast<QDockWidget*>(dockWidget))
+                dockWidget = dockWidget->parentWidget();
+        }
+        
+        if (dockWidget) {
+            QWidget * titleBarWidget = (qobject_cast<QDockWidget*>(dockWidget))->titleBarWidget();
+            if (titleBarWidget)
+                titleBarWidget->update();
+        }
+    });
+#endif
 }
 
 // Singleton

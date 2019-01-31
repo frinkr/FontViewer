@@ -65,7 +65,7 @@ QUCMapBlockWidget::reloadCMapsCombobox() {
     // disable invalid cmaps
     QStandardItemModel * model = qobject_cast<QStandardItemModel*>(ui_->cmapComboBox->model());
     for (int i = 0; i < ui_->cmapComboBox->count(); ++ i) {
-        QStandardItem* item= model->item(i);
+        QStandardItem * item= model->item(i);
         bool isValid = ui_->cmapComboBox->itemData(i).toBool();
         if (!isValid) 
             item->setFlags(item->flags() & ~Qt::ItemIsEnabled);

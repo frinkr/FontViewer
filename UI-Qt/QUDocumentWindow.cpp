@@ -209,7 +209,7 @@ QUDocumentWindow::onTableAction() {
     if (!tableDockWidget_) {
         tableDockWidget_ = new QDockWidget(tr("Glyphs Table"), this);
         tableDockWidget_->setWidget(new QUGlyphTableWidget(document_));
-        tableDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
+        tableDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(tableDockWidget_));
         addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
     }
     toggleDockWidget(tableDockWidget_);
@@ -222,7 +222,7 @@ QUDocumentWindow::onShapingAction() {
         QUShapingWidget * widget = new QUShapingWidget(this);
         widget->setDocument(document_);
         shapingDockWidget_->setWidget(widget);
-        shapingDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
+        shapingDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(shapingDockWidget_));
         addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
     }
     toggleDockWidget(shapingDockWidget_);
@@ -233,7 +233,7 @@ QUDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
         infoDockWidget_ = new QDockWidget(tr("Info"), this);
         infoDockWidget_->setWidget(new QUFontInfoWidget(document_->face(), infoDockWidget_));
-        infoDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(this));
+        infoDockWidget_->setTitleBarWidget(new QUDockTitleBarWidget(infoDockWidget_));
         addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
     }
 
