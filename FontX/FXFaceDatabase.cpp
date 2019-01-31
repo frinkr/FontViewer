@@ -1,5 +1,7 @@
 #include <iostream>
 #include <fstream>
+#include <thread>
+#include <chrono>
 #include <boost/serialization/vector.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/text_iarchive.hpp>
@@ -11,19 +13,29 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 2;
+    constexpr int FACE_DB_VERSION = 3;
+
+    size_t hashFile(const FXString & file, size_t hash) {
+        boost::hash_combine(hash, file);
+        boost::hash_combine(hash, BST::fileSize(file));
+        return hash;
+    }
 
     size_t
     hashFiles(const FXSet<FXString> & files) {
         size_t hash = 0;
         boost::hash_combine(hash, 0);
-        for (const auto & f : files) {
-            boost::hash_combine(hash, f);
-            boost::hash_combine(hash, BST::fileSize(f));
-        }
+        for (const auto & f : files) 
+            hash = hashFile(f, hash);
+        
         return hash;
     }
+
+    size_t hashFile(const FXString & file) {
+        return hashFiles({file});
+    }
 }
+
 namespace boost {namespace serialization {
 
         template <class Archive>
@@ -62,6 +74,7 @@ namespace boost {namespace serialization {
         template <class Archive>
         void
         serialize(Archive & ar, FXFaceDatabase::FaceItem & item, const unsigned int version) {
+            ar & item.fileHash;
             ar & item.desc;
             ar & item.atts;
         }
@@ -75,6 +88,8 @@ FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXStrin
     , progress_(progressCallback) {
     if (!load() || checkUpdate())
         rescan();
+    else
+        hashMap_.clear();
 }
 
 size_t
@@ -108,7 +123,7 @@ FXFaceDatabase::createFace(const FXFaceDescriptor & descriptor) const {
 
 void
 FXFaceDatabase::rescan() {
-    faces_.clear();
+    FXVector<FaceItem> faces;
 
     size_t current = 0;
     for (auto & file: files_) {
@@ -116,6 +131,20 @@ FXFaceDatabase::rescan() {
         if (progress_)
             progress_(current, files_.size(), file);
 
+        auto hash = hashFile(file);
+
+        // Reuse the FaceItems if file hash is not changed
+        const auto & indexes = hashMap_[file];
+        if (indexes.size()) {
+            auto & item = faces_[indexes[0]];
+            if (item.fileHash == hash) {
+                for (auto index: indexes)
+                    faces.push_back(faces_[index]);
+                continue;
+            }                
+        }
+        // using namespace std::chrono_literals;
+        // std::this_thread::sleep_for(20ms);
         size_t count = 0;
         if (!FXFTCountFaces(FXLib::get(), file, count)) {
             for (size_t i = 0; i < count; ++ i) {
@@ -123,13 +152,16 @@ FXFaceDatabase::rescan() {
                 FXPtr<FXFace> face = FXFace::createFace(desc);
                 if (!face)
                     continue;
-                FaceItem item = {desc, face->attributes()};
-                faces_.push_back(item);
+                FaceItem item = {hashFile(desc.filePath), desc, face->attributes()};
+                faces.push_back(item);
             }
         }
     }
 
+    faces_ = faces;
     hash_ = hashFiles(files_);
+    hashMap_.clear(); // not needed anymore
+
     save();
 }
 
@@ -170,6 +202,12 @@ FXFaceDatabase::load() {
         
         ia >> faces_;
         ia >> hash_;
+
+        // Build hash map
+        for (size_t i = 0; i < faces_.size(); ++ i) {
+            const auto & item = faces_[i];
+            hashMap_[item.desc.filePath].push_back(i);
+        }
     }
     catch(const boost::archive::archive_exception &) {
         return false;

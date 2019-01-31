@@ -30,6 +30,7 @@ public:
 
 public:
     struct FaceItem {
+        size_t           fileHash;
         FXFaceDescriptor desc;
         FXFaceAttributes atts;   
     };
@@ -53,6 +54,8 @@ protected:
     size_t             hash_;
 
     ProgressCallback   progress_;
+
+    FXMap<FXString, FXVector<size_t>> hashMap_;
     //FXVector<FXFaceDescriptor>  faces_;
     //FXVector<FXFaceAttributes>  attrs_;
 };
