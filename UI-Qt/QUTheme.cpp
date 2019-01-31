@@ -56,8 +56,8 @@ QUTheme::applyDarkFusionOnWindowTitleBar() {
 
     aOldColors[0] = GetSysColor(aElements[0]);
     aOldColors[1] = GetSysColor(aElements[1]);
-    aNewColors[0] = RGB(0x80, 0x80, 0x80);  // light gray 
-    aNewColors[1] = RGB(0x80, 0x00, 0x80);  // dark purple 
+    aNewColors[0] = RGB(0x80, 0x80, 0x80);  // light gray
+    aNewColors[1] = RGB(0x80, 0x00, 0x80);  // dark purple
 
     SetSysColors(2, aElements, aNewColors);
 #endif

@@ -11,15 +11,21 @@ MacHelper::hideTitleBar(QWidget * widget)
     NSView *nativeView = reinterpret_cast<NSView *>(widget->winId());
     NSWindow* nativeWindow = nativeView.window;
 
-    // Default masks
-    nativeWindow.styleMask = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable | NSWindowStyleMaskMiniaturizable | NSWindowStyleMaskResizable;
+    QColor background = widget->palette().color(QPalette::Window);
 
-    // Content under title bar
-    nativeWindow.styleMask |= NSWindowStyleMaskFullSizeContentView;
-//    nativeWindow.styleMask |= NSWindowStyleMaskHUDWindow;
-    
+    nativeWindow.styleMask =
+        NSWindowStyleMaskTitled |
+        NSWindowStyleMaskClosable |
+        NSWindowStyleMaskMiniaturizable |
+        NSWindowStyleMaskResizable |
+        NSWindowStyleMaskFullSizeContentView;
+
     nativeWindow.titlebarAppearsTransparent = true;
-    //nativeWindow.titleVisibility = NSWindowTitleHidden; // Hide window title name
+
+    nativeWindow.backgroundColor = [NSColor colorWithRed:background.redF()
+                                                   green:background.greenF()
+                                                    blue: background.blueF()
+                                                   alpha: 1];
 }
 
 
