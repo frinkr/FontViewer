@@ -1,6 +1,7 @@
 #include <QFileDialog>
 #include <QMenu>
 #include <QSettings>
+#include <QTimer>
 
 #include "QUApplication.h"
 #include "QUConv.h"
@@ -53,8 +54,17 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
     
     QUFontManager::get();
 
-    if (QUDocumentWindowManager::instance()->recentFonts().size())
-        ui_->fontComboBox->selectFont(QUDocumentWindowManager::instance()->recentFonts()[0]);
+    QUDocumentWindowManager * mgr = QUDocumentWindowManager::instance();
+
+    if (mgr->recentFonts().size()) {
+        for (const auto & uri: mgr->recentFonts()) {
+            if (-1 != ui_->fontComboBox->selectFont(uri))
+                break;
+        }
+    }
+    if (-1 == ui_->fontComboBox->selectedFontIndex())
+        ui_->fontComboBox->selectFont(0);
+    
 
     slotFontSelected(ui_->fontComboBox->selectedFont(),
                      ui_->fontComboBox->selectedFontIndex());
@@ -70,7 +80,12 @@ QUOpenFontDialog::QUOpenFontDialog(QWidget *parent)
                     QVariant data = action->data();
                     if (data.canConvert<QUFontURI>()) {
                         QUFontURI uri = data.value<QUFontURI>();
-                        ui_->fontComboBox->selectFont(uri);
+                        if (-1 == ui_->fontComboBox->selectFont(uri)) {
+                            QTimer::singleShot(0, [this, uri]() {
+                                QUDocumentWindowManager::instance()->openFontURI(uri);
+                                this->reject();                         
+                            });
+                        }
                     }
                 });
             }
@@ -101,9 +116,6 @@ QUOpenFontDialog::selectedFont() {
 void
 QUOpenFontDialog::accept() {
     QDialog::accept();
-
-    //QSettings settings;
-    //settings.setValue("")
 }
 
 void

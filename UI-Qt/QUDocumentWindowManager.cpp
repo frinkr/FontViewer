@@ -175,7 +175,7 @@ QUDocumentWindowManager::doOpenFontDialog() {
     QUOpenFontDialog openDialog(nullptr);
     if (QDialog::Accepted == openDialog.exec()) {
         const QUFontURI fontURI = openDialog.selectedFont();
-        openFont(fontURI);
+        openFontURI(fontURI);
     }
     return;
 }
@@ -203,10 +203,14 @@ QUDocumentWindowManager::addToRecents(QUDocument * document) {
     item.faceIndex = document->uri().faceIndex;
     item.fullName  = QUDocument::faceDisplayName(document->face()->attributes());
 
+    // add or move to front
     int index = recentFonts_.indexOf(item);
     if (index != -1)
         recentFonts_.takeAt(index);
-    recentFonts_.insert(0, item); // add or move to front
+    recentFonts_.insert(0, item); 
+
+    while (recentFonts_.size() > kMaxRecentFiles)
+        recentFonts_.takeLast();
 }
 
 void
@@ -217,17 +221,17 @@ QUDocumentWindowManager::doOpenFontFromFile() {
     openFileDialog.setNameFilter(tr("C files (*.c *.cc *.cpp *.h);;Text files (*.txt);;All Files (*)"));
 
     if (openFileDialog.exec())
-        openFile(openFileDialog.selectedFiles()[0]);
+        openFontFile(openFileDialog.selectedFiles()[0]);
 }
 
 void
-QUDocumentWindowManager::openFile(const QString & filePath) {
+QUDocumentWindowManager::openFontFile(const QString & filePath) {
     QUFontURI uri {filePath, 0};
-    openFont(uri);
+    openFontURI(uri);
 }
 
 void
-QUDocumentWindowManager::openFont(const QUFontURI & uri) {
+QUDocumentWindowManager::openFontURI(const QUFontURI & uri) {
     // check already open
     QUDocument * document = getDocument(uri);
     if (document) {
@@ -244,6 +248,11 @@ QUDocumentWindowManager::openFont(const QUFontURI & uri) {
             addToRecents(document);
             QUDocumentWindow * window = createDocumentWindow(document);
             window->show();
+        } else {
+            QMessageBox::critical(nullptr,
+                                  tr("Error to open file"),
+                                  tr("The file %1 can't be open.").arg(uri.filePath),
+                                  QMessageBox::Ok);
         }
     }
 }

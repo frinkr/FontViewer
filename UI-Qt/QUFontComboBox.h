@@ -63,13 +63,16 @@ class QUFontComboBox : public QComboBox {
 public:
     explicit QUFontComboBox(QWidget * parent = nullptr);
 
-    size_t
+    int
     selectedFontIndex() const;
 
     QUFontURI
     selectedFont() const;
 
-    void
+    int
+    selectFont(int index);
+
+    int
     selectFont(const QUFontURI & fontURI);
 
 signals:

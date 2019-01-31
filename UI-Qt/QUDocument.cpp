@@ -176,6 +176,9 @@ QUDocument::QUDocument(const QUFontURI & uri, QObject * parent)
 bool
 QUDocument::load() {
     face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);
+    if (!face_)
+        return false;
+
     fullGlyphsBlock_.reset(new FXCharRangeBlock(0, FXChar(face_->glyphCount()), FXGCharTypeGlyphID, "All Glyphs"));
     dummyImage_ = QImage(glyphEmSize(), QImage::Format_ARGB32);
     dummyImage_.setDevicePixelRatio(2);

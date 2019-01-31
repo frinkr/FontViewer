@@ -1,12 +1,11 @@
 #pragma once
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QIcon>
-#include "QUSingleApplication.h"
 
 class QEvent;
 
-class QUApplication : public QUSingleApplication
+class QUApplication : public QApplication
 {
 public:
     QUApplication(int & argc, char ** argv);

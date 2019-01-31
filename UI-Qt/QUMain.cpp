@@ -43,7 +43,7 @@ int quMain(int argc, char *argv[])
     QStringList arguments = app.arguments();
     if (arguments.count() > 1) {
         for (int i = 1; i < arguments.count(); i++)
-            QUDocumentWindowManager::instance()->openFile(arguments.at(i));
+            QUDocumentWindowManager::instance()->openFontFile(arguments.at(i));
     }
     else {
 #ifndef Q_OS_MAC

@@ -84,10 +84,10 @@ public slots:
     void doOpenFontFromFile();
 
     void
-    openFile(const QString & filePath);
+    openFontFile(const QString & filePath);
 
     void
-    openFont(const QUFontURI & uri);
+    openFontURI(const QUFontURI & uri);
 
 private slots:
     void
@@ -118,7 +118,7 @@ private slots:
     saveRecentFontsSettings();
 
 private:
-    enum {kMaxRecentFiles = 8};
+    enum {kMaxRecentFiles = 20};
 
     QList<QURecentFontItem> recentFonts_;
 

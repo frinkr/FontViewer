@@ -7,7 +7,7 @@
 #include "QUDocumentWindowManager.h"
 #include "QUApplication.h"
 
-QUApplication::QUApplication(int & argc, char ** argv) : QUSingleApplication(argc, argv, true) {
+QUApplication::QUApplication(int & argc, char ** argv) : QApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");
@@ -59,7 +59,7 @@ QUApplication::event(QEvent *event)
 {
     if (event->type() == QEvent::FileOpen)
     {
-        QUDocumentWindowManager::instance()->openFile(static_cast<QFileOpenEvent *>(event)->file());
+        QUDocumentWindowManager::instance()->openFontFile(static_cast<QFileOpenEvent *>(event)->file());
 
         return true;
     }

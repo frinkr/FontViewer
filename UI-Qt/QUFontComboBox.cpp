@@ -156,7 +156,7 @@ QUFontComboBox::QUFontComboBox(QWidget * parent)
     view()->installEventFilter(this);
 }
 
-size_t
+int
 QUFontComboBox::selectedFontIndex() const {
     return currentSourceIndex().row();
 }
@@ -174,13 +174,18 @@ QUFontComboBox::selectedFont() const {
     return uri;
 }
 
-void
-QUFontComboBox::selectFont(const QUFontURI & fontURI) {
-    proxyModel()->clearFilter();
-    int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
+int
+QUFontComboBox::selectFont(int index) {
     QModelIndex proxyIndex = proxyModel()->mapFromSource(sourceModel()->index(index));
     setCurrentIndex(proxyIndex.row());
     onFontSelected(proxyIndex.row());
+    return selectedFontIndex();
+}
+int
+QUFontComboBox::selectFont(const QUFontURI & fontURI) {
+    proxyModel()->clearFilter();
+    int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
+    return selectFont(index);
 }
 
 QUFontListModel *

@@ -29,7 +29,7 @@ QUMenuBar::QUMenuBar(QWidget * parent)
                         QVariant data = action->data();
                         if (data.canConvert<QUFontURI>()) {
                             QUFontURI uri = data.value<QUFontURI>();
-                            QUDocumentWindowManager::instance()->openFont(uri);
+                            QUDocumentWindowManager::instance()->openFontURI(uri);
                         }
                     });
                 }
