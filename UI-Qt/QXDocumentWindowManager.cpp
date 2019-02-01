@@ -181,6 +181,27 @@ QXDocumentWindowManager::doOpenFontDialog() {
 }
 
 void
+QXDocumentWindowManager::autoOpenFontDialog() {
+    if (documents().empty()) {
+        bool hasWindow = false;
+        for (QWidget * widget: qApp->allWidgets()) {
+            QWidget * window = widget->window();
+            if (window &&
+                window->isWindow() &&
+                window->isVisible()
+                && !qobject_cast<QMenuBar*>(window)
+                && !qobject_cast<QMenu*>(window))
+            {
+                hasWindow = true;
+                break;
+            }
+        }
+        if (!hasWindow)
+            doOpenFontDialog();
+    }
+}
+
+void
 QXDocumentWindowManager::onDocumentWindowAboutToClose(QXDocumentWindow * window) {
     // remove from list
     removeDocumentWindow(window);

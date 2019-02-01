@@ -6,7 +6,6 @@
 
 #include "QXAboutDialog.h"
 #include "QXApplication.h"
-#include "QXMenuBar.h"
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
 
@@ -71,25 +70,8 @@ QXApplication::event(QEvent * event) {
     else if (event->type() == QEvent::ApplicationStateChange) {
         // This open the dialog when clicking the dock
         auto changeEvent = static_cast<QApplicationStateChangeEvent *>(event);
-        if (changeEvent->applicationState() == Qt::ApplicationActive) {
-            if (QXDocumentWindowManager::instance()->documents().empty()) {
-                bool hasWindow = false;
-                for (QWidget * widget: qApp->allWidgets()) {
-                    QWidget * window = widget->window();
-                    if (window &&
-                        window->isWindow() &&
-                        window->isVisible()
-                        && !qobject_cast<QMenuBar*>(window)
-                        && !qobject_cast<QMenu*>(window))
-                    {
-                        hasWindow = true;
-                        break;
-                    }
-                }
-                if (!hasWindow)
-                    QXDocumentWindowManager::instance()->doOpenFontDialog();
-            }
-        }
+        if (changeEvent->applicationState() == Qt::ApplicationActive) 
+            QXDocumentWindowManager::instance()->autoOpenFontDialog();
     }
 
     return QApplication::event(event);

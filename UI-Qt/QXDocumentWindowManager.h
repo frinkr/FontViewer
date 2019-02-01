@@ -79,6 +79,9 @@ public slots:
     doOpenFontDialog();
 
     void
+    autoOpenFontDialog();
+
+    void
     closeAllDocumentsAndQuit();
 
     void doOpenFontFromFile();

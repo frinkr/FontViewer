@@ -40,10 +40,7 @@ int qxMain(int argc, char *argv[])
             QXDocumentWindowManager::instance()->openFontFile(arguments.at(i));
     }
     else {
-#ifndef Q_OS_MAC
-        // For macOS, it's handled in QXApplication::event
-        QXDocumentWindowManager::instance()->doOpenFontDialog();
-#endif
+        QXDocumentWindowManager::instance()->autoOpenFontDialog();
     }  
 
     return app.exec();
