@@ -1,8 +1,11 @@
 #include <QActionGroup>
 #include <QDockWidget>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QLineEdit>
+#include <QMimeData>
 #include <QToolButton>
 #include <QWidgetAction>
 
@@ -101,7 +104,6 @@ QXDocumentWindow::initMenu() {
 
     setMenuBar(menuBar_);
     QXTheme::applyDarkFusionOnMenuBar(menuBar_);
-    
 }
 
 void
@@ -145,7 +147,9 @@ QXDocumentWindow::initToolBar() {
 void
 QXDocumentWindow::initListView() {
     ui_->listView->setModel(document_);
-    ui_->listView->setItemDelegate(new QXGlyphItemDelegate(this));    
+    ui_->listView->setItemDelegate(new QXGlyphItemDelegate(this));
+    ui_->listView->installEventFilter(this);
+    ui_->listView->setAcceptDrops(true);
 }
 
 void
@@ -182,6 +186,35 @@ void
 QXDocumentWindow::closeEvent(QCloseEvent * event) {
     emit aboutToClose(this);
     QMainWindow::closeEvent(event);
+}
+
+void
+QXDocumentWindow::dropEvent(QDropEvent * event) {
+    for (const QUrl & url: event->mimeData()->urls()) {
+        event->acceptProposedAction();
+        QString filePath = url.toLocalFile();
+        QXDocumentWindowManager::instance()->openFontFile(filePath);
+        return;
+    }
+    QMainWindow::dropEvent(event);
+}
+
+bool
+QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
+    if (watched == ui_->listView || watched == menuBar_) {
+        if (event->type() == QEvent::Drop) {
+            dropEvent(static_cast<QDropEvent *>(event));
+            event->accept();
+            return true;
+        }
+        else if (event->type() == QEvent::DragEnter) {
+            auto ev = static_cast<QDragEnterEvent *>(event);
+            if (ev->mimeData()->hasUrls())
+                ev->acceptProposedAction();
+            return true;
+        }
+    }
+    return false;
 }
 
 void

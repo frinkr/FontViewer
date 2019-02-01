@@ -73,6 +73,11 @@ private:
     void
     closeEvent(QCloseEvent * event);
 
+    void
+    dropEvent(QDropEvent * event);
+
+    bool
+	eventFilter(QObject * watched, QEvent * event);
 private slots:
 
     void
