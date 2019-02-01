@@ -103,7 +103,10 @@ QXDocumentWindow::initMenu() {
     });
 
     setMenuBar(menuBar_);
+
+#if !defined(Q_OS_MAC)
     QXTheme::applyDarkFusionOnMenuBar(menuBar_);
+#endif
 }
 
 void
@@ -141,7 +144,11 @@ QXDocumentWindow::initToolBar() {
     
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
+#if defined(Q_OS_MAC)
     this->setUnifiedTitleAndToolBarOnMac(true);
+#else
+    QXTheme::applyDarkFusionOnToolBar(toolBar);
+#endif
 }
 
 void

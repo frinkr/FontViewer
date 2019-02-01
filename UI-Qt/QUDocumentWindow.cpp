@@ -139,7 +139,7 @@ QUDocumentWindow::initToolBar() {
     
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
-    this->setUnifiedTitleAndToolBarOnMac(true);
+//    this->setUnifiedTitleAndToolBarOnMac(true);
 }
 
 void

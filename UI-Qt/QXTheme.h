@@ -1,5 +1,6 @@
 #pragma once
 class QMenuBar;
+class QToolBar;
 
 class QXTheme {
 public:
@@ -8,6 +9,9 @@ public:
 
     static void
     applyDarkFusionOnMenuBar(QMenuBar * menuBar);
+
+    static void
+    applyDarkFusionOnToolBar(QToolBar * toolBar);
 
     static void
     applyDarkFusionOnWindowTitleBar();
