@@ -39,7 +39,7 @@ namespace {
             : QXFontInfoPage(title, face, parent) {
             htmlTemplate_ = QXHtmlTemplate::createFromFile(QXResource::path("/Html/template.html"), this);
         }
-        
+
         virtual QString html() {
             if (htmlTableRows_.isEmpty())
                 loadTableRows();
@@ -91,8 +91,8 @@ namespace {
         QXHtmlTemplate   * htmlTemplate_;
         QString            htmlTableRows_;
     };
-    
-    
+
+
     class QUFontGeneralPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
@@ -248,6 +248,7 @@ namespace {
             addDataRow(tr("Device Offset"), h.device_offset);
         }
 
+    private:
         static QString
         charsetStr(FT_Byte cs) {
             switch(cs) {
@@ -272,6 +273,53 @@ namespace {
             case FT_WinFNT_ID_CP1361: return "CP1361";
             default: return "UNKNOWN";
             }
+        }
+    };
+
+    class QXType1Page : public QXFontHtmlTemplatePage {
+    public:
+        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
+        void
+        loadTableRows() override {
+            loadGeneralInfo();
+        }
+
+    private:
+        void
+        loadGeneralInfo() {
+            PS_FontInfoRec info;
+            if (FT_Get_PS_Font_Info(ftFace_, &info)) {
+                addHeadRow(tr("<i>ERROR TO READ TYPE 1 INFO</i>"));
+                return;
+            }
+            addHeadRow(tr("FontInfo"));
+            addDataRow(tr("Version"), info.version);
+            addDataRow(tr("Notice"), info.notice);
+            addDataRow(tr("Full Name"), info.full_name);
+            addDataRow(tr("Family Name"), info.family_name);
+            addDataRow(tr("Weight"), info.weight);
+            addDataRow(tr("Italic Angle"), info.italic_angle);
+            addDataRow(tr("Fixed Pitch"), static_cast<bool>(info.is_fixed_pitch));
+            addDataRow(tr("Underline Position"), info.underline_position);
+            addDataRow(tr("Underline Thickness"), info.underline_thickness);
+
+            T1_EncodingType encodingType;
+            if (sizeof(encodingType) == FT_Get_PS_Font_Value(ftFace_, PS_DICT_ENCODING_TYPE, 0, &encodingType, sizeof(encodingType)))
+                addDataRow(tr("Encoding Type"), encodingTypeToString(encodingType));
+            else
+                addDataRow(tr("Encoding Type"), tr("<i>UNKNOWN</i>"));
+
+        }
+        static QString
+        encodingTypeToString(T1_EncodingType e) {
+            switch(e) {
+            case T1_ENCODING_TYPE_NONE: return "None";
+            case T1_ENCODING_TYPE_ARRAY: return "Array";
+            case T1_ENCODING_TYPE_STANDARD: return "Standard";
+            case T1_ENCODING_TYPE_ISOLATIN1: return "ISO Latin 1";
+            case T1_ENCODING_TYPE_EXPERT: return "Expert";
+            }
+            return "<i>UNKNOWN</i>";
         }
     };
 }
@@ -315,6 +363,9 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     else if (face->attributes().format == FXFaceFormatConstant::WinFNT) {
         pages_.append(new QXWinFNTPage(tr("Windows FNT"), face, this));
     }
+    else if (face->attributes().format == FXFaceFormatConstant::Type1) {
+        pages_.append(new QXType1Page(tr("Postscript Type 1"), face, this));
+    }
 
     ui->comboBox->clear();
     foreach(QXFontInfoPage * page, pages_)
@@ -329,7 +380,7 @@ QXFontInfoWidget::~QXFontInfoWidget()
 {
     delete ui;
 }
-    
+
 void
 QXFontInfoWidget::onCombobox(int index) {
     ui->textBrowser->setHtml(pages_.at(index)->html());
