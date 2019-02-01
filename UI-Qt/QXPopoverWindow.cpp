@@ -33,6 +33,7 @@ QXPopoverWindow::QXPopoverWindow(QWidget * parent)
 void
 QXPopoverWindow::setWidget(QWidget * widget) {
     widget_ = widget;
+    widget_->setParent(this);
     setFocusProxy(widget_);
 }
 

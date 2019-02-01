@@ -76,7 +76,12 @@ QXApplication::event(QEvent * event) {
                 bool hasWindow = false;
                 for (QWidget * widget: qApp->allWidgets()) {
                     QWidget * window = widget->window();
-                    if (window && window->isWindow() && !qobject_cast<QMenuBar*>(window) && !qobject_cast<QMenu*>(window)) {
+                    if (window &&
+                        window->isWindow() &&
+                        window->isVisible()
+                        && !qobject_cast<QMenuBar*>(window)
+                        && !qobject_cast<QMenu*>(window))
+                    {
                         hasWindow = true;
                         break;
                     }
