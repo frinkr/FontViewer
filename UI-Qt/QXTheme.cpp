@@ -98,7 +98,7 @@ namespace {
             p.setColor(QPalette::AlternateBase,   QColor(66, 66, 66));
             p.setColor(QPalette::ToolTipBase,     Qt::white);
             p.setColor(QPalette::ToolTipText,     Qt::white);
-            p.setColor(QPalette::PlaceholderText, QColor(42, 130, 218));
+            //p.setColor(QPalette::PlaceholderText, QColor(42, 130, 218));
             p.setColor(QPalette::Text,            Qt::white);
             p.setColor(QPalette::Button,          QColor(53, 53, 53));
             p.setColor(QPalette::ButtonText,      Qt::white);

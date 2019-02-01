@@ -173,7 +173,7 @@ FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
 }
 
 const FXString FXFaceFormatConstant::TrueType{"TrueType"};
-const FXString FXFaceFormatConstant::Type1{"Type1"};
+const FXString FXFaceFormatConstant::Type1{"Type 1"};
 const FXString FXFaceFormatConstant::CFF{"CFF"};
 const FXString FXFaceFormatConstant::WinFNT{"Windows FNT"};
 const FXString FXFaceFormatConstant::Other{"Other"};
