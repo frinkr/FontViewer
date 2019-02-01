@@ -25,7 +25,8 @@ int qxMain(int argc, char *argv[])
     app.setWindowIcon(QIcon(":/images/app.png"));
 
 #if !defined(Q_OS_MAC)
-    QXTheme::applyDarkFusion();
+    QXTheme::setCurrent("Dark Fusion");
+    QXTheme::current()->applyToApplication();
 #endif
     
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

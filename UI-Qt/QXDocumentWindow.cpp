@@ -105,7 +105,7 @@ QXDocumentWindow::initMenu() {
     setMenuBar(menuBar_);
 
 #if !defined(Q_OS_MAC)
-    QXTheme::applyDarkFusionOnMenuBar(menuBar_);
+    QXTheme::current()->applyToMenuBar(menuBar_);
 #endif
 }
 
@@ -147,7 +147,7 @@ QXDocumentWindow::initToolBar() {
 #if defined(Q_OS_MAC)
     this->setUnifiedTitleAndToolBarOnMac(true);
 #else
-    QXTheme::applyDarkFusionOnToolBar(toolBar);
+    QXTheme::current()->applyToToolBar(toolBar);
 #endif
 }
 

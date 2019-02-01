@@ -1,18 +1,40 @@
 #pragma once
+#include <QObject>
+
 class QMenuBar;
 class QToolBar;
 
-class QXTheme {
+class QXTheme : public QObject{
+    Q_OBJECT
 public:
-    static void
-    applyDarkFusion();
+    static QXTheme *
+    current();
+
+    static QStringList
+    availableThemes();
 
     static void
-    applyDarkFusionOnMenuBar(QMenuBar * menuBar);
+    setCurrent(const QString & current);
 
-    static void
-    applyDarkFusionOnToolBar(QToolBar * toolBar);
+private:
+    static QXTheme *
+    getTheme(const QString & name);
 
-    static void
-    applyDarkFusionOnWindowTitleBar();
+public:
+    using QObject::QObject;
+
+    virtual QString
+    name() = 0;
+
+    virtual void
+    applyToApplication() = 0;
+
+    virtual void
+    applyToMenuBar(QMenuBar * menuBar) = 0;
+
+    virtual void
+    applyToToolBar(QToolBar * toolBar) = 0;
+
+    virtual void
+    applyToWindowTitleBar(QWidget * widget) = 0;
 };
