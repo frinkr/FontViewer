@@ -145,6 +145,7 @@ QXTheme::availableThemes() {
 void
 QXTheme::setCurrent(const QString & current) {
     currentTheme_.reset(getTheme(current));
+    currentTheme_->applyToApplication();
 }
 
 QXTheme *

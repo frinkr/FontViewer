@@ -18,6 +18,8 @@ QXAboutDialog::QXAboutDialog(QWidget *parent) :
     map["QT_VERSION"] = toQString(QT_VERSION_STR);
 
     ui->textBrowser->setHtml(html->instantialize(map));
+//    setFixedSize(width(), height());
+    setWindowFlags(Qt::Dialog | Qt::WindowTitleHint | Qt::CustomizeWindowHint | Qt::WindowCloseButtonHint);
 }
 
 QXAboutDialog::~QXAboutDialog() {

@@ -11,14 +11,12 @@
 #include "QXTheme.h"
 
 #ifdef QU_MAIN
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]) {
     return quMain(argc, argv);
 }
 #endif
 
-int qxMain(int argc, char *argv[])
-{
+int qxMain(int argc, char *argv[]) {
     Q_INIT_RESOURCE(QXApplication);
     
     QXApplication app(argc, argv);
@@ -26,7 +24,6 @@ int qxMain(int argc, char *argv[])
 
 #if !defined(Q_OS_MAC)
     QXTheme::setCurrent("Dark Fusion");
-    QXTheme::current()->applyToApplication();
 #endif
     
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
