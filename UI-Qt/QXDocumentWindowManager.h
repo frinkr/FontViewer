@@ -119,6 +119,10 @@ private slots:
     saveRecentFontsSettings();
 
 private:
+    void
+    showOpenFontFileError(const QString & file);
+
+private:
     enum {kMaxRecentFiles = 20};
 
     QList<QXRecentFontItem> recentFonts_;

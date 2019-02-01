@@ -84,6 +84,9 @@ public:
     openFromFile(const QString & filePath, size_t faceIndex, QObject * parent = nullptr);
 
     static QString
+    faceDisplayName(const FXPtr<FXFace> & face);
+
+    static QString
     faceDisplayName(const FXFaceAttributes & atts);
 
 public:

@@ -33,6 +33,11 @@ QXDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * p
 }
 
 QString
+QXDocument::faceDisplayName(const FXPtr<FXFace> & face) {
+    return faceDisplayName(face->attributes());
+}
+
+QString
 QXDocument::faceDisplayName(const FXFaceAttributes & atts) {
     QString familyName = toQString(atts.names.familyName());
     QString styleName = toQString(atts.names.styleName());

@@ -107,7 +107,10 @@ pt2px(double p, double dpi = FXDefaultDPI);
 
 double
 px2pt(double p, double dpi = FXDefaultDPI);
-    
+
+size_t
+FXCountFaces(const FXString & filePath);
+
 class FXFace : public std::enable_shared_from_this<FXFace> {
 public:
     static FXPtr<FXFace>

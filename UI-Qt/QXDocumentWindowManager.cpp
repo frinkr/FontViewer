@@ -9,11 +9,14 @@
 #include <QtDebug>
 #include <QtGui>
 
+#include "FontX/FXFace.h"
+
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
+#include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 #include "QXOpenFontDialog.h"
 
@@ -244,14 +247,27 @@ QXDocumentWindowManager::doOpenFontFromFile() {
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
     openFileDialog.setNameFilter(tr("C files (*.c *.cc *.cpp *.h);;Text files (*.txt);;All Files (*)"));
 
-    if (openFileDialog.exec())
+    if (QDialog::Accepted == openFileDialog.exec())
         openFontFile(openFileDialog.selectedFiles()[0]);
 }
 
 void
 QXDocumentWindowManager::openFontFile(const QString & filePath) {
-    QXFontURI uri {filePath, 0};
-    openFontURI(uri);
+    size_t faceCount = FXCountFaces(toStdString(filePath));
+    if (faceCount == 1) {
+        QXFontURI uri {filePath, 0};
+        openFontURI(uri);
+    }
+    else if (faceCount > 1) {
+        int index = QXFontCollectionDialog::selectFontIndex(filePath);
+        if (index != -1) {
+            QXFontURI uri {filePath, static_cast<size_t>(index)};
+            openFontURI(uri);
+        }
+    }
+    else {
+        showOpenFontFileError(filePath);
+    }
 }
 
 void
@@ -276,10 +292,7 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
             QXDocumentWindow * window = createDocumentWindow(document);
             window->show();
         } else {
-            QMessageBox::critical(nullptr,
-                                  tr("Error to open file"),
-                                  tr("The file %1 can't be open.").arg(uri.filePath),
-                                  QMessageBox::Ok);
+            showOpenFontFileError(uri.filePath);
         }
     }
 }
@@ -288,13 +301,10 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
 #ifdef Q_OS_MAC
 // Handle selection of a document window in the Window menu.
 void
-QXDocumentWindowManager::slotShowWindow()
-{
-    if (QAction *action = qobject_cast<QAction *>(sender()))
-    {
+QXDocumentWindowManager::slotShowWindow() {
+    if (QAction *action = qobject_cast<QAction *>(sender())) {
         QVariant v = action->data();
-        if (v.canConvert<int>())
-        {
+        if (v.canConvert<int>()) {
             int offset = qvariant_cast<int>(v);
             QXDocumentWindow *w = documentWindows_.at(offset);
 
@@ -306,6 +316,14 @@ QXDocumentWindowManager::slotShowWindow()
 }
 
 #endif
+
+void
+QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
+    QMessageBox::critical(nullptr,
+                      tr("Error to open file"),
+                      tr("The file %1 can't be open.").arg(file),
+                      QMessageBox::Ok);
+}
 
 void
 QXDocumentWindowManager::loadRecentFontSettings() {

@@ -172,6 +172,14 @@ FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
     return name;
 }
 
+size_t
+FXCountFaces(const FXString & filePath) {
+    size_t count;
+    if (!FXFTCountFaces(FXLib::get(), filePath, count))
+        return count;
+    return 0;
+}
+
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
 	auto face = new FXFace(descriptor);

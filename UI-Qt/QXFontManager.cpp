@@ -116,9 +116,9 @@ QXFontManager::QXFontManager() {
     systemFontFolders_ = _systemFontFolders();
     FXVector<FXString> dirs;
     for (const auto & dir : systemFontFolders_)
-        dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
+        dirs.push_back(toStdString(QDir::toNativeSeparators(dir)));
     for (const auto & dir : userFontFolders_)
-        dirs.push_back(QDir::toNativeSeparators(dir).toUtf8().constData());
+        dirs.push_back(toStdString(QDir::toNativeSeparators(dir)));
 
 	const QString dbPath = dbFilePath();
 

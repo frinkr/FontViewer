@@ -28,6 +28,7 @@ set(UI
   QXAboutDialog.ui
   QXCMapBlockWidget.ui
   QXDocumentWindow.ui
+  QXFontCollectionDialog.ui
   QXFontInfoWidget.ui
   QXGlyphTableWidget.ui
   QXOpenFontDialog.ui
@@ -59,6 +60,8 @@ set(SHARED_SOURCES
   QXDocumentWindowManager.h
   QXEncoding.cpp
   QXEncoding.h
+  QXFontCollectionDialog.h
+  QXFontCollectionDialog.cpp
   QXFontComboBox.cpp
   QXFontComboBox.h
   QXFontInfoWidget.cpp
