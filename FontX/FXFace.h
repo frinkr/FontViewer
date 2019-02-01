@@ -85,6 +85,14 @@ protected:
     
 };
 
+struct FXFaceFormatConstant {
+    static const FXString TrueType;
+    static const FXString Type1;
+    static const FXString CFF;
+    static const FXString WinFNT;
+    static const FXString Other;
+};
+
 struct FXFaceAttributes {
     FXFaceDescriptor desc;
     size_t           upem { 0 };

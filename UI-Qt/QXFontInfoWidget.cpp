@@ -154,8 +154,8 @@ namespace {
                 addDataRow(tr("Modification"), ftDateTimeToString(modified));
             }
             else {
-                addDataRow(tr("Creation"), "<i>UNDEFINED</i>");
-                addDataRow(tr("Modification"), "<i>UNDEFINED</i>");
+                addDataRow(tr("Creation"), QString());
+                addDataRow(tr("Modification"), QString());
             }
         }
     };
@@ -201,7 +201,14 @@ namespace {
         using QUFontHtmlTemplatePage::QUFontHtmlTemplatePage;
 
     };
+
     class QUFontGlyfPage : public QUFontHtmlTemplatePage {
+    public:
+        using QUFontHtmlTemplatePage::QUFontHtmlTemplatePage;
+
+    };
+
+    class QUWinFNTPage : public QUFontHtmlTemplatePage {
     public:
         using QUFontHtmlTemplatePage::QUFontHtmlTemplatePage;
 
@@ -212,6 +219,7 @@ QXFontInfoPage::QXFontInfoPage(const QString & title, FXPtr<FXFace> face, QObjec
     : QObject(parent)
     , title_(title)
     , face_(face)
+    , ftFace_(face_->face())
 {
 }
 
@@ -232,15 +240,21 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     ui->setupUi(this);
 
     pages_.append(new QUFontGeneralPage(tr("General"), face, this));
-    pages_.append(new QUFontHheaPage(tr("hhea"), face, this));
-    pages_.append(new QUFontHmtxPage(tr("hmtx"), face, this));
-    pages_.append(new QUFontOS2Page(tr("OS/2"),  face, this));
-    pages_.append(new QUFontPostPage(tr("post"), face, this));
-    pages_.append(new QUFontGDEFPage(tr("GDEF"), face, this));
-    pages_.append(new QUFontGSUBPage(tr("GSUB"), face, this));
-    pages_.append(new QUFontGPOSPage(tr("GPOS"), face, this));
-    pages_.append(new QUFontGlyfPage(tr("glyf"), face, this));
-    
+
+    if (FT_IS_SFNT(face->face())) {
+        pages_.append(new QUFontHheaPage(tr("hhea"), face, this));
+        pages_.append(new QUFontHmtxPage(tr("hmtx"), face, this));
+        pages_.append(new QUFontOS2Page(tr("OS/2"),  face, this));
+        pages_.append(new QUFontPostPage(tr("post"), face, this));
+        pages_.append(new QUFontGDEFPage(tr("GDEF"), face, this));
+        pages_.append(new QUFontGSUBPage(tr("GSUB"), face, this));
+        pages_.append(new QUFontGPOSPage(tr("GPOS"), face, this));
+        pages_.append(new QUFontGlyfPage(tr("glyf"), face, this));
+    }
+    else if (face->attributes().format == FXFaceFormatConstant::WinFNT) {
+        pages_.append(new QUWinFNTPage(tr("Windows FNT"), face, this));
+    }
+
     ui->comboBox->clear();
     foreach(QXFontInfoPage * page, pages_)
         ui->comboBox->addItem(page->title());

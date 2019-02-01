@@ -25,6 +25,7 @@ protected:
 protected:
     QString       title_;
     FXPtr<FXFace> face_;
+    FXFTFace      ftFace_;
 };
 
 class QXFontInfoWidget : public QWidget

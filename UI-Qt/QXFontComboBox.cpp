@@ -87,13 +87,13 @@ QXFontListModel::displayName(size_t index) const {
 QIcon
 QXFontListModel::icon(size_t index) const {
     auto const & attrs = attributes(index);
-    if (attrs.format == "CFF")
+    if (attrs.format == FXFaceFormatConstant::CFF)
         return qApp->loadIcon(":/images/opentype.png");
-    if (attrs.format == "Type 1")
+    if (attrs.format == FXFaceFormatConstant::Type1)
         return qApp->loadIcon(":/images/postscript.png");
-    if (attrs.format == "TrueType")
+    if (attrs.format == FXFaceFormatConstant::TrueType)
         return qApp->loadIcon(":/images/truetype.png");
-    if (attrs.format == "Windows FNT")
+    if (attrs.format == FXFaceFormatConstant::WinFNT)
         return qApp->loadIcon(":/images/windowsfnt.png");
     return QIcon();
 }

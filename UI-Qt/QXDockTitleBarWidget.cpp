@@ -26,7 +26,7 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     closeButton->setMaximumSize(iconSize, iconSize);
     closeButton->setIconSize(QSize(iconSize, iconSize));
     closeButton->setFlat(true);
-    closeButton->setStyleSheet("boder:none;");
+    //closeButton->setStyleSheet("boder:none;");
     connect(closeButton, &QPushButton::clicked, this, [this]() {
         QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
         dockWidget->hide();

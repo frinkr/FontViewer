@@ -11,13 +11,13 @@ namespace {
     class QXSystemTheme : public QXTheme {
     public:
         static QString
-        sname() {
+        staticName() {
             return tr("System");
         }
 
         QString
         name() override {
-            return sname();
+            return staticName();
         }
 
         void
@@ -44,13 +44,13 @@ namespace {
     class QXDarkFusionTheme : public QXTheme {
     public:
         static QString
-        sname() {
+        staticName() {
             return tr("Dark Fusion");
         }
 
         QString
         name() override {
-            return sname();
+            return staticName();
         }
 
         void
@@ -138,7 +138,7 @@ QXTheme::current() {
 QStringList
 QXTheme::availableThemes() {
     QStringList list;
-    list << QXSystemTheme::sname() << QXDarkFusionTheme::sname();
+    list << QXSystemTheme::staticName() << QXDarkFusionTheme::staticName();
     return list;
 }
 
@@ -150,9 +150,9 @@ QXTheme::setCurrent(const QString & current) {
 
 QXTheme *
 QXTheme::getTheme(const QString & name) {
-    if (name == QXSystemTheme::sname())
+    if (name == QXSystemTheme::staticName())
         return new QXSystemTheme;
-    if (name == QXDarkFusionTheme::sname())
+    if (name == QXDarkFusionTheme::staticName())
         return new QXDarkFusionTheme;
     return nullptr;
 }
