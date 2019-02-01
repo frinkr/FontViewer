@@ -1,3 +1,4 @@
+#include <QApplicationStateChangeEvent>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QtDebug>
@@ -5,6 +6,7 @@
 
 #include "QXAboutDialog.h"
 #include "QXApplication.h"
+#include "QXMenuBar.h"
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
 
@@ -59,15 +61,30 @@ QXApplication::preferences() const {
 }
 
 #ifdef Q_OS_MAC
-// This opens a document using this application from the Finder.
 bool
-QXApplication::event(QEvent *event)
-{
-    if (event->type() == QEvent::FileOpen)
-    {
+QXApplication::event(QEvent * event) {
+    if (event->type() == QEvent::FileOpen) {
+        // This opens a document using this application from the Finder.
         QXDocumentWindowManager::instance()->openFontFile(static_cast<QFileOpenEvent *>(event)->file());
-
         return true;
+    }
+    else if (event->type() == QEvent::ApplicationStateChange) {
+        // This open the dialog when clicking the dock
+        auto changeEvent = static_cast<QApplicationStateChangeEvent *>(event);
+        if (changeEvent->applicationState() == Qt::ApplicationActive) {
+            if (QXDocumentWindowManager::instance()->documents().empty()) {
+                bool hasWindow = false;
+                for (QWidget * widget: qApp->allWidgets()) {
+                    QWidget * window = widget->window();
+                    if (window && window->isWindow() && !qobject_cast<QMenuBar*>(window) && !qobject_cast<QMenu*>(window)) {
+                        hasWindow = true;
+                        break;
+                    }
+                }
+                if (!hasWindow)
+                    QXDocumentWindowManager::instance()->doOpenFontDialog();
+            }
+        }
     }
 
     return QApplication::event(event);

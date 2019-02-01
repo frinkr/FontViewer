@@ -1,7 +1,6 @@
 #include <QWidget>
 
 #import <AppKit/AppKit.h>
-#import "MacApplicationDelegate.h"
 #import "MacHelper.h"
 
 
@@ -24,14 +23,7 @@ MacHelper::hideTitleBar(QWidget * widget)
 
     nativeWindow.backgroundColor = [NSColor colorWithRed:background.redF()
                                                    green:background.greenF()
-                                                    blue: background.blueF()
-                                                   alpha: 1];
+                                                    blue:background.blueF()
+                                                   alpha:1];
 }
 
-
-void
-MacHelper::installNSApplicationDelegate() {
-    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    [[NSApplication sharedApplication] setDelegate:[[MacApplicationDelegate alloc] init]];
-    [pool release];
-}

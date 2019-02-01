@@ -128,8 +128,6 @@ FXFaceDatabase::rescan() {
     size_t current = 0;
     for (auto & file: files_) {
         ++ current;
-        if (progress_)
-            progress_(current, files_.size(), file);
 
         auto hash = hashFile(file);
 
@@ -141,8 +139,14 @@ FXFaceDatabase::rescan() {
                 for (auto index: indexes)
                     faces.push_back(faces_[index]);
                 continue;
-            }                
+            }
+            if (progress_ && (current % 100 == 0))
+                progress_(current, files_.size(), file);
         }
+
+        if (progress_)
+            progress_(current, files_.size(), file);
+
         // using namespace std::chrono_literals;
         // std::this_thread::sleep_for(20ms);
         size_t count = 0;
@@ -157,6 +161,10 @@ FXFaceDatabase::rescan() {
             }
         }
     }
+
+    // make progress finish
+    if (progress_)
+        progress_(files_.size(), files_.size(), FXString());
 
     faces_ = faces;
     hash_ = hashFiles(files_);

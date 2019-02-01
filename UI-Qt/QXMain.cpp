@@ -1,8 +1,6 @@
 #include <QtGui>
 
-#ifdef Q_OS_MAC
-#  include "MacHelper.h"
-#else
+#ifndef Q_OS_MAC
 #  include "QXTheme.h"
 #endif
 
@@ -21,10 +19,6 @@ int main(int argc, char * argv[])
 
 int qxMain(int argc, char *argv[])
 {
-#ifdef Q_OS_MAC
-    MacHelper::installNSApplicationDelegate();
-#endif
-
     Q_INIT_RESOURCE(QXApplication);
     
     QXApplication app(argc, argv);
@@ -47,7 +41,7 @@ int qxMain(int argc, char *argv[])
     }
     else {
 #ifndef Q_OS_MAC
-        // For macOS, it's handled in MacApplicationDelegate
+        // For macOS, it's handled in QXApplication::event
         QXDocumentWindowManager::instance()->doOpenFontDialog();
 #endif
     }  

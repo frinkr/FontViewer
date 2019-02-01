@@ -99,8 +99,6 @@ set(SHARED_SOURCES
   QXToolBar.h
   )
 set(APPLE_SOURCES
-  MacApplicationDelegate.h
-  MacApplicationDelegate.mm
   MacHelper.h
   MacHelper.mm
   )

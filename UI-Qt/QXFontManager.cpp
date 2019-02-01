@@ -52,7 +52,7 @@ namespace {
 
 bool
 QXFontManager::checkResetDatabase() {
-    bool keyPressed = (qApp->queryKeyboardModifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) == (Qt::ShiftModifier | Qt::ControlModifier);
+    bool keyPressed = qApp->queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
     QFile dbFile(dbFilePath());
     if (keyPressed && dbFile.exists()) {
         if (QMessageBox::Yes == QMessageBox::question(
@@ -131,6 +131,7 @@ QXFontManager::QXFontManager() {
             return true;
         }
     ));
-	progress->deleteLater();
+    progress->close();
+	delete progress;
 }
 
