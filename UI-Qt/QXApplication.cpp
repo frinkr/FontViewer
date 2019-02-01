@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QtDebug>
 #include <QtGui>
+#include <QTimer>
 
 #include "QXAboutDialog.h"
 #include "QXApplication.h"
@@ -70,8 +71,10 @@ QXApplication::event(QEvent * event) {
     else if (event->type() == QEvent::ApplicationStateChange) {
         // This open the dialog when clicking the dock
         auto changeEvent = static_cast<QApplicationStateChangeEvent *>(event);
-        if (changeEvent->applicationState() == Qt::ApplicationActive) 
-            QXDocumentWindowManager::instance()->autoOpenFontDialog();
+        if (changeEvent->applicationState() == Qt::ApplicationActive)
+            QTimer::singleShot(0, [](){
+                QXDocumentWindowManager::instance()->autoOpenFontDialog();
+            });
     }
 
     return QApplication::event(event);

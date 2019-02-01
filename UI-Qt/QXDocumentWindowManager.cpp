@@ -19,8 +19,7 @@
 
 QXDocumentWindowManager * QXDocumentWindowManager::instance_ = nullptr;
 
-QXDocumentWindowManager::QXDocumentWindowManager()
-{
+QXDocumentWindowManager::QXDocumentWindowManager() {
 #ifdef Q_OS_MAC
     // Create default menu bar.
     new QXMenuBar();
@@ -47,6 +46,10 @@ QXDocumentWindowManager::QXDocumentWindowManager()
         }
     });
 #endif
+}
+
+QXDocumentWindowManager::~QXDocumentWindowManager() {
+    delete openFontDialog_;
 }
 
 // Singleton
@@ -172,12 +175,12 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 
 void
 QXDocumentWindowManager::doOpenFontDialog() {
-    QXOpenFontDialog openDialog(nullptr);
-    if (QDialog::Accepted == openDialog.exec()) {
-        const QXFontURI fontURI = openDialog.selectedFont();
+    if (!openFontDialog_)
+        openFontDialog_ = new QXOpenFontDialog(nullptr);
+    if (QDialog::Accepted == openFontDialog_->exec()) {
+        const QXFontURI fontURI = openFontDialog_->selectedFont();
         openFontURI(fontURI);
     }
-    return;
 }
 
 void
@@ -253,6 +256,9 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
 
 void
 QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
+    if (openFontDialog_ && openFontDialog_->isVisible())
+        openFontDialog_->close();
+
     // check already open
     QXDocument * document = getDocument(uri);
     if (document) {

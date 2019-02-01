@@ -1,17 +1,14 @@
-#ifndef QUDOCUMENTWINDOWMANAGER_H
-#define QUDOCUMENTWINDOWMANAGER_H
-
-#include <QObject>
+#pragma once
 
 #include <QList>
+#include <QObject>
 #include <QPointer>
 #include <QStringList>
 
 #include "QXDocument.h"
 
 class QXDocumentWindow;
-
-
+class QXOpenFontDialog;
 class QMenu;
 class QString;
 
@@ -43,6 +40,7 @@ class QXDocumentWindowManager : public QObject
 
 public:
     QXDocumentWindowManager();
+    ~QXDocumentWindowManager();
 
     static QXDocumentWindowManager *
     instance();
@@ -131,8 +129,9 @@ private:
     QList<QPointer<QXDocumentWindow> > documentWindows_;
     QList<QPointer<QXDocument> >       documents_;
     bool                               quitRequested_ {false};
+    QXOpenFontDialog                 * openFontDialog_ {nullptr};
+
     static QXDocumentWindowManager   * instance_;
 
 };
 
-#endif // QUDOCUMENTWINDOWMANAGER_H

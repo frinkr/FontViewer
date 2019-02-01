@@ -1,12 +1,15 @@
 #include <QWidget>
+#include <QVariant>
 
 #import <AppKit/AppKit.h>
 #import "MacHelper.h"
 
 
 void
-MacHelper::hideTitleBar(QWidget * widget)
-{
+MacHelper::hideTitleBar(QWidget * widget) {
+    if (!widget->property("QXMacTitleBarHidden").isNull())
+        return;
+
     NSView *nativeView = reinterpret_cast<NSView *>(widget->winId());
     NSWindow* nativeWindow = nativeView.window;
 
@@ -25,5 +28,6 @@ MacHelper::hideTitleBar(QWidget * widget)
                                                    green:background.greenF()
                                                     blue:background.blueF()
                                                    alpha:1];
+    widget->setProperty("QXMacTitleBarHidden", true);
 }
 
