@@ -151,7 +151,7 @@ QXDocumentWindow::initListView() {
 void
 QXDocumentWindow::initGlyphInfoView() {
     glyphPopover_ = new QXPopoverWindow(this);
-    glyphWidget_  = new QXGlyphInfoWidget(this);
+    glyphWidget_  = new QXGlyphInfoWidget(glyphPopover_);
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
     glyphWidget_->setQUDocument(document_);
