@@ -89,7 +89,7 @@ FXCMapPlatform::initUnicodeEncoding() {
 
 void
 FXCMapPlatform::initMacintoshEncoding() {
-    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Mac Roman"));
+    blocksMap_[TT_MAC_ID_ROMAN].push_back(std::make_shared<FXCharRangeBlock>(0, 256, FXGCharTypeOther, "Mac Roman"));
 }
 
 void
@@ -101,15 +101,15 @@ void
 FXCMapPlatform::initMicrosoftEncoding() {
     blocksMap_[TT_MS_ID_UNICODE_CS] = getUnicodeBlocks();
     blocksMap_[TT_MS_ID_UCS_4] = getUnicodeBlocks();
-    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF, FXGCharTypeUnicode, "Windows Symbol"));
+    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF + 1, FXGCharTypeUnicode, "Windows Symbol"));
 }
 
 void
 FXCMapPlatform::initAdobeEncoding() {
-    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Standard"));
-    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Expert"));
-    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Custom"));
-    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXCharRangeBlock>(0, 255, FXGCharTypeOther, "Latin 1"));
+    blocksMap_[TT_ADOBE_ID_STANDARD].push_back(std::make_shared<FXCharRangeBlock>(0, 256, FXGCharTypeOther, "Standard"));
+    blocksMap_[TT_ADOBE_ID_EXPERT].push_back(std::make_shared<FXCharRangeBlock>(0, 256, FXGCharTypeOther, "Expert"));
+    blocksMap_[TT_ADOBE_ID_CUSTOM].push_back(std::make_shared<FXCharRangeBlock>(0, 256, FXGCharTypeOther, "Custom"));
+    blocksMap_[TT_ADOBE_ID_LATIN_1].push_back(std::make_shared<FXCharRangeBlock>(0, 256, FXGCharTypeOther, "Latin 1"));
 }
 
 const std::vector<FXPtr<FXGCharBlock> > &

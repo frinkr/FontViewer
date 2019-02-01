@@ -8,7 +8,7 @@ struct FXUCDBlock {
 
     bool
     contains(FXChar c) const {
-        return c >= from && c <= to;
+        return c >= from && c < to;
     }
 };
 

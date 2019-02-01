@@ -60,7 +60,7 @@ public:
 
     virtual size_t
     size() const {
-        return range_.to - range_.from + 1;
+        return range_.to - range_.from;
     }
 
     virtual FXGChar

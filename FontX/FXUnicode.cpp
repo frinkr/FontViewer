@@ -99,7 +99,7 @@ FXUCD::blocks() const {
             FXCharRange range;
             FXString text;
             if (reader.parseLine(line, range, text)) {
-                FXUCDBlock block {range.from, range.to, text};
+                FXUCDBlock block {range.from, range.to + 1, text};
                 blocks_.push_back(block);
             }
         }
