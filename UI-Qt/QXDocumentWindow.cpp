@@ -109,26 +109,26 @@ QXDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
 
     cmapBlockAction_ = toolBar->addAction(
-        qxApp->loadIcon(":/images/cmap.png"),tr("CMap"),
+        qApp->loadIcon(":/images/cmap.png"),tr("CMap"),
         this, &QXDocumentWindow::onCMapBlockAction);
 
     QAction* variant = toolBar->addAction(
-		qxApp->loadIcon(":/images/variant.png"), tr("Variant"));
+		qApp->loadIcon(":/images/variant.png"), tr("Variant"));
 
     shapingAction_ = toolBar->addAction(
-		qxApp->loadIcon(":/images/shape.png"), tr("Shape"),
+		qApp->loadIcon(":/images/shape.png"), tr("Shape"),
         this, &QXDocumentWindow::onShapingAction);
     
     tableAction_ = toolBar->addAction(
-		qxApp->loadIcon(":/images/table.png"), tr("Table"),
+		qApp->loadIcon(":/images/table.png"), tr("Table"),
         this, &QXDocumentWindow::onTableAction);
     
     infoAction_ = toolBar->addAction(
-		qxApp->loadIcon(":/images/info.png"), tr("Info"),
+		qApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QXDocumentWindow::onFontInfoAction);
     
     searchAction_ = toolBar->addAction(
-		qxApp->loadIcon(":/images/search.png"), tr("Search"),
+		qApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QXDocumentWindow::onSearchAction);
     
     searchAction_->setShortcut(QKeySequence(QKeySequence::Find));

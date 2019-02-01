@@ -27,7 +27,7 @@ QXDocumentWindowManager::QXDocumentWindowManager()
 #endif
 
     loadRecentFontSettings();
-    connect(qxApp, &QXApplication::aboutToQuit, this, &QXDocumentWindowManager::saveRecentFontsSettings);
+    connect(qApp, &QXApplication::aboutToQuit, this, &QXDocumentWindowManager::saveRecentFontsSettings);
 #if 0
     connect(qApp, &QApplication::focusChanged, [](QWidget * oldWidget, QWidget * newWidget) {
         QWidget * dockWidget = newWidget;

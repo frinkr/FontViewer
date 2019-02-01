@@ -37,7 +37,7 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         });
 
         actionPreferences = menuFile->addAction(tr("&Preferences"), []() {
-            qxApp->preferences();
+            qApp->preferences();
         }, QKeySequence(QKeySequence::Preferences));
 
         actionQuit = menuFile->addAction(tr("&Quit"), []() {
@@ -117,7 +117,7 @@ QXMenuBar::QXMenuBar(QWidget * parent)
     }
 
     menuHelp = addMenu(tr("&Help")); {
-        actionAbout = menuHelp->addAction(tr("About"), qxApp, &QXApplication::about);
+        actionAbout = menuHelp->addAction(tr("About"), qApp, &QXApplication::about);
         actionAbout->setMenuRole(QAction::AboutRole);
     }
 }

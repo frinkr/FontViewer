@@ -79,7 +79,7 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     if (true) {
         QImage image = placeGlyphImage(g, emSize);
-        if ((opt.state & QStyle::State_Selected) || qxApp->darkMode())
+        if ((opt.state & QStyle::State_Selected) || qApp->darkMode())
             image.invertPixels();
         QPixmap pixmap = QPixmap::fromImage(image);
         painter->drawImage(iconRect, image, QRectF(0, 0, image.width(), image.height()));

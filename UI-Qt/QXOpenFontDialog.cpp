@@ -45,8 +45,8 @@ QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
     , ui_(new Ui::QXOpenFontDialog)
     , recentMenu_(nullptr) {
     ui_->setupUi(this);
-	ui_->filterButton->setIcon(qxApp->loadIcon(":/images/filter.png"));
-    ui_->recentButton->setIcon(qxApp->loadIcon(":/images/history.png"));
+	ui_->filterButton->setIcon(qApp->loadIcon(":/images/filter.png"));
+    ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
 
     
     connect(ui_->fontComboBox, &QXFontComboBox::fontSelected,

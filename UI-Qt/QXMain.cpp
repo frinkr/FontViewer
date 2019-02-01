@@ -23,7 +23,6 @@ int qxMain(int argc, char *argv[])
     
     QXApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
-	qxApp = &app;
 
 #if !defined(Q_OS_MAC)
     QXTheme::applyDarkFusion();

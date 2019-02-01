@@ -77,5 +77,3 @@ QXApplication::event(QEvent * event) {
     return QApplication::event(event);
 }
 #endif
-
-QXApplication * qxApp = nullptr;

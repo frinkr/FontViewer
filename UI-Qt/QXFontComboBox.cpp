@@ -88,13 +88,13 @@ QIcon
 QXFontListModel::icon(size_t index) const {
     auto const & attrs = attributes(index);
     if (attrs.format == "CFF")
-        return qxApp->loadIcon(":/images/opentype.png");
+        return qApp->loadIcon(":/images/opentype.png");
     if (attrs.format == "Type 1")
-        return qxApp->loadIcon(":/images/postscript.png");
+        return qApp->loadIcon(":/images/postscript.png");
     if (attrs.format == "TrueType")
-        return qxApp->loadIcon(":/images/truetype.png");
+        return qApp->loadIcon(":/images/truetype.png");
     if (attrs.format == "Windows FNT")
-        return qxApp->loadIcon(":/images/windowsfnt.png");
+        return qApp->loadIcon(":/images/windowsfnt.png");
     return QIcon();
 }
 

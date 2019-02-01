@@ -33,6 +33,9 @@ private:
     QMap<QString, QIcon> iconCache_;
 };
 
-extern QXApplication * qxApp;
+#if defined(qApp)
+#undef qApp
+#endif
 
+#define qApp (static_cast<QXApplication *>(QCoreApplication::instance()))
 

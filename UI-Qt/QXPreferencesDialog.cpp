@@ -17,8 +17,8 @@ QXPreferencesDialog::QXPreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui_(new Ui::QXPreferencesDialog) {
     ui_->setupUi(this);
-    ui_->addButton->setIcon(qxApp->loadIcon(":/images/plus.png"));
-    ui_->removeButton->setIcon(qxApp->loadIcon(":/images/minus.png"));
+    ui_->addButton->setIcon(qApp->loadIcon(":/images/plus.png"));
+    ui_->removeButton->setIcon(qApp->loadIcon(":/images/minus.png"));
     ui_->dirListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
     for (const QString & folder: QXFontManager::instance().systemFontFolders()) {

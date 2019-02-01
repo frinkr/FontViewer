@@ -19,7 +19,7 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     QSpacerItem * spacer = new QSpacerItem(10, TITLE_BAR_HEIGHT, QSizePolicy::Expanding, QSizePolicy::Minimum);
     
     int iconSize = TITLE_BAR_HEIGHT - 6;
-    QIcon closeIcon = qxApp->loadIcon(":/images/close.png");
+    QIcon closeIcon = qApp->loadIcon(":/images/close.png");
     QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
 
     closeButton->setMinimumSize(iconSize, iconSize);
