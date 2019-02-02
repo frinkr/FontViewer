@@ -10,9 +10,8 @@
 #include "QXGlyphListView.h"
 
 void
-QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const
-{
-    QXDocument * model = (QXDocument*)index.model();
+QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index) const {
+    const QXDocument * model = qobject_cast<const QXDocument*>(index.model());
 
     QVariant v = index.data(QXGlyphRole);
     if (!v.canConvert<QXGlyph>())
@@ -24,7 +23,9 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     initStyleOption(&opt, index);
     
     painter->save();
-    painter->setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+    painter->setRenderHint(QPainter::HighQualityAntialiasing);
+    if (g.face->isScalable())
+        painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
     const QWidget * widget = opt.widget;
     QStyle * style = widget ? widget->style() : QApplication::style();

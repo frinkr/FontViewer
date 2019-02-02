@@ -1,6 +1,6 @@
 #include <QSettings>
 #include <QStringList>
-
+#include <QDebug>
 #include "QXPreferences.h"
 
 void
@@ -27,9 +27,9 @@ QXPreferences::setUserFontFolders(const QStringList & folders) {
 
 QList<QXRecentFontItem>
 QXPreferences::recentFonts() {
-    QList<QXRecentFontItem> recentFonts;
     qRegisterMetaTypeStreamOperators<QXRecentFontItem>("QXRecentFontItem");
 
+    QList<QXRecentFontItem> recentFonts;
     QSettings settings;
     QList<QVariant> variantList = settings.value("recentFonts").toList();
     foreach(QVariant v, variantList) {
