@@ -59,17 +59,25 @@ namespace {
 
         void
         applyToMenuBar(QMenuBar * menuBar) override {
+#if defined(Q_OS_LINUX)
             QPalette p = palette();
-            QString style = QString("background-color:%1;color:%2")
+            QString menuBarStyle = QString(" \
+                QMenuBar { background-color:%1;color:%2; }  \
+                QMenuBar::item::selected {background: %3; } \
+                ")
                 .arg(p.color(QPalette::Window).name(QColor::HexRgb))
-                .arg(p.color(QPalette::WindowText).name(QColor::HexRgb));
+                .arg(p.color(QPalette::WindowText).name(QColor::HexRgb))
+                .arg(p.color(QPalette::Highlight).name(QColor::HexRgb));
     
-            menuBar->setStyleSheet(style);
+            menuBar->setStyleSheet(menuBarStyle);
+            return;
+
             for (QAction * action : menuBar->actions()) {
                 if (QMenu * menu = action->menu()) {
-                    menu->setStyleSheet(style);
+                    menu->setStyleSheet(menuBarStyle);
                 }
             }
+#endif
         }
 
         void
@@ -105,8 +113,6 @@ namespace {
             p.setColor(QPalette::HighlightedText, Qt::white);
             p.setColor(QPalette::Link,            QColor(42, 130, 218));
             p.setColor(QPalette::LinkVisited,     QColor(42, 130, 218));
-            p.setColor(QPalette::NoRole, Qt::red);
-            //p.setColor(QPalette::NColorRoles, Qt::red);
 
             // Disabled
             p.setColor(QPalette::Disabled, QPalette::ButtonText,      QColor(127, 127, 127));
@@ -115,30 +121,6 @@ namespace {
             p.setColor(QPalette::Disabled, QPalette::Text,            QColor(127, 127, 127));
             p.setColor(QPalette::Disabled, QPalette::WindowText,      QColor(127, 127, 127));
 
-            // Current
-#if 0
-            p.setColor(QPalette::Inactive, QPalette::Window,          Qt::red);//QColor(53, 53, 53));
-            p.setColor(QPalette::Inactive, QPalette::Background,      Qt::red);//QColor(53, 53, 53));
-            p.setColor(QPalette::Inactive, QPalette::WindowText,      Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Foreground,      Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Base,            Qt::red);//QColor(42, 42, 42));
-            p.setColor(QPalette::Inactive, QPalette::AlternateBase,   Qt::red);//QColor(66, 66, 66));
-            p.setColor(QPalette::Inactive, QPalette::ToolTipBase,     Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::ToolTipText,     Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Text,            Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Button,          Qt::red);//QColor(53, 53, 53));
-            p.setColor(QPalette::Inactive, QPalette::ButtonText,      Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::BrightText,      Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Light,           Qt::red);//QColor(73, 73, 73));
-            p.setColor(QPalette::Inactive, QPalette::Midlight,        Qt::red);//QColor(63, 63, 63));
-            p.setColor(QPalette::Inactive, QPalette::Dark,            Qt::red);//QColor(35, 35, 35));
-            p.setColor(QPalette::Inactive, QPalette::Mid,             Qt::red);//QColor(44, 44, 44));
-            p.setColor(QPalette::Inactive, QPalette::Shadow,          Qt::red);//QColor(20, 20, 20));
-            p.setColor(QPalette::Inactive, QPalette::Highlight,       Qt::red);//QColor(42, 130, 218));
-            p.setColor(QPalette::Inactive, QPalette::HighlightedText, Qt::red);//Qt::white);
-            p.setColor(QPalette::Inactive, QPalette::Link,            Qt::red);//QColor(42, 130, 218));
-            p.setColor(QPalette::Inactive, QPalette::LinkVisited,     Qt::red);//QColor(42, 130, 218));
-#endif
             return p;
         }
     };
