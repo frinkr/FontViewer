@@ -1,4 +1,5 @@
 #include <QApplicationStateChangeEvent>
+#include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QtDebug>
@@ -80,3 +81,19 @@ QXApplication::event(QEvent * event) {
     return QApplication::event(event);
 }
 #endif
+
+
+bool
+QXApplication::userRequiredToResetAppData() {
+    bool keyPressed = queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
+    if (keyPressed) {
+        if (QMessageBox::Yes == QMessageBox::question(
+                nullptr,
+                tr("Reset font database"),
+                tr("Are you sure to reset the database? The font database will be deleted and rebuilt."),
+                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)) {
+            return true;
+		}
+    }
+    return false;
+}

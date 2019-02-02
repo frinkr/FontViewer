@@ -43,22 +43,6 @@ namespace {
 
 }
 
-bool
-QXFontManager::checkResetDatabase() {
-    bool keyPressed = qApp->queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
-    QFile dbFile(dbFilePath());
-    if (keyPressed && dbFile.exists()) {
-        if (QMessageBox::Yes == QMessageBox::question(
-                nullptr,
-                tr("Reset font database"),
-                tr("Are you sure to reset the database? The font database will be deleted and rebuilt."),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)) {
-            return true;
-		}
-    }
-    return false;
-}
-
 void
 QXFontManager::resetDatabase() {
     QFile dbFile(dbFilePath());

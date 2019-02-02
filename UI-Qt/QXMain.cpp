@@ -23,13 +23,18 @@ int qxMain(int argc, char *argv[]) {
     QXApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
 
+    const bool resetAppData = app.userRequiredToResetAppData();
+
+    if (resetAppData)
+        QXPreferences::resetPreferences();
+
 #if !defined(Q_OS_MAC)
     QXTheme::setCurrent(QXPreferences::theme());
 #endif
     
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 
-    if (QXFontManager::checkResetDatabase())
+    if (resetAppData) 
         QXFontManager::resetDatabase();
 
     QStringList arguments = app.arguments();

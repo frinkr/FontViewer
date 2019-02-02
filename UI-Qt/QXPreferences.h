@@ -6,6 +6,9 @@ class QXPreferences : public QObject {
     Q_OBJECT
 
 public:
+    static void
+    resetPreferences();
+
     static QStringList
     userFontFolders();
 

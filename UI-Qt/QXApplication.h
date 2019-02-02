@@ -17,6 +17,9 @@ public:
 	QIcon
 	loadIcon(const QString & path);
 
+    bool
+    userRequiredToResetAppData();
+
 public slots:
     void
     about() const;

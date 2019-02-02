@@ -3,6 +3,12 @@
 
 #include "QXPreferences.h"
 
+void
+QXPreferences::resetPreferences() {
+    QSettings settings;
+    settings.clear();
+}
+
 QStringList
 QXPreferences::userFontFolders() {
     QSettings settings;

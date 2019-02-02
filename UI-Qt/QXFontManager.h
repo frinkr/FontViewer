@@ -7,8 +7,6 @@
 class QXFontManager : public QObject {
     Q_OBJECT
 public:
-    static bool
-    checkResetDatabase();
 
     static void
     resetDatabase();
