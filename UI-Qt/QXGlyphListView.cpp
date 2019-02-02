@@ -24,7 +24,7 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing);
-    if (g.face->isScalable())
+    if (g.face->attributes().format == FXFaceFormatConstant::WinFNT)
         painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
     const QWidget * widget = opt.widget;
@@ -80,7 +80,7 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     if (true) {
         QImage image = placeGlyphImage(g, emSize);
-        if ((opt.state & QStyle::State_Selected) || qApp->darkMode())
+        if (g.face->isScalable() && ((opt.state & QStyle::State_Selected) || qApp->darkMode()))
             image.invertPixels();
         QPixmap pixmap = QPixmap::fromImage(image);
         painter->drawImage(iconRect, image, QRectF(0, 0, image.width(), image.height()));

@@ -94,7 +94,7 @@ QXGlyphInfoWidget::loadGlyph() {
     FXGlyph glyph = document_->face()->glyph(char_);
     
     QImage image = placeGlyphImage(glyph, glyphEmSize());
-    if (qApp->darkMode())
+    if (glyph.face->isScalable() && qApp->darkMode())
         image.invertPixels();
     
     QTextDocument * qdoc = new QTextDocument;

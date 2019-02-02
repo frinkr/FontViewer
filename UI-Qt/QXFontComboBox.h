@@ -75,6 +75,9 @@ public:
     int
     selectFont(const QXFontURI & fontURI);
 
+    void
+    clearFilter();
+
 signals:
     void
     fontSelected(const QXFontURI & fontURI, size_t index);

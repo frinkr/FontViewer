@@ -183,9 +183,14 @@ QXFontComboBox::selectFont(int index) {
 }
 int
 QXFontComboBox::selectFont(const QXFontURI & fontURI) {
-    proxyModel()->clearFilter();
+    clearFilter();
     int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
     return selectFont(index);
+}
+
+void
+QXFontComboBox::clearFilter() {
+    proxyModel()->clearFilter();
 }
 
 QXFontListModel *

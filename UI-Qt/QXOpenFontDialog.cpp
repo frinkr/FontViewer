@@ -115,6 +115,7 @@ QXOpenFontDialog::selectedFont() {
 
 void
 QXOpenFontDialog::accept() {
+    ui_->fontComboBox->clearFilter();
     QDialog::accept();
 }
 
