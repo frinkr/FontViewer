@@ -19,25 +19,23 @@ namespace {
         name() override {
             return staticName();
         }
+    };
+
+    class QXFusionTheme : public QXTheme {
+    public:
+        static QString
+        staticName() {
+            return tr("Fusion");
+        }
+
+        QString
+        name() override {
+            return staticName();
+        }
 
         void
         applyToApplication() override {
-            
-        }
-
-        void
-        applyToMenuBar(QMenuBar * menuBar) override {
-             
-        }
-
-        void
-        applyToToolBar(QToolBar * toolBar) override {
-             
-        }
-
-        void
-        applyToWindowTitleBar(QWidget * widget) override {
-             
+            qApp->setStyle(QStyleFactory::create("Fusion"));
         }
     };
 
@@ -77,11 +75,6 @@ namespace {
         void
         applyToToolBar(QToolBar * toolBar) override {
             toolBar->setStyleSheet("QToolBar { border: 0px }");
-        }
-
-        void
-        applyToWindowTitleBar(QWidget * widget) override {
-             
         }
 
     protected:
@@ -138,7 +131,7 @@ QXTheme::current() {
 QStringList
 QXTheme::availableThemes() {
     QStringList list;
-    list << QXSystemTheme::staticName() << QXDarkFusionTheme::staticName();
+    list << QXSystemTheme::staticName() << QXFusionTheme::staticName() <<  QXDarkFusionTheme::staticName();
     return list;
 }
 
@@ -152,6 +145,8 @@ QXTheme *
 QXTheme::getTheme(const QString & name) {
     if (name == QXSystemTheme::staticName())
         return new QXSystemTheme;
+    if (name == QXFusionTheme::staticName())
+        return new QXFusionTheme;
     if (name == QXDarkFusionTheme::staticName())
         return new QXDarkFusionTheme;
     return nullptr;

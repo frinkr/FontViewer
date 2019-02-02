@@ -84,6 +84,8 @@ set(SHARED_SOURCES
   QXOpenFontDialog.h
   QXPopoverWindow.cpp
   QXPopoverWindow.h
+  QXPreferences.h
+  QXPreferences.cpp
   QXPreferencesDialog.cpp
   QXPreferencesDialog.h
   QXProgressDialog.cpp

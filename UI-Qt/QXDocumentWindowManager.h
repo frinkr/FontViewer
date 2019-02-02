@@ -6,33 +6,12 @@
 #include <QStringList>
 
 #include "QXDocument.h"
+#include "QXPreferences.h"
 
 class QXDocumentWindow;
 class QXOpenFontDialog;
 class QMenu;
 class QString;
-
-struct QXRecentFontItem : public QXFontURI {
-    QString fullName;
-
-    friend QDataStream &
-    operator << (QDataStream & arch, const QXRecentFontItem & item)
-    {
-        arch << static_cast<const QXFontURI&>(item);
-        arch << item.fullName;
-        return arch;
-    }
-
-    friend QDataStream &
-    operator >> (QDataStream & arch, QXRecentFontItem & item)
-    {
-        arch >> static_cast<QXFontURI&>(item);
-        arch >> item.fullName;
-        return arch;
-    }
-};
-
-Q_DECLARE_METATYPE(QXRecentFontItem);
 
 class QXDocumentWindowManager : public QObject
 {
@@ -111,12 +90,6 @@ private slots:
     void
     slotShowWindow();
 #endif
-
-    void
-    loadRecentFontSettings();
-
-    void
-    saveRecentFontsSettings();
 
 private:
     void

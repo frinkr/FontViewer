@@ -27,9 +27,12 @@ QXDocumentWindowManager::QXDocumentWindowManager() {
     // Create default menu bar.
     new QXMenuBar();
 #endif
+    recentFonts_ = QXPreferences::recentFonts();
 
-    loadRecentFontSettings();
-    connect(qApp, &QXApplication::aboutToQuit, this, &QXDocumentWindowManager::saveRecentFontsSettings);
+    connect(qApp, &QXApplication::aboutToQuit, [this]() {
+        QXPreferences::setRecentFonts(recentFonts_);
+    });
+
 #if 0
     connect(qApp, &QApplication::focusChanged, [](QWidget * oldWidget, QWidget * newWidget) {
         QWidget * dockWidget = newWidget;
@@ -216,6 +219,7 @@ QXDocumentWindowManager::onDocumentWindowAboutToClose(QXDocumentWindow * window)
 
 void
 QXDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
+    Q_UNUSED(obj);
 #ifdef Q_OS_MAC
     // show Open Font dialog if no document open
     if (!quitRequested_ && documents_.empty())
@@ -326,37 +330,13 @@ QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
 }
 
 void
-QXDocumentWindowManager::loadRecentFontSettings() {
-    qRegisterMetaTypeStreamOperators<QXRecentFontItem>("QURecentFontItem");
-
-    QSettings settings;
-    QList<QVariant> variantList = settings.value("recentFonts").toList();
-    foreach(QVariant v, variantList) {
-        if (v.canConvert<QXRecentFontItem>())
-            recentFonts_.append(v.value<QXRecentFontItem>());
-    }
-}
-
-void
-QXDocumentWindowManager::saveRecentFontsSettings() {
-    qRegisterMetaTypeStreamOperators<QXRecentFontItem>("QURecentFontItem");
-
-    QSettings settings;
-    QList<QVariant> variantList;
-    foreach(QXRecentFontItem uri, recentFonts_)
-        variantList.append(QVariant::fromValue(uri));
-
-    settings.setValue("recentFonts", variantList);
-}
-
-void
 QXDocumentWindowManager::closeAllDocumentsAndQuit() {
     for (int i = 0; i < documentWindows_.size(); i++) {
         QXDocumentWindow * w = documentWindows_[i];
         w->close();
     }
     
-    saveRecentFontsSettings();
+    QXPreferences::setRecentFonts(recentFonts_);
     quitRequested_ = true;
     qApp->quit();
 }

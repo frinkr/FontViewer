@@ -13,6 +13,7 @@
 
 #include "QXConv.h"
 #include "QXFontManager.h"
+#include "QXPreferences.h"
 #include "QXProgressDialog.h"
 
 namespace {
@@ -30,14 +31,6 @@ namespace {
 #else
         return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
 #endif
-    }
-
-    QStringList _userFontFolders() {
-        QSettings settings;
-        QVariant  data = settings.value("userFontFolders");
-        if (data.canConvert<QStringList>())
-            return data.value<QStringList>();
-        return QStringList();
     }
 
     QXProgressDialog *
@@ -106,13 +99,12 @@ QXFontManager::userFontFolders() const {
 
 void
 QXFontManager::setUserFontFolders(const QStringList & folders) {
-    QSettings settings;
-    settings.setValue("userFontFolders", folders);
+    QXPreferences::setUserFontFolders(folders);
     userFontFolders_ = folders;
 }
 
 QXFontManager::QXFontManager() {
-    userFontFolders_ = _userFontFolders();
+    userFontFolders_ = QXPreferences::userFontFolders();
     systemFontFolders_ = _systemFontFolders();
     FXVector<FXString> dirs;
     for (const auto & dir : systemFontFolders_)
