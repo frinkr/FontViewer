@@ -26,13 +26,13 @@ public:
 
 private slots:
     void
-    onCurrentDirItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
+    onCurrentFontFoldertemChanged(QListWidgetItem * current, QListWidgetItem * previous);
 
     void
-    onAddButtonClicked();
+    onAddFontFolderButtonClicked();
 
     void
-    onRemoveButtonClicked();
+    onRemoveFontFolderButtonClicked();
 private:
     Ui::QXPreferencesDialog * ui_;
 };

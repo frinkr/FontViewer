@@ -4,7 +4,9 @@
 
 #include "QXApplication.h"
 #include "QXFontManager.h"
+#include "QXPreferences.h"
 #include "QXPreferencesDialog.h"
+#include "QXTheme.h"
 
 #include "ui_QXPreferencesDialog.h"
 
@@ -17,21 +19,25 @@ QXPreferencesDialog::QXPreferencesDialog(QWidget *parent) :
     QDialog(parent),
     ui_(new Ui::QXPreferencesDialog) {
     ui_->setupUi(this);
-    ui_->addButton->setIcon(qApp->loadIcon(":/images/plus.png"));
-    ui_->removeButton->setIcon(qApp->loadIcon(":/images/minus.png"));
-    ui_->dirListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 
+    // Font Folder list widget
+    ui_->addFontFolderButton->setIcon(qApp->loadIcon(":/images/plus.png"));
+    ui_->removeFontFolderButton->setIcon(qApp->loadIcon(":/images/minus.png"));
+    ui_->fontFolderListWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     for (const QString & folder: QXFontManager::instance().systemFontFolders()) {
-        QListWidgetItem * item = new QListWidgetItem(folder, ui_->dirListWidget, kSystemFontFolder);
+        QListWidgetItem * item = new QListWidgetItem(folder, ui_->fontFolderListWidget, kSystemFontFolder);
         item->setForeground(palette().color(QPalette::Disabled, QPalette::WindowText));
     }
-
     for (const QString & folder: QXFontManager::instance().userFontFolders())
-        new QListWidgetItem(folder, ui_->dirListWidget, kUserFontFolder);
+        new QListWidgetItem(folder, ui_->fontFolderListWidget, kUserFontFolder);
 
-    connect(ui_->dirListWidget, &QListWidget::currentItemChanged, this, &QXPreferencesDialog::onCurrentDirItemChanged);
-    connect(ui_->addButton, &QToolButton::clicked, this, &QXPreferencesDialog::onAddButtonClicked);
-    connect(ui_->removeButton, &QToolButton::clicked, this, &QXPreferencesDialog::onRemoveButtonClicked);
+    connect(ui_->fontFolderListWidget, &QListWidget::currentItemChanged, this, &QXPreferencesDialog::onCurrentFontFoldertemChanged);
+    connect(ui_->addFontFolderButton, &QToolButton::clicked, this, &QXPreferencesDialog::onAddFontFolderButtonClicked);
+    connect(ui_->removeFontFolderButton, &QToolButton::clicked, this, &QXPreferencesDialog::onRemoveFontFolderButtonClicked);
+
+    // Theme combobox
+    ui_->themeCombobox->addItems(QXTheme::availableThemes());
+    ui_->themeCombobox->setCurrentText(QXPreferences::theme());
 }
 
 QXPreferencesDialog::~QXPreferencesDialog() {
@@ -41,8 +47,8 @@ QXPreferencesDialog::~QXPreferencesDialog() {
 QStringList
 QXPreferencesDialog::userFontFolders() const {
     QStringList list;
-    for (int i = 0; i < ui_->dirListWidget->count(); ++ i) {
-        auto item = ui_->dirListWidget->item(i);
+    for (int i = 0; i < ui_->fontFolderListWidget->count(); ++ i) {
+        auto item = ui_->fontFolderListWidget->item(i);
         if (item->type() == kUserFontFolder)
             list.append(item->text());
     }
@@ -56,16 +62,18 @@ QXPreferencesDialog::showPreferences() {
 }
 
 void
-QXPreferencesDialog::onCurrentDirItemChanged(QListWidgetItem * current, QListWidgetItem * previous) {
+QXPreferencesDialog::onCurrentFontFoldertemChanged(QListWidgetItem * current, QListWidgetItem * previous) {
+    Q_UNUSED(previous);
+
     int type = 0;
     if (current) 
         type = current->type();
 
-    ui_->removeButton->setEnabled(type == kUserFontFolder);
+    ui_->removeFontFolderButton->setEnabled(type == kUserFontFolder);
 }
 
 void
-QXPreferencesDialog::onAddButtonClicked() {
+QXPreferencesDialog::onAddFontFolderButtonClicked() {
     QString dir = QFileDialog::getExistingDirectory(
         this,
         tr("Add Font Directory"),
@@ -74,17 +82,17 @@ QXPreferencesDialog::onAddButtonClicked() {
 
     if (!dir.isEmpty()) {
         // check exists
-        if(ui_->dirListWidget->findItems(dir, Qt::MatchFixedString).isEmpty())
-            new QListWidgetItem(dir, ui_->dirListWidget, 1);
+        if(ui_->fontFolderListWidget->findItems(dir, Qt::MatchFixedString).isEmpty())
+            new QListWidgetItem(dir, ui_->fontFolderListWidget, 1);
     }
 }
 
 void
-QXPreferencesDialog::onRemoveButtonClicked() {
-    int row = ui_->dirListWidget->currentRow();
-    auto item = ui_->dirListWidget->currentItem();
+QXPreferencesDialog::onRemoveFontFolderButtonClicked() {
+    int row = ui_->fontFolderListWidget->currentRow();
+    auto item = ui_->fontFolderListWidget->currentItem();
     if (row != -1 && item && item->type() == kUserFontFolder) 
-        ui_->dirListWidget->takeItem(row);
+        ui_->fontFolderListWidget->takeItem(row);
 }
 
 void
@@ -95,6 +103,9 @@ QXPreferencesDialog::accept() {
         QMessageBox::information(this, tr("Restart Required"), tr("The font folders change will take effect after restart."));
         QXFontManager::instance().setUserFontFolders(newUserFolders);
     }
-    
+
+    QXPreferences::setTheme(ui_->themeCombobox->currentText());
+    QXTheme::setCurrent(ui_->themeCombobox->currentText());
+
     QDialog::accept();
 }

@@ -6,8 +6,9 @@
 
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
-#include "QXMain.h"
 #include "QXFontManager.h"
+#include "QXMain.h"
+#include "QXPreferences.h"
 #include "QXTheme.h"
 
 #ifdef QU_MAIN
@@ -23,7 +24,7 @@ int qxMain(int argc, char *argv[]) {
     app.setWindowIcon(QIcon(":/images/app.png"));
 
 #if !defined(Q_OS_MAC)
-    QXTheme::setCurrent("Dark Fusion");
+    QXTheme::setCurrent(QXPreferences::theme());
 #endif
     
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);

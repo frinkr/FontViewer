@@ -41,8 +41,26 @@ struct QXFontURI
         return arch;
     }
 };
-
 Q_DECLARE_METATYPE(QXFontURI);
+
+struct QXRecentFontItem : public QXFontURI {
+    QString fullName;
+
+    friend QDataStream &
+    operator << (QDataStream & arch, const QXRecentFontItem & item) {
+        arch << static_cast<const QXFontURI&>(item);
+        arch << item.fullName;
+        return arch;
+    }
+
+    friend QDataStream &
+    operator >> (QDataStream & arch, QXRecentFontItem & item) {
+        arch >> static_cast<QXFontURI&>(item);
+        arch >> item.fullName;
+        return arch;
+    }
+};
+Q_DECLARE_METATYPE(QXRecentFontItem);
 
 class QXGlyph : public QObject {
     Q_OBJECT

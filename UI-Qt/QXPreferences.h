@@ -2,27 +2,6 @@
 #include <QObject>
 #include "QXDocument.h"
 
-struct QXRecentFontItem : public QXFontURI {
-    QString fullName;
-
-    friend QDataStream &
-    operator << (QDataStream & arch, const QXRecentFontItem & item) {
-        arch << static_cast<const QXFontURI&>(item);
-        arch << item.fullName;
-        return arch;
-    }
-
-    friend QDataStream &
-    operator >> (QDataStream & arch, QXRecentFontItem & item) {
-        arch >> static_cast<QXFontURI&>(item);
-        arch >> item.fullName;
-        return arch;
-    }
-};
-
-Q_DECLARE_METATYPE(QXRecentFontItem);
-
-
 class QXPreferences : public QObject {
     Q_OBJECT
 
@@ -38,6 +17,12 @@ public:
 
     static void
     setRecentFonts(const QList<QXRecentFontItem> & recentFonts);
+
+    static QString
+    theme();
+
+    static void
+    setTheme(const QString & theme);
 
 private:
     using QObject::QObject;

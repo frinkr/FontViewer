@@ -44,3 +44,18 @@ QXPreferences::setRecentFonts(const QList<QXRecentFontItem> & recentFonts) {
 
     settings.setValue("recentFonts", variantList);
 }
+
+QString
+QXPreferences::theme() {
+    QSettings settings;
+    QVariant  data = settings.value("theme");
+    if (data.canConvert<QString>())
+        return data.value<QString>();
+    return QString();
+}
+
+void
+QXPreferences::setTheme(const QString & theme) {
+    QSettings settings;
+    settings.setValue("theme", theme);
+}
