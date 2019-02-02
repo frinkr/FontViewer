@@ -27,14 +27,14 @@ public:
     name() = 0;
 
     virtual void
-    applyToApplication() {};
+    applyToApplication() {}
 
     virtual void
-    applyToMenuBar(QMenuBar * menuBar) {};
+    applyToMenuBar(QMenuBar * menuBar) { Q_UNUSED(menuBar); }
 
     virtual void
-    applyToToolBar(QToolBar * toolBar) {};
+    applyToToolBar(QToolBar * toolBar) { Q_UNUSED(toolBar); }
 
     virtual void
-    applyToWindowTitleBar(QWidget * widget) {};
+    applyToWindowTitleBar(QWidget * widget) { Q_UNUSED(widget); }
 };
