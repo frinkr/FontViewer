@@ -7,6 +7,7 @@
 #include <QTimer>
 
 #include "QXAboutDialog.h"
+#include "QXAboutFontsDialog.h"
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
@@ -53,8 +54,14 @@ QXApplication::~QXApplication() {
 
 void
 QXApplication::about() const {
-    QXAboutDialog::showAbout();    
+    QXAboutDialog::showAbout();
 }
+
+void
+QXApplication::aboutFonts() const {
+    QXAboutFontsDialog::showAbout();
+}
+
 
 void
 QXApplication::preferences() const {

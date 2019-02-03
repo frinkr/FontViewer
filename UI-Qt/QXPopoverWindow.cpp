@@ -157,9 +157,14 @@ QXPopoverWindow::edgeRelativeTo(const QRect & rect, QXPopoverEdges preferedEgdes
     QList<QRect> geometries;
     foreach(QXPopoverEdge edge, edges) 
         geometries.append(geometryRelativeTo(rect, edge));
-
+    
+#if QT_VERSION_MAJOR >= 5 && QT_VERSION_MINOR >= 10
     QScreen * screen = qApp->screenAt(rect.center());
     if (!screen) screen = qApp->primaryScreen();
+#else
+    QScreen * screen = qApp->primaryScreen();
+#endif
+    
     if (screen) {
         auto screenRect = screen->availableGeometry();
         for (int i = 0; i < edges.size(); ++ i) {
@@ -167,7 +172,6 @@ QXPopoverWindow::edgeRelativeTo(const QRect & rect, QXPopoverEdges preferedEgdes
                 return edges[i];
         }
     }
-
     return edges[0];
 }
     

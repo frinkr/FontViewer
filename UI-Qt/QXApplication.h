@@ -25,6 +25,9 @@ public slots:
     about() const;
 
     void
+    aboutFonts() const;
+
+    void
     preferences() const;
 
 private:

@@ -35,7 +35,7 @@ public:
 
     // Help menu
     QAction * actionAbout;
-
+    QAction * actionAboutFonts;
 
     QMenu * menuFile;
     QMenu * menuRecent;

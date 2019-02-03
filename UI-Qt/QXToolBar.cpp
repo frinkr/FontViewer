@@ -37,7 +37,7 @@ QXToolBar::mouseReleaseEvent(QMouseEvent * event) {
 
 void
 QXToolBar::mouseDoubleClickEvent(QMouseEvent * event) {
-#ifdef QX_MOVE_WINDOW_BY_TOOLBAR
+#ifdef Q_OS_MAC
     if (this->window()->windowState().testFlag(Qt::WindowMaximized))
         this->window()->showNormal();
     else

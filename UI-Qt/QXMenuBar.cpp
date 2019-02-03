@@ -119,5 +119,8 @@ QXMenuBar::QXMenuBar(QWidget * parent)
     menuHelp = addMenu(tr("&Help")); {
         actionAbout = menuHelp->addAction(tr("About"), qApp, &QXApplication::about);
         actionAbout->setMenuRole(QAction::AboutRole);
+
+        actionAboutFonts = menuHelp->addAction(tr("About Fonts"), qApp, &QXApplication::aboutFonts);
+
     }
 }

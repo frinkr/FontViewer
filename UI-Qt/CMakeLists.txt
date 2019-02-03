@@ -26,6 +26,7 @@ endif()
 
 set(UI
   QXAboutDialog.ui
+  QXAboutFontsDialog.ui
   QXCMapBlockWidget.ui
   QXDocumentWindow.ui
   QXFontCollectionDialog.ui
@@ -43,6 +44,8 @@ qt5_wrap_ui(UI_HEADERS ${UI})
 set(SHARED_SOURCES 
   QXAboutDialog.cpp
   QXAboutDialog.h
+  QXAboutFontsDialog.h
+  QXAboutFontsDialog.cpp
   QXApplication.cpp
   QXApplication.h
   QXApplication.qrc
