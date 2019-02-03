@@ -4,11 +4,9 @@
 
 
 #include <QDir>
-#include <QGuiApplication>
 #include <QLabel>
 #include <QMessageBox>
 #include <QProgressDialog>
-#include <QSettings>
 #include <QStandardPaths>
 
 #include "QXConv.h"

@@ -23,11 +23,12 @@ int qxMain(int argc, char *argv[]) {
     QXApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
 
+    QXPreferences::load();
+
     const bool resetAppData = app.userRequiredToResetAppData();
-
     if (resetAppData)
-        QXPreferences::resetPreferences();
-
+        QXPreferences::reset();
+    
 #if !defined(Q_OS_MAC)
     QXTheme::setCurrent(QXPreferences::theme());
 #endif
@@ -46,5 +47,7 @@ int qxMain(int argc, char *argv[]) {
         QXDocumentWindowManager::instance()->autoOpenFontDialog();
     }  
 
-    return app.exec();
+    int code = app.exec();
+    QXPreferences::save();
+    return code;
 }

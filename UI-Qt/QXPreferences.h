@@ -7,7 +7,13 @@ class QXPreferences : public QObject {
 
 public:
     static void
-    resetPreferences();
+    load();
+
+    static void
+    save();
+    
+    static void
+    reset();
 
     static QStringList
     userFontFolders();
