@@ -14,53 +14,21 @@ struct QXFontURI
 
     bool
     operator==(const QXFontURI & other) const {
-        return filePath == other.filePath &&
-            faceIndex == other.faceIndex;
+        return filePath == other.filePath && faceIndex == other.faceIndex;
     }
     
     bool
     operator!=(const QXFontURI & other) const {
         return !(*this == other);
     }
-
-    friend QDataStream &
-    operator << (QDataStream & arch, const QXFontURI & uri)
-    {
-        arch << uri.filePath;
-        arch << static_cast<int>(uri.faceIndex);
-        return arch;
-    }
-
-    friend QDataStream &
-    operator >> (QDataStream & arch, QXFontURI & uri)
-    {
-        int index = 0;
-        arch >> uri.filePath;
-        arch >> index;
-        uri.faceIndex = static_cast<size_t>(index);
-        return arch;
-    }
 };
 Q_DECLARE_METATYPE(QXFontURI);
 
 struct QXRecentFontItem : public QXFontURI {
     QString fullName;
-
-    friend QDataStream &
-    operator << (QDataStream & arch, const QXRecentFontItem & item) {
-        arch << static_cast<const QXFontURI&>(item);
-        arch << item.fullName;
-        return arch;
-    }
-
-    friend QDataStream &
-    operator >> (QDataStream & arch, QXRecentFontItem & item) {
-        arch >> static_cast<QXFontURI&>(item);
-        arch >> item.fullName;
-        return arch;
-    }
 };
 Q_DECLARE_METATYPE(QXRecentFontItem);
+
 
 class QXGlyph : public QObject {
     Q_OBJECT

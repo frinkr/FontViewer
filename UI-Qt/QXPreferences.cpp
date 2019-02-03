@@ -1,6 +1,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QSettings>
@@ -19,6 +20,28 @@ namespace {
             folder.mkpath(".");
         return folder.filePath("FontViewer.prefs");
     }
+
+    QJsonObject
+    toJsonObject(const QXRecentFontItem & item) {
+        QJsonObject obj;
+        obj["filePath"]  = item.filePath;
+        obj["faceIndex"] = static_cast<double>(item.faceIndex);
+        obj["fullName"]  = item.fullName;
+        return obj;
+    }
+
+    QXRecentFontItem
+    toQXRecentFontItem(const QJsonObject & obj) {
+        QXRecentFontItem item;
+        if (obj["filePath"].isString())
+            item.filePath = obj["filePath"].toString();
+        if (obj["faceIndex"].isDouble())
+            item.faceIndex = static_cast<size_t>(obj["faceIndex"].toDouble());
+        if (obj["fullName"].isString())
+            item.fullName = obj["fullName"].toString();
+        return item;
+    }
+
 }
 
 void
@@ -47,54 +70,53 @@ QXPreferences::reset() {
 
 QStringList
 QXPreferences::userFontFolders() {
-    QSettings settings;
-    QVariant  data = settings.value("userFontFolders");
-    if (data.canConvert<QStringList>())
-        return data.value<QStringList>();
-    return QStringList();
+    QStringList list;
+    if (json["userFontFolders"].isArray()) {
+        QJsonArray array = json["userFontFolders"].toArray();
+        for (const auto value: array) {
+            if (value.isString())
+                list.append(value.toString());
+        }
+    }
+    return list;
 }
 
 void
 QXPreferences::setUserFontFolders(const QStringList & folders) {
-    QSettings settings;
-    settings.setValue("userFontFolders", folders);
+    QJsonArray array;
+    for (const auto & folder: folders)
+        array.append(folder);
+    json["userFontFolders"] = array;
 }
 
 
 QList<QXRecentFontItem>
 QXPreferences::recentFonts() {
-    qRegisterMetaType<QXFontURI>();
-    qRegisterMetaType<QXRecentFontItem>();
-    qRegisterMetaTypeStreamOperators<QXRecentFontItem>("QXRecentFontItem");
-
-    QList<QXRecentFontItem> recentFonts;
-    QSettings settings;
-    QList<QVariant> variantList = settings.value("recentFonts").toList();
-    foreach(QVariant v, variantList) {
-        if (v.canConvert<QXRecentFontItem>())
-            recentFonts.append(v.value<QXRecentFontItem>());
+    QList<QXRecentFontItem> list;
+    if (json["recentFonts"].isArray()) {
+        QJsonArray array = json["recentFonts"].toArray();
+        for (const auto value: array) {
+            if (value.isObject()) {
+                auto item = toQXRecentFontItem(value.toObject());
+                if (!item.fullName.isEmpty())
+                    list.append(item);
+            }
+        }
     }
-    return recentFonts;
+    return list;
 }
 
 void
 QXPreferences::setRecentFonts(const QList<QXRecentFontItem> & recentFonts) {
-
-    qRegisterMetaType<QXFontURI>();
-    qRegisterMetaType<QXRecentFontItem>();
-    qRegisterMetaTypeStreamOperators<QXRecentFontItem>("QXRecentFontItem");
-
-    QSettings settings;
-    QList<QVariant> variantList;
-    foreach(QXRecentFontItem uri, recentFonts)
-        variantList.append(QVariant::fromValue(uri));
-
-    settings.setValue("recentFonts", variantList);
+    QJsonArray array;
+    for (const auto & item: recentFonts)
+        array.append(toJsonObject(item));
+    json["recentFonts"] = array;
 }
 
 QString
 QXPreferences::theme() {
-    if (json.contains("theme") && json["theme"].isString())
+    if (json["theme"].isString())
         return json["theme"].toString();
     return QString();
 }
