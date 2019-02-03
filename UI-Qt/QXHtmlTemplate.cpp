@@ -2,6 +2,7 @@
 #include <QTextStream>
 
 #include "QXHtmlTemplate.h"
+#include "QXResource.h"
 
 QXHtmlTemplate *
 QXHtmlTemplate::createFromFile(const QString & file, QObject * parent) {
@@ -45,3 +46,40 @@ QXHtmlTemplate::readTemplate() const {
     }
     return QString();
 }
+
+QXHtmlTableTemplate::QXHtmlTableTemplate(QObject * parent)
+    : QObject(parent) {
+    htmlTemplate_ = QXHtmlTemplate::createFromFile(QXResource::path("/Html/template.html"), this);
+}
+
+QString
+QXHtmlTableTemplate::html() {
+    if (htmlTableRows_.isEmpty())
+        loadTableRows();
+
+    QMap<QString, QVariant> vars;
+    vars["TABLE_ROWS"] = htmlTableRows_;
+    return htmlTemplate_->instantialize(vars);
+}
+
+void
+QXHtmlTableTemplate::addHeadRow(const QString & text) {
+    QString h = "                                  \
+            <tr>                                   \
+              <td class=\"key\">                   \
+                 <strong>%1</strong>               \
+              </td>                                \
+            </tr>                                  \
+            \n";
+    htmlTableRows_ += h.arg(text);
+}
+
+void
+QXHtmlTableTemplate::addEmptyRow() {
+    QString h = "                                  \
+            <tr>                                   \
+            </tr>                                  \
+            \n";
+    htmlTableRows_ += h;
+}
+

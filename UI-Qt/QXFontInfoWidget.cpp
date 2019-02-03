@@ -37,49 +37,30 @@ namespace {
 
         QXFontHtmlTemplatePage(const QString & title, FXPtr<FXFace> face, QObject * parent = nullptr)
             : QXFontInfoPage(title, face, parent) {
-            htmlTemplate_ = QXHtmlTemplate::createFromFile(QXResource::path("/Html/template.html"), this);
+            tableTemplate_ = new QXHtmlTableTemplate(this);
         }
 
         virtual QString html() {
-            if (htmlTableRows_.isEmpty())
+            if (!rowsLoaded_) {
                 loadTableRows();
-
-            QMap<QString, QVariant> vars;
-            vars["TABLE_ROWS"] = htmlTableRows_;
-            return htmlTemplate_->instantialize(vars);
+                rowsLoaded_ = true;
+            }
+            return tableTemplate_->html();
         }
 
         template <typename T> void
         addDataRow(const QString & name, const T & value) {
-            QString h = "                           \
-            <tr>                                    \
-              <td class=\"key\">%1:</td>            \
-              <td>%2</td>                           \
-            </tr>                                   \
-            \n";
-
-            htmlTableRows_ += h.arg(name).arg(QStringTraits<T>::toQString(value));
+            tableTemplate_->addDataRow(name, value);
         }
 
         void
         addHeadRow(const QString & text) {
-            QString h = "                          \
-            <tr>                                   \
-              <td class=\"key\">                   \
-                 <strong>%1</strong>               \
-              </td>                                \
-            </tr>                                  \
-            \n";
-            htmlTableRows_ += h.arg(text);
+            tableTemplate_->addHeadRow(text);
         }
 
         void
         addEmptyRow() {
-            QString h = "                          \
-            <tr>                                   \
-            </tr>                                  \
-            \n";
-            htmlTableRows_ += h;
+            tableTemplate_->addEmptyRow();
         }
 
 
@@ -88,8 +69,8 @@ namespace {
         }
 
     protected:
-        QXHtmlTemplate   * htmlTemplate_;
-        QString            htmlTableRows_;
+        bool rowsLoaded_{false};
+        QXHtmlTableTemplate * tableTemplate_;
     };
 
 
