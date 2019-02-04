@@ -61,6 +61,9 @@ QXDocumentWindow::initUI() {
     initGlyphInfoView();
 
     connectSingals();
+
+    // Toggle the action to show palette
+    // onFontInfoAction();
 }
 
 void
