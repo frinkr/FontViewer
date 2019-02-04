@@ -5,6 +5,7 @@
 #include "ui_QXAboutFontsDialog.h"
 
 namespace {
+    
     struct FormatStats {
         size_t total;
         
@@ -15,9 +16,19 @@ namespace {
         size_t other;
     };
 
-    FormatStats
-    fontFormatStats() {
+    struct DuplicateStats {
+        FXMap<FXStrig, FXSet<FXFaceDescriptor>> duplicates;
+    };
+
+    struct FontDbStats {
+        FormatStats format;
+    };
+
+    FontDbStats
+    fontDbStats() {
         FXSet<FXString> total, tt, cff, t1, winfnt, other;
+        FXMap<FXStrig, FXSet<FXFaceDescriptor>> duplicates;
+
         auto db = QXFontManager::instance().db();
         for (size_t i = 0;  i < db->faceCount(); ++ i) {
             auto & desc = db->faceDescriptor(i);
@@ -35,21 +46,27 @@ namespace {
                 other.insert(desc.filePath);
         }
 
-        FormatStats stats;
-        stats.total = total.size();
-        stats.truetype = tt.size();
-        stats.cff = cff.size();
-        stats.type1 = t1.size();
-        stats.winfnt = winfnt.size();
-        stats.other = other.size();
+        FormatStats fmt;
+        fmt.total = total.size();
+        fmt.truetype = tt.size();
+        fmt.cff = cff.size();
+        fmt.type1 = t1.size();
+        fmt.winfnt = winfnt.size();
+        fmt.other = other.size();
+
+        FontDbStats stats;
+        stats.format = fmt;
         return stats;
     }
 }
 
 QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
-    : QDialog(parent)
+    : QDialog(parent, Qt::Dialog | Qt::WindowStaysOnTopHint | Qt::WindowShadeButtonHint)
     , ui(new Ui::QXAboutFontsDialog) {
     ui->setupUi(this);
+    setAttribute(Qt::WA_DeleteOnClose);
+
+    const auto stats = fontDbStats();
 
     QXHtmlTableTemplate html;
     html.addHeadRow(tr("Font Folders"));
@@ -57,14 +74,13 @@ QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
     html.addDataRow(tr("User"), QXFontManager::instance().userFontFolders().join("<br>"));
 
     html.addEmptyRow();
-    FormatStats stats = fontFormatStats();
-    html.addHeadRow("Font Formats");
-    html.addDataRow(tr("Total"), stats.total);
-    html.addDataRow(tr("True Type"), stats.truetype);
-    html.addDataRow(tr("CFF"), stats.cff);
-    html.addDataRow(tr("Postscript Type 1"), stats.type1);
-    html.addDataRow(tr("Windows FNT"), stats.winfnt);
-    html.addDataRow(tr("Other"), stats.other);
+    html.addHeadRow("Font Files");
+    html.addDataRow(tr("Total"), stats.format.total);
+    html.addDataRow(tr("True Type"), stats.format.truetype);
+    html.addDataRow(tr("CFF"), stats.format.cff);
+    html.addDataRow(tr("Postscript Type 1"), stats.format.type1);
+    html.addDataRow(tr("Windows FNT"), stats.format.winfnt);
+    html.addDataRow(tr("Other"), stats.format.other);
     
     ui->textBrowser->setHtml(html.html());
 }
@@ -74,7 +90,21 @@ QXAboutFontsDialog::~QXAboutFontsDialog() {
 }
 
 void
-QXAboutFontsDialog::showAbout() {
-    QXAboutFontsDialog dialog;
-    dialog.exec();
+QXAboutFontsDialog::showAbout(bool modal) {
+    if (modal) {
+        QXAboutFontsDialog dialog;
+        dialog.exec();
+    } else {
+        static QXAboutFontsDialog * instance = nullptr;
+        if (!instance) {
+            instance = new QXAboutFontsDialog;
+            connect(instance, &QObject::destroyed, []() {
+                instance = nullptr;
+            });
+        }
+        
+        instance->show();
+        instance->raise();
+        instance->activateWindow();
+    }
 }

@@ -120,7 +120,7 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         actionAbout = menuHelp->addAction(tr("About"), qApp, &QXApplication::about);
         actionAbout->setMenuRole(QAction::AboutRole);
 
-        actionAboutFonts = menuHelp->addAction(tr("About Fonts"), qApp, &QXApplication::aboutFonts);
+        actionAboutFonts = menuHelp->addAction(tr("About Font Database"), qApp, &QXApplication::aboutFonts);
 
     }
 }

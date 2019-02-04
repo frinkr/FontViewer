@@ -14,7 +14,7 @@ public:
     ~QXAboutFontsDialog();
 
     static void
-    showAbout();
+    showAbout(bool model = false);
 
 private:
     Ui::QXAboutFontsDialog *ui;
