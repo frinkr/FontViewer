@@ -6,56 +6,42 @@
 
 namespace {
     
-    struct FormatStats {
-        size_t total;
-        
-        size_t truetype;
-        size_t cff;
-        size_t type1;
-        size_t winfnt;
-        size_t other;
-    };
-
-    struct DuplicateStats {
-        FXMap<FXStrig, FXSet<FXFaceDescriptor>> duplicates;
-    };
-
     struct FontDbStats {
-        FormatStats format;
+        size_t totalFiles;
+
+        // Format to count
+        FXMap<FXString, size_t> formatCount;
+        // PS name to files
+        FXMap<FXString, FXSet<FXFaceDescriptor>> duplicates;
     };
+
+
 
     FontDbStats
     fontDbStats() {
-        FXSet<FXString> total, tt, cff, t1, winfnt, other;
-        FXMap<FXStrig, FXSet<FXFaceDescriptor>> duplicates;
+        FXSet<FXString> allFiles;
+        FXMap<FXString, FXSet<FXString> > formats;
+        FXMap<FXString, FXSet<FXFaceDescriptor>> duplicates;
 
         auto db = QXFontManager::instance().db();
         for (size_t i = 0;  i < db->faceCount(); ++ i) {
             auto & desc = db->faceDescriptor(i);
             auto & atts = db->faceAttributes(i);
-            total.insert(desc.filePath);
-            if (atts.format == FXFaceFormatConstant::TrueType)
-                tt.insert(desc.filePath);
-            else if (atts.format == FXFaceFormatConstant::Type1)
-                t1.insert(desc.filePath);
-            else if (atts.format == FXFaceFormatConstant::CFF)
-                cff.insert(desc.filePath);
-            else if (atts.format == FXFaceFormatConstant::WinFNT)
-                winfnt.insert(desc.filePath);
-            else
-                other.insert(desc.filePath);
+            allFiles.insert(desc.filePath);
+
+            formats[atts.format].insert(desc.filePath);
+            duplicates[atts.names.postscriptName()].insert(desc);
         }
 
-        FormatStats fmt;
-        fmt.total = total.size();
-        fmt.truetype = tt.size();
-        fmt.cff = cff.size();
-        fmt.type1 = t1.size();
-        fmt.winfnt = winfnt.size();
-        fmt.other = other.size();
-
         FontDbStats stats;
-        stats.format = fmt;
+        stats.totalFiles = allFiles.size();
+        for (const auto &kv : formats) 
+            stats.formatCount[kv.first] = kv.second.size();
+        
+        for (const auto &kv : duplicates) {
+            if (kv.second.size() > 1)
+                stats.duplicates[kv.first] = kv.second;
+        }
         return stats;
     }
 }
@@ -75,13 +61,20 @@ QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
 
     html.addEmptyRow();
     html.addHeadRow("Font Files");
-    html.addDataRow(tr("Total"), stats.format.total);
-    html.addDataRow(tr("True Type"), stats.format.truetype);
-    html.addDataRow(tr("CFF"), stats.format.cff);
-    html.addDataRow(tr("Postscript Type 1"), stats.format.type1);
-    html.addDataRow(tr("Windows FNT"), stats.format.winfnt);
-    html.addDataRow(tr("Other"), stats.format.other);
+    html.addDataRow(tr("Total"), stats.totalFiles);
+    for (const auto & kv : stats.formatCount) {
+        QString format = kv.first.empty() ? "<i>UNKNOWN</i>" : toQString(kv.first);
+        html.addDataRow(format, kv.second);
+    }
     
+    html.addEmptyRow();
+    html.addHeadRow(tr("Postscript Name Duplicates"));
+    for (const auto & kv : stats.duplicates) {
+        QList<QString> files;
+        for (auto & file : kv.second)
+            files.append(toQString(file.filePath));
+        html.addDataRow(toQString(kv.first), files.join("<br>"));
+    }
     ui->textBrowser->setHtml(html.html());
 }
 

@@ -12,6 +12,10 @@ struct FXFaceDescriptor {
 
     bool
     operator==(const FXFaceDescriptor & other) const;
+    
+    bool
+    operator<(const FXFaceDescriptor & other) const;
+
     bool
     operator!=(const FXFaceDescriptor & other) const;
 };

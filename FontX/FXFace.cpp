@@ -54,6 +54,11 @@ FXFaceDescriptor::operator==(const FXFaceDescriptor & other) const {
 }
 
 bool
+FXFaceDescriptor::operator<(const FXFaceDescriptor & other) const {
+    return filePath < other.filePath && index< other.index;
+}
+
+bool
 FXFaceDescriptor::operator!=(const FXFaceDescriptor & other) const {
     return !operator==(other);
 }
