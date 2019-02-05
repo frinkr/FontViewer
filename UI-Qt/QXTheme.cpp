@@ -184,6 +184,63 @@ namespace {
     };
 
 
+    class QXBlackFusionTheme : public QXFusionColorTheme {
+    public:
+        static QString
+        staticName() {
+            return tr("Black Fusion");
+        }
+
+        QString
+        name() override {
+            return staticName();
+        }
+
+    protected:
+        QPalette
+        palette() override {
+            QPalette p;
+
+            // Normal
+            p.setColor(QPalette::Window,          d(0x00));
+            p.setColor(QPalette::Background,      d(0x00));
+            p.setColor(QPalette::WindowText,      d(0xFF));
+            p.setColor(QPalette::Foreground,      d(0xFF));
+            p.setColor(QPalette::Base,            d(0x10));
+            p.setColor(QPalette::AlternateBase,   d(0x30));
+            p.setColor(QPalette::ToolTipBase,     d(0xFF));
+            p.setColor(QPalette::ToolTipText,     d(0xFF));
+            p.setColor(QPalette::Text,            d(0xFF));
+            p.setColor(QPalette::Button,          d(0x10));
+            p.setColor(QPalette::ButtonText,      d(0xFF));
+            p.setColor(QPalette::BrightText,      d(0xFF));
+            p.setColor(QPalette::Light,           d(0x20));
+            p.setColor(QPalette::Midlight,        d(0x18));
+            p.setColor(QPalette::Dark,            d(0x05));
+            p.setColor(QPalette::Mid,             d(0x08));
+            p.setColor(QPalette::Shadow,          d(0x05));
+            p.setColor(QPalette::Highlight,       QColor(42, 130, 218));
+            p.setColor(QPalette::HighlightedText, d(0xFF));
+            p.setColor(QPalette::Link,            QColor(42, 130, 218));
+            p.setColor(QPalette::LinkVisited,     QColor(42, 130, 218));
+
+            // Disabled
+            p.setColor(QPalette::Disabled, QPalette::ButtonText,      Qt::gray); 
+            p.setColor(QPalette::Disabled, QPalette::Highlight,       Qt::darkGray);
+            p.setColor(QPalette::Disabled, QPalette::HighlightedText, Qt::gray);
+            p.setColor(QPalette::Disabled, QPalette::Text,            Qt::gray);
+            p.setColor(QPalette::Disabled, QPalette::WindowText,      Qt::gray);
+
+            return p;
+        }
+
+        static QColor
+        d(int level) {
+            return QColor(level, level,level);
+        }
+    };
+
+
     std::unique_ptr<QXTheme> currentTheme_;
 }
 
@@ -198,7 +255,10 @@ QXTheme::availableThemes() {
     list << QXSystemTheme::staticName()
          << QXFusionTheme::staticName()
          << QXDarkFusionTheme::staticName()
-         << QXBlueFusionTheme::staticName();
+         << QXBlueFusionTheme::staticName()
+         << QXBlackFusionTheme::staticName()
+        ;
+
     return list;
 }
 
@@ -218,5 +278,7 @@ QXTheme::getTheme(const QString & name) {
         return new QXDarkFusionTheme;
     if (name == QXBlueFusionTheme::staticName())
         return new QXBlueFusionTheme;
+    if (name == QXBlackFusionTheme::staticName())
+        return new QXBlackFusionTheme;
     return new QXSystemTheme;;
 }
