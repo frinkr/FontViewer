@@ -138,7 +138,11 @@ QXDocumentWindow::initToolBar() {
     searchAction_ = toolBar->addAction(
 		qApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QXDocumentWindow::onSearchAction);
-    
+
+    variant->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_V));
+    shapingAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+    tableAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
+    infoAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I));
     searchAction_->setShortcut(QKeySequence(QKeySequence::Find));
         
     QWidget * spacer = new QWidget;

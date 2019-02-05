@@ -8,6 +8,8 @@
 #include "QXFontInfoWidget.h"
 #include "ui_QXFontInfoWidget.h"
 
+#define QXFONTINFO_ADDFLAG(f) {f, #f}
+
 namespace {
     template <typename T>
     struct QStringTraits {
@@ -74,7 +76,7 @@ namespace {
     };
 
 
-    class QUFontGeneralPage : public QXFontHtmlTemplatePage {
+    class QXFontGeneralPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
 
@@ -85,17 +87,30 @@ namespace {
             TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(ftFace, FT_SFNT_HEAD);
             TT_OS2 * os2 = (TT_OS2 *)FT_Get_Sfnt_Table(ftFace, FT_SFNT_OS2);
 
-            addHeadRow(tr("Basic"));
+            addHeadRow(tr("Face"));
             addDataRow(tr("File"), toQString(faceAtts().desc.filePath));
-            addDataRow(tr("Index"), static_cast<int>(faceAtts().desc.index));
+            addDataRow(tr("Index"), (ftFace->num_faces > 1)?
+                       QString("%1/%2").arg(static_cast<int>(faceAtts().desc.index)).arg(ftFace->num_faces):
+                       QString("%1").arg(static_cast<int>(faceAtts().desc.index)));
             addDataRow(tr("Postscript"), toQString(faceAtts().names.postscriptName()));
             addDataRow(tr("Family Name"), toQString(faceAtts().names.familyName()));
             addDataRow(tr("Style Name"), toQString(faceAtts().names.styleName()));
+            addDataRow(tr("Face Flags"), faceFlagsStr(ftFace->face_flags).join("<br>"));
+            addDataRow(tr("Style Flags"), styleFlagsStr(ftFace->style_flags).join("<br>"));
+            addDataRow(tr("Num Glyph"), static_cast<int>(faceAtts().glyphCount));
+            addDataRow(tr("Num Fixed Sizes"), static_cast<int>(ftFace->num_fixed_sizes));
+            addDataRow(tr("Num CMaps"), static_cast<int>(ftFace->num_charmaps));
+            addDataRow(tr("UPEM"), static_cast<int>(faceAtts().upem));
+            addDataRow(tr("Ascender"), static_cast<int>(ftFace->ascender));
+            addDataRow(tr("Descender"), static_cast<int>(ftFace->descender));
+            addDataRow(tr("Height"), static_cast<int>(ftFace->height));
+            addDataRow(tr("Max Adv Width"), static_cast<int>(ftFace->max_advance_width));
+            addDataRow(tr("Max Adv Height"), static_cast<int>(ftFace->max_advance_height));
+            addDataRow(tr("Underline Position"), static_cast<int>(ftFace->underline_position));
+            addDataRow(tr("Underline Thickness"), static_cast<int>(ftFace->underline_thickness));
 
             addEmptyRow();
-            addHeadRow(tr("Format"));
-            addDataRow(tr("UPEM"), static_cast<int>(faceAtts().upem));
-            addDataRow(tr("Glyph Count"), static_cast<int>(faceAtts().glyphCount));
+            addHeadRow(tr("Format"));            
             addDataRow(tr("Format"), toQString(faceAtts().format));
             addDataRow(tr("IsCID"), faceAtts().isCID);
             addDataRow(tr("CID"), toQString(faceAtts().cid));
@@ -118,7 +133,7 @@ namespace {
             addDataRow(tr("Tables"), tables.isEmpty()? tr("<i>NOT A SFNT FONT</i>"): tables);
 
             addEmptyRow();
-            addHeadRow(tr("Vendor Info"));
+            addHeadRow(tr("Version"));
             if (os2)
                 addDataRow(tr("Vendor"), QString("<a href=https://www.microsoft.com/typography/links/vendorlist.aspx>%1</a>").arg(toQString(FXString((const char *)(os2->achVendID), 4))));
             else
@@ -137,6 +152,50 @@ namespace {
                 addDataRow(tr("Creation"), QString());
                 addDataRow(tr("Modification"), QString());
             }
+        }
+
+
+
+        static QStringList
+        faceFlagsStr(FT_Long flags) {
+            static FXMap<FT_Long, FXString> map = {
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_SCALABLE),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FIXED_SIZES),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FIXED_WIDTH),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_SFNT),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_HORIZONTAL),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VERTICAL),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_KERNING),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FAST_GLYPHS),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_MULTIPLE_MASTERS),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_GLYPH_NAMES),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_EXTERNAL_STREAM),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_HINTER),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_CID_KEYED),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_TRICKY),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_COLOR),
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VARIATION)
+            };
+            QStringList list;
+            for (const auto & kv: map) {
+                if (flags & kv.first)
+                    list << toQString(kv.second);
+            }
+            return list;
+        }
+
+        static QStringList
+        styleFlagsStr(FT_Long flags) {
+            static FXMap<FT_Long, FXString> map = {
+                QXFONTINFO_ADDFLAG(FT_STYLE_FLAG_ITALIC),
+                QXFONTINFO_ADDFLAG(FT_STYLE_FLAG_BOLD),
+            };
+            QStringList list;
+            for (const auto & kv: map) {
+                if (flags & kv.first)
+                    list << toQString(kv.second);
+            }
+            return list;            
         }
     };
 
@@ -329,7 +388,7 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
 {
     ui->setupUi(this);
 
-    pages_.append(new QUFontGeneralPage(tr("General"), face, this));
+    pages_.append(new QXFontGeneralPage(tr("General"), face, this));
 
     if (FT_IS_SFNT(face->face())) {
         pages_.append(new QXHheaPage(tr("hhea"), face, this));
