@@ -47,7 +47,7 @@ namespace {
 }
 
 QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
-    : QDialog(parent, Qt::Dialog | Qt::WindowStaysOnTopHint | Qt::WindowShadeButtonHint)
+    : QDialog(parent, Qt::Dialog | Qt::WindowStaysOnTopHint)
     , ui(new Ui::QXAboutFontsDialog) {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);

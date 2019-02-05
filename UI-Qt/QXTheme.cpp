@@ -211,13 +211,13 @@ namespace {
             p.setColor(QPalette::ToolTipBase,     d(0xFF));
             p.setColor(QPalette::ToolTipText,     d(0xFF));
             p.setColor(QPalette::Text,            d(0xFF));
-            p.setColor(QPalette::Button,          d(0x10));
+            p.setColor(QPalette::Button,          d(0x20));
             p.setColor(QPalette::ButtonText,      d(0xFF));
             p.setColor(QPalette::BrightText,      d(0xFF));
-            p.setColor(QPalette::Light,           d(0x20));
-            p.setColor(QPalette::Midlight,        d(0x18));
-            p.setColor(QPalette::Dark,            d(0x05));
-            p.setColor(QPalette::Mid,             d(0x08));
+            p.setColor(QPalette::Light,           d(0x30));
+            p.setColor(QPalette::Midlight,        d(0x28));
+            p.setColor(QPalette::Dark,            d(0x10));
+            p.setColor(QPalette::Mid,             d(0x18));
             p.setColor(QPalette::Shadow,          d(0x05));
             p.setColor(QPalette::Highlight,       QColor(42, 130, 218));
             p.setColor(QPalette::HighlightedText, d(0xFF));
