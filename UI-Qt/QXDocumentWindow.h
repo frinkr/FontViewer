@@ -90,6 +90,9 @@ private slots:
     onCMapBlockAction();
 
     void
+    onVariableAction();
+
+    void
     onShapingAction();
 
     void
@@ -113,7 +116,9 @@ private:
     QXMenuBar       * menuBar_;
     
     QAction         * cmapBlockAction_;
-    QXPopoverWindow * cmapBlockWindow_;
+    QXPopoverWindow * cmapBlockPopover_;
+    QAction         * variableAction_;
+    QXPopoverWindow * variablePopover_;
     QAction         * shapingAction_;
     QDockWidget     * shapingDockWidget_;
     QAction         * tableAction_;
@@ -121,7 +126,7 @@ private:
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
     QAction         * searchAction_;
-    QXPopoverWindow * searchWindow_;
+    QXPopoverWindow * searchPopover_;
 
     QXPopoverWindow   * glyphPopover_;
     QXGlyphInfoWidget * glyphWidget_;

@@ -2,6 +2,7 @@
 #include "FX.h"
 #include "FXCMap.h"
 #include "FXGlyph.h"
+#include "FXTag.h"
 
 class FXGlyphCache;
 class FXInspector;
@@ -207,6 +208,38 @@ public:
     charsForGlyph(FXGlyphID gid) const;
 
 public:
+    struct VariableAxis {
+        size_t    index;
+        FXString  name;
+        FXTag     tag;
+        FXFixed   minValue;
+        FXFixed   maxValue;
+        FXFixed   defaultValue;
+    };
+
+    struct VariableNamedInstance {
+        size_t            index;
+        FXString          name;
+        FXString          psName;
+        FXVector<FXFixed> coordinates;
+    };
+
+    const FXVector<VariableAxis> &
+    variableAxises() const;
+
+    const FXVector<VariableNamedInstance> &
+    variableNamedInstances() const;
+
+    const FXVector<FXFixed>
+    currentVariableCoordinates() const;
+
+    const VariableNamedInstance *
+    currentVariableNamedInstace();
+
+    void
+    setCurrentVariableCoordinates(const FXVector<FXFixed> & coords);
+
+public:
     FXPtr<FXInspector>
     inspector();
 
@@ -227,6 +260,10 @@ private:
 
     bool
     initCMap();
+
+    bool
+    initVariables();
+
 protected:
     FXFaceDescriptor     desc_;
     FXFTFace             face_;
@@ -235,9 +272,13 @@ protected:
     bool                 scalable_;
     double               bmScale_;
     int                  bmStrikeIndex_;
-    
+
     FXFaceAttributes     atts_;
     std::vector<FXCMap>  cmaps_;
     FXPtr<FXGlyphCache>  cache_;
     FXPtr<FXInspector>   inspector_;
+
+    FXVector<VariableAxis>            variableAxises_;
+    FXVector<VariableNamedInstance>   variableNamedInstances_;
 };
+

@@ -427,6 +427,37 @@ FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//                     VARIABLES
+//
+
+
+const FXVector<FXFace::VariableAxis> &
+FXFace::variableAxises() const {
+    return variableAxises_;    
+}
+
+const FXVector<FXFace::VariableNamedInstance> &
+FXFace::variableNamedInstances() const {
+    return variableNamedInstances_;
+}
+
+const FXVector<FXFixed>
+FXFace::currentVariableCoordinates() const {
+    
+}
+
+const FXFace::VariableNamedInstance *
+FXFace::currentVariableNamedInstace() {
+    return nullptr;
+}
+
+void
+FXFace::setCurrentVariableCoordinates(const FXVector<FXFixed> & coords) {
+    
+}
+
+
 FXPtr<FXInspector>
 FXFace::inspector() {
     if (!inspector_)
@@ -442,7 +473,10 @@ FXFace::init() {
     scalable_ = FT_IS_SCALABLE(face_);
     selectFontSize(FXDefaultFontSize);
     cache_.reset(new FXGlyphCache);
-    return initAttributes() && initCMap();
+    return
+        initAttributes() &&
+        initCMap() &&
+        initVariables();
 }
 
 bool
@@ -515,4 +549,53 @@ FXFace::initCMap() {
     selectCMap(current);
     
     return true;
+}
+
+bool
+FXFace::initVariables() {
+    FT_MM_Var * var = nullptr;
+    FT_Multi_Master  mm;
+    bool isMM = false;
+
+    if (!FT_HAS_MULTIPLE_MASTERS(face_))
+        return true;
+
+    if (FT_Get_MM_Var(face_, &var))
+        var = nullptr;
+    if (FT_Get_Multi_Master(face_, &mm) == 0) 
+        isMM =  true;
+
+    if (!var && !isMM)
+        return true;
+
+    // Load axises
+    for (FT_UInt i = 0; i < var->num_axis; ++ i) {
+        const FT_Var_Axis * axis = var->axis + i;
+        VariableAxis a;
+        a.name     = atts_.names.getSFNTName(axis->strid);
+        a.index    = i;
+        a.tag      = axis->tag;
+        a.minValue = axis->minimum;
+        a.maxValue = axis->maximum;
+        a.defaultValue = axis->def;
+
+        variableAxises_.push_back(a);
+    }
+
+    if (isMM)
+        return true;
+
+    // Load named instances
+    for (FT_UInt i = 0; i < var->num_namedstyles; ++ i) {
+        const FT_Var_Named_Style * style = var->namedstyle + i;
+        VariableNamedInstance instance;
+        instance.index      = i;
+        instance.name       = atts_.names.getSFNTName(style->strid);
+        instance.psName     = atts_.names.getSFNTName(style->psid);
+
+        for (FT_UInt j = 0; j < var->num_axis; ++ j)
+            instance.coordinates.push_back(style->coords[j]);
+
+        variableNamedInstances_.push_back(instance);
+    }
 }

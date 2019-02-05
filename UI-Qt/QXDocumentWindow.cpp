@@ -16,6 +16,7 @@
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
 #include "QXFontInfoWidget.h"
+#include "QXVariableWidget.h"
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphListView.h"
 #include "QXGlyphTableWidget.h"
@@ -31,11 +32,12 @@
 QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent) 
     : QMainWindow(parent)
     , ui_(new Ui::QXDocumentWindow)
-    , cmapBlockWindow_(nullptr)
+    , cmapBlockPopover_(nullptr)
+    , variablePopover_(nullptr)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
-    , searchWindow_(nullptr)
+    , searchPopover_(nullptr)
     , glyphPopover_(nullptr)
     , glyphWidget_(nullptr)
     , document_(document)
@@ -120,8 +122,9 @@ QXDocumentWindow::initToolBar() {
         qApp->loadIcon(":/images/cmap.png"),tr("CMap"),
         this, &QXDocumentWindow::onCMapBlockAction);
 
-    QAction* variant = toolBar->addAction(
-		qApp->loadIcon(":/images/variant.png"), tr("Variant"));
+    variableAction_ = toolBar->addAction(
+		qApp->loadIcon(":/images/variant.png"), tr("OpenType Variable / Multiple Master"),
+        this, &QXDocumentWindow::onVariableAction);
 
     shapingAction_ = toolBar->addAction(
 		qApp->loadIcon(":/images/shape.png"), tr("Shape"),
@@ -139,7 +142,7 @@ QXDocumentWindow::initToolBar() {
 		qApp->loadIcon(":/images/search.png"), tr("Search"),
         this, &QXDocumentWindow::onSearchAction);
 
-    variant->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_V));
+    variableAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_V));
     shapingAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
     tableAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
     infoAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I));
@@ -250,13 +253,24 @@ QXDocumentWindow::onCharLinkClicked(FXGChar c) {
 
 void
 QXDocumentWindow::onCMapBlockAction() {
-    if (!cmapBlockWindow_) {
-        cmapBlockWindow_ = new QXPopoverWindow(this);
+    if (!cmapBlockPopover_) {
+        cmapBlockPopover_ = new QXPopoverWindow(this);
         QXCMapBlockWidget * widget = new QXCMapBlockWidget;
         widget->setDocument(document_);
-        cmapBlockWindow_->setWidget(widget);
+        cmapBlockPopover_->setWidget(widget);
     }
-    cmapBlockWindow_->showRelativeTo(senderToolButton(), QXPopoverRight);
+    cmapBlockPopover_->showRelativeTo(senderToolButton(), QXPopoverRight);
+}
+
+void
+QXDocumentWindow::onVariableAction() {
+    if (!variablePopover_) {
+        variablePopover_ = new QXPopoverWindow(this);
+        QXVariableWidget * widget = new QXVariableWidget;
+        widget->setDocument(document_);
+        variablePopover_->setWidget(widget);
+    }
+    variablePopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
 }
 
 void
@@ -297,13 +311,13 @@ QXDocumentWindow::onFontInfoAction() {
 
 void
 QXDocumentWindow::onSearchAction() {
-    if (!searchWindow_) {
-        searchWindow_ = new QXPopoverWindow;
+    if (!searchPopover_) {
+        searchPopover_ = new QXPopoverWindow;
         QXSearchWidget * widget = new QXSearchWidget;
         widget->setDocument(document_);
-        searchWindow_->setWidget(widget);
+        searchPopover_->setWidget(widget);
     }
-    searchWindow_->showRelativeTo(senderToolButton(), QXPopoverBottom);
+    searchPopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
 }
 
 void
@@ -317,8 +331,8 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);
     
-    if (searchWindow_)
-        searchWindow_->hide();
+    if (searchPopover_)
+        searchPopover_->hide();
 }
 
 void

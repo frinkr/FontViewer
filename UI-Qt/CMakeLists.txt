@@ -37,6 +37,7 @@ set(UI
   QXProgressDialog.ui
   QXSearchWidget.ui
   QXShapingWidget.ui
+  QXVariableWidget.ui
   )
 
 qt5_wrap_ui(UI_HEADERS ${UI})
@@ -44,8 +45,8 @@ qt5_wrap_ui(UI_HEADERS ${UI})
 set(SHARED_SOURCES 
   QXAboutDialog.cpp
   QXAboutDialog.h
-  QXAboutFontsDialog.h
   QXAboutFontsDialog.cpp
+  QXAboutFontsDialog.h
   QXApplication.cpp
   QXApplication.h
   QXApplication.qrc
@@ -63,8 +64,8 @@ set(SHARED_SOURCES
   QXDocumentWindowManager.h
   QXEncoding.cpp
   QXEncoding.h
-  QXFontCollectionDialog.h
   QXFontCollectionDialog.cpp
+  QXFontCollectionDialog.h
   QXFontComboBox.cpp
   QXFontComboBox.h
   QXFontInfoWidget.cpp
@@ -87,8 +88,8 @@ set(SHARED_SOURCES
   QXOpenFontDialog.h
   QXPopoverWindow.cpp
   QXPopoverWindow.h
-  QXPreferences.h
   QXPreferences.cpp
+  QXPreferences.h
   QXPreferencesDialog.cpp
   QXPreferencesDialog.h
   QXProgressDialog.cpp
@@ -105,6 +106,8 @@ set(SHARED_SOURCES
   QXTheme.h
   QXToolBar.cpp
   QXToolBar.h
+  QXVariableWidget.cpp
+  QXVariableWidget.h
   )
 set(APPLE_SOURCES
   MacHelper.h
