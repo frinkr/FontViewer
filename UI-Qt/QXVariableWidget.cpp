@@ -1,5 +1,5 @@
 #include <QAbstractButton>
-#include <QHBoxLayout>
+#include <QBoxLayout>
 #include <QFormLayout>
 #include <QSplitter>
 #include <QSlider>
@@ -69,10 +69,25 @@ void
 QXVariableWidget::initNonVariableFont() {
     ui_->instanceLabel->hide();
     ui_->instanceComboBox->hide();
+    ui_->buttonBox->hide();
 
-    QHBoxLayout * layout = new QHBoxLayout(ui_->axisesWidget);
-    QLabel * warning = new QLabel(tr("Not an OpenType variable or multiple master font!"), ui_->axisesWidget);
-    layout->addWidget(warning);
+    QVBoxLayout * layout = new QVBoxLayout(ui_->axisesWidget);
+    QPixmap pixmap(":/images/warning.png");
+
+    QLabel * icon = new QLabel();
+    icon->setPixmap(pixmap.scaled(QSize(32, 32), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    icon->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+
+    QLabel * text = new QLabel(
+        tr(R"("%1" is not an OpenType variable or multiple master font!)")
+        .arg(document_->displayName()), 
+        ui_->axisesWidget);
+    text->setTextFormat(Qt::RichText);
+    text->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    text->setWordWrap(true);
+    text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    layout->addWidget(icon);
+    layout->addWidget(text);
     ui_->axisesWidget->setLayout(layout);
 }
 

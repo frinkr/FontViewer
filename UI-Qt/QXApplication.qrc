@@ -37,6 +37,7 @@
     <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
     <file alias="images/minus.png">../Resources/Images/minus.png</file>
     <file alias="images/minus_d.png">../Resources/Images/minus_d.png</file>
+    <file alias="images/warning.png">../Resources/Images/warning.png</file>
     
 </qresource>
 </RCC>
