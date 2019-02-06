@@ -123,7 +123,7 @@ public:
     charAt(const QModelIndex & index) const;
 
     int
-    rowCount(const QModelIndex &) const;
+    rowCount(const QModelIndex & parent = QModelIndex()) const;
     
     QVariant
     data(const QModelIndex &, int) const;
@@ -140,6 +140,9 @@ signals:
     
     void
     searchDone(const QXSearchResult & result, const QString & text);
+
+    void
+    variableCoordinatesChanged();
 
 protected:
     QXDocument(const QXFontURI & uri, QObject * parent);

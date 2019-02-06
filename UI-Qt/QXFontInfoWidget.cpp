@@ -174,7 +174,9 @@ namespace {
                 QXFONTINFO_ADDFLAG(FT_FACE_FLAG_CID_KEYED),
                 QXFONTINFO_ADDFLAG(FT_FACE_FLAG_TRICKY),
                 QXFONTINFO_ADDFLAG(FT_FACE_FLAG_COLOR),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VARIATION)
+#ifdef FT_FACE_FLAG_VARIATION
+                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VARIATION),
+#endif
             };
             QStringList list;
             for (const auto & kv: map) {

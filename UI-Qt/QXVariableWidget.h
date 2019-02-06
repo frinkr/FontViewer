@@ -4,6 +4,7 @@
 #include "FontX/FX.h"
 
 class QXDocument;
+class QSlider;
 
 namespace Ui {
     class QXVariableWidget;
@@ -33,9 +34,15 @@ private:
     void
     initNonVariableFont();
 
-    
+    void
+    updateFaceVariables();
+
+    QList<int>
+    faceVariables() const;
+
 private:
     Ui::QXVariableWidget * ui_;
     QXDocument               * document_;
+    QList<QSlider *>           sliders_;
     FXVector<VariableInstance> varInstances_;
 };

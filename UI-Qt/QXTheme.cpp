@@ -212,6 +212,7 @@ namespace {
             p.setColor(QPalette::ToolTipText,     d(0xFF));
             p.setColor(QPalette::Text,            d(0xFF));
             p.setColor(QPalette::Button,          d(0x20));
+
             p.setColor(QPalette::ButtonText,      d(0xFF));
             p.setColor(QPalette::BrightText,      d(0xFF));
             p.setColor(QPalette::Light,           d(0x30));

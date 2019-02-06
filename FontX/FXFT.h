@@ -15,3 +15,5 @@
 #include FT_TYPE1_TABLES_H
 #include FT_WINFONTS_H
 #include "FX.h"
+
+static_assert(sizeof(FXFixed) == sizeof(FT_Fixed), "FXFixed must be same size with FT_Fixed");

@@ -180,8 +180,12 @@ QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
     , uri_(uri)
     , blockIndex_(0)
     , charMode_(true)
-    , glyphLabel_(QXGlyphLabel::GlyphName)
-{}
+    , glyphLabel_(QXGlyphLabel::GlyphName) {
+
+    connect(this, &QXDocument::variableCoordinatesChanged, [this]() {       
+        dataChanged(index(0), index(rowCount(), 0));
+    });
+}
 
 bool
 QXDocument::load() {
