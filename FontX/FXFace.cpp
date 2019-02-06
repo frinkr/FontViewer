@@ -468,6 +468,11 @@ FXFace::setCurrentVariableCoordinates(const FXVector<FXFixed> & coords) {
     return true;
 }
 
+void
+FXFace::resetVariableCoordinates() {
+    FT_Set_Var_Design_Coordinates(face_, 0, nullptr);
+}
+
 
 FXPtr<FXInspector>
 FXFace::inspector() {

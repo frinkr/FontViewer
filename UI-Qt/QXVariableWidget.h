@@ -40,6 +40,9 @@ private:
     void
     onSliderValueChanged();
 
+    void
+    onResetButtonClicked();
+
     QList<int>
     faceVariables() const;
 

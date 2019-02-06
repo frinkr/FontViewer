@@ -1,3 +1,4 @@
+#include <QAbstractButton>
 #include <QHBoxLayout>
 #include <QFormLayout>
 #include <QSplitter>
@@ -51,11 +52,14 @@ QXVariableWidget::initVariableFont() {
         slider->setMinimum(axis.minValue);
         slider->setMaximum(axis.maxValue);
         slider->setValue(axis.defaultValue);
+        slider->setPageStep((axis.maxValue - axis.minValue) / 20);
         slider->setTracking(true);
         connect(slider, &QSlider::valueChanged, this, &QXVariableWidget::onSliderValueChanged);
         sliders_.append(slider);
     }
     ui_->axisesWidget->setLayout(layout);
+
+    connect(ui_->buttonBox, &QDialogButtonBox::clicked, this, &QXVariableWidget::onResetButtonClicked);
 
     updateSliderValues();
     updateComboBoxIndex();
@@ -93,6 +97,14 @@ QXVariableWidget::onSliderValueChanged() {
         emit document_->variableCoordinatesChanged();
         updateComboBoxIndex();
     }
+}
+
+void
+QXVariableWidget::onResetButtonClicked() {
+    document_->face()->resetVariableCoordinates();
+    emit document_->variableCoordinatesChanged();
+    updateComboBoxIndex();
+    updateSliderValues();
 }
 
 QList<int>

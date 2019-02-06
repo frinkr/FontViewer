@@ -237,6 +237,9 @@ public:
     bool 
     setCurrentVariableCoordinates(const FXVector<FXFixed> & coords);
 
+    void
+    resetVariableCoordinates();
+
 public:
     FXPtr<FXInspector>
     inspector();
