@@ -233,10 +233,8 @@ public:
     const FXVector<FXFixed>
     currentVariableCoordinates() const;
 
-    const VariableNamedInstance *
-    currentVariableNamedInstace();
-
-    void
+    /*return true if changed*/
+    bool 
     setCurrentVariableCoordinates(const FXVector<FXFixed> & coords);
 
 public:

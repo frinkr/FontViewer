@@ -444,16 +444,20 @@ FXFace::variableNamedInstances() const {
 
 const FXVector<FXFixed>
 FXFace::currentVariableCoordinates() const {
-    return FXVector<FXFixed>();
+    FXVector<FXFixed> coords(variableAxises_.size());
+    FT_Get_Var_Design_Coordinates(
+        face_,
+        coords.size(),
+        reinterpret_cast<FT_Fixed *>(&coords[0])
+        );
+    return coords;
 }
 
-const FXFace::VariableNamedInstance *
-FXFace::currentVariableNamedInstace() {
-    return nullptr;
-}
-
-void
+bool
 FXFace::setCurrentVariableCoordinates(const FXVector<FXFixed> & coords) {
+    if (coords == currentVariableCoordinates())
+        return false;
+
     FT_Set_Var_Design_Coordinates(
         face_,
         variableAxises_.size(),
@@ -461,6 +465,7 @@ FXFace::setCurrentVariableCoordinates(const FXVector<FXFixed> & coords) {
         );
     
     cache_->clear();
+    return true;
 }
 
 

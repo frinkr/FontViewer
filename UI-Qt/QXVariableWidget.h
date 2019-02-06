@@ -35,10 +35,19 @@ private:
     initNonVariableFont();
 
     void
-    updateFaceVariables();
+    onComboboxIndexChanged(int index);
+
+    void
+    onSliderValueChanged();
 
     QList<int>
     faceVariables() const;
+
+    void
+    updateComboBoxIndex();
+
+    void
+    updateSliderValues();
 
 private:
     Ui::QXVariableWidget * ui_;

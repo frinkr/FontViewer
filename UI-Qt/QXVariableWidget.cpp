@@ -2,6 +2,7 @@
 #include <QFormLayout>
 #include <QSplitter>
 #include <QSlider>
+#include <QSignalBlocker>
 
 #include "FontX/FXFT.h"
 #include "FontX/FXLib.h"
@@ -12,7 +13,6 @@
 #include "ui_QXVariableWidget.h"
 
 namespace {
-    
 }
 
 QXVariableWidget::QXVariableWidget(QWidget *parent) :
@@ -36,11 +36,13 @@ QXVariableWidget::setDocument(QXDocument * document) {
 
 void
 QXVariableWidget::initVariableFont() {
+    for (auto & instance : document_->face()->variableNamedInstances())
+        ui_->instanceComboBox->addItem(toQString(instance.name), static_cast<int>(instance.index));
+    ui_->instanceComboBox->addItem(tr("<current>"), -1);
 
-    for (auto & instance : document_->face()->variableNamedInstances()) {
-        ui_->instanceComboBox->addItem(toQString(instance.name));
-    }
-
+    connect(ui_->instanceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), 
+        this, &QXVariableWidget::onComboboxIndexChanged);
+            
     QFormLayout * layout = new QFormLayout(ui_->axisesWidget);
     for (auto & axis : document_->face()->variableAxises()) {
         QLabel * label = new QLabel(toQString(axis.name), this);
@@ -49,11 +51,14 @@ QXVariableWidget::initVariableFont() {
         slider->setMinimum(axis.minValue);
         slider->setMaximum(axis.maxValue);
         slider->setValue(axis.defaultValue);
-//        slider->setTracking(true);
-        connect(slider, &QSlider::valueChanged, this, &QXVariableWidget::updateFaceVariables);
+        slider->setTracking(true);
+        connect(slider, &QSlider::valueChanged, this, &QXVariableWidget::onSliderValueChanged);
         sliders_.append(slider);
     }
     ui_->axisesWidget->setLayout(layout);
+
+    updateSliderValues();
+    updateComboBoxIndex();
 }
 
 void
@@ -68,13 +73,26 @@ QXVariableWidget::initNonVariableFont() {
 }
 
 void
-QXVariableWidget::updateFaceVariables() {
+QXVariableWidget::onComboboxIndexChanged(int index) {
+    auto & all = document_->face()->variableNamedInstances();
+    if (index < all.size()) {
+        auto & instance = all[index];
+        if (document_->face()->setCurrentVariableCoordinates(instance.coordinates)) {
+            emit document_->variableCoordinatesChanged();
+            updateSliderValues();
+        }
+    }
+}
+
+void
+QXVariableWidget::onSliderValueChanged() {
     FXVector<FXFixed> coords;
     for (auto v : faceVariables()) 
         coords.push_back(v);
-    document_->face()->setCurrentVariableCoordinates(coords);
-
-    emit document_->variableCoordinatesChanged();
+    if (document_->face()->setCurrentVariableCoordinates(coords)) {
+        emit document_->variableCoordinatesChanged();
+        updateComboBoxIndex();
+    }
 }
 
 QList<int>
@@ -83,4 +101,42 @@ QXVariableWidget::faceVariables() const {
     for (const auto slider: sliders_) 
         values.append(slider->value());
     return values;
+}
+
+void
+QXVariableWidget::updateComboBoxIndex() {
+    const auto & instances = document_->face()->variableNamedInstances();
+    auto coords = document_->face()->currentVariableCoordinates();
+
+    QSignalBlocker signalBlocker(ui_->instanceComboBox);
+
+    int current = -1;
+    for (int i = 0; i < ui_->instanceComboBox->count(); ++ i) {
+        QVariant d = ui_->instanceComboBox->itemData(i);
+        bool ok = false;
+        int index = d.toInt(&ok);
+        if (ok) {
+            if (index != -1) {
+                if (instances[index].coordinates == coords) {
+                    ui_->instanceComboBox->setCurrentIndex(i);
+                    return;
+                }
+            }
+            else {
+                current = i;
+            }
+        }
+    }
+
+    if (current != -1)
+        ui_->instanceComboBox->setCurrentIndex(current);
+}
+
+void
+QXVariableWidget::updateSliderValues() {
+    auto coords = document_->face()->currentVariableCoordinates();
+    for (size_t i = 0; i < coords.size(); ++ i) {
+        QSignalBlocker signalBlocker(sliders_[i]);
+        sliders_[i]->setValue(coords[i]);
+    } 
 }
