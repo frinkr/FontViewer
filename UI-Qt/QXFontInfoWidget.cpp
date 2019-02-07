@@ -1,5 +1,6 @@
 #include <QVBoxLayout>
 #include "FontX/FXFT.h"
+#include "FontX/FXFTNames.h"
 #include "FontX/FXTag.h"
 
 #include "QXConv.h"
@@ -11,27 +12,6 @@
 #define QXFONTINFO_ADDFLAG(f) {f, #f}
 
 namespace {
-    template <typename T>
-    struct QStringTraits {
-        static QString
-        toQString(const T & v) {
-            return QString("%1").arg(v);
-        }
-    };
-
-    template <> struct QStringTraits<bool> {
-        static QString
-        toQString(bool value) {
-            return value? "Yes": "No";
-        }
-    };
-
-    template <> struct QStringTraits<FXString> {
-        static QString
-        toQString(const FXString & value) {
-            return ::toQString(value);
-        }
-    };
 
     class QXFontHtmlTemplatePage : public QXFontInfoPage {
     public:
@@ -84,8 +64,8 @@ namespace {
         loadTableRows() override {
             FT_Face ftFace = face_->face();
 
-            TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(ftFace, FT_SFNT_HEAD);
-            TT_OS2 * os2 = (TT_OS2 *)FT_Get_Sfnt_Table(ftFace, FT_SFNT_OS2);
+            TT_Header * head = reinterpret_cast<TT_Header *>(FT_Get_Sfnt_Table(ftFace, FT_SFNT_HEAD));
+            TT_OS2 * os2 = reinterpret_cast<TT_OS2 *>(FT_Get_Sfnt_Table(ftFace, FT_SFNT_OS2));
 
             addHeadRow(tr("Face"));
             addDataRow(tr("File"), toQString(faceAtts().desc.filePath));
@@ -135,7 +115,7 @@ namespace {
             addEmptyRow();
             addHeadRow(tr("Version"));
             if (os2)
-                addDataRow(tr("Vendor"), QString("<a href=https://www.microsoft.com/typography/links/vendorlist.aspx>%1</a>").arg(toQString(FXString((const char *)(os2->achVendID), 4))));
+                addDataRow(tr("Vendor"), QString("<a href=https://www.microsoft.com/typography/links/vendorlist.aspx>%1</a>").arg(toQString(FXString(reinterpret_cast<const char *>(os2->achVendID), 4))));
             else
                 addDataRow(tr("Vendor"), faceAtts().names.vendor());
             addDataRow(tr("Version"), faceAtts().names.version());
@@ -159,23 +139,23 @@ namespace {
         static QStringList
         faceFlagsStr(FT_Long flags) {
             static FXMap<FT_Long, FXString> map = {
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_SCALABLE),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FIXED_SIZES),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FIXED_WIDTH),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_SFNT),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_HORIZONTAL),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VERTICAL),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_KERNING),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_FAST_GLYPHS),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_MULTIPLE_MASTERS),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_GLYPH_NAMES),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_EXTERNAL_STREAM),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_HINTER),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_CID_KEYED),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_TRICKY),
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_COLOR),
+                {FT_FACE_FLAG_SCALABLE, "SCALABLE"},
+                {FT_FACE_FLAG_FIXED_SIZES, "FIXED_SIZES"},
+                {FT_FACE_FLAG_FIXED_WIDTH, "FIXED_WIDTH"},
+                {FT_FACE_FLAG_SFNT, "SFNT"},
+                {FT_FACE_FLAG_HORIZONTAL, "HORIZONTAL"},
+                {FT_FACE_FLAG_VERTICAL, "VERTICAL"},
+                {FT_FACE_FLAG_KERNING, "KERNING"},
+                {FT_FACE_FLAG_FAST_GLYPHS, "GLYPHS"},
+                {FT_FACE_FLAG_MULTIPLE_MASTERS, "MULTIPLE_MASTERS"},
+                {FT_FACE_FLAG_GLYPH_NAMES, "GLYPH_NAMES"},
+                {FT_FACE_FLAG_EXTERNAL_STREAM, "EXTERNAL_STREAM"},
+                {FT_FACE_FLAG_HINTER, "HINTER"},
+                {FT_FACE_FLAG_CID_KEYED, "CID_KEYED"},
+                {FT_FACE_FLAG_TRICKY, "TRICKY"},
+                {FT_FACE_FLAG_COLOR, "COLOR"},
 #ifdef FT_FACE_FLAG_VARIATION
-                QXFONTINFO_ADDFLAG(FT_FACE_FLAG_VARIATION),
+                {FT_FACE_FLAG_VARIATION, "VARIATION"},
 #endif
             };
             QStringList list;
@@ -189,8 +169,8 @@ namespace {
         static QStringList
         styleFlagsStr(FT_Long flags) {
             static FXMap<FT_Long, FXString> map = {
-                QXFONTINFO_ADDFLAG(FT_STYLE_FLAG_ITALIC),
-                QXFONTINFO_ADDFLAG(FT_STYLE_FLAG_BOLD),
+                {FT_STYLE_FLAG_ITALIC, "ITALIC"},
+                {FT_STYLE_FLAG_BOLD, "BOLD"},
             };
             QStringList list;
             for (const auto & kv: map) {
@@ -211,6 +191,28 @@ namespace {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
 
+    };
+
+    class QXNamePage : public QXFontHtmlTemplatePage {
+    public:
+        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
+
+        void
+        loadTableRows() override {
+            FT_UInt sfntCount = FT_Get_Sfnt_Name_Count(ftFace_);
+            for (FT_UInt i = 0; i < sfntCount; ++i) {
+                FT_SfntName sfnt;
+                if (FT_Get_Sfnt_Name(ftFace_, i, &sfnt))
+                    continue;
+
+                addDataRow(QString("(%1-%2 %3) %4")
+                           .arg(sfnt.platform_id)
+                           .arg(sfnt.encoding_id)
+                           .arg(toQString(FXSFNTGetLanguage(&sfnt, ftFace_)))
+                           .arg(toQString(FXSFNTGetName(&sfnt))),
+                           toQString(FXSFNTGetValue(&sfnt)));
+            } 
+        }
     };
 
     class QXOS2Page : public QXFontHtmlTemplatePage {
@@ -395,6 +397,7 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     if (FT_IS_SFNT(face->face())) {
         pages_.append(new QXHheaPage(tr("hhea"), face, this));
         pages_.append(new QXHmtxPage(tr("hmtx"), face, this));
+        pages_.append(new QXNamePage(tr("name"), face, this));
         pages_.append(new QXOS2Page(tr("OS/2"),  face, this));
         pages_.append(new QXPostPage(tr("post"), face, this));
         pages_.append(new QXGDEFPage(tr("GDEF"), face, this));

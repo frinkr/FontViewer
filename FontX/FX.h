@@ -33,7 +33,7 @@ using FXFTSize    = struct FT_SizeRec_ *;
 using FXHBFace    = struct hb_face_t *;
 using FXHBFont    = struct hb_font_t *;
 
-using FXFixed     = int32_t;     // 16.16
+using FXFixed     = signed long;     // 16.16
 using FXChar      = uint32_t;
 using FXGlyphID   = uint32_t;
 

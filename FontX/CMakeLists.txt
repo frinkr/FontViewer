@@ -11,6 +11,8 @@ endif()
 
 find_package(Freetype REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
+find_package(Iconv REQUIRED)
+
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
@@ -66,6 +68,7 @@ target_include_directories(FontX PUBLIC
   ${FREETYPE_INCLUDE_DIRS}
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
+  ${Iconv_INCLUDE_DIRS}
   )
 
 target_link_libraries(FontX
@@ -73,6 +76,7 @@ target_link_libraries(FontX
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
+  ${Iconv_LIBRARIES}
   )
 
 if (APPLE)

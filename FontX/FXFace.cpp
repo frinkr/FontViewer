@@ -281,13 +281,12 @@ FXFace::currentCMap() const {
 
 size_t
 FXFace::currentCMapIndex() const {
-    size_t i = FT_Get_Charmap_Index(face_->charmap);
-    return i;
+    return static_cast<size_t>(FT_Get_Charmap_Index(face_->charmap));
 }
 
 bool
 FXFace::selectCMap(size_t cmapIndex) {
-    if (cmapIndex >= face_->num_charmaps)
+    if (cmapIndex >= static_cast<size_t>(face_->num_charmaps))
         return false;
     return !FT_Set_Charmap(face_, face_->charmaps[cmapIndex]);
 }

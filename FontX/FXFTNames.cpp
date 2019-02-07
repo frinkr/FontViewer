@@ -1,4 +1,5 @@
 #include <map>
+#include <iconv.h>
 #include <unicode/utypes.h>
 #include <unicode/stringpiece.h>
 #include <unicode/utf8.h>
@@ -417,7 +418,138 @@ static const FtLanguage   ftLanguages[] = {
     {  TT_PLATFORM_MICROSOFT,	TT_MS_LANGID_PAPIAMENTU_NETHERLANDS_ANTILLES,"pap" },
 };
 
-#define NUM_FT_LANGUAGES  (int) (sizeof (ftLanguages) / sizeof (ftLanguages[0]))
+#define NUM_FT_LANGUAGES  (sizeof (ftLanguages) / sizeof (ftLanguages[0]))
+
+
+template <typename T> T
+swap2(T value) {
+    return static_cast<T>(((value & 0xff) << 8) + ((value & 0xff00) >> 8));
+}
+
+
+static FXString 
+FXUTF16BE2UTF8(void * buf, size_t bufLen) {
+    const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
+    const size_t u16Len = bufLen / 2;
+    FXVector<uint16_t> v;
+    v.reserve(u16Len);
+    for (uint32_t i = 0; i < u16Len; i++)
+        v.push_back(swap2(u16Buf[i]));
+    icu::UnicodeString uStr(&v[0], static_cast<int32_t>(u16Len));
+    FXString u8;
+    return uStr.toUTF8String(u8);
+}
+
+static FXString 
+FXUTF16BE2UTF8(const uint16_t * u16Buf, size_t u16Len) {
+    FXVector<uint16_t> v;
+    v.reserve(u16Len);
+    for (uint32_t i = 0; i < u16Len; i++)
+        v.push_back(swap2(u16Buf[i]));
+    icu::UnicodeString uStr(&v[0], static_cast<int32_t>(u16Len));
+    FXString u8;
+    return uStr.toUTF8String(u8);
+}
+
+static FXString 
+FXUTF162UTF8(void * buf, size_t bufLen) {
+    const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
+    const size_t u16Len = bufLen / 2;
+    icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
+    FXString u8;
+    return uStr.toUTF8String(u8);
+}
+
+static FXString 
+FXUTF162UTF8(const uint16_t * u16Buf, size_t u16Len) {
+    icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
+    FXString u8;
+    return uStr.toUTF8String(u8);
+}
+
+static FXString
+FXMacRoman2UTF8(const unsigned char * buffer, size_t bufferLen) {
+    static const uint16_t uni[128] = {
+        /* 0x80 */
+        0x00c4, 0x00c5, 0x00c7, 0x00c9, 0x00d1, 0x00d6, 0x00dc, 0x00e1,
+        0x00e0, 0x00e2, 0x00e4, 0x00e3, 0x00e5, 0x00e7, 0x00e9, 0x00e8,
+        /* 0x90 */
+        0x00ea, 0x00eb, 0x00ed, 0x00ec, 0x00ee, 0x00ef, 0x00f1, 0x00f3,
+        0x00f2, 0x00f4, 0x00f6, 0x00f5, 0x00fa, 0x00f9, 0x00fb, 0x00fc,
+        /* 0xa0 */
+        0x2020, 0x00b0, 0x00a2, 0x00a3, 0x00a7, 0x2022, 0x00b6, 0x00df,
+        0x00ae, 0x00a9, 0x2122, 0x00b4, 0x00a8, 0x2260, 0x00c6, 0x00d8,
+        /* 0xb0 */
+        0x221e, 0x00b1, 0x2264, 0x2265, 0x00a5, 0x00b5, 0x2202, 0x2211,
+        0x220f, 0x03c0, 0x222b, 0x00aa, 0x00ba, 0x2126, 0x00e6, 0x00f8,
+        /* 0xc0 */
+        0x00bf, 0x00a1, 0x00ac, 0x221a, 0x0192, 0x2248, 0x2206, 0x00ab,
+        0x00bb, 0x2026, 0x00a0, 0x00c0, 0x00c3, 0x00d5, 0x0152, 0x0153,
+        /* 0xd0 */
+        0x2013, 0x2014, 0x201c, 0x201d, 0x2018, 0x2019, 0x00f7, 0x25ca,
+        0x00ff, 0x0178, 0x2044, 0x00a4, 0x2039, 0x203a, 0xfb01, 0xfb02,
+        /* 0xe0 */
+        0x2021, 0x00b7, 0x201a, 0x201e, 0x2030, 0x00c2, 0x00ca, 0x00c1,
+        0x00cb, 0x00c8, 0x00cd, 0x00ce, 0x00cf, 0x00cc, 0x00d3, 0x00d4,
+        /* 0xf0 */
+        0xfffd, 0x00d2, 0x00da, 0x00db, 0x00d9, 0x0131, 0x02c6, 0x02dc,
+        0x00af, 0x02d8, 0x02d9, 0x02da, 0x00b8, 0x02dd, 0x02db, 0x02c7,
+    };
+
+    FXVector<uint16_t> u16(bufferLen);
+    for (size_t i = 0; i < bufferLen; ++ i) {
+        if (buffer[i] < 0x80)
+            u16[i] = buffer[i];
+        else
+            u16[i] = uni[buffer[i] - 0x80];
+    }
+    return FXUTF162UTF8(&u16[0], u16.size());
+}
+
+static FXString
+FXIconv(const FXString & encoding, const char * buffer, size_t bufferLen) {
+    iconv_t cd = iconv_open(encoding.c_str(), "UTF-8");
+    if (cd == reinterpret_cast<iconv_t>(-1))
+        return FXString();
+
+    
+    char * inBuf = const_cast<char*>(buffer);
+    size_t inLen = bufferLen;
+    size_t outLen = 1024;
+    char * outBuf = reinterpret_cast<char*>(malloc(outLen));
+    bool error = false;
+    do {
+        // reset
+        iconv(cd, nullptr, nullptr, nullptr, nullptr);
+
+        size_t stringLen = outLen;
+        iconv(cd, &inBuf, &inLen, &outBuf, &outLen);
+        if (errno == 0) {
+            outLen = stringLen - outLen;
+            break;
+        }
+
+        if (errno == E2BIG)  {
+            outLen += 1024;
+            outBuf = reinterpret_cast<char*>(realloc(outBuf, outLen));
+        }
+        else {
+            error = true;
+            break;
+        }
+    } while (true);
+
+    iconv_close(cd);
+
+    if (error) {
+        free(outBuf);
+        return FXString();
+    }
+
+    FXString ret(outBuf, outLen);
+    free(outBuf);
+    return ret;
+}
 
 std::string
 FXGetPlatformName(FT_UShort platformId) {
@@ -531,7 +663,7 @@ FXGetEncodingName(FT_UShort platformId, FT_UShort encodingId) {
 
 FXString
 FXGetLanguageName(FT_UShort platformId, FT_UShort languageId) {
-    for (int i = 0; i < NUM_FT_LANGUAGES; i++)
+    for (size_t i = 0; i < NUM_FT_LANGUAGES; i++)
         if (ftLanguages[i].platform_id == platformId &&
             (ftLanguages[i].language_id == TT_LANGUAGE_DONT_CARE ||
              ftLanguages[i].language_id == languageId))
@@ -545,12 +677,13 @@ FXGetLanguageName(FT_UShort platformId, FT_UShort languageId) {
 }
 
 
-static FXString FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
-    return FXString();
-#if 0
+static FXString
+FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
     if (encodingId == TT_MAC_ID_ROMAN)
-        return [[NSString alloc] initWithBytes:string length:stringLen encoding:NSMacOSRomanStringEncoding];
-    
+        return FXMacRoman2UTF8(reinterpret_cast<const unsigned char *>(string), stringLen);
+
+    return FXString();
+#if 0    
     NSString * name = nil;
     
     while (true) {
@@ -589,27 +722,11 @@ static FXString FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_
 #endif
 }
 
-template <typename T> T
-swap2(T value) {
-    return static_cast<T>(((value & 0xff) << 8) + ((value & 0xff00) >> 8));
-}
+
 
 static FXString 
-UTF16BE2UTF8(void * buf, uint32_t bufLen) {
-    const uint16_t * u16Buf = (const uint16_t*)buf;
-    const uint32_t u16Len = bufLen / 2;
-    FXVector<uint16_t> v;
-    v.reserve(u16Len);
-    for (uint32_t i = 0; i < u16Len; i++)
-        v.push_back(swap2(u16Buf[i]));
-    icu::UnicodeString uStr(&v[0], u16Len);
-    FXString u8;
-    return uStr.toUTF8String(u8);
-}
-
-static FXString 
-FXFTStringAppleUnicode(FT_UShort encodingId, void * buf, uint32_t bufLen) {
-    return UTF16BE2UTF8(buf, bufLen);
+FXFTStringAppleUnicode(FT_UShort /*encodingId*/, void * buf, uint32_t bufLen) {
+    return FXUTF16BE2UTF8(buf, bufLen);
 }
 
 
@@ -617,71 +734,28 @@ static FXString
 FXFTStringMicrosoft(FT_UShort encodingId, void * buf, uint32_t bufLen) {
     switch (encodingId)
     {
-        case TT_MS_ID_UNICODE_CS:
-        case TT_MS_ID_SYMBOL_CS: {
-            return UTF16BE2UTF8(buf, bufLen);
-        } break;
-        default:
-            return FXString();
-            break;
-
+    case TT_MS_ID_UNICODE_CS:
+    case TT_MS_ID_SYMBOL_CS: 
+        return FXUTF16BE2UTF8(buf, bufLen);
+    case TT_MS_ID_PRC:
+        return FXIconv("WINDOWS-936", reinterpret_cast<const char *>(buf), bufLen);
+    case TT_MS_ID_SJIS:
+        return FXIconv("SHIFT-JIS", reinterpret_cast<const char *>(buf), bufLen);
+    case TT_MS_ID_BIG_5:
+        return FXIconv("BIGFIVE", reinterpret_cast<const char *>(buf), bufLen);
+    default:
+        return FXString();
     }
-#if 0
-    NSStringEncoding enc = kCFStringEncodingInvalidId;
-    
-    BOOL mbs = NO;
-    switch(encodingId) {
-        case TT_MS_ID_UNICODE_CS: // UTF16-BE
-        case TT_MS_ID_SYMBOL_CS:
-            enc = NSUTF16BigEndianStringEncoding;
-            break;
-        case TT_MS_ID_UCS_4:
-            enc = NSUTF32BigEndianStringEncoding;
-            break;
-        case TT_MS_ID_PRC:
-            enc = (NSStringEncoding)CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
-            mbs = YES;
-            break;
-        case TT_MS_ID_SJIS:
-            enc = NSShiftJISStringEncoding;
-            mbs = YES;
-            break;
-        case TT_MS_ID_BIG_5:
-            enc = (NSStringEncoding)CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingBig5);
-            mbs = YES;
-            break;
-        default:
-            break;
-    }
-    
-    if (enc == kCFStringEncodingInvalidId)
-        return nil;
-    
-    if (mbs) {
-        // byte 0 is not valid in MBS, so remove all byte 0
-        unsigned char * trimed = (unsigned char *) malloc(stringLen);
-        uint32_t trimedLen = 0;
-        for (uint32_t i = 0; i < stringLen; ++ i) {
-            unsigned char c = ((unsigned char *)string)[i];
-            if (c) trimed[trimedLen++] = c;
-        }
-        if (trimedLen)
-            return [[NSString alloc] initWithBytes:trimed length:trimedLen encoding:enc];
-        else
-            return nil;
-    }
-    return [[NSString alloc] initWithBytes:string length:stringLen encoding:enc];
-#endif
 }
 
 FXString
 FXToString(FT_UShort platformId, FT_UShort encodingId, void * string, uint32_t stringLen) {
     FXString str;
     switch(platformId) {
-        case TT_PLATFORM_MACINTOSH: str = FXFTStringMacintosh(encodingId, string, stringLen); break;
-        case TT_PLATFORM_MICROSOFT: str = FXFTStringMicrosoft(encodingId, string, stringLen); break;
-        case TT_PLATFORM_APPLE_UNICODE: str = FXFTStringAppleUnicode(encodingId, string, stringLen); break;
-        default: break;
+    case TT_PLATFORM_MACINTOSH: str = FXFTStringMacintosh(encodingId, string, stringLen); break;
+    case TT_PLATFORM_MICROSOFT: str = FXFTStringMicrosoft(encodingId, string, stringLen); break;
+    case TT_PLATFORM_APPLE_UNICODE: str = FXFTStringAppleUnicode(encodingId, string, stringLen); break;
+    default: break;
     }
     //if (str.empty())
     //    return FXString((const char * )string, stringLen);
