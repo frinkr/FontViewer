@@ -7,10 +7,10 @@ template <typename T>
 constexpr FXTag
 FXMakeTag(T a, T b, T c, T d) {
     return FXTag(
-        (((uint8_t)(a))<<24) |
-        (((uint8_t)(b))<<16) |
-        (((uint8_t)(c))<<8) |
-        ((uint8_t)(d))
+        ((static_cast<uint8_t>(a))<<24) |
+        ((static_cast<uint8_t>(b))<<16) |
+        ((static_cast<uint8_t>(c))<<8) |
+        (static_cast<uint8_t>(d))
         );
 }
 
@@ -20,16 +20,16 @@ constexpr FXTag FXTableCMAP    = 'cmap';
 constexpr FXTag FXTableGUSB    = 'GSUB';
 constexpr FXTag FXTableGPOS    = 'GPOS';
 constexpr FXTag FXTableGDEF    = 'GDEF';
-constexpr FXTag FXTagInvalid = -1;
+constexpr FXTag FXTagInvalid = static_cast<FXTag>(-1);
 
 
 template <typename T = FXTag> FXString
 FXTag2Str(T tag) {
     char str[] = {
-        (char)(tag >> 24),
-        (char)(tag >> 16),
-        (char)(tag >> 8),
-        (char)(tag),
+        static_cast<char>(tag >> 24),
+        static_cast<char>(tag >> 16),
+        static_cast<char>(tag >> 8),
+        static_cast<char>(tag),
         0
     };
     return str;
@@ -46,7 +46,3 @@ FXStr2Tag(const T & str) {
     }
     return tag;
 }
-
-
-
-

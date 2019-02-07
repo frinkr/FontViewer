@@ -23,7 +23,7 @@ toStdString(const QString & str) {
 
 QImage
 toQImage(const FXPixmapARGB & bm) {
-#if QU_IMAGE_NO_OPTIMIZE
+#ifdef QU_IMAGE_NO_OPTIMIZE
     QImage image(bm.width, bm.height, QImage::Format_ARGB32);
     image.setDevicePixelRatio(2);
     for (int y = 0; y < bm.height; ++ y) {
@@ -34,7 +34,7 @@ toQImage(const FXPixmapARGB & bm) {
     }
 #else
     FXPixmapARGB * ref = new FXPixmapARGB(bm); // make a new ref
-    QImage image((uchar*)bm.buffer,
+    QImage image(reinterpret_cast<uchar*>(bm.buffer),
                  bm.width,
                  bm.height,
                  QImage::Format_ARGB32,

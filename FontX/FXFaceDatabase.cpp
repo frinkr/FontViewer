@@ -40,7 +40,7 @@ namespace boost {namespace serialization {
 
         template <class Archive>
         void
-        serialize(Archive & ar, FXSFNTName & sfnt, const unsigned int version) {
+        serialize(Archive & ar, FXSFNTName & sfnt, const unsigned int /*version*/) {
             ar & sfnt.platformId;
             ar & sfnt.encodingId;
             ar & sfnt.language;
@@ -50,14 +50,14 @@ namespace boost {namespace serialization {
         
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceDescriptor & desc, const unsigned int version) {
+        serialize(Archive & ar, FXFaceDescriptor & desc, const unsigned int /*version*/) {
             ar & desc.filePath;
             ar & desc.index;
         }
 
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceAttributes & atts, const unsigned int version) {
+        serialize(Archive & ar, FXFaceAttributes & atts, const unsigned int /*version*/) {
             ar & atts.desc;
             ar & atts.upem;
             ar & atts.format;
@@ -73,7 +73,7 @@ namespace boost {namespace serialization {
         
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceDatabase::FaceItem & item, const unsigned int version) {
+        serialize(Archive & ar, FXFaceDatabase::FaceItem & item, const unsigned int /*version*/) {
             ar & item.fileHash;
             ar & item.desc;
             ar & item.atts;
@@ -84,7 +84,7 @@ namespace boost {namespace serialization {
 FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath, ProgressCallback progressCallback)
     : folders_(folders)
     , dbPath_(dbPath)
-    , hash_(-1)
+    , hash_(static_cast<size_t>(-1))
     , progress_(progressCallback) {
     if (!load() || checkUpdate())
         rescan();
@@ -103,7 +103,7 @@ FXFaceDatabase::faceIndex(const FXFaceDescriptor & desc) const {
         if (desc == faces_[i].desc)
             return i;
     }
-    return -1;
+    return static_cast<size_t>(-1);
 }
 
 const FXFaceDescriptor &

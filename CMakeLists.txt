@@ -3,8 +3,12 @@ project(FontViewer)
 
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(FX_DIR ${PROJECT_SOURCE_DIR})
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+  SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-multichar")
+endif()
+
+set(FX_DIR ${PROJECT_SOURCE_DIR})
 list(APPEND CMAKE_MODULE_PATH "${FX_DIR}/cmake")
 
 add_definitions(
