@@ -24,7 +24,7 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
     
     painter->save();
     painter->setRenderHint(QPainter::HighQualityAntialiasing);
-    if (g.face->attributes().format == FXFaceFormatConstant::WinFNT)
+    if (g.face->attributes().format != FXFaceFormatConstant::WinFNT)
         painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
     const QWidget * widget = opt.widget;
@@ -43,7 +43,10 @@ QXGlyphItemDelegate::paint(QPainter * painter, const QStyleOptionViewItem & opti
 #else
         if (opt.state & QStyle::State_Selected) {
             QRect bgRect = textRect.united(iconRect);
-            painter->fillRect(bgRect, opt.palette.color(QPalette::Active, QPalette::Highlight));
+            if (opt.state & QStyle::State_Active)
+                painter->fillRect(bgRect, opt.palette.color(QPalette::Active, QPalette::Highlight));
+            else
+                painter->fillRect(bgRect, opt.palette.color(QPalette::Inactive, QPalette::Highlight));
         }
 #endif
     }

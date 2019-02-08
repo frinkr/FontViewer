@@ -46,3 +46,4 @@ FXStr2Tag(const T & str) {
     }
     return tag;
 }
+

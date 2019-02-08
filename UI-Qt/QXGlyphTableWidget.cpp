@@ -39,7 +39,7 @@ public:
     virtual QString
     name() const {
         return name_;
-    };
+    }
 
     virtual QVariant
     value(const FXGlyph & g) const = 0;
@@ -120,7 +120,7 @@ namespace {
         virtual QVariant
         value(const FXGlyph & g) const {
             return toVariant(g.*p_);
-        };
+        }
     protected:
         PointerToMember p_;
     };
@@ -135,7 +135,7 @@ namespace {
         virtual QVariant
         value(const FXGlyph & g) const {
             return toVariant(g.metrics.*p_);
-        };
+        }
     protected:
         PointerToMember p_;
     };
@@ -269,6 +269,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
     , ui_(new Ui::QXGlyphTableWidget)
     , document_(document) {
     ui_->setupUi(this);
+
     model_ = new QXGlyphTableModel(document, this);
     
     QSortFilterProxyModel * proxyModel = new QSortFilterProxyModel(this);
@@ -280,6 +281,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
     ui_->tableView->setSortingEnabled(true);
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
+    ui_->tableView->setAlternatingRowColors(true);
     
     connect(ui_->pushButton, &QPushButton::clicked,
             this, &QUGlyphTableWidget::exportToFile);
