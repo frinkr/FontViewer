@@ -1,5 +1,4 @@
-#ifndef QUOPENFONTDIALOG_H
-#define QUOPENFONTDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include "QXDocument.h"
@@ -23,10 +22,10 @@ public:
             
 private slots:
     void
-    slotBrowseFile();
+    onOpenFileButtonClicked();
 
     void
-    slotFontSelected(const QXFontURI & uri, size_t index);
+    onFontSelected(const QXFontURI & uri, size_t index);
 
 private:
     void
@@ -37,4 +36,4 @@ private:
     QMenu                * recentMenu_; 
 };
 
-#endif
+

@@ -16,7 +16,6 @@
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
 #include "QXFontInfoWidget.h"
-#include "QXVariableWidget.h"
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphListView.h"
 #include "QXGlyphTableWidget.h"
@@ -26,6 +25,7 @@
 #include "QXSearchWidget.h"
 #include "QXShapingWidget.h"
 #include "QXTheme.h"
+#include "QXVariableWidget.h"
 
 #include "ui_QXDocumentWindow.h"
 
@@ -117,6 +117,10 @@ QXDocumentWindow::initMenu() {
 void
 QXDocumentWindow::initToolBar() {
     QToolBar * toolBar = ui_->toolBar;
+
+    openFontAction_ = toolBar->addAction(
+        qApp->loadIcon(":/images/open-font.png"),tr("Open Font"),
+        this, &QXDocumentWindow::onOpenFontAction);
 
     cmapBlockAction_ = toolBar->addAction(
         qApp->loadIcon(":/images/cmap.png"),tr("CMap"),
@@ -249,6 +253,11 @@ QXDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
 void
 QXDocumentWindow::onCharLinkClicked(FXGChar c) {
     //ui_->listView->selectChar(c);
+}
+
+void
+QXDocumentWindow::onOpenFontAction() {
+    QXDocumentWindowManager::instance()->doOpenFontDialog();
 }
 
 void

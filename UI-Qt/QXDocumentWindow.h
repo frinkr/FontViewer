@@ -87,6 +87,9 @@ private slots:
     onCharLinkClicked(FXGChar c);
 
     void
+    onOpenFontAction();
+
+    void
     onCMapBlockAction();
 
     void
@@ -114,7 +117,8 @@ private:
 private:
     Ui::QXDocumentWindow * ui_;
     QXMenuBar       * menuBar_;
-    
+
+    QAction         * openFontAction_;
     QAction         * cmapBlockAction_;
     QXPopoverWindow * cmapBlockPopover_;
     QAction         * variableAction_;

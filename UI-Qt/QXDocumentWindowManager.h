@@ -61,7 +61,9 @@ public slots:
     void
     closeAllDocumentsAndQuit();
 
-    void doOpenFontFromFile();
+    /* Return true if use selected a font file, false if canceled.*/
+    bool
+    doOpenFontFromFile();
 
     void
     openFontFile(const QString & filePath);

@@ -45,12 +45,16 @@ QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
     , ui_(new Ui::QXOpenFontDialog)
     , recentMenu_(nullptr) {
     ui_->setupUi(this);
+    ui_->openButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
 	ui_->filterButton->setIcon(qApp->loadIcon(":/images/filter.png"));
     ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
 
-    
+
+    connect(ui_->openButton, &QPushButton::clicked,
+            this, &QXOpenFontDialog::onOpenFileButtonClicked);
+
     connect(ui_->fontComboBox, &QXFontComboBox::fontSelected,
-            this, &QXOpenFontDialog::slotFontSelected);
+            this, &QXOpenFontDialog::onFontSelected);
     
     QXFontManager::instance();
 
@@ -66,7 +70,7 @@ QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
         ui_->fontComboBox->selectFont(0);
     
 
-    slotFontSelected(ui_->fontComboBox->selectedFont(),
+    onFontSelected(ui_->fontComboBox->selectedFont(),
                      ui_->fontComboBox->selectedFontIndex());
 
     recentMenu_ = new QMenu(ui_->recentButton);
@@ -120,17 +124,13 @@ QXOpenFontDialog::accept() {
 }
 
 void
-QXOpenFontDialog::slotBrowseFile() {
-    QString file = QFileDialog::getOpenFileName(
-        this,
-        tr("Open Font"),
-        QString(),
-        tr("Fonts (*.otf *.ttf);;All Files (*)"));
-
+QXOpenFontDialog::onOpenFileButtonClicked() {
+    if (QXDocumentWindowManager::instance()->doOpenFontFromFile())
+        reject();
 }
 
 void
-QXOpenFontDialog::slotFontSelected(const QXFontURI & uri, size_t index) {
+QXOpenFontDialog::onFontSelected(const QXFontURI & uri, size_t index) {
     if (index == -1)
         return;
     auto & desc = QXFontManager::instance().db()->faceDescriptor(index);

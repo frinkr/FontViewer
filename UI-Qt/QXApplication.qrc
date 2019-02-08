@@ -7,17 +7,27 @@
     <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
     <file alias="images/filter.png">../Resources/Images/filter.png</file>
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
+    <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
+    <file alias="images/font-book_d.png">../Resources/Images/font-book_d.png</file>
     <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
     <file alias="images/glyph_d.png">../Resources/Images/glyph_d.png</file>
     <file alias="images/history.png">../Resources/Images/history.png</file>
     <file alias="images/history_d.png">../Resources/Images/history_d.png</file>
     <file alias="images/info.png">../Resources/Images/info.png</file>
     <file alias="images/info_d.png">../Resources/Images/info_d.png</file>
+    <file alias="images/minus.png">../Resources/Images/minus.png</file>
+    <file alias="images/minus_d.png">../Resources/Images/minus_d.png</file>
     <file alias="images/ok.png">../Resources/Images/ok.png</file>
+    <file alias="images/open-folder.png">../Resources/Images/open-folder.png</file>
+    <file alias="images/open-folder_d.png">../Resources/Images/open-folder_d.png</file>
+    <file alias="images/open-font.png">../Resources/Images/open-font.png</file>
+    <file alias="images/open-font_d.png">../Resources/Images/open-font_d.png</file>
     <file alias="images/open.png">../Resources/Images/open.png</file>
     <file alias="images/open_d.png">../Resources/Images/open_d.png</file>
     <file alias="images/opentype.png">../Resources/Images/opentype.png</file>
     <file alias="images/opentype_d.png">../Resources/Images/opentype_d.png</file>
+    <file alias="images/plus.png">../Resources/Images/plus.png</file>
+    <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
     <file alias="images/postscript.png">../Resources/Images/postscript.png</file>
     <file alias="images/postscript_d.png">../Resources/Images/postscript_d.png</file>
     <file alias="images/search.png">../Resources/Images/search.png</file>
@@ -30,14 +40,10 @@
     <file alias="images/truetype_d.png">../Resources/Images/truetype_d.png</file>
     <file alias="images/undefined.png">../Resources/Images/undefined.png</file>
     <file alias="images/undefined_d.png">../Resources/Images/undefined_d.png</file>
-    <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
     <file alias="images/variant.png">../Resources/Images/variant.png</file>
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
-    <file alias="images/plus.png">../Resources/Images/plus.png</file>
-    <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
-    <file alias="images/minus.png">../Resources/Images/minus.png</file>
-    <file alias="images/minus_d.png">../Resources/Images/minus_d.png</file>
     <file alias="images/warning.png">../Resources/Images/warning.png</file>
+    <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
     
 </qresource>
 </RCC>

@@ -244,15 +244,18 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
         recentFonts_.takeLast();
 }
 
-void
+bool
 QXDocumentWindowManager::doOpenFontFromFile() {
     QFileDialog openFileDialog(nullptr);
 
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
-    openFileDialog.setNameFilter(tr("C files (*.c *.cc *.cpp *.h);;Text files (*.txt);;All Files (*)"));
+    openFileDialog.setNameFilter(tr("Font files (*.ttf *.otf);;All Files (*)"));
 
-    if (QDialog::Accepted == openFileDialog.exec())
+    if (QDialog::Accepted == openFileDialog.exec()) {
         openFontFile(openFileDialog.selectedFiles()[0]);
+        return true;
+    }
+    return false;
 }
 
 void
