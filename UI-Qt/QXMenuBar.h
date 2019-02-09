@@ -20,6 +20,7 @@ public:
 
     // Edit menu
     QAction * actionCopy;
+    QAction * actionSearch;
 
     // View menu
     QAction * actionCharacterCode;
@@ -53,6 +54,9 @@ signals:
 
     void
     copyActionTriggered(QAction * action);
+
+    void
+    searchActionTriggered(QAction * action);
 
     void
     fullScreenActionTriggered(QAction * action);

@@ -50,6 +50,10 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         actionCopy = menuEdit->addAction(tr("&Copy"), [this]() {
             emit copyActionTriggered(actionCopy);
         }, QKeySequence(QKeySequence::Copy));
+
+        actionSearch = menuEdit->addAction(tr("&Find"), [this]() {
+            emit searchActionTriggered(actionSearch);
+        }, QKeySequence(QKeySequence::Find));
     }
 
     menuView = addMenu(tr("&View")); {

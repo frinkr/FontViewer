@@ -10,6 +10,7 @@
 
 class QAction;
 class QFileDialog;
+class QLineEdit;
 class QMenu;
 class QMessageBox;
 class QStringListModel;
@@ -57,6 +58,9 @@ private:
     
     void
     initToolBar();
+
+    void
+    initSearchField();
 
     void
     initListView();
@@ -108,6 +112,9 @@ private slots:
     onSearchAction();
 
     void
+    onSearchLineEditReturnPressed();
+
+    void
     onSearchResult(const QXSearchResult & result, const QString & text);
 
 private:
@@ -129,11 +136,10 @@ private:
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
-    QAction         * searchAction_;
-    QXPopoverWindow * searchPopover_;
+    QLineEdit       * searchLineEdit_;
 
     QXPopoverWindow   * glyphPopover_;
     QXGlyphInfoWidget * glyphWidget_;
 
-    QXDocument      * document_;
+    QXDocument        * document_;
 };

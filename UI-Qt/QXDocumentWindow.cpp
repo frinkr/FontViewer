@@ -5,6 +5,7 @@
 #include <QFileIconProvider>
 #include <QFileInfo>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QMimeData>
 #include <QToolButton>
 #include <QWidgetAction>
@@ -37,7 +38,6 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
-    , searchPopover_(nullptr)
     , glyphPopover_(nullptr)
     , glyphWidget_(nullptr)
     , document_(document)
@@ -86,6 +86,10 @@ QXDocumentWindow::initMenu() {
 
     connect(menuBar_, &QXMenuBar::copyActionTriggered, [this](QAction * action) {
         
+    });
+
+    connect(menuBar_, &QXMenuBar::searchActionTriggered, [this](QAction * action) {
+        this->onSearchAction();
     });
 
     connect(menuBar_, &QXMenuBar::glyphLabelActionTriggered, [this](QAction * action, QXGlyphLabel label) {
@@ -141,20 +145,17 @@ QXDocumentWindow::initToolBar() {
     infoAction_ = toolBar->addAction(
 		qApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QXDocumentWindow::onFontInfoAction);
-    
-    searchAction_ = toolBar->addAction(
-		qApp->loadIcon(":/images/search.png"), tr("Search"),
-        this, &QXDocumentWindow::onSearchAction);
+
+    QWidget * spacer = new QWidget(this);
+    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+    toolBar->addWidget(spacer);
+
+    initSearchField();
 
     variableAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_V));
     shapingAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
     tableAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_T));
     infoAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I));
-    searchAction_->setShortcut(QKeySequence(QKeySequence::Find));
-        
-    QWidget * spacer = new QWidget;
-    spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-    toolBar->addWidget(spacer);
     
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
 
@@ -163,6 +164,28 @@ QXDocumentWindow::initToolBar() {
 #else
     QXTheme::current()->applyToToolBar(toolBar);
 #endif
+}
+
+void
+QXDocumentWindow::initSearchField() {
+    QMenu * searchHistoryMenu = new QMenu(this);
+    searchHistoryMenu->addAction("U+FB01");
+    searchHistoryMenu->addAction("fi");
+
+    searchLineEdit_ = new QLineEdit(this);
+    searchLineEdit_->setStyleSheet("border-radius: 15px;");
+    searchLineEdit_->setMinimumHeight(30);
+    searchLineEdit_->setMinimumWidth(200);
+    searchLineEdit_->setPlaceholderText(tr("Search..."));
+    searchLineEdit_->setClearButtonEnabled(true);
+    searchLineEdit_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+    QAction * searchIconAction = new QAction(this);
+    searchIconAction->setIcon(qApp->loadIcon(":/images/search.png"));
+    searchIconAction->setMenu(searchHistoryMenu);
+    searchLineEdit_->addAction(searchIconAction, QLineEdit::LeadingPosition);
+    ui_->toolBar->addWidget(searchLineEdit_);
+    connect(searchLineEdit_, &QLineEdit::returnPressed, this, &QXDocumentWindow::onSearchLineEditReturnPressed);
 }
 
 void
@@ -320,28 +343,31 @@ QXDocumentWindow::onFontInfoAction() {
 
 void
 QXDocumentWindow::onSearchAction() {
-    if (!searchPopover_) {
-        searchPopover_ = new QXPopoverWindow;
-        QXSearchWidget * widget = new QXSearchWidget;
-        widget->setDocument(document_);
-        searchPopover_->setWidget(widget);
-    }
-    searchPopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
+    searchLineEdit_->setFocus();
+    searchLineEdit_->selectAll();
+}
+
+void
+QXDocumentWindow::onSearchLineEditReturnPressed() {
+    document_->search(searchLineEdit_->text());
 }
 
 void
 QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & text) {
-    if (!result.found)
+    if (!result.found) {
+        QMessageBox::warning(this,
+                             tr("Failed to find glyph"),
+                             tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
         return;
+    }
+        
     document_->setCharMode(result.charMode);
     document_->selectBlock(result.block);
 
     QModelIndex index = document_->index(result.index, 0);
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);
-    
-    if (searchPopover_)
-        searchPopover_->hide();
+    ui_->listView->setFocus();
 }
 
 void
