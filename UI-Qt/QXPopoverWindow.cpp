@@ -23,7 +23,7 @@ namespace {
 }
 
 QXPopoverWindow::QXPopoverWindow(QWidget * parent)
-    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint)
+    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint)
     , edge_(QXPopoverBottom)      
     , widget_(nullptr)
     , layout_(nullptr) {
@@ -85,20 +85,20 @@ QXPopoverWindow::minimumSizeHint() const {
 void
 QXPopoverWindow::resizeEvent(QResizeEvent * event) {
 #ifdef Q_OS_WIN
-	setMask(localRegion(0));
+	//setMask(localRegion(0));
 #endif
     QWidget::resizeEvent(event);
 }
 
 void
 QXPopoverWindow::paintEvent(QPaintEvent * event) {
-    QWidget::paintEvent(event);
+    //QWidget::paintEvent(event);
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
 	
     auto poly = localPolygon(BORDER);
     auto color = palette().color(QPalette::Normal, QPalette::Window);
-    QPen pen(palette().color(QPalette::Normal, QPalette::Mid), BORDER, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
+    QPen pen(palette().color(QPalette::Normal, QPalette::Midlight), BORDER, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     p.setBrush(color);
     p.setPen(pen);
     p.drawConvexPolygon(poly);
