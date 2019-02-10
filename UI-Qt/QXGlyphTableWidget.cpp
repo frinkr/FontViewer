@@ -278,9 +278,11 @@ QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
     
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
-    ui_->tableView->setSortingEnabled(true);
+    if (document->face()->glyphCount() < 1000) {
+        ui_->tableView->setSortingEnabled(true);   
+        ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
+    }
     ui_->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-    ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
     ui_->tableView->setAlternatingRowColors(true);
     
     connect(ui_->pushButton, &QPushButton::clicked,

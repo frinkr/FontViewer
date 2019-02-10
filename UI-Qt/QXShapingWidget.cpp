@@ -3,6 +3,7 @@
 #include "FontX/FXInspector.h"
 #include "FontX/FXShaper.h"
 
+#include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocument.h"
 #include "QXSearchEngine.h"
@@ -33,7 +34,9 @@ QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
     : QWidget(parent)
     , selectedIndex_(-1)
     , fontSize_(100)
-    , shaper_(nullptr) {}
+    , shaper_(nullptr) {
+    setFocusPolicy(Qt::StrongFocus);
+}
 
 void
 QXShapingGlyphView::setShaper(FXShaper * shaper) {
@@ -60,8 +63,9 @@ QXShapingGlyphView::sizeHint() const {
 
 void
 QXShapingGlyphView::paintEvent(QPaintEvent * event) {
-    QPainter p(this);
-    p.fillRect(rect(), Qt::white);
+    const QPalette & p = palette();
+    QPainter painter(this);
+    painter.fillRect(rect(), p.base());
 
     if (!shaper_)
         return ;
@@ -69,7 +73,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     const QPen baseLinePen(Qt::green, 1, Qt::SolidLine);
     const QPen boundaryPen(Qt::red, 1, Qt::DashLine);
     const QPen originPen(Qt::blue, 1, Qt::SolidLine);
-    const QPen textPen(Qt::black);
+    const QPen textPen(p.color(QPalette::Text));
 
     /*
       |              |        |       |       |
@@ -93,6 +97,10 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     FXFace * face = shaper_->face();
     FXFace::AutoFontSize autoFontSize(face, fontSize_);
 
+    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    if (face->attributes().format != FXFaceFormatConstant::WinFNT)
+        painter.setRenderHint(QPainter::SmoothPixmapTransform);
+
     // draw baseline
     const int baseLineY = baseLinePosition().y();
     const int baseLineX = baseLinePosition().x();
@@ -106,7 +114,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             // draw background for selected
             if (selectedIndex_ == i) {
                 QRect rect(penX, 0, fu2px(adv.x), gridCellBottom(1));
-                p.fillRect(rect, QColor(179, 216, 253));
+                painter.fillRect(rect, palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
             }
             
             penX += fu2px(adv.x);
@@ -128,13 +136,15 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             
             FXPixmapARGB bm = face->pixmap(gid, &bmOffset);
             QImage img = toQImage(bm);
+            if (face->isScalable() && ((i == selectedIndex_) || qApp->darkMode()))
+                img.invertPixels();
 
             const int left = penX + bmOffset.x;
             const int bottom = penY - bmOffset.y;
             const int right = left + bm.width * bmScale + fu2px(off.x);
             const int top = bottom - bm.height * bmScale - fu2px(off.y);
 
-            p.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
+            painter.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                         img,
                         QRect(0, 0, bm.width, bm.height),
                         Qt::AutoColor
@@ -150,8 +160,8 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         int penX = baseLineX;
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
 
-            p.setPen(boundaryPen);
-            p.drawLine(penX, 0, penX, gridCellBottom(4, i));
+            painter.setPen(boundaryPen);
+            painter.drawLine(penX, 0, penX, gridCellBottom(4, i));
             
             if (i == shaper_->glyphCount())
                 break;
@@ -162,32 +172,32 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
     // draw baseline
     {
-        p.setPen(baseLinePen);
-        p.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
+        painter.setPen(baseLinePen);
+        painter.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
     }
         
     // draw grid
     {
-        p.setPen(gridPen);
+        painter.setPen(gridPen);
 
         // row lines
         for (int i = 0; i < 5; ++ i) 
-            p.drawLine(QU_SHAPINGVIEW_MARGIN, gridCellBottom(i),
+            painter.drawLine(QU_SHAPINGVIEW_MARGIN, gridCellBottom(i),
                        rect().right(), gridCellBottom(i));
         // column lines
         for (int i = 0; i <= shaper_->glyphCount(); ++ i)  {
-            p.drawLine(gridCellLeft(4, i), gridCellBottom(4),
+            painter.drawLine(gridCellLeft(4, i), gridCellBottom(4),
                        gridCellLeft(1, i), gridCellBottom(1));
-            p.drawLine(gridCellLeft(0, i), gridCellBottom(1),
+            painter.drawLine(gridCellLeft(0, i), gridCellBottom(1),
                        gridCellLeft(0, i), gridCellBottom(0));
         }
         
         // headers
-        p.setPen(textPen);
-        p.drawText(gridCellRect(1, -1).translated(0, QU_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
-        p.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
-        p.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
-        p.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
+        painter.setPen(textPen);
+        painter.drawText(gridCellRect(1, -1).translated(0, QU_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
+        painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
+        painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
+        painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
 
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
@@ -196,10 +206,10 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             FXGlyph g = face->glyph(FXGChar(gid, FXGCharTypeGlyphID));
             fu kern = adv.x - g.metrics.horiAdvance;
             
-            p.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
-            p.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
-            p.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
-            p.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(gid));
+            painter.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
+            painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
+            painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
+            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(gid));
         }
     }
 }

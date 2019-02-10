@@ -28,6 +28,7 @@ QXPopoverWindow::QXPopoverWindow(QWidget * parent)
     , widget_(nullptr)
     , layout_(nullptr) {
     setAttribute(Qt::WA_TranslucentBackground);
+    setAutoFillBackground(false);
 }
 
 void
@@ -97,7 +98,7 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
 	
     auto poly = localPolygon(BORDER);
     auto color = palette().color(QPalette::Normal, QPalette::Window);
-    QPen pen(palette().color(QPalette::Normal, QPalette::Mid), BORDER);
+    QPen pen(palette().color(QPalette::Normal, QPalette::Mid), BORDER, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
     p.setBrush(color);
     p.setPen(pen);
     p.drawConvexPolygon(poly);
