@@ -15,10 +15,25 @@ namespace {
 #else
     constexpr qreal BORDER = 1;
 #endif
+
     constexpr qreal POPOVER_ARROW_SIZE = 10;
     bool
     isHorizontal(QXPopoverEdge edge) {
         return edge == QXPopoverLeft || edge == QXPopoverRight;
+    }
+
+    QRect
+    screenRectAtPoint(const QPoint & point) {
+#if QT_VERSION_MAJOR >= 5 && QT_VERSION_MINOR >= 10
+        QScreen * screen = qApp->screenAt(point);
+        if (!screen) screen = qApp->primaryScreen();
+#else
+        QScreen * screen = qApp->primaryScreen();
+#endif
+        if (screen)
+            return screen->availableGeometry();
+        else
+            return QRect();
     }
 }
 
@@ -38,6 +53,16 @@ QXPopoverWindow::setWidget(QWidget * widget) {
     setFocusProxy(widget_);
 }
 
+qreal
+QXPopoverWindow::borderRadius() const {
+    return borderRadius_;
+}
+
+void
+QXPopoverWindow::setBorderRadius(qreal radius) {
+    borderRadius_ = radius;
+}
+
 QWidget *
 QXPopoverWindow::widget() const {
     return widget_;
@@ -50,10 +75,11 @@ QXPopoverWindow::edge() const {
 
 void
 QXPopoverWindow::showRelativeTo(const QRect & rect, QXPopoverEdges preferedEgdes) {
+    referenceRect_ = rect;
     setEdge(edgeRelativeTo(rect, preferedEgdes));
     setFocus(Qt::ActiveWindowFocusReason);
     show();
-    move(geometryRelativeTo(rect, edge_).topLeft());
+    move(windowGeometryRelativeTo(rect, edge_).topLeft());
 }
 
 void
@@ -70,7 +96,7 @@ QXPopoverWindow::sizeHint() const {
         return QWidget::sizeHint();
     return widget_->sizeHint() + QSize(
         isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
-        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0);
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(BORDER + borderRadius_, BORDER + borderRadius_);
 }
 
 QSize
@@ -79,29 +105,60 @@ QXPopoverWindow::minimumSizeHint() const {
         return QWidget::minimumSizeHint();
     return widget_->minimumSizeHint() + QSize(
         isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
-        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0);
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(BORDER + borderRadius_, BORDER + borderRadius_);
 }
 
 void
 QXPopoverWindow::resizeEvent(QResizeEvent * event) {
-#ifdef Q_OS_WIN
-	//setMask(localRegion(0));
-#endif
     QWidget::resizeEvent(event);
 }
 
 void
 QXPopoverWindow::paintEvent(QPaintEvent * event) {
-    //QWidget::paintEvent(event);
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
-	
-    auto poly = localPolygon(BORDER);
-    auto color = palette().color(QPalette::Normal, QPalette::Window);
-    QPen pen(palette().color(QPalette::Normal, QPalette::Midlight), BORDER, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin);
-    p.setBrush(color);
-    p.setPen(pen);
-    p.drawConvexPolygon(poly);
+
+    auto backgroundColor = palette().color(QPalette::Normal, QPalette::Window);
+    auto borderColor = palette().color(QPalette::Normal, QPalette::Midlight);
+    p.setBrush(backgroundColor);
+    p.setPen(QPen(borderColor, BORDER));
+
+    QRectF contentRect = this->contentRect(BORDER);
+    QPainterPath roundRectPath;
+    roundRectPath.addRoundedRect(contentRect, borderRadius_, borderRadius_);
+    p.fillPath(roundRectPath, backgroundColor);
+    p.drawPath(roundRectPath);
+
+    const QRect refRect(mapFromGlobal(referenceRect_.topLeft()), mapFromGlobal(referenceRect_.bottomRight()));
+
+    QPoint arrowHead, arrowLeft, arrowRight;
+    if (edge_ == QXPopoverBottom) {
+        arrowHead = QPoint(refRect.center().x(), refRect.bottom());
+        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
+        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
+    }
+    else if (edge_ == QXPopoverTop) {
+        arrowHead = QPoint(refRect.center().x(), refRect.top());
+        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
+        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
+    }
+    else if (edge_ == QXPopoverLeft) {
+        arrowHead = QPoint(refRect.left(), refRect.center().y());
+        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
+        arrowRight = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
+    }
+    else {
+        arrowHead = QPoint(refRect.right(), refRect.center().y());
+        arrowLeft = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
+        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
+    }
+
+    QPainterPath arrowPath;
+    arrowPath.moveTo(arrowLeft);
+    arrowPath.lineTo(arrowHead);
+    arrowPath.lineTo(arrowRight);
+    arrowPath.closeSubpath();
+    p.fillPath(arrowPath, borderColor);
 }
 
 void
@@ -133,7 +190,8 @@ QXPopoverWindow::setEdge(QXPopoverEdge edge) {
         layout_->addSpacing(POPOVER_ARROW_SIZE);
 
     layout_->setSpacing(0);
-    layout_->setContentsMargins(BORDER, BORDER, BORDER, BORDER);
+    const qreal margin = BORDER + borderRadius_;
+    layout_->setContentsMargins(margin, margin, margin, margin);
     setLayout(layout_);
 }
 
@@ -157,28 +215,20 @@ QXPopoverWindow::edgeRelativeTo(const QRect & rect, QXPopoverEdges preferedEgdes
     
     QList<QRect> geometries;
     foreach(QXPopoverEdge edge, edges) 
-        geometries.append(geometryRelativeTo(rect, edge));
+        geometries.append(windowGeometryRelativeTo(rect, edge));
     
-#if QT_VERSION_MAJOR >= 5 && QT_VERSION_MINOR >= 10
-    QScreen * screen = qApp->screenAt(rect.center());
-    if (!screen) screen = qApp->primaryScreen();
-#else
-    QScreen * screen = qApp->primaryScreen();
-#endif
-    
-    if (screen) {
-        auto screenRect = screen->availableGeometry();
-        for (int i = 0; i < edges.size(); ++ i) {
-            if (screenRect.contains(geometries[i]))
-                return edges[i];
-        }
+    auto screenRect = screenRectAtPoint(rect.center());
+    for (int i = 0; i < edges.size(); ++ i) {
+        if (screenRect.contains(geometries[i]))
+            return edges[i];
     }
+    
     return edges[0];
 }
     
 
 QRect
-QXPopoverWindow::geometryRelativeTo(const QRect & rect, QXPopoverEdge edge) {
+QXPopoverWindow::windowGeometryRelativeTo(const QRect & rect, QXPopoverEdge edge) {
     const int width = frameSize().width();
     const int height = frameSize().height();
     QPoint center;
@@ -208,87 +258,51 @@ QXPopoverWindow::geometryRelativeTo(const QRect & rect, QXPopoverEdge edge) {
     
     QRect box = QRect(center - QPoint(width / 2, height / 2),
                       center + QPoint(width / 2, height / 2));
+
+    // Make sure 'box' is not out of screen
+    QRectF screenRect = screenRectAtPoint(box.center());
+    if (edge == QXPopoverTop || edge == QXPopoverBottom) {
+        if (box.left() < screenRect.left())
+            box.translate(screenRect.left() - box.left(), 0);
+        else if (box.right() > screenRect.right())
+            box.translate(screenRect.right() - box.right(), 0);
+    }
+    if (edge == QXPopoverLeft || edge == QXPopoverRight) {
+        if (box.top() < screenRect.top())
+            box.translate(0, screenRect.top() - box.top());
+        else if (box.bottom() > screenRect.bottom())
+            box.translate(0, screenRect.bottom() - box.bottom());
+    }
+    
     return box;
 }
 
-QRegion
-QXPopoverWindow::localRegion(qreal border) {
-    return localPolygon(border).toPolygon();
-}
-
-QPolygonF
-QXPopoverWindow::localPolygon(qreal border) {
+QRectF
+QXPopoverWindow::contentRect(qreal border) const {
     QVector<QPointF> points;
-    const qreal width = size().width() - (isHorizontal(edge_)? POPOVER_ARROW_SIZE : 0);
-    const qreal height = size().height() - (isHorizontal(edge_)? 0: POPOVER_ARROW_SIZE);
-    
-    const qreal arrowHeight = POPOVER_ARROW_SIZE - border;
-    const qreal arrowWidth  = arrowHeight * 2.5;
+    const qreal width = size().width() - (isHorizontal(edge_) ? POPOVER_ARROW_SIZE : 0);
+    const qreal height = size().height() - (isHorizontal(edge_) ? 0 : POPOVER_ARROW_SIZE);
 
-    const QPointF topLeft((border-width)/2, (border-height)/2);
-    const QPointF topRight((width-border)/2, (border-height)/2);
-    const QPointF bottomLeft((border-width)/2, (height-border)/2);
-    const QPointF bottomRight((width-border)/2, (height-border)/2);
-
-    QVector<QPointF> arrowPoints;
-    arrowPoints.append(QPointF(-arrowWidth/2, 0));
-    arrowPoints.append(QPointF(0, - arrowHeight));
-    arrowPoints.append(QPointF(arrowWidth/2, 0));
-
-    auto rotate = [](const QVector<QPointF> & points, const QPointF & translate, qreal rotate) {
-        QTransform r, t, xform;
-        r.rotate(rotate);
-        t.translate(translate.x(), translate.y());
-        xform = r * t;
-        
-        QVector<QPointF> ret;
-        for(QPointF p : points)
-            ret.append(xform.map(p));
-        return ret;
-    };
+    const QPointF topLeft((border - width) / 2, (border - height) / 2);
+    const QPointF bottomRight((width - border) / 2, (height - border) / 2);
 
     QPointF center;
     switch (edge_) {
     case QXPopoverLeft:
         center = QPointF(width / 2, height / 2);
-        points.append(topLeft);
-        points.append(topRight);
-        points.append(rotate(arrowPoints, QPointF((width - border) / 2, 0), 90));
-        points.append(bottomRight);
-        points.append(bottomLeft);
-        points.append(topLeft);
         break;
     case QXPopoverRight:
         center = QPointF(width / 2 + POPOVER_ARROW_SIZE, height / 2);
-        points.append(topLeft);
-        points.append(topRight);
-        points.append(bottomRight);
-        points.append(bottomLeft);
-        points.append(rotate(arrowPoints, QPointF((border - width) / 2, 0), -90));
-        points.append(topLeft);
         break;
     case QXPopoverTop:
         center = QPointF(width / 2, height / 2);
-        points.append(topLeft);
-        points.append(topRight);
-        points.append(bottomRight);
-        points.append(rotate(arrowPoints, QPointF(0, (height - border)/ 2), 180));
-        points.append(bottomLeft);
-        points.append(topLeft);
         break;
     case QXPopoverBottom:
     default:
         center = QPointF(width / 2, height / 2 + POPOVER_ARROW_SIZE);
-        points.append(topLeft);
-        points.append(rotate(arrowPoints, QPointF(0, (border - height) / 2), 0));
-        points.append(topRight);
-        points.append(bottomRight);
-        points.append(bottomLeft);
-        points.append(topLeft);
         break;
     }
-    
-    QPolygonF poly(points);
-    poly.translate(center);
-    return poly;
+
+    QRectF rect(topLeft, bottomRight);
+    return rect.translated(center);
 }

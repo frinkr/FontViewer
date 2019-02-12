@@ -23,6 +23,12 @@ public:
     void
     setWidget(QWidget * widget);
 
+    qreal
+    borderRadius() const;
+
+    void
+    setBorderRadius(qreal radius);
+
     QWidget *
     widget() const;
 
@@ -36,7 +42,6 @@ public:
     void
     showRelativeTo(QWidget * widget,
                    QXPopoverEdges preferedEgdes = QXPopoverAnyEdge);
-
     
 public:
     virtual QSize
@@ -62,18 +67,17 @@ protected:
     edgeRelativeTo(const QRect & rect, QXPopoverEdges preferedEgdes);
         
     QRect
-    geometryRelativeTo(const QRect & rect, QXPopoverEdge edge);
+    windowGeometryRelativeTo(const QRect & rect, QXPopoverEdge edge);
 
-    QRegion
-    localRegion(qreal border);
-
-    QPolygonF
-    localPolygon(qreal border);
+    QRectF
+    contentRect(qreal border) const;
     
 protected:
-    QRegion   mask_;
     QXPopoverEdge edge_;
-
-    QWidget * widget_;
+    
+    QWidget    * widget_;
     QBoxLayout * layout_;
+    
+    QRect        referenceRect_;
+    qreal        borderRadius_{2};
 };

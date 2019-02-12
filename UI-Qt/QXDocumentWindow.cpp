@@ -205,6 +205,7 @@ QXDocumentWindow::initListView() {
 void
 QXDocumentWindow::initGlyphInfoView() {
     glyphPopover_ = new QXPopoverWindow(this);
+    glyphPopover_->setBorderRadius(0);
     glyphWidget_  = new QXGlyphInfoWidget(glyphPopover_);
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
@@ -304,7 +305,7 @@ QXDocumentWindow::onCMapBlockAction() {
         widget->setDocument(document_);
         cmapBlockPopover_->setWidget(widget);
     }
-    cmapBlockPopover_->showRelativeTo(senderToolButton(), QXPopoverRight);
+    cmapBlockPopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
 }
 
 void
