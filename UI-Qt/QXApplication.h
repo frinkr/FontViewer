@@ -32,7 +32,7 @@ public slots:
 
 private:
 #ifdef Q_OS_MAC
-    bool event(QEvent *);
+    bool event(QEvent * event);
 #endif
 
 private:

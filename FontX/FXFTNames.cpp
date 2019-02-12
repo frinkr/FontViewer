@@ -1,5 +1,6 @@
 #include <map>
 #include <iconv.h>
+#include <boost/predef.h>
 #include <unicode/utypes.h>
 #include <unicode/stringpiece.h>
 #include <unicode/utf8.h>
@@ -8,6 +9,8 @@
 #include <unicode/uchar.h>
 
 #include "FXFTNames.h"
+
+#include <CoreServices/CoreServices.h>
 
 typedef struct {
     const FT_UShort	platform_id;
@@ -39,7 +42,7 @@ static const FtLanguage   ftLanguages[] = {
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_MALTESE,		    "mt" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_TURKISH,		    "tr" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_CROATIAN,		    "hr" },
-    {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_CHINESE_TRADITIONAL,  "zh-tw" },
+    {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_CHINESE_TRADITIONAL,  "zh-hant" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_URDU,		        "ur" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_HINDI,		    "hi" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_THAI,		        "th" },
@@ -53,7 +56,7 @@ static const FtLanguage   ftLanguages[] = {
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_FAEROESE,		    "fo" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_FARSI,		    "fa" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_RUSSIAN,		    "ru" },
-    {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_CHINESE_SIMPLIFIED,   "zh-cn" },
+    {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_CHINESE_SIMPLIFIED,   "zh-hans" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_FLEMISH,		    "nl" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_IRISH,		    "ga" },
     {  TT_PLATFORM_MACINTOSH,	TT_MAC_LANGID_ALBANIAN,		    "sq" },
@@ -508,43 +511,39 @@ FXMacRoman2UTF8(const unsigned char * buffer, size_t bufferLen) {
 
 static FXString
 FXIconv(const FXString & encoding, const char * buffer, size_t bufferLen) {
-    iconv_t cd = iconv_open(encoding.c_str(), "UTF-8");
-    if (cd == reinterpret_cast<iconv_t>(-1))
-        return FXString();
-
-    
-    char * inBuf = const_cast<char*>(buffer);
-    size_t inLen = bufferLen;
-    size_t outLen = 1024;
+    constexpr size_t BLOCK_SIZE = 128;
+    size_t outLen = BLOCK_SIZE;
     char * outBuf = reinterpret_cast<char*>(malloc(outLen));
-    bool error = false;
+    
     do {
-        // reset
-        iconv(cd, nullptr, nullptr, nullptr, nullptr);
-
-        size_t stringLen = outLen;
-        iconv(cd, &inBuf, &inLen, &outBuf, &outLen);
-        if (errno == 0) {
-            outLen = stringLen - outLen;
-            break;
+        iconv_t cd = iconv_open("UTF-8", encoding.c_str());
+        if (cd == reinterpret_cast<iconv_t>(-1)) {
+            free(outBuf);
+            return FXString();
         }
+        char * inBuf = const_cast<char*>(buffer);
+        size_t inLen = bufferLen;
+        
+        size_t outLenIconv = outLen;
+        char * outBufIconv = outBuf;
+        size_t ret = iconv(cd, &inBuf, &inLen, &outBufIconv, &outLenIconv);
+        iconv_close(cd);
 
-        if (errno == E2BIG)  {
-            outLen += 1024;
+        if (ret == -1 && errno == E2BIG)  {
+            // Need more memory
+            outLen += BLOCK_SIZE;
             outBuf = reinterpret_cast<char*>(realloc(outBuf, outLen));
+        } else if (ret == 0) {
+            // OK
+            outLen = outLen - outLenIconv;
+            break;
         }
         else {
-            error = true;
-            break;
+            // Error
+            free(outBuf);
+            return FXString();
         }
     } while (true);
-
-    iconv_close(cd);
-
-    if (error) {
-        free(outBuf);
-        return FXString();
-    }
 
     FXString ret(outBuf, outLen);
     free(outBuf);
@@ -680,12 +679,11 @@ FXGetLanguageName(FT_UShort platformId, FT_UShort languageId) {
 static FXString
 FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
     if (encodingId == TT_MAC_ID_ROMAN)
-        return FXMacRoman2UTF8(reinterpret_cast<const unsigned char *>(string), stringLen);
+        return FXIconv("MacRoman", reinterpret_cast<const char *>(string), stringLen);
+        //return FXMacRoman2UTF8(reinterpret_cast<const unsigned char *>(string), stringLen);
 
-    return FXString();
-#if 0    
-    NSString * name = nil;
-    
+#if defined(BOOST_OS_MACOS)
+    FXString name;
     while (true) {
         OSStatus error = 0;
         TextEncoding textEncoding;
@@ -711,7 +709,7 @@ FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
                                          buf);
         
         if (!error)
-            name = [[NSString alloc] initWithCharacters:buf length:unicodeLen/2];
+            name = FXUTF162UTF8((void*)buf, unicodeLen);
         
         DisposeTextToUnicodeInfo(&textToUnicodeInfo);
         free(buf);

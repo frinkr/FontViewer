@@ -525,7 +525,7 @@ FXFace::initAttributes() {
         FXSFNTName entry;
         entry.platformId = sfnt.platform_id;
         entry.encodingId = sfnt.encoding_id;
-        entry.language   = FXGetLanguageName(sfnt.platform_id, sfnt.language_id);
+        entry.language   = FXSFNTGetLanguage(&sfnt, face_);
         entry.nameId     = sfnt.name_id;
         entry.value      = FXToString(sfnt.platform_id, sfnt.encoding_id, sfnt.string, sfnt.string_len);
 

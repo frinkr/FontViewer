@@ -12,7 +12,8 @@
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
 
-QXApplication::QXApplication(int & argc, char ** argv) : QApplication(argc, argv) {
+QXApplication::QXApplication(int & argc, char ** argv)
+    : QApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");
@@ -84,7 +85,9 @@ QXApplication::event(QEvent * event) {
                 QXDocumentWindowManager::instance()->autoOpenFontDialog();
             });
     }
-
+    else if (event->type() == QEvent::Show) {
+        
+    }
     return QApplication::event(event);
 }
 #endif

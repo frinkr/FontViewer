@@ -144,8 +144,8 @@ QXOpenFontDialog::onFontSelected(const QXFontURI & uri, size_t index) {
 
 void
 QXOpenFontDialog::showEvent(QShowEvent * event) {
+    QDialog::showEvent(event);
 #if defined(Q_OS_MAC)
     MacHelper::hideTitleBar(this);
 #endif
-    QDialog::showEvent(event);
 }

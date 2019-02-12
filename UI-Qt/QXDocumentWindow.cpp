@@ -28,6 +28,10 @@
 #include "QXTheme.h"
 #include "QXVariableWidget.h"
 
+#if defined(Q_OS_MAC)
+#  include "MacHelper.h"
+#endif
+
 #include "ui_QXDocumentWindow.h"
 
 QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent) 
@@ -48,6 +52,7 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
 
     document->setParent(this);
     document_->setCharMode(false);
+    installEventFilter(this);
 }
 
 QXDocumentWindow::~QXDocumentWindow() {
@@ -161,6 +166,7 @@ QXDocumentWindow::initToolBar() {
 
 #if defined(Q_OS_MAC)
     this->setUnifiedTitleAndToolBarOnMac(true);
+    QXTheme::current()->applyToToolBar(toolBar);
 #else
     QXTheme::current()->applyToToolBar(toolBar);
 #endif
@@ -256,6 +262,13 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
             if (ev->mimeData()->hasUrls())
                 ev->acceptProposedAction();
             return true;
+        }
+    }
+    else if (watched == this) {
+        if(event->type() == QEvent::Show) {
+#if defined(Q_OS_MAC)
+            MacHelper::hideTitleBar(this);
+#endif
         }
     }
     return false;
