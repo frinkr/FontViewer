@@ -58,10 +58,11 @@ QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
     html.addHeadRow(tr("Font Folders"));
     html.addDataRow(tr("System"), QXFontManager::instance().systemFontFolders().join("<br>"));
     html.addDataRow(tr("User"), QXFontManager::instance().userFontFolders().join("<br>"));
-
+        
     html.addEmptyRow();
     html.addHeadRow("Font Files");
-    html.addDataRow(tr("Total"), stats.totalFiles);
+    html.addDataRow(tr("Total Fonts"), QXFontManager::instance().db()->faceCount());
+    html.addDataRow(tr("Total Files"), stats.totalFiles);
     for (const auto & kv : stats.formatCount) {
         QString format = kv.first.empty() ? "<i>UNKNOWN</i>" : toQString(kv.first);
         html.addDataRow(format, kv.second);

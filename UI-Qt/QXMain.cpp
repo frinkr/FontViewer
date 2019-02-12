@@ -29,10 +29,7 @@ int qxMain(int argc, char *argv[]) {
     if (resetAppData)
         QXPreferences::reset();
     
-#if !defined(Q_OS_MAC)
     QXTheme::setCurrent(QXPreferences::theme());
-#endif
-    
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
 
     if (resetAppData) 

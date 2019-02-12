@@ -30,6 +30,7 @@ QXDocumentWindowManager::QXDocumentWindowManager() {
     recentFonts_ = QXPreferences::recentFonts();
 
     connect(qApp, &QXApplication::aboutToQuit, [this]() {
+        appIsAboutToQuit_ = true;
         QXPreferences::setRecentFonts(recentFonts_);
     });
 
@@ -222,7 +223,7 @@ QXDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
     Q_UNUSED(obj);
 #ifdef Q_OS_MAC
     // show Open Font dialog if no document open
-    if (!quitRequested_ && documents_.empty())
+    if (!appIsAboutToQuit_ && documents_.empty())
         doOpenFontDialog();
 #endif    
 }
@@ -340,6 +341,6 @@ QXDocumentWindowManager::closeAllDocumentsAndQuit() {
     }
     
     QXPreferences::setRecentFonts(recentFonts_);
-    quitRequested_ = true;
+    appIsAboutToQuit_ = true;
     qApp->quit();
 }

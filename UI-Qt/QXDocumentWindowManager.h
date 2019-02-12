@@ -107,7 +107,7 @@ private:
 #endif
     QList<QPointer<QXDocumentWindow> > documentWindows_;
     QList<QPointer<QXDocument> >       documents_;
-    bool                               quitRequested_ {false};
+    bool                               appIsAboutToQuit_ {false};
     QXOpenFontDialog                 * openFontDialog_ {nullptr};
 
     static QXDocumentWindowManager   * instance_;
