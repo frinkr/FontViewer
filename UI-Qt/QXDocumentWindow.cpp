@@ -179,7 +179,16 @@ QXDocumentWindow::initSearchField() {
     searchHistoryMenu->addAction("fi");
 
     searchLineEdit_ = new QLineEdit(this);
-    searchLineEdit_->setStyleSheet("border-radius: 15px;");
+    // Round box
+    searchLineEdit_->setStyleSheet(
+        QString("QLineEdit {border-radius: 15px;}"                      \
+                "QLineEdit:focus { "                                    \
+                "  border:2px solid; "                                  \
+                "  border-radius: 15px; "                               \
+                "  border-color:%1;}")
+        .arg(palette().color(QPalette::Highlight).name(QColor::HexRgb)));
+    searchLineEdit_->setAttribute(Qt::WA_MacShowFocusRect, 0);
+
     searchLineEdit_->setMinimumHeight(30);
     searchLineEdit_->setMinimumWidth(200);
     searchLineEdit_->setPlaceholderText(tr("Search..."));

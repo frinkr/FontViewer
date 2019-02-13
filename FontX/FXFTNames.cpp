@@ -1,3 +1,4 @@
+#include <boost/predef.h>
 #if BOOST_OS_MACOS
 #  include <CoreServices/CoreServices.h>
 #endif
