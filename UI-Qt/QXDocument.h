@@ -12,6 +12,12 @@ struct QXFontURI
     QString filePath;
     size_t  faceIndex;
 
+    QString
+    toString() const;
+
+    static const QXFontURI
+    fromString(const QString & string);
+
     bool
     operator==(const QXFontURI & other) const {
         return filePath == other.filePath && faceIndex == other.faceIndex;

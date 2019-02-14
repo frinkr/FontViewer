@@ -1,7 +1,31 @@
 #include <QFileInfo>
+#include <QRegularExpression>
+
 #include "QXConv.h"
 #include "QXSearchEngine.h"
 #include "QXDocument.h"
+
+QString
+QXFontURI::toString() const {
+    return QString("%1@%2").arg(faceIndex).arg(filePath);
+}
+
+const QXFontURI
+QXFontURI::fromString(const QString & string) {
+    QXFontURI uri;
+
+    QRegularExpression re(R"(^(?<index>\d*)@(?<path>.*$))");
+    QRegularExpressionMatch match = re.match(string);
+    if (match.hasMatch()) {
+        uri.faceIndex = match.captured("index").toInt();
+        uri.filePath = match.captured("path");
+    }
+    else {
+        uri.faceIndex = -1;
+        uri.filePath = string;
+    }
+    return uri;
+}
 
 QXGlyph::QXGlyph(const FXGlyph & glyph, QObject * parent)
     : QObject(parent)

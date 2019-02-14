@@ -19,7 +19,7 @@
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 #include "QXOpenFontDialog.h"
-
+#include "QXJumpListHelper.h"
 QXDocumentWindowManager * QXDocumentWindowManager::instance_ = nullptr;
 
 QXDocumentWindowManager::QXDocumentWindowManager() {
@@ -243,6 +243,8 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
 
     while (recentFonts_.size() > kMaxRecentFiles)
         recentFonts_.takeLast();
+
+    QXJumpListHelper::addRecentFontItem(item);
 }
 
 bool
@@ -299,6 +301,8 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
             addToRecents(document);
             QXDocumentWindow * window = createDocumentWindow(document);
             window->show();
+
+
         } else {
             showOpenFontFileError(uri.filePath);
         }

@@ -5,6 +5,7 @@
 #endif
 
 #include "QXApplication.h"
+#include "QXDocument.h"
 #include "QXDocumentWindowManager.h"
 #include "QXFontManager.h"
 #include "QXMain.h"
@@ -37,8 +38,13 @@ int qxMain(int argc, char *argv[]) {
 
     QStringList arguments = app.arguments();
     if (arguments.count() > 1) {
-        for (int i = 1; i < arguments.count(); i++)
-            QXDocumentWindowManager::instance()->openFontFile(arguments.at(i));
+        for (int i = 1; i < arguments.count(); i++) {
+            auto uri = QXFontURI::fromString(arguments.at(i));
+            if (uri.faceIndex == -1)
+                QXDocumentWindowManager::instance()->openFontFile(uri.filePath);
+            else 
+                QXDocumentWindowManager::instance()->openFontURI(uri);
+        }
     }
     else {
         QXDocumentWindowManager::instance()->autoOpenFontDialog();
