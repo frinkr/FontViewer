@@ -33,26 +33,6 @@ QXDocumentWindowManager::QXDocumentWindowManager() {
         appIsAboutToQuit_ = true;
         QXPreferences::setRecentFonts(recentFonts_);
     });
-
-#if 0
-    connect(qApp, &QApplication::focusChanged, [](QWidget * oldWidget, QWidget * newWidget) {
-        QWidget * dockWidget = newWidget;
-        while (dockWidget && !qobject_cast<QDockWidget*>(dockWidget))
-            dockWidget = dockWidget->parentWidget();
-        
-        if (!dockWidget) {
-            QWidget * dockWidget = oldWidget;
-            while (dockWidget && !qobject_cast<QDockWidget*>(dockWidget))
-                dockWidget = dockWidget->parentWidget();
-        }
-        
-        if (dockWidget) {
-            QWidget * titleBarWidget = (qobject_cast<QDockWidget*>(dockWidget))->titleBarWidget();
-            if (titleBarWidget)
-                titleBarWidget->update();
-        }
-    });
-#endif
 }
 
 QXDocumentWindowManager::~QXDocumentWindowManager() {
@@ -182,9 +162,20 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 
 void
 QXDocumentWindowManager::doOpenFontDialog() {
-    if (!openFontDialog_)
+    if (!openFontDialog_) {
         openFontDialog_ = new QXOpenFontDialog(nullptr);
-    if (QDialog::Accepted == openFontDialog_->exec()) {
+#if !defined(Q_OS_MAC)
+        // This piece of shit makes qApp quit
+        connect(openFontDialog_, &QDialog::rejected, this, [this]() {
+            if (documents_.empty()) {
+                delete openFontDialog_;
+                openFontDialog_ = nullptr;
+                closeAllDocumentsAndQuit();
+            }
+        }, Qt::QueuedConnection);
+#endif
+    }
+    if (openFontDialog_ && QDialog::Accepted == openFontDialog_->exec()) {
         const QXFontURI fontURI = openFontDialog_->selectedFont();
         openFontURI(fontURI);
     }

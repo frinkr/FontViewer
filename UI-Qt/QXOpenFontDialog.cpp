@@ -49,7 +49,6 @@ QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
 	ui_->filterButton->setIcon(qApp->loadIcon(":/images/filter.png"));
     ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
 
-
     connect(ui_->openButton, &QPushButton::clicked,
             this, &QXOpenFontDialog::onOpenFileButtonClicked);
 
