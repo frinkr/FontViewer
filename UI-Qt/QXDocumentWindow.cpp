@@ -201,10 +201,16 @@ QXDocumentWindow::initSearchField() {
 
 void
 QXDocumentWindow::initListView() {
+#if 0
     ui_->listView->setModel(document_);
     ui_->listView->setItemDelegate(new QXGlyphItemDelegate(this));
     ui_->listView->installEventFilter(this);
     ui_->listView->setAcceptDrops(true);
+#else
+    //throw "NOT IMPLEMENTED";
+#endif
+    ui_->listView->hide();
+    ui_->glyphCollectionView->setDocument(document_);
 }
 
 void
@@ -382,11 +388,14 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
         
     document_->setCharMode(result.charMode);
     document_->selectBlock(result.block);
-
+#if 0
     QModelIndex index = document_->index(result.index, 0);
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);
     ui_->listView->setFocus();
+#else
+    throw "NOT IMPLEMENTED";
+#endif
 }
 
 void

@@ -3,6 +3,7 @@
 #include <QImage>
 
 #include "FontX/FXFace.h"
+#include "QXCollectionView.h"
 
 struct QXSearchResult;
 struct QXSearch;
@@ -62,7 +63,7 @@ enum class QXGlyphLabel {
 
 Q_DECLARE_METATYPE(QXGlyph);
 
-class QXDocument : public QAbstractListModel
+class QXDocument : public QXCollectionViewDataModel
 {
     Q_OBJECT
 public:
@@ -134,6 +135,19 @@ public:
     QVariant
     data(const QModelIndex &, int) const;
     
+public:   // IMPL: QXCollectionViewDataModel
+    int
+    sectionCount() const override;
+
+    int
+    itemCount(int section) const override;
+
+    QVariant
+    data(const QXCollectionViewDataIndex & index, int role) const override;
+
+    QVariant
+    data(int section) const override;
+
 signals:
     void
     cmapActivated(int index);
@@ -162,6 +176,7 @@ protected:
 
     FXPtr<FXGCharBlock> fullGlyphsBlock_;
     size_t           blockIndex_;
+    FXVector<size_t> blockIndexes_;
     QImage           dummyImage_;
     bool             charMode_;
     QXGlyphLabel     glyphLabel_;

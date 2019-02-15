@@ -87,6 +87,7 @@ QXDocument::displayName() const {
 bool
 QXDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {
+        
         selectBlock(0);
         emit cmapActivated(int(index));
         return true;
@@ -99,9 +100,9 @@ QXDocument::selectBlock(size_t index) {
     if (blockIndex_ == index)
         return;
     
-    beginResetModel();
+//    beginResetModel();
     blockIndex_ = charMode_? index : 0;
-    endResetModel();
+//    endResetModel();
 
     emit blockSelected(blockIndex_);
 }
@@ -199,16 +200,45 @@ QXDocument::data(const QModelIndex & index, int role) const {
         return QVariant();
 }
 
+int
+QXDocument::sectionCount() const {
+    return currentCMap().blocks().size();
+} 
+
+int
+QXDocument::itemCount(int section) const {
+    return currentCMap().blocks()[section]->size();
+}
+
+QVariant
+QXDocument::data(const QXCollectionViewDataIndex & index, int role) const {
+    if (role == QXGlyphRole) {
+        auto & block = currentCMap().blocks()[index.section];
+        FXGlyph g = face_->glyph(block->get(index.item));
+        QVariant v;
+        v.setValue(QXGlyph(g));
+        return v;
+    }
+    return QString("G %1,%2").arg(index.section).arg(index.item);
+}
+
+QVariant
+QXDocument::data(int section) const {
+    return toQString(currentCMap().blocks()[section]->name());
+}
+
+
 QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
-    : QAbstractListModel(parent)
+    : QXCollectionViewDataModel(parent)
     , uri_(uri)
     , blockIndex_(0)
     , charMode_(true)
     , glyphLabel_(QXGlyphLabel::GlyphName) {
-
+#if 0
     connect(this, &QXDocument::variableCoordinatesChanged, [this]() {       
         dataChanged(index(0), index(rowCount(), 0));
     });
+#endif
 }
 
 bool

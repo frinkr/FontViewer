@@ -18,7 +18,56 @@ struct QXCollectionViewDataIndex {
         return !operator==(other);
     }
 };
+class QXCollectionViewContentWidget;
 
+class QXCollectionViewDelegate: public QObject {
+  Q_OBJECT
+public:
+    using QObject::QObject;
+
+    virtual void
+    drawCell(
+        QXCollectionViewContentWidget * view,
+        QPainter * painter,
+        const QRect & rect,
+        const QXCollectionViewDataIndex & index,
+        bool selected) = 0;
+
+    virtual void
+    drawHeader(
+        QXCollectionViewContentWidget * view,
+        QPainter * painter,
+        const QRect & rect,
+        int section) = 0;
+};
+
+class QXCollectionViewDataModel : public QObject {
+    Q_OBJECT
+public:
+    using QObject::QObject;
+
+    virtual int
+    sectionCount() const = 0;
+
+    virtual int
+    itemCount(int section) const = 0;
+
+    virtual QVariant
+    data(const QXCollectionViewDataIndex & index, int role) const = 0;
+
+    virtual QVariant
+    data(int section) const = 0;
+
+signals:
+    void
+    reset();
+
+    void
+    beginResetModel();
+
+    void 
+    endResetModel();
+};
 
 class QXCollectionViewContentWidget: public QWidget {
     Q_OBJECT
@@ -82,36 +131,15 @@ private:
     
     friend class QXCollectionView;
 private:
-    QXCollectionViewDataModel * model_;
-    QXCollectionViewDataIndex   selected_;
+    QXCollectionViewDataModel * model_ {nullptr};
+    QXCollectionViewDelegate  * delegate_ {nullptr};
+    QXCollectionViewDataIndex   selected_ {-1, -1};
 
     QSize     cellSize_;
     int       cellSpace_;
     int       headerHeight_;
     int       sectionSpace_;
     int       contentMargin_;
-};
-
-class QXCollectionViewDataModel : public QObject {
-    Q_OBJECT
-public:
-    using QObject::QObject;
-
-    virtual int
-    sectionCount() const = 0;
-
-    virtual int
-    itemCount(int section) const = 0;
-
-    virtual QVariant
-    data(const QXCollectionViewDataIndex & index, int role) const = 0;
-
-    virtual QVariant
-    data(int section) const = 0;
-
-signals:
-    void
-    reset();
 };
 
 
@@ -125,6 +153,12 @@ public:
 
     void
     setModel(QXCollectionViewDataModel * model);
+
+    QXCollectionViewDelegate *
+    delegate() const;
+
+    void
+    setDelegate(QXCollectionViewDelegate * delegate);
 
     void
     setCellSize(const QSize & size);

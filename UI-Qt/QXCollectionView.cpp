@@ -73,7 +73,7 @@ QXCollectionViewContentWidget::QXCollectionViewContentWidget(QWidget * parent)
 
 int
 QXCollectionViewContentWidget::columnCount() const {
-    return (rect().width() - 2 * contentMargin_ + cellSpace_) / (cellSize_.width() + cellSpace_);
+    return std::max(1, (rect().width() - 2 * contentMargin_ + cellSpace_) / (cellSize_.width() + cellSpace_));
 }
 
 int
@@ -248,6 +248,9 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
 
 void
 QXCollectionViewContentWidget::drawCell(QPainter * painter, const QRect & rect, const QXCollectionViewDataIndex & index, bool selected) {
+    if (delegate_) 
+        return delegate_->drawCell(this, painter, rect, index, selected);
+
     auto bg = QColor(colors[index.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
     int expand = 10;
     if (selected)
@@ -259,6 +262,9 @@ QXCollectionViewContentWidget::drawCell(QPainter * painter, const QRect & rect, 
 
 void
 QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QRect & rect, int section) {
+    if (delegate_)
+        return delegate_->drawHeader(this, painter, rect, section);
+
     auto bg = QColor(colors[section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
     auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
     painter->setPen(bg);
@@ -293,8 +299,20 @@ QXCollectionView::model() const {
 void
 QXCollectionView::setModel(QXCollectionViewDataModel * model) {
     widget_->model_ = model;
+    model->setParent(widget_);
     connect(model, &QXCollectionViewDataModel::reset, this, &QXCollectionView::onModelReset);
     //emit model->reset();
+}
+
+QXCollectionViewDelegate *
+QXCollectionView::delegate() const {
+    return widget_->delegate_;
+}
+
+void
+QXCollectionView::setDelegate(QXCollectionViewDelegate * delegate) {
+    widget_->delegate_ = delegate;
+    delegate->setParent(widget_);
 }
 
 void
