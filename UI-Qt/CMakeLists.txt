@@ -19,6 +19,10 @@ find_package(Qt5Gui REQUIRED)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Network REQUIRED)
 
+if (WIN32)
+  find_package(Qt5WinExtras CONFIG REQUIRED)
+endif()
+
 if (UIQT_USE_FONTCONFIG)
   find_package(Fontconfig REQUIRED)
   add_definitions(-DUIQT_USE_FONTCONFIG=1)
@@ -80,6 +84,8 @@ set(SHARED_SOURCES
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
   QXHtmlTemplate.h
+  QXJumpListHelper.cpp
+  QXJumpListHelper.h
   QXMain.cpp
   QXMain.h
   QXMenuBar.cpp
@@ -131,6 +137,10 @@ target_link_libraries(UI-Qt PRIVATE Qt5::Core)
 target_link_libraries(UI-Qt PRIVATE Qt5::Gui)
 target_link_libraries(UI-Qt PRIVATE Qt5::Widgets)
 target_link_libraries(UI-Qt PRIVATE Qt5::Network)
+if (WIN32)
+  target_link_libraries(UI-Qt PRIVATE Qt5::WinExtras Qt5::WinExtrasPrivate)
+endif()
+
 target_link_libraries(UI-Qt PRIVATE FontX)
 
 if (UIQT_USE_FONTCONFIG)

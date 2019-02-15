@@ -706,7 +706,7 @@ FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
         int bufLen = stringLen * 4;
         UniChar * buf = (UniChar*)malloc(bufLen * sizeof(UniChar));
         error = ConvertFromTextToUnicode(textToUnicodeInfo,
-                                         stringLen, string,
+                                         stringLen, string, 
                                          0, 0, 0, 0, 0, // no font offset
                                          bufLen, &sourceRead, &unicodeLen,
                                          buf);
@@ -720,6 +720,8 @@ FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
     }
     
     return name;
+#else
+    return FXString();
 #endif
 }
 
