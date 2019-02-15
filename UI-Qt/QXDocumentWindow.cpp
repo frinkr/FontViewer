@@ -185,8 +185,7 @@ QXDocumentWindow::initSearchField() {
                 "QLineEdit:focus { "                                    \
                 "  border:2px solid; "                                  \
                 "  border-radius: 15px; "                               \
-                "  border-color:%1;}")
-        .arg(palette().color(QPalette::Highlight).name(QColor::HexRgb)));
+                "  border-color:palette(highlight);}"));
     searchLineEdit_->setAttribute(Qt::WA_MacShowFocusRect, 0);
 
     searchLineEdit_->setMinimumHeight(30);

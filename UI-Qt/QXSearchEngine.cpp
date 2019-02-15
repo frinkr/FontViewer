@@ -65,6 +65,8 @@ QUSearchEngine::search(const QXSearch & expression) const {
 
 QXSearchResult
 QUSearchEngine::searchChar(FXGChar c) const {
+    assert(!c.isGlyphID());
+    
     QXSearchResult result;
 
     size_t blockIndex = -1;
@@ -108,7 +110,7 @@ QUSearchEngine::searchGlyph(FXGlyphID g) const {
     const auto & cm = document_->face()->currentCMap();
     const FXVector<FXChar> chs = cm.charsForGlyph(g);
 
-    if (chs.size()) {
+    if (document_->charMode() && chs.size()) {
         return searchChar(FXGChar(chs[0], cm.isUnicode()?FXGCharTypeUnicode:FXGCharTypeOther));
     }
     else if (g < document_->face()->glyphCount()) {

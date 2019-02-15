@@ -580,7 +580,7 @@ FXFace::initVariables() {
     if (FT_Get_Multi_Master(face_, &mm) == 0) 
         isMM =  true;
 
-    if (!var && !isMM)
+    if (!var)
         return true;
 
     // Load axises

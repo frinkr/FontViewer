@@ -185,7 +185,7 @@ FXCMap::description() const {
 bool
 FXCMap::isUnicode() const {
     return platformID_ == TT_PLATFORM_APPLE_UNICODE
-        || (platformID_ == TT_PLATFORM_MICROSOFT && (encodingID_ == TT_MS_ID_UNICODE_CS || encodingID_ == TT_MS_ID_UCS_4))
+        || (platformID_ == TT_PLATFORM_MICROSOFT && (encodingID_ == TT_MS_ID_UNICODE_CS || encodingID_ == TT_MS_ID_UCS_4 || encodingID_ == TT_MS_ID_SYMBOL_CS))
         ;
 }
 
