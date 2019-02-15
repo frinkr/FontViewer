@@ -37,6 +37,12 @@ public:
     void
     mousePressEvent(QMouseEvent * event) override;
 
+    virtual void
+    drawCell(QPainter * painter, const QRect & rect, const QXListViewDataIndex & index, bool selected);
+
+    virtual void
+    drawHeader(QPainter * painter, const QRect & rect, int section);
+
 private:
     /* number of columns at current widget's width */
     int
@@ -73,6 +79,7 @@ private:
     int
     headerHeight() const;
 
+    
     friend class QXListView;
 private:
     QXListViewDataModel * model_;

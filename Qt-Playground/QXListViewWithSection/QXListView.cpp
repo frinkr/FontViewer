@@ -55,18 +55,20 @@ namespace {
             return QVariant();
         }
     };
+
+    Qt::GlobalColor colors[] = {Qt::cyan, Qt::yellow, Qt::magenta, Qt::darkGreen, Qt::darkBlue, Qt::red, Qt::green, Qt::blue, };
 }
 
 
 QXListViewContentWidget::QXListViewContentWidget(QWidget * parent)
     : QWidget(parent)
-    , model_(new QXListViewEmptyDataModel(this))
     , selected_{-1, -1}
     , cellSize_(80, 100)
     , cellSpace_(20)
     , headerHeight_{20}
     , sectionSpace_{40}
     , contentMargin_{5} {
+    model_ = new QXDummyModel(this);
 }
 
 int
@@ -192,19 +194,16 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
         y += sectionHeight(s);
     y += headerHeight();
 
-    Qt::GlobalColor colors[] = {Qt::cyan, Qt::yellow, Qt::magenta, Qt::darkGreen, Qt::darkBlue, Qt::red, Qt::green, Qt::blue, };
 
     int updatedCellCount = 0;
     for (int s = beginSection; s <= endSection; ++ s) {
         auto bg = QColor(colors[s % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
         auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
-        painter.setPen(bg);
         QRect sectionHeaderRect(contentMargin_,
                                 y - headerSpaceBelow_ - headerHeight_,
                                 width() - 2 * contentMargin_,
                                 headerHeight_);
-
-        painter.drawText(sectionHeaderRect, Qt::AlignCenter, model_->data(s).toString());
+        drawHeader(&painter, sectionHeaderRect, s);
         painter.setPen(fg);
 
         int r0 = 0, r1 = rowCount(s) - 1;
@@ -231,14 +230,9 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
             for (int c = 0; c < cEnd; ++ c) {
                 QPoint leftTop(contentMargin_ + c * (cellSize_.width() + cellSpace_), rowY);
                 QRect cellRect(leftTop, cellSize_);
-
                 QXListViewDataIndex dataIndex = {s, r * columns + c};
-                int expand = 10;
-                if (selected_ == dataIndex)
-                    painter.fillRect(cellRect.adjusted(-expand, -expand, expand, expand), bg);
-                else
-                    painter.fillRect(cellRect, bg);
-                painter.drawText(cellRect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(dataIndex, 0).toString());
+                drawCell(&painter, cellRect, dataIndex, selected_ == dataIndex);
+
                 ++ updatedCellCount;
             }
             rowY += rowHeight();
@@ -253,6 +247,25 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
 }
 
 void
+QXListViewContentWidget::drawCell(QPainter * painter, const QRect & rect, const QXListViewDataIndex & index, bool selected) {
+    auto bg = QColor(colors[index.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
+    int expand = 10;
+    if (selected)
+        painter->fillRect(rect.adjusted(-expand, -expand, expand, expand), bg);
+    else
+        painter->fillRect(rect, bg);
+    painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(index, 0).toString());
+}
+
+void
+QXListViewContentWidget::drawHeader(QPainter * painter, const QRect & rect, int section) {
+    auto bg = QColor(colors[section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
+    auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
+    painter->setPen(bg);
+    painter->drawText(rect, Qt::AlignCenter, model_->data(section).toString());
+}
+
+void
 QXListViewContentWidget::mousePressEvent(QMouseEvent * event) {
     selected_ = cellAt(event->pos());
     update();
@@ -263,9 +276,9 @@ QXListView::QXListView(QWidget *parent)
     : QScrollArea(parent) {
     this->setWidgetResizable(false);
 
-    widget_ = new QXListViewContentWidget(this);
+    widget_ = new QXListViewContentWidget();
     this->setWidget(widget_);
-    setModel(new QXDummyModel(this));
+    //setModel(new QXDummyModel(this));
 }
 
 
@@ -278,7 +291,7 @@ void
 QXListView::setModel(QXListViewDataModel * model) {
     widget_->model_ = model;
     connect(model, &QXListViewDataModel::reset, this, &QXListView::onModelReset);
-    emit model->reset();
+    //emit model->reset();
 }
 
 void
