@@ -30,8 +30,8 @@ namespace {
         }
 
         QVariant
-        data(int section, int item, int role) const override {
-            return QString("%1, %2").arg(section).arg(item);
+        data(const QXListViewDataIndex & index, int role) const override {
+            return QString("%1, %2").arg(index.section).arg(index.item);
         }
 
         QVariant
@@ -91,7 +91,7 @@ QXListViewContentWidget::rowY(int section, int row) const {
     return height;
 }
 
-std::tuple<int, int>
+QXListViewDataIndex
 QXListViewContentWidget::cellAt(const QPoint & pos) const {
     int section, row;
     std::tie(section, row) = rowAt(pos.y());
@@ -101,7 +101,7 @@ QXListViewContentWidget::cellAt(const QPoint & pos) const {
 
     if (pos.y() < yMin) {
         // header
-        return std::make_tuple(section, -1);
+        return {section, -1};
     }
     else {
         int columns = columnCount();
@@ -113,12 +113,12 @@ QXListViewContentWidget::cellAt(const QPoint & pos) const {
         for (int c = 0; c < cellEnd; ++ c) {
             if (pos.x() >= x && pos.x() <= (x + cellWidth_)) {
                 int itemIndex = row * columns + c;
-                return std::make_tuple(section, itemIndex);
+                return {section, itemIndex};
             }
             x += (cellWidth_ + cellSpace_);
         }
     }
-    return std::make_tuple(-1, -1);
+    return {-1, -1};
 }
 
 int
@@ -205,13 +205,13 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
                 QPoint leftTop(contentMargin_ + c * (cellWidth_ + cellSpace_), rowY);
                 QRect cellRect(leftTop, QSize(cellWidth_, cellHeight_));
 
-                int itemIndex = r * columns + c;
+                QXListViewDataIndex dataIndex = {s, r * columns + c};
                 int expand = 10;
-                if (selected_.index == itemIndex && selected_.section == s)
+                if (selected_ == dataIndex)
                     painter.fillRect(cellRect.adjusted(-expand, -expand, expand, expand), bg);
                 else
                     painter.fillRect(cellRect, bg);
-                painter.drawText(cellRect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(s, itemIndex, 0).toString());
+                painter.drawText(cellRect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(dataIndex, 0).toString());
                 ++ updatedCellCount;
             }
             rowY += rowHeight();
@@ -227,11 +227,7 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
 
 void
 QXListViewContentWidget::mousePressEvent(QMouseEvent * event) {
-    auto pos = event->pos();
-    int section, item;
-    std::tie(section, item) = cellAt(pos);
-    selected_.index = item;
-    selected_.section = section;
+    selected_ = cellAt(event->pos());
     update();
 }
 

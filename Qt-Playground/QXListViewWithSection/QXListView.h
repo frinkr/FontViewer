@@ -6,9 +6,19 @@
 class QXListViewDataModel;
 
 struct QXListViewDataIndex {
-    int section {-1};
-    int index {-1};
+    int section;
+    int item;
+
+    bool
+    operator==(const QXListViewDataIndex & other) const {
+        return section == other.section && item == other.item;
+    }
+    bool
+    operator!=(const QXListViewDataIndex & other) const {
+        return !operator==(other);
+    }
 };
+
 
 class QXListViewContentWidget: public QWidget {
     Q_OBJECT
@@ -49,7 +59,7 @@ private:
      *        <s, -1> for clicking the section header
      *        <s, i> click section 's' at item 'i'
      */
-    std::tuple<int, int>
+    QXListViewDataIndex
     cellAt(const QPoint & pos) const;
 
     int
@@ -60,9 +70,6 @@ private:
 
     int
     headerHeight() const;
-
-    QRect
-    cellRect(int section, int cell) const;
 
 private:
     QXListViewDataModel * model_;
@@ -81,7 +88,7 @@ public:
     itemCount(int section) const = 0;
 
     virtual QVariant
-    data(int section, int item, int role) const = 0;
+    data(const QXListViewDataIndex & index, int role) const = 0;
 
     virtual QVariant
     data(int section) const = 0;
