@@ -22,7 +22,7 @@ QXListViewContentWidget::sizeHint() const {
 
 QSize
 QXListViewContentWidget::minimumSizeHint() const {
-    return QSize(COLUMNS * (CELL_SIZE + CELL_SPACE) + 2 * CONTENT_MARGIN - CELL_SPACE, 1000);
+    return QSize(1 * (CELL_SIZE + CELL_SPACE) + 2 * CONTENT_MARGIN - CELL_SPACE, 1000);
 }
 
 void
