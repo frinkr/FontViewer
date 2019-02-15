@@ -84,8 +84,8 @@ set(SHARED_SOURCES
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
   QXHtmlTemplate.h
-  QXJumpListHelper.cpp
-  QXJumpListHelper.h
+#QXJumpListHelper.cpp
+#QXJumpListHelper.h
   QXMain.cpp
   QXMain.h
   QXMenuBar.cpp

@@ -1,7 +1,9 @@
 .DS_Store
 build/
-build-linux/
+build-*/
 .vs/
 .idea/
 cmake-build-debug/
 CMakeLists.txt.user
+*.pro.user
+*.autosave
