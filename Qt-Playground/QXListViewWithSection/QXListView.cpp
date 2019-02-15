@@ -1,5 +1,6 @@
 #include <QScrollArea>
 #include <QPaintEvent>
+#include <QMouseEvent>
 #include <QPainter>
 #include "QXListView.h"
 #include <QRandomGenerator>
@@ -25,7 +26,7 @@ namespace {
 
         int
         itemCount(int section) const override {
-            return std::pow(2 + sectionCount() / 2 - std::abs(sectionCount() / 2 - section), 2);
+            return std::pow(2 + sectionCount() / 2 - std::abs(sectionCount() / 2 - section), 4);
         }
 
         QVariant
@@ -77,7 +78,47 @@ QXListViewContentWidget::rowAt(int y) const {
     // Return last row of last section
     return std::make_tuple(model_->sectionCount() - 1,
                            rowCount(model_->sectionCount() - 1) - 1);
-    
+}
+
+int
+QXListViewContentWidget::rowY(int section, int row) const {
+    int height = contentMargin_;
+    for (int s = 0; s < section; ++ s)
+        height += sectionHeight(s);
+    height += headerHeight();
+    for (int r = 0; r <= row; ++ r)
+        height += cellHeight_ + (r?cellSpace_: 0);
+    return height;
+}
+
+std::tuple<int, int>
+QXListViewContentWidget::cellAt(const QPoint & pos) const {
+    int section, row;
+    std::tie(section, row) = rowAt(pos.y());
+
+    int yMax = rowY(section, row);
+    int yMin = yMax - rowHeight();
+
+    if (pos.y() < yMin) {
+        // header
+        return std::make_tuple(section, -1);
+    }
+    else {
+        int columns = columnCount();
+        int cellEnd = columns;
+        if ((row + 1) * columns > model_->itemCount(row))
+            cellEnd = model_->itemCount(section) - row * columns;
+
+        int x = contentMargin_;
+        for (int c = 0; c < cellEnd; ++ c) {
+            if (pos.x() >= x && pos.x() <= (x + cellWidth_)) {
+                int itemIndex = row * columns + c;
+                return std::make_tuple(section, itemIndex);
+            }
+            x += (cellWidth_ + cellSpace_);
+        }
+    }
+    return std::make_tuple(-1, -1);
 }
 
 int
@@ -132,6 +173,7 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
 
     Qt::GlobalColor colors[] = {Qt::cyan, Qt::yellow, Qt::magenta, Qt::darkGreen, Qt::darkBlue, Qt::red, Qt::green, Qt::blue, };
 
+    int updatedCellCount = 0;
     for (int s = beginSection; s <= endSection; ++ s) {
         auto bg = QColor(colors[s % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
         auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
@@ -162,17 +204,37 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
             for (int c = 0; c < cEnd; ++ c) {
                 QPoint leftTop(contentMargin_ + c * (cellWidth_ + cellSpace_), rowY);
                 QRect cellRect(leftTop, QSize(cellWidth_, cellHeight_));
-                painter.fillRect(cellRect, bg);
 
                 int itemIndex = r * columns + c;
+                int expand = 10;
+                if (selected_.index == itemIndex && selected_.section == s)
+                    painter.fillRect(cellRect.adjusted(-expand, -expand, expand, expand), bg);
+                else
+                    painter.fillRect(cellRect, bg);
                 painter.drawText(cellRect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(s, itemIndex, 0).toString());
+                ++ updatedCellCount;
             }
             rowY += rowHeight();
         }
 
         y += sectionHeight(s);
     }
+
+    qWarning("QXListViewContentWidget::update => rect: (%d, %d, %d, %d), beginSection: %d, %d, endSection: %d, %d, total updated cells: %d",
+             event->rect().left(), event->rect().top(), event->rect().right(), event->rect().bottom(),
+             beginSection, beginRow, endSection, endRow, updatedCellCount);
 }
+
+void
+QXListViewContentWidget::mousePressEvent(QMouseEvent * event) {
+    auto pos = event->pos();
+    int section, item;
+    std::tie(section, item) = cellAt(pos);
+    selected_.index = item;
+    selected_.section = section;
+    update();
+}
+
 
 QXListView::QXListView(QWidget *parent)
     : QScrollArea(parent) {

@@ -5,6 +5,11 @@
 
 class QXListViewDataModel;
 
+struct QXListViewDataIndex {
+    int section {-1};
+    int index {-1};
+};
+
 class QXListViewContentWidget: public QWidget {
     Q_OBJECT
 public:
@@ -19,6 +24,9 @@ public:
     void
     paintEvent(QPaintEvent * event)  override;
 
+    void
+    mousePressEvent(QMouseEvent * event) override;
+
 private:
     /* number of columns at current widget's width */
     int
@@ -28,9 +36,21 @@ private:
     int
     rowCount(int section) const;
 
+    /* Y location of row */
+    int
+    rowY(int section, int row) const;
+
     /* the <section, row> pair at Y position */
     std::tuple<int, int>
     rowAt(int y) const;
+
+    /* the <section, item> pair at mouse position.
+     * return <-1, -1> for click nothing.
+     *        <s, -1> for clicking the section header
+     *        <s, i> click section 's' at item 'i'
+     */
+    std::tuple<int, int>
+    cellAt(const QPoint & pos) const;
 
     int
     sectionHeight(int section) const;
@@ -46,6 +66,7 @@ private:
 
 private:
     QXListViewDataModel * model_;
+    QXListViewDataIndex   selected_;
 };
 
 class QXListViewDataModel : public QObject{
