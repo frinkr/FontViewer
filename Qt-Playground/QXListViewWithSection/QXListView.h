@@ -50,7 +50,9 @@ private:
     int
     rowY(int section, int row) const;
 
-    /* the <section, row> pair at Y position */
+    /* the <section, row> pair at Y position
+     * return <-1, -1> empty model.
+     */
     std::tuple<int, int>
     rowAt(int y) const;
 
@@ -71,12 +73,19 @@ private:
     int
     headerHeight() const;
 
+    friend class QXListView;
 private:
     QXListViewDataModel * model_;
     QXListViewDataIndex   selected_;
+
+    QSize     cellSize_;
+    int       cellSpace_;
+    int       headerHeight_;
+    int       sectionSpace_;
+    int       contentMargin_;
 };
 
-class QXListViewDataModel : public QObject{
+class QXListViewDataModel : public QObject {
     Q_OBJECT
 public:
     using QObject::QObject;
@@ -92,14 +101,57 @@ public:
 
     virtual QVariant
     data(int section) const = 0;
+
+signals:
+    void
+    reset();
 };
+
 
 class QXListView : public QScrollArea {
     Q_OBJECT
 public:
     explicit QXListView(QWidget *parent = nullptr);
 
-signals:
+    QXListViewDataModel *
+    model() const;
+
+    void
+    setModel(QXListViewDataModel * model);
+
+    void
+    setCellSize(const QSize & size);
+
+    void
+    setCellSize(int size);
+
+    const QSize &
+    cellSize() const;
+
+    void
+    setCellSpace(int space);
+
+    int
+    cellSpace() const;
+
+    void
+    setSectionSpace(int space);
+
+    int
+    sectionSpace() const;
+
+    void
+    setHeaderHeight(int height);
+
+    int
+    headerHeight() const;
 
 public slots:
+
+private slots:
+    void
+    onModelReset();
+
+private:
+    QXListViewContentWidget * widget_{nullptr};
 };

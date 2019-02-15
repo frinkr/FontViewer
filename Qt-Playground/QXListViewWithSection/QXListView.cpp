@@ -6,14 +6,7 @@
 #include <QRandomGenerator>
 
 namespace {
-    constexpr qreal cellWidth_ = 80;
-    constexpr qreal cellHeight_ = 80;
-    constexpr qreal cellSpace_ = 20;
-    constexpr qreal headerHeight_ = 20;
-    constexpr qreal headerSpaceAbove_ = 12;
     constexpr qreal headerSpaceBelow_ = 8;
-    constexpr qreal contentMargin_ = 20;
-
     constexpr int minimumColumnCount_ = 1;
 
     class QXDummyModel: public QXListViewDataModel {
@@ -26,7 +19,7 @@ namespace {
 
         int
         itemCount(int section) const override {
-            return std::pow(2 + sectionCount() / 2 - std::abs(sectionCount() / 2 - section), 4);
+            return std::pow(2 + sectionCount() / 2 - std::abs(sectionCount() / 2 - section), 2);
         }
 
         QVariant
@@ -39,17 +32,46 @@ namespace {
             return QString("Section %1").arg(section);
         }
     };
+
+    class QXListViewEmptyDataModel : public QXListViewDataModel {
+        using QXListViewDataModel::QXListViewDataModel;
+        int
+        sectionCount() const override {
+            return 0;
+        }
+
+        int
+        itemCount(int section) const override {
+            return 0;
+        }
+
+        QVariant
+        data(const QXListViewDataIndex & index, int role) const override {
+            return QVariant();
+        }
+
+        QVariant
+        data(int section) const override {
+            return QVariant();
+        }
+    };
 }
 
 
 QXListViewContentWidget::QXListViewContentWidget(QWidget * parent)
-    : QWidget(parent) {
-    model_ = new QXDummyModel(this);
+    : QWidget(parent)
+    , model_(new QXListViewEmptyDataModel(this))
+    , selected_{-1, -1}
+    , cellSize_(80, 100)
+    , cellSpace_(20)
+    , headerHeight_{20}
+    , sectionSpace_{40}
+    , contentMargin_{5} {
 }
 
 int
 QXListViewContentWidget::columnCount() const {
-    return (rect().width() - 2 * contentMargin_ + cellSpace_) / (cellWidth_ + cellSpace_);
+    return (rect().width() - 2 * contentMargin_ + cellSpace_) / (cellSize_.width() + cellSpace_);
 }
 
 int
@@ -66,7 +88,7 @@ QXListViewContentWidget::rowAt(int y) const {
         if (y <= newHeight) {
             int rowY = height + headerHeight();
             for (int r = 0; r < rowCount(s); ++ r) {
-                rowY += cellHeight_ + (r?cellSpace_: 0);
+                rowY += cellSize_.height() + (r?cellSpace_: 0);
                 if (y <= rowY)
                     return std::make_tuple(s, r);
             }
@@ -87,7 +109,7 @@ QXListViewContentWidget::rowY(int section, int row) const {
         height += sectionHeight(s);
     height += headerHeight();
     for (int r = 0; r <= row; ++ r)
-        height += cellHeight_ + (r?cellSpace_: 0);
+        height += cellSize_.height() + (r?cellSpace_: 0);
     return height;
 }
 
@@ -111,11 +133,11 @@ QXListViewContentWidget::cellAt(const QPoint & pos) const {
 
         int x = contentMargin_;
         for (int c = 0; c < cellEnd; ++ c) {
-            if (pos.x() >= x && pos.x() <= (x + cellWidth_)) {
+            if (pos.x() >= x && pos.x() <= (x + cellSize_.width())) {
                 int itemIndex = row * columns + c;
                 return {section, itemIndex};
             }
-            x += (cellWidth_ + cellSpace_);
+            x += (cellSize_.width() + cellSpace_);
         }
     }
     return {-1, -1};
@@ -128,12 +150,12 @@ QXListViewContentWidget::sectionHeight(int section) const {
 
 int
 QXListViewContentWidget::rowHeight() const {
-    return cellHeight_ + cellSpace_;
+    return cellSize_.height() + cellSpace_;
 }
 
 int
 QXListViewContentWidget::headerHeight() const {
-    return headerHeight_ + headerSpaceAbove_ + headerSpaceBelow_;
+    return headerHeight_ + sectionSpace_ + headerSpaceBelow_;
 }
 
 QSize
@@ -147,17 +169,13 @@ QXListViewContentWidget::minimumSizeHint() const {
     for (int i = 0; i < model_->sectionCount(); ++ i) 
         height += sectionHeight(i);
         
-    return QSize(minimumColumnCount_ * (cellWidth_ + cellSpace_) + 2 * contentMargin_ - cellSpace_,
+    return QSize(minimumColumnCount_ * (cellSize_.width() + cellSpace_) + 2 * contentMargin_ - cellSpace_,
                  height + 2 * contentMargin_);
 }
 
 void
 QXListViewContentWidget::paintEvent(QPaintEvent * event) {
     QPainter painter(this);
-    painter.setPen(Qt::white);
-
-    painter.setBrush(Qt::red);
-
     painter.fillRect(event->rect(), palette().base());
 
     int columns = columnCount();
@@ -165,6 +183,9 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
 
     std::tie(beginSection, beginRow) = rowAt(event->rect().top());
     std::tie(endSection, endRow) = rowAt(event->rect().bottom());
+
+    if (beginSection == -1 || endSection == -1)
+        return ;
 
     int y = contentMargin_;
     for (int s = 0; s < beginSection; ++ s)
@@ -178,8 +199,14 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
         auto bg = QColor(colors[s % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
         auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
         painter.setPen(bg);
-        painter.drawText(QPoint(contentMargin_, y - headerSpaceBelow_), model_->data(s).toString());
+        QRect sectionHeaderRect(contentMargin_,
+                                y - headerSpaceBelow_ - headerHeight_,
+                                width() - 2 * contentMargin_,
+                                headerHeight_);
+
+        painter.drawText(sectionHeaderRect, Qt::AlignCenter, model_->data(s).toString());
         painter.setPen(fg);
+
         int r0 = 0, r1 = rowCount(s) - 1;
         if (s == beginSection) {
             r0 = beginRow;
@@ -202,8 +229,8 @@ QXListViewContentWidget::paintEvent(QPaintEvent * event) {
                 cEnd = model_->itemCount(s) - r * columns;
 
             for (int c = 0; c < cEnd; ++ c) {
-                QPoint leftTop(contentMargin_ + c * (cellWidth_ + cellSpace_), rowY);
-                QRect cellRect(leftTop, QSize(cellWidth_, cellHeight_));
+                QPoint leftTop(contentMargin_ + c * (cellSize_.width() + cellSpace_), rowY);
+                QRect cellRect(leftTop, cellSize_);
 
                 QXListViewDataIndex dataIndex = {s, r * columns + c};
                 int expand = 10;
@@ -234,8 +261,72 @@ QXListViewContentWidget::mousePressEvent(QMouseEvent * event) {
 
 QXListView::QXListView(QWidget *parent)
     : QScrollArea(parent) {
-
     this->setWidgetResizable(false);
 
-    this->setWidget(new QXListViewContentWidget);
+    widget_ = new QXListViewContentWidget(this);
+    this->setWidget(widget_);
+    setModel(new QXDummyModel(this));
+}
+
+
+QXListViewDataModel *
+QXListView::model() const {
+    return qobject_cast<QXListViewContentWidget*>(widget())->model_;
+}
+
+void
+QXListView::setModel(QXListViewDataModel * model) {
+    widget_->model_ = model;
+    connect(model, &QXListViewDataModel::reset, this, &QXListView::onModelReset);
+    emit model->reset();
+}
+
+void
+QXListView::onModelReset() {
+    widget()->update();
+}
+
+void
+QXListView::setCellSize(const QSize & size) {
+    widget_->cellSize_ = size;
+}
+
+void
+QXListView::setCellSize(int size) {
+    widget_->cellSize_ = QSize(size, size);
+}
+
+const QSize &
+QXListView::cellSize() const {
+    return widget_->cellSize_;
+}
+
+void
+QXListView::setCellSpace(int space) {
+    widget_->cellSpace_ = space;
+}
+
+int
+QXListView::cellSpace() const {
+    return widget_->cellSpace_;
+}
+
+void
+QXListView::setSectionSpace(int space) {
+    widget_->sectionSpace_ = space;
+}
+
+int
+QXListView::sectionSpace() const {
+    return widget_->sectionSpace_;
+}
+
+void
+QXListView::setHeaderHeight(int height) {
+    widget_->headerHeight_ = height;
+}
+
+int
+QXListView::headerHeight() const {
+    return widget_->headerHeight_;
 }
