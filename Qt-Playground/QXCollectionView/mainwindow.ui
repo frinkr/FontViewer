@@ -16,7 +16,7 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QXListView" name="scrollArea">
+     <widget class="QXCollectionView" name="scrollArea">
       <property name="widgetResizable">
        <bool>true</bool>
       </property>
@@ -30,17 +30,29 @@
      <x>0</x>
      <y>0</y>
      <width>804</width>
-     <height>22</height>
+     <height>20</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+   </widget>
+   <addaction name="menuFile"/>
   </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>QXListView</class>
+   <class>QXCollectionView</class>
    <extends>QScrollArea</extends>
-   <header>QXListView.h</header>
+   <header>QXCollectionView.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

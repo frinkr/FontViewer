@@ -3,27 +3,27 @@
 #include <QScrollArea>
 #include <QWidget>
 
-class QXListViewDataModel;
+class QXCollectionViewDataModel;
 
-struct QXListViewDataIndex {
+struct QXCollectionViewDataIndex {
     int section;
     int item;
 
     bool
-    operator==(const QXListViewDataIndex & other) const {
+    operator==(const QXCollectionViewDataIndex & other) const {
         return section == other.section && item == other.item;
     }
     bool
-    operator!=(const QXListViewDataIndex & other) const {
+    operator!=(const QXCollectionViewDataIndex & other) const {
         return !operator==(other);
     }
 };
 
 
-class QXListViewContentWidget: public QWidget {
+class QXCollectionViewContentWidget: public QWidget {
     Q_OBJECT
 public:
-    explicit QXListViewContentWidget(QWidget * parent = nullptr);
+    explicit QXCollectionViewContentWidget(QWidget * parent = nullptr);
 
     QSize
     sizeHint() const override;
@@ -38,7 +38,7 @@ public:
     mousePressEvent(QMouseEvent * event) override;
 
     virtual void
-    drawCell(QPainter * painter, const QRect & rect, const QXListViewDataIndex & index, bool selected);
+    drawCell(QPainter * painter, const QRect & rect, const QXCollectionViewDataIndex & index, bool selected);
 
     virtual void
     drawHeader(QPainter * painter, const QRect & rect, int section);
@@ -67,7 +67,7 @@ private:
      *        <s, -1> for clicking the section header
      *        <s, i> click section 's' at item 'i'
      */
-    QXListViewDataIndex
+    QXCollectionViewDataIndex
     cellAt(const QPoint & pos) const;
 
     int
@@ -80,10 +80,10 @@ private:
     headerHeight() const;
 
     
-    friend class QXListView;
+    friend class QXCollectionView;
 private:
-    QXListViewDataModel * model_;
-    QXListViewDataIndex   selected_;
+    QXCollectionViewDataModel * model_;
+    QXCollectionViewDataIndex   selected_;
 
     QSize     cellSize_;
     int       cellSpace_;
@@ -92,7 +92,7 @@ private:
     int       contentMargin_;
 };
 
-class QXListViewDataModel : public QObject {
+class QXCollectionViewDataModel : public QObject {
     Q_OBJECT
 public:
     using QObject::QObject;
@@ -104,7 +104,7 @@ public:
     itemCount(int section) const = 0;
 
     virtual QVariant
-    data(const QXListViewDataIndex & index, int role) const = 0;
+    data(const QXCollectionViewDataIndex & index, int role) const = 0;
 
     virtual QVariant
     data(int section) const = 0;
@@ -115,16 +115,16 @@ signals:
 };
 
 
-class QXListView : public QScrollArea {
+class QXCollectionView : public QScrollArea {
     Q_OBJECT
 public:
-    explicit QXListView(QWidget *parent = nullptr);
+    explicit QXCollectionView(QWidget *parent = nullptr);
 
-    QXListViewDataModel *
+    QXCollectionViewDataModel *
     model() const;
 
     void
-    setModel(QXListViewDataModel * model);
+    setModel(QXCollectionViewDataModel * model);
 
     void
     setCellSize(const QSize & size);
@@ -160,5 +160,5 @@ private slots:
     onModelReset();
 
 private:
-    QXListViewContentWidget * widget_{nullptr};
+    QXCollectionViewContentWidget * widget_{nullptr};
 };

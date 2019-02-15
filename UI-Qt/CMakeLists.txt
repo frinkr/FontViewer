@@ -56,6 +56,8 @@ set(SHARED_SOURCES
   QXApplication.qrc
   QXCMapBlockWidget.cpp
   QXCMapBlockWidget.h
+  QXCollectionView.cpp
+  QXCollectionView.h
   QXConv.cpp
   QXConv.h
   QXDockTitleBarWidget.cpp
