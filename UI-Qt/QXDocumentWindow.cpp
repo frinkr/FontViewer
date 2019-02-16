@@ -288,15 +288,16 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
 
 void
 QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
+    if (index.item == -1 || index.section == -1)
+        return;
     FXGChar c = document_->charAt(index);
     glyphWidget_->setChar(c);
 
-    QRect rect = ui_->glyphCollectionView->visualRect(index);
+    QRect rect = ui_->glyphCollectionView->itemRect(index);
     QRect globalRect(ui_->glyphCollectionView->mapToGlobal(rect.topLeft()),
                      ui_->glyphCollectionView->mapToGlobal(rect.bottomRight()));
 
     glyphPopover_->showRelativeTo(globalRect, QXPopoverTop);
-
 }
 
 void

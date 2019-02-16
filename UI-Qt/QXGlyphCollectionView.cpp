@@ -105,6 +105,7 @@ namespace {
 QXGlyphCollectionView::QXGlyphCollectionView(QWidget * parent)
     : QXCollectionView(parent){
     this->setCellSize(QSize(GLYPH_IMAGE_SIZE, GLYPH_IMAGE_SIZE + GLYPH_NAME_HEIGHT));
+    this->setCellSize(QSize(90, 90));
     this->setCellSpace(10);
     this->setSectionSpace(40);
     setDelegate(new QXGlyphCollectionViewDelegate(this));

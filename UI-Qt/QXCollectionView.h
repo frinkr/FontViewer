@@ -64,6 +64,11 @@ signals:
     doubleClicked(const QXCollectionModelIndex & index);
 
 private:
+    struct RowIndex {
+        int section;
+        int row;
+    };
+    
     /* number of columns at current widget's width */
     int
     columnCount() const;
@@ -74,16 +79,16 @@ private:
 
     /* Top position of row */
     int
-    rowTop(int section, int row) const;
+    rowTop(const RowIndex & index) const;
 
     /* the <section, row> pair at Y position
      * return <-1, -1> empty model.
      */
-    std::tuple<int, int>
+    RowIndex
     rowAt(int y) const;
 
     /* the <section, row> pari at index */
-    std::tuple<int, int>
+    RowIndex
     rowAt(const QXCollectionModelIndex & index) const;
 
     /* the <section, item> pair at mouse position.
@@ -92,7 +97,7 @@ private:
      *        <s, i> click section 's' at item 'i'
      */
     QXCollectionModelIndex
-    cellAt(const QPoint & pos) const;
+    itemAt(const QPoint & pos) const;
 
     int
     sectionHeight(int section) const;
@@ -104,7 +109,7 @@ private:
     headerHeight() const;
 
     QRect
-    visualRect(const QXCollectionModelIndex & index) const;
+    itemRect(const QXCollectionModelIndex & index) const;
     
     friend class QXCollectionView;
 private:
@@ -112,11 +117,12 @@ private:
     QXCollectionViewDelegate  * delegate_ {nullptr};
     QXCollectionModelIndex   selected_ {-1, -1};
 
-    QSize     cellSize_;
-    int       cellSpace_;
-    int       headerHeight_;
-    int       headerSpaceAbove_;
-    int       contentMargin_;
+    QSize     itemSize_;
+    QSize     itemSpace_;
+    int       headerSize_;               // font size of header text
+    int       sectionSpace_;            // space fron header text to last row of previous section
+    int       sectionInterSpace_;
+    QMargins  contentMargins_;
 };
 
 
@@ -165,7 +171,7 @@ public:
     headerHeight() const;
 
     QRect
-    visualRect(const QXCollectionModelIndex & index) const;
+    itemRect(const QXCollectionModelIndex & index) const;
 
 signals:
     void
