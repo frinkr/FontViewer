@@ -431,5 +431,6 @@ QXCollectionView::onBeginResetModel() {
 void
 QXCollectionView::onEndResetModel() {
     widget_->updateGeometry();
+    widget_->update();
     ensureVisible(0, 0);
 }
