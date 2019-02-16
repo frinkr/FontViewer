@@ -20,7 +20,7 @@ namespace {
         }
         
         void
-        drawCell(QXCollectionViewContentWidget * view, QPainter * painter, const QRect & rect, const QXCollectionViewDataIndex & index, bool selected) override {
+        drawCell(QXCollectionViewContentWidget * view, QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected) override {
             auto & palette = view->palette();
             // draw the background and focus
             if (selected) {

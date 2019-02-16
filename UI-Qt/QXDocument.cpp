@@ -176,6 +176,11 @@ QXDocument::charAt(const QModelIndex & index) const {
     return currentBlock()->get(index.row());
 }
 
+FXGChar
+QXDocument::charAt(const QXCollectionModelIndex & index) const {
+    return currentCMap().blocks()[index.section]->get(index.item);
+}
+
 int
 QXDocument::rowCount(const QModelIndex & index) const {
     return int(currentBlock()->size());
@@ -211,7 +216,7 @@ QXDocument::itemCount(int section) const {
 }
 
 QVariant
-QXDocument::data(const QXCollectionViewDataIndex & index, int role) const {
+QXDocument::data(const QXCollectionModelIndex & index, int role) const {
     if (role == QXGlyphRole) {
         auto & block = currentCMap().blocks()[index.section];
         FXGlyph g = face_->glyph(block->get(index.item));
@@ -229,7 +234,7 @@ QXDocument::data(int section) const {
 
 
 QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
-    : QXCollectionViewDataModel(parent)
+    : QXCollectionModel(parent)
     , uri_(uri)
     , blockIndex_(0)
     , charMode_(true)

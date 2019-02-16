@@ -225,7 +225,7 @@ QXDocumentWindow::initGlyphInfoView() {
     
 void
 QXDocumentWindow::connectSingals() {
-    connect(ui_->listView, &QListView::doubleClicked,
+    connect(ui_->glyphCollectionView, &QXCollectionView::doubleClicked,
             this, &QXDocumentWindow::onGlyphDoubleClicked);
 
     connect(glyphWidget_, &QXGlyphInfoWidget::charLinkClicked,
@@ -287,15 +287,16 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
 }
 
 void
-QXDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
+QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
     FXGChar c = document_->charAt(index);
     glyphWidget_->setChar(c);
 
-    QRect rect = ui_->listView->visualRect(index);
-    QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
-                     ui_->listView->mapToGlobal(rect.bottomRight()));
+    QRect rect = ui_->glyphCollectionView->visualRect(index);
+    QRect globalRect(ui_->glyphCollectionView->mapToGlobal(rect.topLeft()),
+                     ui_->glyphCollectionView->mapToGlobal(rect.bottomRight()));
 
     glyphPopover_->showRelativeTo(globalRect, QXPopoverTop);
+
 }
 
 void

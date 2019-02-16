@@ -58,6 +58,8 @@ set(SHARED_SOURCES
   QXCMapBlockWidget.h
   QXCollectionView.cpp
   QXCollectionView.h
+  QXCollectionModel.h
+  QXCollectionModel.cpp
   QXConv.cpp
   QXConv.h
   QXDockTitleBarWidget.cpp

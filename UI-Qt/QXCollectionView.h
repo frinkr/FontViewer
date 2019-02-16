@@ -2,26 +2,12 @@
 
 #include <QScrollArea>
 #include <QWidget>
+#include "QXCollectionModel.h"
 
-class QXCollectionViewDataModel;
-
-struct QXCollectionViewDataIndex {
-    int section;
-    int item;
-
-    bool
-    operator==(const QXCollectionViewDataIndex & other) const {
-        return section == other.section && item == other.item;
-    }
-    bool
-    operator!=(const QXCollectionViewDataIndex & other) const {
-        return !operator==(other);
-    }
-};
 class QXCollectionViewContentWidget;
 
-class QXCollectionViewDelegate: public QObject {
-  Q_OBJECT
+class QXCollectionViewDelegate : public QObject {
+    Q_OBJECT
 public:
     using QObject::QObject;
 
@@ -30,7 +16,7 @@ public:
         QXCollectionViewContentWidget * view,
         QPainter * painter,
         const QRect & rect,
-        const QXCollectionViewDataIndex & index,
+        const QXCollectionModelIndex & index,
         bool selected) = 0;
 
     virtual void
@@ -39,34 +25,6 @@ public:
         QPainter * painter,
         const QRect & rect,
         int section) = 0;
-};
-
-class QXCollectionViewDataModel : public QObject {
-    Q_OBJECT
-public:
-    using QObject::QObject;
-
-    virtual int
-    sectionCount() const = 0;
-
-    virtual int
-    itemCount(int section) const = 0;
-
-    virtual QVariant
-    data(const QXCollectionViewDataIndex & index, int role) const = 0;
-
-    virtual QVariant
-    data(int section) const = 0;
-
-signals:
-    void
-    reset();
-
-    void
-    beginResetModel();
-
-    void 
-    endResetModel();
 };
 
 class QXCollectionViewContentWidget: public QWidget {
@@ -86,11 +44,24 @@ public:
     void
     mousePressEvent(QMouseEvent * event) override;
 
+    void
+    mouseMoveEvent(QMouseEvent * event);
+
+    void
+    mouseDoubleClickEvent(QMouseEvent * event) override;
+
     virtual void
-    drawCell(QPainter * painter, const QRect & rect, const QXCollectionViewDataIndex & index, bool selected);
+    drawCell(QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected);
 
     virtual void
     drawHeader(QPainter * painter, const QRect & rect, int section);
+
+signals:
+    void
+    clicked(const QXCollectionModelIndex & index);
+
+    void
+    doubleClicked(const QXCollectionModelIndex & index);
 
 private:
     /* number of columns at current widget's width */
@@ -101,9 +72,9 @@ private:
     int
     rowCount(int section) const;
 
-    /* Y location of row */
+    /* Top position of row */
     int
-    rowY(int section, int row) const;
+    rowTop(int section, int row) const;
 
     /* the <section, row> pair at Y position
      * return <-1, -1> empty model.
@@ -111,12 +82,16 @@ private:
     std::tuple<int, int>
     rowAt(int y) const;
 
+    /* the <section, row> pari at index */
+    std::tuple<int, int>
+    rowAt(const QXCollectionModelIndex & index) const;
+
     /* the <section, item> pair at mouse position.
      * return <-1, -1> for click nothing.
      *        <s, -1> for clicking the section header
      *        <s, i> click section 's' at item 'i'
      */
-    QXCollectionViewDataIndex
+    QXCollectionModelIndex
     cellAt(const QPoint & pos) const;
 
     int
@@ -128,17 +103,19 @@ private:
     int
     headerHeight() const;
 
+    QRect
+    visualRect(const QXCollectionModelIndex & index) const;
     
     friend class QXCollectionView;
 private:
-    QXCollectionViewDataModel * model_ {nullptr};
+    QXCollectionModel * model_ {nullptr};
     QXCollectionViewDelegate  * delegate_ {nullptr};
-    QXCollectionViewDataIndex   selected_ {-1, -1};
+    QXCollectionModelIndex   selected_ {-1, -1};
 
     QSize     cellSize_;
     int       cellSpace_;
     int       headerHeight_;
-    int       sectionSpace_;
+    int       headerSpaceAbove_;
     int       contentMargin_;
 };
 
@@ -148,11 +125,11 @@ class QXCollectionView : public QScrollArea {
 public:
     explicit QXCollectionView(QWidget *parent = nullptr);
 
-    QXCollectionViewDataModel *
+    QXCollectionModel *
     model() const;
 
     void
-    setModel(QXCollectionViewDataModel * model);
+    setModel(QXCollectionModel * model);
 
     QXCollectionViewDelegate *
     delegate() const;
@@ -186,6 +163,16 @@ public:
 
     int
     headerHeight() const;
+
+    QRect
+    visualRect(const QXCollectionModelIndex & index) const;
+
+signals:
+    void
+    clicked(const QXCollectionModelIndex & index);
+
+    void
+    doubleClicked(const QXCollectionModelIndex & index);
 
 public slots:
 

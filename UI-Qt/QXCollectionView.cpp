@@ -9,9 +9,9 @@ namespace {
     constexpr qreal headerSpaceBelow_ = 10;
     constexpr int minimumColumnCount_ = 1;
 
-    class QXDummyModel: public QXCollectionViewDataModel {
+    class QXDummyModel: public QXCollectionModel {
     public:
-        using QXCollectionViewDataModel::QXCollectionViewDataModel;
+        using QXCollectionModel::QXCollectionModel;
         int
         sectionCount() const override {
             return 20;
@@ -23,7 +23,7 @@ namespace {
         }
 
         QVariant
-        data(const QXCollectionViewDataIndex & index, int role) const override {
+        data(const QXCollectionModelIndex & index, int role) const override {
             return QString("%1, %2").arg(index.section).arg(index.item);
         }
 
@@ -33,8 +33,8 @@ namespace {
         }
     };
 
-    class QXCollectionViewEmptyDataModel : public QXCollectionViewDataModel {
-        using QXCollectionViewDataModel::QXCollectionViewDataModel;
+    class QXCollectionViewEmptyDataModel : public QXCollectionModel {
+        using QXCollectionModel::QXCollectionModel;
         int
         sectionCount() const override {
             return 0;
@@ -46,7 +46,7 @@ namespace {
         }
 
         QVariant
-        data(const QXCollectionViewDataIndex & index, int role) const override {
+        data(const QXCollectionModelIndex & index, int role) const override {
             return QVariant();
         }
 
@@ -66,10 +66,12 @@ QXCollectionViewContentWidget::QXCollectionViewContentWidget(QWidget * parent)
     , cellSize_(80, 80)
     , cellSpace_(20)
     , headerHeight_{25}
-    , sectionSpace_{40}
-    , contentMargin_{5} {
-        model_ = new QXDummyModel(this);
-      }
+    , headerSpaceAbove_{40}
+    , contentMargin_{5}
+{
+    model_ = new QXDummyModel(this);
+    setMouseTracking(false);
+}
 
 int
 QXCollectionViewContentWidget::columnCount() const {
@@ -104,24 +106,29 @@ QXCollectionViewContentWidget::rowAt(int y) const {
                            rowCount(model_->sectionCount() - 1) - 1);
 }
 
+std::tuple<int, int>
+QXCollectionViewContentWidget::rowAt(const QXCollectionModelIndex & index) const {
+    return std::make_tuple(index.section, index.item / columnCount());
+}
+
 int
-QXCollectionViewContentWidget::rowY(int section, int row) const {
+QXCollectionViewContentWidget::rowTop(int section, int row) const {
     int height = contentMargin_;
     for (int s = 0; s < section; ++ s)
         height += sectionHeight(s);
     height += headerHeight();
-    for (int r = 0; r <= row; ++ r)
-        height += cellSize_.height() + (r?cellSpace_: 0);
+    for (int r = 0; r < row; ++ r)
+        height += rowHeight();
     return height;
 }
 
-QXCollectionViewDataIndex
+QXCollectionModelIndex
 QXCollectionViewContentWidget::cellAt(const QPoint & pos) const {
     int section, row;
     std::tie(section, row) = rowAt(pos.y());
 
-    int yMax = rowY(section, row);
-    int yMin = yMax - rowHeight();
+    int yMin = rowTop(section, row);
+    int yMax = yMin + rowHeight();
 
     if (pos.y() < yMin) {
         // header
@@ -145,9 +152,20 @@ QXCollectionViewContentWidget::cellAt(const QPoint & pos) const {
     return {-1, -1};
 }
 
+QRect
+QXCollectionViewContentWidget::visualRect(const QXCollectionModelIndex & index) const {
+    int section, row;
+    std::tie(section, row) = rowAt(index);
+    int top = rowTop(section, row);
+    int left = contentMargin_;
+    for (int i = 0; i < index.item % columnCount(); ++ i) 
+        left += cellSize_.width() + cellSpace_;
+    return QRect(QPoint(left, top), cellSize_);
+}
+
 int
 QXCollectionViewContentWidget::sectionHeight(int section) const {
-    return rowCount(section) * rowHeight() - cellSpace_ + headerHeight();
+    return rowCount(section) * rowHeight() - cellSpace_ + headerHeight() - (section? 0: headerSpaceAbove_);
 }
 
 int
@@ -157,7 +175,7 @@ QXCollectionViewContentWidget::rowHeight() const {
 
 int
 QXCollectionViewContentWidget::headerHeight() const {
-    return headerHeight_ + sectionSpace_ + headerSpaceBelow_;
+    return headerHeight_ + headerSpaceAbove_ + headerSpaceBelow_;
 }
 
 QSize
@@ -189,22 +207,17 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
     if (beginSection == -1 || endSection == -1)
         return ;
 
-    int y = contentMargin_;
+    int sectionTop = contentMargin_;
     for (int s = 0; s < beginSection; ++ s)
-        y += sectionHeight(s);
-    y += headerHeight();
-
+        sectionTop += sectionHeight(s);
 
     int updatedCellCount = 0;
     for (int s = beginSection; s <= endSection; ++ s) {
-        auto bg = QColor(colors[s % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
-        auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
         QRect sectionHeaderRect(contentMargin_,
-                                y - headerSpaceBelow_ - headerHeight_,
+                                sectionTop + headerSpaceAbove_,
                                 width() - 2 * contentMargin_,
                                 headerHeight_);
         drawHeader(&painter, sectionHeaderRect, s);
-        painter.setPen(fg);
 
         int r0 = 0, r1 = rowCount(s) - 1;
         if (s == beginSection) {
@@ -218,9 +231,9 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
             r1 = endRow;
         }
 
-        int rowY = y;
+        int rowTop = sectionTop + headerHeight();;
         for (int r = 0; r < r0; ++ r)
-            rowY += rowHeight();
+            rowTop += rowHeight();
 
         for (int r = r0; r <= r1; ++ r) {
             int cEnd = columns;
@@ -228,17 +241,17 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
                 cEnd = model_->itemCount(s) - r * columns;
 
             for (int c = 0; c < cEnd; ++ c) {
-                QPoint leftTop(contentMargin_ + c * (cellSize_.width() + cellSpace_), rowY);
+                QPoint leftTop(contentMargin_ + c * (cellSize_.width() + cellSpace_), rowTop);
                 QRect cellRect(leftTop, cellSize_);
-                QXCollectionViewDataIndex dataIndex = {s, r * columns + c};
+                QXCollectionModelIndex dataIndex = {s, r * columns + c};
                 drawCell(&painter, cellRect, dataIndex, selected_ == dataIndex);
 
                 ++ updatedCellCount;
             }
-            rowY += rowHeight();
+            rowTop += rowHeight();
         }
 
-        y += sectionHeight(s);
+        sectionTop += sectionHeight(s); // TODO: or sectionTop = rowTop?
     }
 
     qWarning("QXCollectionViewContentWidget::update => rect: (%d, %d, %d, %d), beginSection: %d, %d, endSection: %d, %d, total updated cells: %d",
@@ -247,7 +260,7 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
 }
 
 void
-QXCollectionViewContentWidget::drawCell(QPainter * painter, const QRect & rect, const QXCollectionViewDataIndex & index, bool selected) {
+QXCollectionViewContentWidget::drawCell(QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected) {
     if (delegate_) 
         return delegate_->drawCell(this, painter, rect, index, selected);
 
@@ -278,8 +291,23 @@ void
 QXCollectionViewContentWidget::mousePressEvent(QMouseEvent * event) {
     selected_ = cellAt(event->pos());
     update();
+    emit clicked(selected_);
 }
 
+void
+QXCollectionViewContentWidget::mouseMoveEvent(QMouseEvent * event) {
+    selected_ = cellAt(event->pos());
+    update();
+    emit clicked(selected_);
+}
+
+void
+QXCollectionViewContentWidget::mouseDoubleClickEvent(QMouseEvent * event) {
+    emit doubleClicked(selected_);
+}
+
+
+///////////////////////////////////////////////////////////////////
 
 QXCollectionView::QXCollectionView(QWidget *parent)
     : QScrollArea(parent) {
@@ -287,21 +315,28 @@ QXCollectionView::QXCollectionView(QWidget *parent)
 
     widget_ = new QXCollectionViewContentWidget();
     this->setWidget(widget_);
-    //setModel(new QXDummyModel(this));
+
+    connect(widget_, &QXCollectionViewContentWidget::clicked,
+            this, &QXCollectionView::clicked);
+
+    connect(widget_, &QXCollectionViewContentWidget::doubleClicked,
+            this, &QXCollectionView::doubleClicked);
 }
 
 
-QXCollectionViewDataModel *
+QXCollectionModel *
 QXCollectionView::model() const {
     return qobject_cast<QXCollectionViewContentWidget*>(widget())->model_;
 }
 
 void
-QXCollectionView::setModel(QXCollectionViewDataModel * model) {
+QXCollectionView::setModel(QXCollectionModel * model) {
+    if (widget_->model_) 
+        widget_->model_->disconnect(this);
+        
     widget_->model_ = model;
     model->setParent(widget_);
-    connect(model, &QXCollectionViewDataModel::reset, this, &QXCollectionView::onModelReset);
-    //emit model->reset();
+    connect(model, &QXCollectionModel::reset, this, &QXCollectionView::onModelReset);
 }
 
 QXCollectionViewDelegate *
@@ -347,12 +382,12 @@ QXCollectionView::cellSpace() const {
 
 void
 QXCollectionView::setSectionSpace(int space) {
-    widget_->sectionSpace_ = space;
+    widget_->headerSpaceAbove_ = space;
 }
 
 int
 QXCollectionView::sectionSpace() const {
-    return widget_->sectionSpace_;
+    return widget_->headerSpaceAbove_;
 }
 
 void
@@ -360,7 +395,15 @@ QXCollectionView::setHeaderHeight(int height) {
     widget_->headerHeight_ = height;
 }
 
+
 int
 QXCollectionView::headerHeight() const {
     return widget_->headerHeight_;
+}
+
+QRect
+QXCollectionView::visualRect(const QXCollectionModelIndex & index) const {
+    QRect rect = widget_->visualRect(index);
+    return QRect(widget_->mapToParent(rect.topLeft()),
+                 widget_->mapToParent(rect.bottomRight()));
 }
