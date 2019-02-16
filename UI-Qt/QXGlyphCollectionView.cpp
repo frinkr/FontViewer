@@ -20,14 +20,14 @@ namespace {
         }
         
         void
-        drawCell(QXCollectionViewContentWidget * view, QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected) override {
-            auto & palette = view->palette();
+        drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) override {
+            auto & palette = option.widget->palette();
             // draw the background and focus
-            if (selected) {
-                painter->fillRect(rect, palette.color(QPalette::Active, QPalette::Highlight));
+            if (option.selected) {
+                painter->fillRect(option.rect, palette.color(QPalette::Active, QPalette::Highlight));
             }
 
-            auto data = document_->data(index, QXGlyphRole);
+            auto data = document_->data(option.index, QXGlyphRole);
             if (!data.canConvert<QXGlyph>())
                 return;
 
@@ -61,8 +61,8 @@ namespace {
                 }
 
                 if (!text.isEmpty()) {
-                    painter->setPen(palette.color(QPalette::Normal, selected? QPalette::HighlightedText: QPalette::Text));
-                    QRect textRect = rect.adjusted(0, GLYPH_IMAGE_SIZE, 0, 0);
+                    painter->setPen(palette.color(QPalette::Normal, option.selected? QPalette::HighlightedText: QPalette::Text));
+                    QRect textRect = option.rect.adjusted(0, GLYPH_IMAGE_SIZE, 0, 0);
                     painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWrapAnywhere, text);
                 }
             }
@@ -73,10 +73,10 @@ namespace {
                 QRect emRect(0, 0, emSize.width(), emSize.height());
     
                 QImage image = placeGlyphImage(g, emSize);
-                if (g.face->isScalable() && (selected || qApp->darkMode()))
+                if (g.face->isScalable() && (option.selected || qApp->darkMode()))
                     image.invertPixels();
                 QPixmap pixmap = QPixmap::fromImage(image);
-                QRect imageRect = rect.adjusted(0, 0, 0, -GLYPH_NAME_HEIGHT);
+                QRect imageRect = option.rect.adjusted(0, 0, 0, -GLYPH_NAME_HEIGHT);
                 painter->drawImage(imageRect, image, QRectF(0, 0, image.width(), image.height()));
             }
 
@@ -85,16 +85,19 @@ namespace {
         }
 
         void
-        drawHeader(QXCollectionViewContentWidget * view, QPainter * painter, const QRect & rect, int section) override {
-            auto bg = QColor(colors[section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
+        drawHeader(QPainter * painter, const QXCollectionViewDrawHeaderOption & option) override {
+            auto bg = QColor(colors[option.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
             auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
             painter->save();
-            painter->setPen(view->palette().color(QPalette::Text));
+            painter->setPen(option.widget->palette().color(option.selected? QPalette::HighlightedText: QPalette::Text));
+            if (option.selected) {
+                painter->fillRect(option.rect, option.widget->palette().color(QPalette::Highlight));
+            }
             QFont font = painter->font();
-            font.setPixelSize(rect.height() - 2);
+            font.setPixelSize(option.rect.height() - 2);
             font.setBold(true);
             painter->setFont(font);
-            painter->drawText(rect, Qt::AlignCenter, document_->data(section).toString());
+            painter->drawText(option.rect, Qt::AlignCenter, document_->data(option.section).toString());
             painter->restore();
         }
 
@@ -105,7 +108,6 @@ namespace {
 QXGlyphCollectionView::QXGlyphCollectionView(QWidget * parent)
     : QXCollectionView(parent){
     this->setCellSize(QSize(GLYPH_IMAGE_SIZE, GLYPH_IMAGE_SIZE + GLYPH_NAME_HEIGHT));
-    this->setCellSize(QSize(90, 90));
     this->setCellSpace(10);
     this->setSectionSpace(40);
     setDelegate(new QXGlyphCollectionViewDelegate(this));

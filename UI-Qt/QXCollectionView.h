@@ -6,25 +6,32 @@
 
 class QXCollectionViewContentWidget;
 
+struct QXCollectionViewDrawItemOption {
+    QXCollectionViewContentWidget * widget;
+    QRect  rect;
+    QXCollectionModelIndex index;
+    bool selected;
+};
+
+struct QXCollectionViewDrawHeaderOption {
+    QXCollectionViewContentWidget * widget;
+    QRect  rect;
+    int section;
+    bool selected;
+};
+
 class QXCollectionViewDelegate : public QObject {
     Q_OBJECT
 public:
     using QObject::QObject;
 
     virtual void
-    drawCell(
-        QXCollectionViewContentWidget * view,
-        QPainter * painter,
-        const QRect & rect,
-        const QXCollectionModelIndex & index,
-        bool selected) = 0;
+    drawItem(QPainter * painter,
+             const QXCollectionViewDrawItemOption & option) = 0;
 
     virtual void
-    drawHeader(
-        QXCollectionViewContentWidget * view,
-        QPainter * painter,
-        const QRect & rect,
-        int section) = 0;
+    drawHeader(QPainter * painter,
+               const QXCollectionViewDrawHeaderOption & option) = 0;
 };
 
 class QXCollectionViewContentWidget: public QWidget {
@@ -51,10 +58,12 @@ public:
     mouseDoubleClickEvent(QMouseEvent * event) override;
 
     virtual void
-    drawCell(QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected);
+    drawItem(QPainter * painter,
+             const QXCollectionViewDrawItemOption & option);
 
     virtual void
-    drawHeader(QPainter * painter, const QRect & rect, int section);
+    drawHeader(QPainter * painter,
+               const QXCollectionViewDrawHeaderOption & option);
 
 signals:
     void

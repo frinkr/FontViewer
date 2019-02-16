@@ -136,7 +136,7 @@ QXCollectionViewContentWidget::itemAt(const QPoint & pos) const {
     else {
         int columns = columnCount();
         int cellEnd = columns;
-        if ((rowIndex.row + 1) * columns > model_->itemCount(rowIndex.row))
+        if ((rowIndex.row + 1) * columns > model_->itemCount(rowIndex.section))
             cellEnd = model_->itemCount(rowIndex.section) - rowIndex.row * columns;
 
         int x = contentMargins_.left();
@@ -213,7 +213,14 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
                                 sectionTop + sectionSpace_,
                                 width() - contentMargins_.left() - contentMargins_.right(),
                                 headerSize_);
-        drawHeader(&painter, sectionHeaderRect, s);
+
+        QXCollectionViewDrawHeaderOption option;
+        option.widget = this;
+        option.rect = sectionHeaderRect;
+        option.section = s;
+        option.selected = (selected_.item == -1 && selected_.section == s);
+
+        drawHeader(&painter, option);
 
         int r0 = 0, r1 = rowCount(s) - 1;
         if (s == beginRowIndex.section) {
@@ -240,7 +247,14 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
                 QPoint leftTop(contentMargins_.left() + c * (itemSize_.width() + itemSpace_.width()), rowTop);
                 QRect cellRect(leftTop, itemSize_);
                 QXCollectionModelIndex dataIndex = {s, r * columns + c};
-                drawCell(&painter, cellRect, dataIndex, selected_ == dataIndex);
+
+                QXCollectionViewDrawItemOption option;
+                option.widget = this;
+                option.rect = cellRect;
+                option.selected = selected_ == dataIndex;
+                option.index = dataIndex;
+
+                drawItem(&painter, option);
 
                 ++ updatedCellCount;
             }
@@ -257,31 +271,31 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
 }
 
 void
-QXCollectionViewContentWidget::drawCell(QPainter * painter, const QRect & rect, const QXCollectionModelIndex & index, bool selected) {
+QXCollectionViewContentWidget::drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) {
     if (delegate_) 
-        return delegate_->drawCell(this, painter, rect, index, selected);
+        return delegate_->drawItem(painter, option);
 
-    auto bg = QColor(colors[index.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
+    auto bg = QColor(colors[option.index.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
     int expand = 10;
-    if (selected)
-        painter->fillRect(rect.adjusted(-expand, -expand, expand, expand), bg);
+    if (option.selected)
+        painter->fillRect(option.rect.adjusted(-expand, -expand, expand, expand), bg);
     else
-        painter->fillRect(rect, bg);
-    painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(index, 0).toString());
+        painter->fillRect(option.rect, bg);
+    painter->drawText(option.rect, Qt::AlignHCenter | Qt::AlignVCenter, model_->data(option.index, 0).toString());
 }
 
 void
-QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QRect & rect, int section) {
+QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QXCollectionViewDrawHeaderOption & option) {
     if (delegate_)
-        return delegate_->drawHeader(this, painter, rect, section);
+        return delegate_->drawHeader(painter, option);
 
-    auto bg = QColor(colors[section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
+    auto bg = QColor(colors[option.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
     auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
     painter->setPen(bg);
     QFont font = painter->font();
-    font.setPixelSize(rect.height() - 2);
+    font.setPixelSize(option.rect.height() - 2);
     painter->setFont(font);
-    painter->drawText(rect, Qt::AlignCenter, model_->data(section).toString());
+    painter->drawText(option.rect, Qt::AlignCenter, model_->data(option.section).toString());
 }
 
 void
