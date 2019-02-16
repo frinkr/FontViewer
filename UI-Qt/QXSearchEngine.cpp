@@ -68,7 +68,7 @@ QUSearchEngine::searchChar(FXGChar c) const {
     assert(!c.isGlyphID());
     
     QXSearchResult result;
-
+#if 0
     size_t blockIndex = -1;
     size_t charIndex = -1;
             
@@ -100,6 +100,9 @@ QUSearchEngine::searchChar(FXGChar c) const {
         if (gid)
             return searchGlyph(gid);
     }
+#else
+    throw "NOT IMPLEMETED";
+#endif
     return result;
 }
 

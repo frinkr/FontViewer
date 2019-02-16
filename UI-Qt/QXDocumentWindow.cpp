@@ -51,7 +51,6 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     initUI();
 
     document->setParent(this);
-    document_->setCharMode(false);
     installEventFilter(this);
 }
 
@@ -387,10 +386,10 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
                              tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
         return;
     }
-        
+#if 0        
     document_->setCharMode(result.charMode);
     document_->selectBlock(result.block);
-#if 0
+
     QModelIndex index = document_->index(result.index, 0);
     ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
     ui_->listView->scrollTo(index);

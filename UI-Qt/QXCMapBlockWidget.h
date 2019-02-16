@@ -29,6 +29,12 @@ private slots:
     reloadBlocksCombobox();
 
     void
+    onBlockComboBoxChanged(int index);
+
+    void
+    updateBlockComboBoxIndex(int book);
+
+    void
     onGlyphCheckBox(bool state);
 
     void

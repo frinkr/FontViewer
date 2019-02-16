@@ -63,6 +63,40 @@ enum class QXGlyphLabel {
 
 Q_DECLARE_METATYPE(QXGlyph);
 
+class QXGCharBook {
+public:
+    enum Scope {
+        Single,       // The book contains only one block
+        CMap,         // The book contains all blocks from current CMap
+        GlyphList,    // The book contains the block of all glyphs in font
+        FullUnicode,  // The book contains all blocks of Unicode
+    };
+public:
+    explicit QXGCharBook(Scope scope, const QString & name = QString());
+
+    const FXVector<FXPtr<FXGCharBlock>> &
+    blocks() const;
+
+    void
+    addBlock(FXPtr<FXGCharBlock> block);
+
+    Scope
+    scope() const;
+
+    const QString &
+    name() const;
+
+    void
+    setName(const QString & name);
+
+private:
+    QString  name_;
+    Scope    scope_;
+    FXVector<FXPtr<FXGCharBlock>> blocks_;
+};
+
+using QXGCharBooks = FXVector<QXGCharBook>;
+
 class QXDocument : public QXCollectionModel
 {
     Q_OBJECT
@@ -96,7 +130,7 @@ public slots:
     selectCMap(size_t index);
     
     void
-    selectBlock(size_t index);
+    selectBook(int index);
 
     void
     search(const QXSearch & s);
@@ -108,12 +142,15 @@ public:
     const FXCMap &
     currentCMap() const;
 
-    FXPtr<FXGCharBlock>
-    currentBlock() const;
+    const QXGCharBooks &
+    books() const;
 
-    size_t
-    currentBlockIndex() const;
-    
+    const QXGCharBook &
+    currentBook() const;
+
+    int
+    currentBookIndex() const;
+
     bool
     charMode() const;
 
@@ -127,17 +164,8 @@ public:
     setGlyphLabel(QXGlyphLabel label);
 
     FXGChar
-    charAt(const QModelIndex & index) const;
-
-    FXGChar
     charAt(const QXCollectionModelIndex & index) const;
 
-    int
-    rowCount(const QModelIndex & parent = QModelIndex()) const;
-    
-    QVariant
-    data(const QModelIndex &, int) const;
-    
 public:   // IMPL: QXCollectionViewModel
     int
     sectionCount() const override;
@@ -156,7 +184,7 @@ signals:
     cmapActivated(int index);
 
     void
-    blockSelected(int index);
+    bookSelected(int index);
 
     void
     charModeChanged(bool charMode);
@@ -173,14 +201,16 @@ protected:
     bool
     load();
 
+    void
+    loadBooks();
+
 protected:
     QXFontURI        uri_;
     FXPtr<FXFace>    face_;
 
-    FXPtr<FXGCharBlock> fullGlyphsBlock_;
-    size_t           blockIndex_;
-    FXVector<size_t> blockIndexes_;
-    QImage           dummyImage_;
+    QXGCharBooks     books_;
+    size_t           bookIndex_;
+
     bool             charMode_;
     QXGlyphLabel     glyphLabel_;
     
