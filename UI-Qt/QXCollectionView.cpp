@@ -1,5 +1,7 @@
+#include <QCoreApplication>
 #include <QScrollArea>
 #include <QPaintEvent>
+#include <QLayout>
 #include <QMouseEvent>
 #include <QPainter>
 #include "QXCollectionView.h"
@@ -348,6 +350,8 @@ QXCollectionView::setModel(QXCollectionModel * model) {
     widget_->model_ = model;
     model->setParent(widget_);
     connect(model, &QXCollectionModel::reset, this, &QXCollectionView::onModelReset);
+    connect(model, &QXCollectionModel::beginResetModel, this, &QXCollectionView::onBeginResetModel);
+    connect(model, &QXCollectionModel::endResetModel, this, &QXCollectionView::onEndResetModel);
 }
 
 QXCollectionViewDelegate *
@@ -417,4 +421,15 @@ QXCollectionView::itemRect(const QXCollectionModelIndex & index) const {
     QRect rect = widget_->itemRect(index);
     return QRect(widget_->mapToParent(rect.topLeft()),
                  widget_->mapToParent(rect.bottomRight()));
+}
+
+void
+QXCollectionView::onBeginResetModel() {
+    
+}
+
+void
+QXCollectionView::onEndResetModel() {
+    widget_->updateGeometry();
+    ensureVisible(0, 0);
 }

@@ -97,12 +97,12 @@ QXDocument::selectCMap(size_t index) {
 
 void
 QXDocument::selectBlock(size_t index) {
-    if (blockIndex_ == index)
-        return;
+    //if (blockIndex_ == index)
+    //    return;
     
-//    beginResetModel();
+    beginResetModel();
     blockIndex_ = charMode_? index : 0;
-//    endResetModel();
+    endResetModel();
 
     emit blockSelected(blockIndex_);
 }

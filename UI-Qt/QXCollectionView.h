@@ -195,6 +195,11 @@ private slots:
     void
     onModelReset();
 
+    void
+    onBeginResetModel();
+
+    void
+    onEndResetModel();
 private:
     QXCollectionViewContentWidget * widget_{nullptr};
 };
