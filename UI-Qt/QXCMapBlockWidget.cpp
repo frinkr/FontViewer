@@ -27,7 +27,7 @@ void
 QXCMapBlockWidget::setDocument(QXDocument * document) {
     if (document_) {
         ui_->cmapComboBox->disconnect(document_);
-        ui_->blockComboBox->disconnect(document_);
+        ui_->bookComboBox->disconnect(document_);
         document_->disconnect(this);
     }
         
@@ -39,7 +39,7 @@ QXCMapBlockWidget::setDocument(QXDocument * document) {
     connect(document_, &QXDocument::cmapActivated,
             this, &QXCMapBlockWidget::reloadBlocksCombobox);
     
-    connect(ui_->blockComboBox, QOverload<int>::of(&QComboBox::activated),
+    connect(ui_->bookComboBox, QOverload<int>::of(&QComboBox::activated),
             this, &QXCMapBlockWidget::onBlockComboBoxChanged);
 
     connect(document_, &QXDocument::bookSelected,
@@ -76,33 +76,33 @@ QXCMapBlockWidget::reloadCMapsCombobox() {
 
 void
 QXCMapBlockWidget::reloadBlocksCombobox() {
-    ui_->blockComboBox->clear();
+    ui_->bookComboBox->clear();
         
     auto & books = document_->books();
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.scope() == QXGCharBook::CMap)
-            ui_->blockComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), i);
     }
 
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.scope() == QXGCharBook::FullUnicode)
-            ui_->blockComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), i);
     }
 
-    ui_->blockComboBox->insertSeparator(9999);
+    ui_->bookComboBox->insertSeparator(9999);
 
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.scope() == QXGCharBook::Single)
-            ui_->blockComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), i);
     }
 }
 
 void
 QXCMapBlockWidget::onBlockComboBoxChanged(int index) {
-    QVariant d = ui_->blockComboBox->itemData(index);
+    QVariant d = ui_->bookComboBox->itemData(index);
     if (d.canConvert<int>()) {
         auto value = d.value<int>();
         document_->selectBook(value);
@@ -111,12 +111,12 @@ QXCMapBlockWidget::onBlockComboBoxChanged(int index) {
 
 void
 QXCMapBlockWidget::onDocumentBookSelected(int book) {
-    for (int i = 0; i < ui_->blockComboBox->count(); ++ i) {
-        QVariant d = ui_->blockComboBox->itemData(i);
+    for (int i = 0; i < ui_->bookComboBox->count(); ++ i) {
+        QVariant d = ui_->bookComboBox->itemData(i);
         if (d.canConvert<int>()) {
             auto value = d.value<int>();
             if (value == book) {
-                ui_->blockComboBox->setCurrentIndex(i);
+                ui_->bookComboBox->setCurrentIndex(i);
                 break;
             }
         }   

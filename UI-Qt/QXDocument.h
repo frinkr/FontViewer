@@ -201,15 +201,18 @@ protected:
     bool
     load();
 
-    void
+    bool
     loadBooks();
 
+    bool
+    initCurrentBook();
 protected:
     QXFontURI        uri_;
     FXPtr<FXFace>    face_;
 
     QXGCharBooks     books_;
     size_t           bookIndex_;
+    size_t           prevBookIndex_;
 
     bool             charMode_;
     QXGlyphLabel     glyphLabel_;

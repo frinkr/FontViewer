@@ -117,9 +117,9 @@ QXDocument::displayName() const {
 bool
 QXDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {
-        emit cmapActivated(int(index));
-
         loadBooks();
+        emit cmapActivated(int(index));
+        initCurrentBook();
         return true;
     }
     return false;
@@ -168,7 +168,6 @@ QXDocument::currentBookIndex() const {
     return bookIndex_;
 }
 
-
 bool
 QXDocument::charMode() const {
     return charMode_;
@@ -181,12 +180,19 @@ QXDocument::setCharMode(bool state) {
     
     charMode_ = state;
 
-    for (auto i = 0; i < books_.size(); ++i) {
-        if (books_[i].scope() == QXGCharBook::GlyphList) {
-            selectBook(i);
-            break;
+    if (!charMode_) {
+        prevBookIndex_ = bookIndex_;
+        for (auto i = 0; i < books_.size(); ++i) {
+            if (books_[i].scope() == QXGCharBook::GlyphList) {
+                selectBook(i);
+                break;
+            }
         }
     }
+    else {
+        selectBook(prevBookIndex_);
+    }
+
     emit charModeChanged(charMode_);
 }
 
@@ -252,11 +258,10 @@ QXDocument::load() {
     if (!face_)
         return false;
 
-    loadBooks();
-    return true;
+    return loadBooks() && initCurrentBook();
 }
 
-void
+bool
 QXDocument::loadBooks() {
     auto & cmap = currentCMap();
     books_.clear();
@@ -289,11 +294,21 @@ QXDocument::loadBooks() {
         books_.push_back(book);
     }
 
+    return true;
+}
+
+bool
+QXDocument::initCurrentBook() {
+    auto & cmap = currentCMap();
+
     // Init current book
+    int bookIndex = 0;
     if(cmap.isUnicode())
-        selectBook(2);
-    else if (cmap.blocks().size() > 1)
-        selectBook(1);
-    else
-        selectBook(0);
+        bookIndex = 2;    
+    else if (!cmap.blocks().empty())
+        bookIndex = 1;
+    prevBookIndex_ = bookIndex;
+    selectBook(bookIndex);
+
+    return true;
 }
