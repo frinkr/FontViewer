@@ -74,6 +74,7 @@ QXCollectionViewContentWidget::QXCollectionViewContentWidget(QWidget * parent)
     model_ = new QXDummyModel(this);
     setMouseTracking(false);
     setCursor(Qt::ArrowCursor);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 int

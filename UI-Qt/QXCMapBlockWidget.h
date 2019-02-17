@@ -32,7 +32,7 @@ private slots:
     onBlockComboBoxChanged(int index);
 
     void
-    updateBlockComboBoxIndex(int book);
+    onDocumentBookSelected(int book);
 
     void
     onGlyphCheckBox(bool state);

@@ -23,8 +23,9 @@ namespace {
         drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) override {
             auto & palette = option.widget->palette();
             // draw the background and focus
+            bool hasFocus = option.widget->hasFocus();
             if (option.selected) {
-                painter->fillRect(option.rect, palette.color(QPalette::Active, QPalette::Highlight));
+                painter->fillRect(option.rect, palette.color(hasFocus?QPalette::Active: QPalette::Inactive, QPalette::Highlight));
             }
 
             auto data = document_->data(option.index, QXGlyphRole);
@@ -61,7 +62,7 @@ namespace {
                 }
 
                 if (!text.isEmpty()) {
-                    painter->setPen(palette.color(QPalette::Normal, option.selected? QPalette::HighlightedText: QPalette::Text));
+                    painter->setPen(palette.color(hasFocus ? QPalette::Active : QPalette::Inactive, option.selected? QPalette::HighlightedText: QPalette::Text));
                     QRect textRect = option.rect.adjusted(0, GLYPH_IMAGE_SIZE, 0, 0);
                     painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWrapAnywhere, text);
                 }
@@ -91,7 +92,7 @@ namespace {
             painter->save();
             painter->setPen(option.widget->palette().color(option.selected? QPalette::HighlightedText: QPalette::Text));
             if (option.selected) {
-                painter->fillRect(option.rect, option.widget->palette().color(QPalette::Highlight));
+                //painter->fillRect(option.rect, option.widget->palette().color(QPalette::Highlight));
             }
             QFont font = painter->font();
             font.setPixelSize(option.rect.height() - 2);
