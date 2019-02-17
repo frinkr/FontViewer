@@ -386,17 +386,13 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
                              tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
         return;
     }
-#if 0        
-    document_->setCharMode(result.charMode);
-    document_->selectBlock(result.block);
 
-    QModelIndex index = document_->index(result.index, 0);
-    ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
-    ui_->listView->scrollTo(index);
-    ui_->listView->setFocus();
-#else
-    throw "NOT IMPLEMENTED";
-#endif
+    document_->setCharMode(result.charMode);
+    document_->selectBook(result.book);
+    QXCollectionModelIndex modelIndex{ result.block, result.index };
+    ui_->glyphCollectionView->select(modelIndex);
+    ui_->glyphCollectionView->scrollTo(modelIndex);
+    ui_->glyphCollectionView->setFocus();
 }
 
 void

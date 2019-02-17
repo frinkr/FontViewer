@@ -425,6 +425,20 @@ QXCollectionView::itemRect(const QXCollectionModelIndex & index) const {
                  widget_->mapToParent(rect.bottomRight()));
 }
 
+
+void
+QXCollectionView::select(const QXCollectionModelIndex & index) {
+    widget_->selected_ = index;
+    widget_->update();
+}
+
+void
+QXCollectionView::scrollTo(const QXCollectionModelIndex & index) {
+    QRect rect = itemRect(index);
+    this->ensureVisible(rect.center().x(), rect.center().y(), rect.width() / 2, rect.height() / 2);
+    widget_->update();
+}
+
 void
 QXCollectionView::onBeginResetModel() {
     

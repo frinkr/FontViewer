@@ -182,6 +182,12 @@ public:
     QRect
     itemRect(const QXCollectionModelIndex & index) const;
 
+    void
+    select(const QXCollectionModelIndex & index);
+
+    void
+    scrollTo(const QXCollectionModelIndex & index);
+
 signals:
     void
     clicked(const QXCollectionModelIndex & index);

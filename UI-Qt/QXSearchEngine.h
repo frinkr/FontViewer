@@ -4,7 +4,8 @@
 struct QXSearchResult {
     bool    found    {false};
     bool    charMode {false};
-    size_t  block    {0};  
+    size_t  book     {0};  // which book
+    size_t  block    {0};  // block in book
     size_t  index    {0};  // index in block
 };
 
@@ -45,6 +46,9 @@ protected:
 
     QXSearchResult
     searchName(const QString & name) const;
+
+    QXSearchResult
+    searchGlyphID(FXGlyphID g) const;
 
 protected:
     QXDocument * document_;

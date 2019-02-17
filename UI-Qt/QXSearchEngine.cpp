@@ -68,58 +68,74 @@ QUSearchEngine::searchChar(FXGChar c) const {
     assert(!c.isGlyphID());
     
     QXSearchResult result;
-#if 0
-    size_t blockIndex = -1;
-    size_t charIndex = -1;
-            
-    auto currentBlock = document_->currentBlock();
-    charIndex = currentBlock->index(c);
-    if (charIndex != -1)
-        blockIndex = document_->currentBlockIndex();
 
-    if (blockIndex == -1) {
-        const FXCMap & cmap = document_->currentCMap();
-        auto blocks = cmap.blocks();
-        for (size_t i = 0; i < blocks.size(); ++ i) {
-            charIndex = blocks[i]->index(c);
-            if (charIndex != -1) {
-                blockIndex = i;
-                break;
+    auto & books = document_->books();
+    FXVector<size_t> indexes(books.size() + 1);
+    indexes[0] = document_->currentBookIndex();
+    std::iota(indexes.begin() + 1, indexes.end(), 0);
+    for (auto bookIndex: indexes) {
+        auto & book = books[bookIndex];
+        if (book.scope() != QXGCharBook::GlyphList) {
+            auto & blocks = book.blocks();
+            for (size_t blockIndex = 0; blockIndex < blocks.size(); ++ blockIndex) {
+                auto & block = blocks[blockIndex];
+                auto charIndex = block->index(c);
+                if (charIndex != -1) {
+                    result.found = true;
+                    result.book  = bookIndex;
+                    result.block = blockIndex;
+                    result.index = charIndex;
+                    result.charMode = true;
+                }
             }
         }
     }
-    if (blockIndex != -1) {
-        result.found    = true;
-        result.charMode = true;
-        result.block    = blockIndex;
-        result.index    = charIndex;
-    }
-    else {
-        // let's convert char to glyph and search in glyph mode
+
+    // let's convert char to glyph and search in glyph mode
+    if (!result.found) {
         FXGlyphID gid = document_->currentCMap().glyphForChar(c.value);
         if (gid)
-            return searchGlyph(gid);
+            return searchGlyphID(gid);
     }
-#else
-    throw "NOT IMPLEMETED";
-#endif
     return result;
 }
 
 QXSearchResult
 QUSearchEngine::searchGlyph(FXGlyphID g) const {
+    if (g < document_->face()->glyphCount()) {
+        const auto & cm = document_->face()->currentCMap();
+        const FXVector<FXChar> chs = cm.charsForGlyph(g);
+        if (document_->charMode() && chs.size())
+            return searchChar(FXGChar(chs[0], cm.isUnicode() ? FXGCharTypeUnicode : FXGCharTypeOther));
+    }
+    return searchGlyphID(g);
+}
+
+QXSearchResult
+QUSearchEngine::searchGlyphID(FXGlyphID g) const {
     QXSearchResult result;
 
-    const auto & cm = document_->face()->currentCMap();
-    const FXVector<FXChar> chs = cm.charsForGlyph(g);
+    FXGChar c(g, FXGCharTypeGlyphID);
+    if (g < document_->face()->glyphCount()) {
+        auto & books = document_->books();
+        for (auto bookIndex = 0; bookIndex < books.size(); ++ bookIndex) {
+            auto & book = books[bookIndex];
+            if (book.scope() != QXGCharBook::GlyphList)
+                continue;
 
-    if (document_->charMode() && chs.size()) {
-        return searchChar(FXGChar(chs[0], cm.isUnicode()?FXGCharTypeUnicode:FXGCharTypeOther));
-    }
-    else if (g < document_->face()->glyphCount()) {
-        result.found    = true;
-        result.charMode = false;
-        result.index    = g;
+            auto & blocks = book.blocks();
+            for (size_t blockIndex = 0; blockIndex < blocks.size(); ++ blockIndex) {
+                auto & block = blocks[blockIndex];
+                auto charIndex = block->index(c);
+                if (charIndex != -1) {
+                    result.found = true;
+                    result.book  = bookIndex;
+                    result.block = blockIndex;
+                    result.index = charIndex;
+                    result.charMode = false;
+                }
+            }            
+        }
     }
     return result;
 }
