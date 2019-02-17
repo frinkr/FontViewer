@@ -164,6 +164,14 @@ QXCollectionViewContentWidget::itemRect(const QXCollectionModelIndex & index) co
     return QRect(QPoint(left, top), itemSize_);
 }
 
+void
+QXCollectionViewContentWidget::select(const QXCollectionModelIndex & index) {
+    if (selected_.section != -1)
+        update(itemRect(selected_));
+    selected_ = index;
+    update(itemRect(index));
+}
+
 int
 QXCollectionViewContentWidget::sectionHeight(int section) const {
     return rowCount(section) * rowHeight() + headerHeight();
@@ -304,15 +312,13 @@ QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QXCollection
 
 void
 QXCollectionViewContentWidget::mousePressEvent(QMouseEvent * event) {
-    selected_ = itemAt(event->pos());
-    update();
+    select(itemAt(event->pos()));
     emit clicked(selected_);
 }
 
 void
 QXCollectionViewContentWidget::mouseMoveEvent(QMouseEvent * event) {
-    selected_ = itemAt(event->pos());
-    update();
+    select(itemAt(event->pos()));
     emit clicked(selected_);
 }
 
@@ -320,8 +326,7 @@ void
 QXCollectionViewContentWidget::mouseDoubleClickEvent(QMouseEvent * event) {
     emit doubleClicked(selected_);
 }
-
-
+ 
 ///////////////////////////////////////////////////////////////////
 
 QXCollectionView::QXCollectionView(QWidget *parent)
@@ -354,6 +359,7 @@ QXCollectionView::setModel(QXCollectionModel * model) {
     connect(model, &QXCollectionModel::reset, this, &QXCollectionView::onModelReset);
     connect(model, &QXCollectionModel::beginResetModel, this, &QXCollectionView::onBeginResetModel);
     connect(model, &QXCollectionModel::endResetModel, this, &QXCollectionView::onEndResetModel);
+    setFocusProxy(widget_);
 }
 
 QXCollectionViewDelegate *
@@ -425,17 +431,15 @@ QXCollectionView::itemRect(const QXCollectionModelIndex & index) const {
                  widget_->mapToParent(rect.bottomRight()));
 }
 
-
 void
 QXCollectionView::select(const QXCollectionModelIndex & index) {
-    widget_->selected_ = index;
-    widget_->update();
+    widget_->select(index);
 }
 
 void
 QXCollectionView::scrollTo(const QXCollectionModelIndex & index) {
     QRect rect = itemRect(index);
-    this->ensureVisible(rect.center().x(), rect.center().y(), rect.width() / 2, rect.height() / 2);
+    this->ensureVisible(rect.center().x(), rect.center().y(), rect.width(), rect.height());
     widget_->update();
 }
 

@@ -70,9 +70,17 @@ QUSearchEngine::searchChar(FXGChar c) const {
     QXSearchResult result;
 
     auto & books = document_->books();
-    FXVector<size_t> indexes(books.size() + 1);
-    indexes[0] = document_->currentBookIndex();
-    std::iota(indexes.begin() + 1, indexes.end(), 0);
+    FXVector<size_t> indexes;
+    const QXGCharBook::Scope bookOrder[] = { QXGCharBook::CMap, QXGCharBook::Single, QXGCharBook::GlyphList, QXGCharBook::FullUnicode };
+    indexes.push_back(document_->currentBookIndex());
+    for (auto scope : bookOrder) {
+        for (size_t i = 0; i < books.size(); ++i) {
+            if (i == indexes.front()) continue;
+            if (books[i].scope() == scope)
+                indexes.push_back(i);
+        }
+    }
+    
     for (auto bookIndex: indexes) {
         auto & book = books[bookIndex];
         if (book.scope() != QXGCharBook::GlyphList) {

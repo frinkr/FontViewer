@@ -119,7 +119,10 @@ private:
 
     QRect
     itemRect(const QXCollectionModelIndex & index) const;
-    
+
+    void
+    select(const QXCollectionModelIndex & index);
+
     friend class QXCollectionView;
 private:
     QXCollectionModel * model_ {nullptr};
