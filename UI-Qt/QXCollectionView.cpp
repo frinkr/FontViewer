@@ -116,6 +116,11 @@ QXCollectionViewContentWidget::rowAt(const QXCollectionModelIndex & index) const
 }
 
 int
+QXCollectionViewContentWidget::colAt(int x) const {
+    return (x - contentMargins_.left()) / (itemSize_.width() + itemSpace_.width());
+}
+
+int
 QXCollectionViewContentWidget::rowTop(const RowIndex & index) const {
     int height = contentMargins_.top();
     for (int s = 0; s < index.section; ++ s)
@@ -211,6 +216,8 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
 
     const RowIndex beginRowIndex = rowAt(event->rect().top());
     const RowIndex endRowIndex = rowAt(event->rect().bottom());
+    const int beginCol = colAt(event->rect().left());
+    const int endCol = colAt(event->rect().right());
 
     if (beginRowIndex.section == -1 || endRowIndex.section == -1)
         return ;
@@ -255,7 +262,7 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
             if ((r + 1) * columns > model_->itemCount(s))
                 cEnd = model_->itemCount(s) - r * columns;
 
-            for (int c = 0; c < cEnd; ++ c) {
+            for (int c = std::max(0, beginCol); c < std::min(cEnd, endCol + 1); ++ c) {
                 QPoint leftTop(contentMargins_.left() + c * (itemSize_.width() + itemSpace_.width()), rowTop);
                 QRect cellRect(leftTop, itemSize_);
                 QXCollectionModelIndex dataIndex = {s, r * columns + c};

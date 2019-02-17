@@ -100,6 +100,10 @@ private:
     RowIndex
     rowAt(const QXCollectionModelIndex & index) const;
 
+    /* the column at X position */
+    int
+    colAt(int x) const;
+
     /* the <section, item> pair at mouse position.
      * return <-1, -1> for click nothing.
      *        <s, -1> for clicking the section header
