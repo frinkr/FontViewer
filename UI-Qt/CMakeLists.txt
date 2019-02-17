@@ -39,7 +39,6 @@ set(UI
   QXOpenFontDialog.ui
   QXPreferencesDialog.ui
   QXProgressDialog.ui
-  QXSearchWidget.ui
   QXShapingWidget.ui
   QXVariableWidget.ui
   )
@@ -84,8 +83,6 @@ set(SHARED_SOURCES
   QXGlyphCollectionView.h
   QXGlyphInfoWidget.cpp
   QXGlyphInfoWidget.h
-  QXGlyphListView.cpp
-  QXGlyphListView.h
   QXGlyphTableWidget.cpp
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
@@ -110,8 +107,6 @@ set(SHARED_SOURCES
   QXResource.h
   QXSearchEngine.cpp
   QXSearchEngine.h
-  QXSearchWidget.cpp
-  QXSearchWidget.h
   QXShapingWidget.cpp
   QXShapingWidget.h
   QXTheme.cpp

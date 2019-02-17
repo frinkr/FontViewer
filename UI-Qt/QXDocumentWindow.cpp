@@ -18,12 +18,10 @@
 #include "QXDocumentWindowManager.h"
 #include "QXFontInfoWidget.h"
 #include "QXGlyphInfoWidget.h"
-#include "QXGlyphListView.h"
 #include "QXGlyphTableWidget.h"
 #include "QXMenuBar.h"
 #include "QXPopoverWindow.h"
 #include "QXSearchEngine.h"
-#include "QXSearchWidget.h"
 #include "QXShapingWidget.h"
 #include "QXTheme.h"
 #include "QXVariableWidget.h"
@@ -200,16 +198,8 @@ QXDocumentWindow::initSearchField() {
 
 void
 QXDocumentWindow::initListView() {
-#if 0
-    ui_->listView->setModel(document_);
-    ui_->listView->setItemDelegate(new QXGlyphItemDelegate(this));
-    ui_->listView->installEventFilter(this);
-    ui_->listView->setAcceptDrops(true);
-#else
-    //throw "NOT IMPLEMENTED";
-#endif
-    ui_->listView->hide();
     ui_->glyphCollectionView->setDocument(document_);
+    ui_->glyphCollectionView->setAcceptDrops(true);
 }
 
 void
@@ -262,7 +252,7 @@ QXDocumentWindow::dropEvent(QDropEvent * event) {
 
 bool
 QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
-    if (watched == ui_->listView || watched == menuBar_) {
+    if (watched == ui_->glyphCollectionView || watched == menuBar_) {
         if (event->type() == QEvent::Drop) {
             dropEvent(static_cast<QDropEvent *>(event));
             event->accept();
