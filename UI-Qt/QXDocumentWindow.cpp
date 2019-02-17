@@ -387,7 +387,7 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
         return;
     }
 
-    document_->setCharMode(result.charMode);
+    document_->setCharMode(document_->books()[result.book].type() != QXGCharBook::GlyphList);
     document_->selectBook(result.book);
     QXCollectionModelIndex modelIndex{ result.block, result.index };
     ui_->glyphCollectionView->select(modelIndex);

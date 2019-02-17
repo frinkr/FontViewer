@@ -38,8 +38,8 @@ QXGlyph::QXGlyph(const QXGlyph & other)
     : g_(other.g()){
 }
 
-QXGCharBook::QXGCharBook(Scope scope, const QString & name)
-    : scope_(scope),
+QXGCharBook::QXGCharBook(Type type, const QString & name)
+    : type_(type),
       name_(name) {
 }
 
@@ -53,9 +53,9 @@ QXGCharBook::addBlock(FXPtr<FXGCharBlock> block) {
     blocks_.push_back(block);
 }
 
-QXGCharBook::Scope
-QXGCharBook::scope() const {
-    return scope_;
+QXGCharBook::Type
+QXGCharBook::type() const {
+    return type_;
 }
 
 const QString &
@@ -136,14 +136,14 @@ QXDocument::selectBook(int index) {
 
 void
 QXDocument::search(const QXSearch & s) {
-    QUSearchEngine * se = new QUSearchEngine(this);
+    QXSearchEngine * se = new QXSearchEngine(this);
     QXSearchResult result = se->search(s);
     emit searchDone(result, "");
 }
 
 void
 QXDocument::search(const QString & text) {
-    QUSearchEngine * se = new QUSearchEngine(this);
+    QXSearchEngine * se = new QXSearchEngine(this);
     QXSearchResult result = se->search(text);
     emit searchDone(result, text);
 }
@@ -183,7 +183,7 @@ QXDocument::setCharMode(bool state) {
     if (!charMode_) {
         prevBookIndex_ = bookIndex_;
         for (auto i = 0; i < books_.size(); ++i) {
-            if (books_[i].scope() == QXGCharBook::GlyphList) {
+            if (books_[i].type() == QXGCharBook::GlyphList) {
                 selectBook(i);
                 break;
             }
@@ -289,7 +289,7 @@ QXDocument::loadBooks() {
 
     // Each block as a book
     for (auto & block : cmap.blocks()) {
-        QXGCharBook book(QXGCharBook::Single, toQString(block->name()));
+        QXGCharBook book(QXGCharBook::One, toQString(block->name()));
         book.addBlock(block);
         books_.push_back(book);
     }

@@ -81,13 +81,13 @@ QXCMapBlockWidget::reloadBlocksCombobox() {
     auto & books = document_->books();
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
-        if (book.scope() == QXGCharBook::CMap)
+        if (book.type() == QXGCharBook::CMap)
             ui_->bookComboBox->addItem(book.name(), i);
     }
 
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
-        if (book.scope() == QXGCharBook::FullUnicode)
+        if (book.type() == QXGCharBook::FullUnicode)
             ui_->bookComboBox->addItem(book.name(), i);
     }
 
@@ -95,7 +95,7 @@ QXCMapBlockWidget::reloadBlocksCombobox() {
 
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
-        if (book.scope() == QXGCharBook::Single)
+        if (book.type() == QXGCharBook::One)
             ui_->bookComboBox->addItem(book.name(), i);
     }
 }

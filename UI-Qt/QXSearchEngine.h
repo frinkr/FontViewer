@@ -3,7 +3,6 @@
     
 struct QXSearchResult {
     bool    found    {false};
-    bool    charMode {false};
     size_t  book     {0};  // which book
     size_t  block    {0};  // block in book
     size_t  index    {0};  // index in block
@@ -26,10 +25,10 @@ public:
     parse(const QString & text);
 };
 
-class QUSearchEngine : public QObject {
+class QXSearchEngine : public QObject {
     Q_OBJECT
 public:
-    QUSearchEngine(QXDocument * document);
+    QXSearchEngine(QXDocument * document);
 
     QXSearchResult
     search(const QString & expression) const;
@@ -37,18 +36,18 @@ public:
     QXSearchResult
     search(const QXSearch & expression) const;
 
+    QXSearchResult
+    search(const FXGChar & c) const;
+
 protected:
-    QXSearchResult
-    searchChar(FXGChar c) const;
-
-    QXSearchResult
-    searchGlyph(FXGlyphID g) const;
-
     QXSearchResult
     searchName(const QString & name) const;
 
     QXSearchResult
     searchGlyphID(FXGlyphID g) const;
+
+    QXSearchResult
+    searchInBook(const FXGChar & c, int bookIndex) const;
 
 protected:
     QXDocument * document_;

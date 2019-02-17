@@ -65,14 +65,14 @@ Q_DECLARE_METATYPE(QXGlyph);
 
 class QXGCharBook {
 public:
-    enum Scope {
-        Single,       // The book contains only one block
+    enum Type {
+        One,       // The book contains only one block
         CMap,         // The book contains all blocks from current CMap
         GlyphList,    // The book contains the block of all glyphs in font
         FullUnicode,  // The book contains all blocks of Unicode
     };
 public:
-    explicit QXGCharBook(Scope scope, const QString & name = QString());
+    explicit QXGCharBook(Type type, const QString & name = QString());
 
     const FXVector<FXPtr<FXGCharBlock>> &
     blocks() const;
@@ -80,8 +80,8 @@ public:
     void
     addBlock(FXPtr<FXGCharBlock> block);
 
-    Scope
-    scope() const;
+    Type
+    type() const;
 
     const QString &
     name() const;
@@ -91,7 +91,7 @@ public:
 
 private:
     QString  name_;
-    Scope    scope_;
+    Type     type_;
     FXVector<FXPtr<FXGCharBlock>> blocks_;
 };
 
