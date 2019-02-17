@@ -67,6 +67,13 @@
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QXGlyphCollectionView" name="glyphCollectionView">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QXToolBar" name="toolBar">
@@ -106,6 +113,12 @@
    <class>QXToolBar</class>
    <extends>QToolBar</extends>
    <header>QXToolBar.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QXGlyphCollectionView</class>
+   <extends>QScrollArea</extends>
+   <header>QXGlyphCollectionView.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

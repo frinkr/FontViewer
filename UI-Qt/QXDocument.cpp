@@ -38,6 +38,36 @@ QXGlyph::QXGlyph(const QXGlyph & other)
     : g_(other.g()){
 }
 
+QXGCharBook::QXGCharBook(Type type, const QString & name)
+    : type_(type),
+      name_(name) {
+}
+
+const FXVector<FXPtr<FXGCharBlock>> &
+QXGCharBook::blocks() const {
+    return blocks_;
+}
+
+void
+QXGCharBook::addBlock(FXPtr<FXGCharBlock> block) {
+    blocks_.push_back(block);
+}
+
+QXGCharBook::Type
+QXGCharBook::type() const {
+    return type_;
+}
+
+const QString &
+QXGCharBook::name() const {
+    return name_;
+}
+
+void
+QXGCharBook::setName(const QString & name) {
+    name_ = name;
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 QXDocument *
@@ -87,35 +117,33 @@ QXDocument::displayName() const {
 bool
 QXDocument::selectCMap(size_t index) {
     if (face_->selectCMap(index)) {
-        selectBlock(0);
+        loadBooks();
         emit cmapActivated(int(index));
+        initCurrentBook();
         return true;
     }
     return false;
 }
 
 void
-QXDocument::selectBlock(size_t index) {
-    if (blockIndex_ == index)
-        return;
-    
+QXDocument::selectBook(int index) {
     beginResetModel();
-    blockIndex_ = charMode_? index : 0;
+    bookIndex_ = index;
     endResetModel();
 
-    emit blockSelected(blockIndex_);
+    emit bookSelected(bookIndex_);
 }
 
 void
 QXDocument::search(const QXSearch & s) {
-    QUSearchEngine * se = new QUSearchEngine(this);
+    QXSearchEngine * se = new QXSearchEngine(this);
     QXSearchResult result = se->search(s);
     emit searchDone(result, "");
 }
 
 void
 QXDocument::search(const QString & text) {
-    QUSearchEngine * se = new QUSearchEngine(this);
+    QXSearchEngine * se = new QXSearchEngine(this);
     QXSearchResult result = se->search(text);
     emit searchDone(result, text);
 }
@@ -124,21 +152,20 @@ const FXCMap &
 QXDocument::currentCMap() const {
     return face_->currentCMap();
 }
-    
-FXPtr<FXGCharBlock>
-QXDocument::currentBlock() const {
-    if (charMode_)
-        return currentCMap().blocks()[blockIndex_];
-    else
-        return fullGlyphsBlock_;
+
+const QXGCharBooks &
+QXDocument::books() const {
+    return books_;
 }
 
-size_t
-QXDocument::currentBlockIndex() const {
-    if (charMode_)
-        return blockIndex_;
-    else
-        return 0;
+const QXGCharBook &
+QXDocument::currentBook() const {
+    return books_[bookIndex_];
+}
+
+int
+QXDocument::currentBookIndex() const {
+    return bookIndex_;
 }
 
 bool
@@ -151,9 +178,20 @@ QXDocument::setCharMode(bool state) {
     if (charMode_ == state)
         return;
     
-    beginResetModel();
     charMode_ = state;
-    endResetModel();
+
+    if (!charMode_) {
+        prevBookIndex_ = bookIndex_;
+        for (auto i = 0; i < books_.size(); ++i) {
+            if (books_[i].type() == QXGCharBook::GlyphList) {
+                selectBook(i);
+                break;
+            }
+        }
+    }
+    else {
+        selectBook(prevBookIndex_);
+    }
 
     emit charModeChanged(charMode_);
 }
@@ -171,43 +209,46 @@ QXDocument::setGlyphLabel(QXGlyphLabel label) {
 }
 
 FXGChar
-QXDocument::charAt(const QModelIndex & index) const {
-    return currentBlock()->get(index.row());
+QXDocument::charAt(const QXCollectionModelIndex & index) const {
+    return currentCMap().blocks()[index.section]->get(index.item);
 }
 
 int
-QXDocument::rowCount(const QModelIndex & index) const {
-    return int(currentBlock()->size());
-}
-    
-QVariant
-QXDocument::data(const QModelIndex & index, int role) const {
-    if (!index.isValid())
-        return QVariant();
+QXDocument::sectionCount() const {
+    return currentBook().blocks().size();
+} 
 
+int
+QXDocument::itemCount(int section) const {
+    return currentBook().blocks()[section]->size();
+}
+
+QVariant
+QXDocument::data(const QXCollectionModelIndex & index, int role) const {
     if (role == QXGlyphRole) {
-        FXGlyph g = face_->glyph(currentBlock()->get(index.row()));
+        auto & block = currentBook().blocks()[index.section];
+        FXGlyph g = face_->glyph(block->get(index.item));
         QVariant v;
         v.setValue(QXGlyph(g));
         return v;
     }
-    else if (role == Qt::DisplayRole) 
-        return QString("Dummy");
-    else if (role == Qt::DecorationRole)
-        return dummyImage_;
-    else
-        return QVariant();
+    return QString("G %1,%2").arg(index.section).arg(index.item);
+}
+
+QVariant
+QXDocument::data(int section) const {
+    return toQString(currentBook().blocks()[section]->name());
 }
 
 QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
-    : QAbstractListModel(parent)
+    : QXCollectionModel(parent)
     , uri_(uri)
-    , blockIndex_(0)
     , charMode_(true)
     , glyphLabel_(QXGlyphLabel::GlyphName) {
 
-    connect(this, &QXDocument::variableCoordinatesChanged, [this]() {       
-        dataChanged(index(0), index(rowCount(), 0));
+    connect(this, &QXDocument::variableCoordinatesChanged, [this]() {
+        beginResetModel();
+        endResetModel();
     });
 }
 
@@ -217,10 +258,57 @@ QXDocument::load() {
     if (!face_)
         return false;
 
-    fullGlyphsBlock_.reset(new FXCharRangeBlock(0, FXChar(face_->glyphCount()), FXGCharTypeGlyphID, "All Glyphs"));
-    dummyImage_ = QImage(glyphEmSize(), QImage::Format_ARGB32);
-    dummyImage_.setDevicePixelRatio(2);
+    return loadBooks() && initCurrentBook();
+}
+
+bool
+QXDocument::loadBooks() {
+    auto & cmap = currentCMap();
+    books_.clear();
+
+    // All glyphs blocks at 0
+    QXGCharBook allGlyphBook(QXGCharBook::GlyphList, "Full Glyphs");
+    allGlyphBook.addBlock(std::make_shared<FXCharRangeBlock>(0, FXChar(face_->glyphCount()), FXGCharTypeGlyphID, "All Glyphs"));
+    books_.push_back(allGlyphBook);
+
+    if (cmap.isUnicode()) {
+        // Add Full Unicode blocks
+        QXGCharBook fullUnicodeBook(QXGCharBook::FullUnicode, "Full Unicode");
+        for (auto & block : cmap.unicodeBlocks())
+            fullUnicodeBook.addBlock(block);
+        books_.push_back(fullUnicodeBook);
+    }
+
+    // Add all blocks to single book
+    if (cmap.blocks().size() > 1) {
+        QXGCharBook allBlockBook(QXGCharBook::CMap, cmap.isUnicode() ? tr("Unicode Compact") : tr("All Blocks"));
+        for (auto & block : cmap.blocks())
+            allBlockBook.addBlock(block);
+        books_.push_back(allBlockBook);
+    }
+
+    // Each block as a book
+    for (auto & block : cmap.blocks()) {
+        QXGCharBook book(QXGCharBook::One, toQString(block->name()));
+        book.addBlock(block);
+        books_.push_back(book);
+    }
+
     return true;
 }
 
-    
+bool
+QXDocument::initCurrentBook() {
+    auto & cmap = currentCMap();
+
+    // Init current book
+    int bookIndex = 0;
+    if(cmap.isUnicode())
+        bookIndex = 2;    
+    else if (!cmap.blocks().empty())
+        bookIndex = 1;
+    prevBookIndex_ = bookIndex;
+    selectBook(bookIndex);
+
+    return true;
+}

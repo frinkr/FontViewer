@@ -22,6 +22,8 @@ class QUFontInfoWindow;
 class QXGlyphInfoWidget;
 class QXMenuBar;
 class QXPopoverWindow;
+
+struct QXCollectionModelIndex;
 struct QXSearchResult;
 
 namespace Ui {
@@ -81,11 +83,11 @@ private:
     dropEvent(QDropEvent * event);
 
     bool
-	eventFilter(QObject * watched, QEvent * event);
-private slots:
+    eventFilter(QObject * watched, QEvent * event);
 
+private slots:
     void
-    onGlyphDoubleClicked(const QModelIndex &index);
+    onGlyphDoubleClicked(const QXCollectionModelIndex & index);
 
     void
     onCharLinkClicked(FXGChar c);

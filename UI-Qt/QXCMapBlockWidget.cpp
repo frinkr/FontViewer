@@ -27,7 +27,7 @@ void
 QXCMapBlockWidget::setDocument(QXDocument * document) {
     if (document_) {
         ui_->cmapComboBox->disconnect(document_);
-        ui_->blockComboBox->disconnect(document_);
+        ui_->bookComboBox->disconnect(document_);
         document_->disconnect(this);
     }
         
@@ -35,15 +35,15 @@ QXCMapBlockWidget::setDocument(QXDocument * document) {
 
     connect(ui_->cmapComboBox, QOverload<int>::of(&QComboBox::activated),
             document_, &QXDocument::selectCMap);
-    
+
     connect(document_, &QXDocument::cmapActivated,
             this, &QXCMapBlockWidget::reloadBlocksCombobox);
     
-    connect(ui_->blockComboBox, QOverload<int>::of(&QComboBox::activated),
-            document_, &QXDocument::selectBlock);
-    
-    connect(document_, &QXDocument::blockSelected,
-            ui_->blockComboBox, &QComboBox::setCurrentIndex);
+    connect(ui_->bookComboBox, QOverload<int>::of(&QComboBox::activated),
+            this, &QXCMapBlockWidget::onBlockComboBoxChanged);
+
+    connect(document_, &QXDocument::bookSelected,
+            this, &QXCMapBlockWidget::onDocumentBookSelected);
 
     connect(ui_->glyphCheckBox, &QCheckBox::stateChanged,
             this, &QXCMapBlockWidget::onGlyphCheckBox);
@@ -76,11 +76,51 @@ QXCMapBlockWidget::reloadCMapsCombobox() {
 
 void
 QXCMapBlockWidget::reloadBlocksCombobox() {
-    ui_->blockComboBox->clear();
+    ui_->bookComboBox->clear();
         
-    FXCMap cmap = document_->face()->currentCMap();
-    for (const auto & block: cmap.blocks()) 
-        ui_->blockComboBox->addItem(toQString(block->name()));
+    auto & books = document_->books();
+    for (size_t i = 0; i < books.size(); ++ i) {
+        const auto & book = books[i];
+        if (book.type() == QXGCharBook::CMap)
+            ui_->bookComboBox->addItem(book.name(), i);
+    }
+
+    for (size_t i = 0; i < books.size(); ++ i) {
+        const auto & book = books[i];
+        if (book.type() == QXGCharBook::FullUnicode)
+            ui_->bookComboBox->addItem(book.name(), i);
+    }
+
+    ui_->bookComboBox->insertSeparator(9999);
+
+    for (size_t i = 0; i < books.size(); ++ i) {
+        const auto & book = books[i];
+        if (book.type() == QXGCharBook::One)
+            ui_->bookComboBox->addItem(book.name(), i);
+    }
+}
+
+void
+QXCMapBlockWidget::onBlockComboBoxChanged(int index) {
+    QVariant d = ui_->bookComboBox->itemData(index);
+    if (d.canConvert<int>()) {
+        auto value = d.value<int>();
+        document_->selectBook(value);
+    }
+}
+
+void
+QXCMapBlockWidget::onDocumentBookSelected(int book) {
+    for (int i = 0; i < ui_->bookComboBox->count(); ++ i) {
+        QVariant d = ui_->bookComboBox->itemData(i);
+        if (d.canConvert<int>()) {
+            auto value = d.value<int>();
+            if (value == book) {
+                ui_->bookComboBox->setCurrentIndex(i);
+                break;
+            }
+        }   
+    }
 }
 
 void

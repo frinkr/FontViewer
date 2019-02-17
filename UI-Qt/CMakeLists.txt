@@ -58,6 +58,8 @@ set(SHARED_SOURCES
   QXCMapBlockWidget.h
   QXCollectionView.cpp
   QXCollectionView.h
+  QXCollectionModel.h
+  QXCollectionModel.cpp
   QXConv.cpp
   QXConv.h
   QXDockTitleBarWidget.cpp
@@ -78,6 +80,8 @@ set(SHARED_SOURCES
   QXFontInfoWidget.h
   QXFontManager.cpp
   QXFontManager.h
+  QXGlyphCollectionView.cpp
+  QXGlyphCollectionView.h
   QXGlyphInfoWidget.cpp
   QXGlyphInfoWidget.h
   QXGlyphListView.cpp

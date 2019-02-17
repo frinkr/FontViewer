@@ -3,6 +3,7 @@
 #include <QImage>
 
 #include "FontX/FXFace.h"
+#include "QXCollectionModel.h"
 
 struct QXSearchResult;
 struct QXSearch;
@@ -62,7 +63,41 @@ enum class QXGlyphLabel {
 
 Q_DECLARE_METATYPE(QXGlyph);
 
-class QXDocument : public QAbstractListModel
+class QXGCharBook {
+public:
+    enum Type {
+        One,       // The book contains only one block
+        CMap,         // The book contains all blocks from current CMap
+        GlyphList,    // The book contains the block of all glyphs in font
+        FullUnicode,  // The book contains all blocks of Unicode
+    };
+public:
+    explicit QXGCharBook(Type type, const QString & name = QString());
+
+    const FXVector<FXPtr<FXGCharBlock>> &
+    blocks() const;
+
+    void
+    addBlock(FXPtr<FXGCharBlock> block);
+
+    Type
+    type() const;
+
+    const QString &
+    name() const;
+
+    void
+    setName(const QString & name);
+
+private:
+    QString  name_;
+    Type     type_;
+    FXVector<FXPtr<FXGCharBlock>> blocks_;
+};
+
+using QXGCharBooks = FXVector<QXGCharBook>;
+
+class QXDocument : public QXCollectionModel
 {
     Q_OBJECT
 public:
@@ -95,7 +130,7 @@ public slots:
     selectCMap(size_t index);
     
     void
-    selectBlock(size_t index);
+    selectBook(int index);
 
     void
     search(const QXSearch & s);
@@ -107,12 +142,15 @@ public:
     const FXCMap &
     currentCMap() const;
 
-    FXPtr<FXGCharBlock>
-    currentBlock() const;
+    const QXGCharBooks &
+    books() const;
 
-    size_t
-    currentBlockIndex() const;
-    
+    const QXGCharBook &
+    currentBook() const;
+
+    int
+    currentBookIndex() const;
+
     bool
     charMode() const;
 
@@ -126,20 +164,27 @@ public:
     setGlyphLabel(QXGlyphLabel label);
 
     FXGChar
-    charAt(const QModelIndex & index) const;
+    charAt(const QXCollectionModelIndex & index) const;
+
+public:   // IMPL: QXCollectionViewModel
+    int
+    sectionCount() const override;
 
     int
-    rowCount(const QModelIndex & parent = QModelIndex()) const;
-    
+    itemCount(int section) const override;
+
     QVariant
-    data(const QModelIndex &, int) const;
-    
+    data(const QXCollectionModelIndex & index, int role) const override;
+
+    QVariant
+    data(int section) const override;
+
 signals:
     void
     cmapActivated(int index);
 
     void
-    blockSelected(int index);
+    bookSelected(int index);
 
     void
     charModeChanged(bool charMode);
@@ -156,13 +201,19 @@ protected:
     bool
     load();
 
+    bool
+    loadBooks();
+
+    bool
+    initCurrentBook();
 protected:
     QXFontURI        uri_;
     FXPtr<FXFace>    face_;
 
-    FXPtr<FXGCharBlock> fullGlyphsBlock_;
-    size_t           blockIndex_;
-    QImage           dummyImage_;
+    QXGCharBooks     books_;
+    size_t           bookIndex_;
+    size_t           prevBookIndex_;
+
     bool             charMode_;
     QXGlyphLabel     glyphLabel_;
     

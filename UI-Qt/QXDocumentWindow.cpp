@@ -51,7 +51,6 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     initUI();
 
     document->setParent(this);
-    document_->setCharMode(false);
     installEventFilter(this);
 }
 
@@ -201,10 +200,16 @@ QXDocumentWindow::initSearchField() {
 
 void
 QXDocumentWindow::initListView() {
+#if 0
     ui_->listView->setModel(document_);
     ui_->listView->setItemDelegate(new QXGlyphItemDelegate(this));
     ui_->listView->installEventFilter(this);
     ui_->listView->setAcceptDrops(true);
+#else
+    //throw "NOT IMPLEMENTED";
+#endif
+    ui_->listView->hide();
+    ui_->glyphCollectionView->setDocument(document_);
 }
 
 void
@@ -219,7 +224,7 @@ QXDocumentWindow::initGlyphInfoView() {
     
 void
 QXDocumentWindow::connectSingals() {
-    connect(ui_->listView, &QListView::doubleClicked,
+    connect(ui_->glyphCollectionView, &QXCollectionView::doubleClicked,
             this, &QXDocumentWindow::onGlyphDoubleClicked);
 
     connect(glyphWidget_, &QXGlyphInfoWidget::charLinkClicked,
@@ -281,13 +286,15 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
 }
 
 void
-QXDocumentWindow::onGlyphDoubleClicked(const QModelIndex &index) {
+QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
+    if (index.item == -1 || index.section == -1)
+        return;
     FXGChar c = document_->charAt(index);
     glyphWidget_->setChar(c);
 
-    QRect rect = ui_->listView->visualRect(index);
-    QRect globalRect(ui_->listView->mapToGlobal(rect.topLeft()),
-                     ui_->listView->mapToGlobal(rect.bottomRight()));
+    QRect rect = ui_->glyphCollectionView->itemRect(index);
+    QRect globalRect(ui_->glyphCollectionView->mapToGlobal(rect.topLeft()),
+                     ui_->glyphCollectionView->mapToGlobal(rect.bottomRight()));
 
     glyphPopover_->showRelativeTo(globalRect, QXPopoverTop);
 }
@@ -379,14 +386,13 @@ QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & 
                              tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
         return;
     }
-        
-    document_->setCharMode(result.charMode);
-    document_->selectBlock(result.block);
 
-    QModelIndex index = document_->index(result.index, 0);
-    ui_->listView->selectionModel()->select(index, QItemSelectionModel::SelectCurrent);
-    ui_->listView->scrollTo(index);
-    ui_->listView->setFocus();
+    document_->setCharMode(document_->books()[result.book].type() != QXGCharBook::GlyphList);
+    document_->selectBook(result.book);
+    QXCollectionModelIndex modelIndex{ result.block, result.index };
+    ui_->glyphCollectionView->select(modelIndex);
+    ui_->glyphCollectionView->scrollTo(modelIndex);
+    ui_->glyphCollectionView->setFocus();
 }
 
 void
