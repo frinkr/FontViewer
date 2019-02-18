@@ -5,10 +5,10 @@
 #include <QImage>
 #include <QBitmap>
 #include <QPixmap>
-#include <QGuiApplication>
+#include "QXApplication.h"
 #include "QXPopoverWindow.h"
-#include <QGraphicsDropShadowEffect>
-
+#include <QStyleOptionFrame>
+#include <QImage>
 namespace {
 #ifdef Q_OS_MACOS
     constexpr qreal BORDER = 0.5;
@@ -41,7 +41,8 @@ QXPopoverWindow::QXPopoverWindow(QWidget * parent)
     : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint)
     , edge_(QXPopoverBottom)      
     , widget_(nullptr)
-    , layout_(nullptr) {
+    , layout_(nullptr)
+    , border_(BORDER) {
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
 }
@@ -51,6 +52,16 @@ QXPopoverWindow::setWidget(QWidget * widget) {
     widget_ = widget;
     widget_->setParent(this);
     setFocusProxy(widget_);
+}
+
+qreal
+QXPopoverWindow::boder() const {
+    return border_;
+}
+
+void
+QXPopoverWindow::setBorder(qreal border) {
+    border_ = border;
 }
 
 qreal
@@ -96,7 +107,7 @@ QXPopoverWindow::sizeHint() const {
         return QWidget::sizeHint();
     return widget_->sizeHint() + QSize(
         isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
-        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(BORDER + borderRadius_, BORDER + borderRadius_);
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(border_ + borderRadius_, border_ + borderRadius_);
 }
 
 QSize
@@ -105,7 +116,7 @@ QXPopoverWindow::minimumSizeHint() const {
         return QWidget::minimumSizeHint();
     return widget_->minimumSizeHint() + QSize(
         isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0,
-        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(BORDER + borderRadius_, BORDER + borderRadius_);
+        !isHorizontal(edge_)? POPOVER_ARROW_SIZE: 0) + QSize(border_ + borderRadius_, border_ + borderRadius_);
 }
 
 void
@@ -118,12 +129,30 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
     QPainter p(this);
     p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
 
-    auto backgroundColor = palette().color(QPalette::Normal, QPalette::Window);
-    auto borderColor = palette().color(QPalette::Normal, QPalette::Midlight);
-    p.setBrush(backgroundColor);
-    p.setPen(QPen(borderColor, BORDER));
+    auto backgroundColor = palette().window().color();
+    auto borderColor = palette().midlight().color();
+    
+    // Get the frame color
+    if (false) {
+        QPixmap px(5, 5);
+        px.fill();
+        QPainter pp(&px);
+        QStyleOptionFrame opt;
+        opt.initFrom(this);
+        opt.rect = QRect(QPoint(0, 0), px.size());
+        opt.frameShape = QFrame::StyledPanel;
+        opt.lineWidth = 20;
+        opt.midLineWidth = 0;
+        style()->drawControl(QStyle::CE_ShapedFrame, &opt, &pp, this);
 
-    QRectF contentRect = this->contentRect(BORDER);
+        QImage img = px.toImage();
+        //borderColor = img.pixel(0, 0);
+    }
+
+    p.setBrush(backgroundColor);
+    p.setPen(QPen(borderColor, border_));
+
+    QRectF contentRect = this->contentRect(border_);
     QPainterPath roundRectPath;
     roundRectPath.addRoundedRect(contentRect, borderRadius_, borderRadius_);
     p.fillPath(roundRectPath, backgroundColor);
@@ -158,7 +187,12 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
     arrowPath.lineTo(arrowHead);
     arrowPath.lineTo(arrowRight);
     arrowPath.closeSubpath();
-    p.fillPath(arrowPath, borderColor);
+    p.fillPath(arrowPath, backgroundColor);
+    p.drawLine(arrowHead, arrowLeft);
+    p.drawLine(arrowHead, arrowRight);
+    p.setPen(QPen(backgroundColor, std::max(1.0, border_)));
+    p.drawLine(arrowLeft, arrowRight);
+
 }
 
 void
@@ -190,7 +224,7 @@ QXPopoverWindow::setEdge(QXPopoverEdge edge) {
         layout_->addSpacing(POPOVER_ARROW_SIZE);
 
     layout_->setSpacing(0);
-    const qreal margin = BORDER + borderRadius_;
+    const qreal margin = border_ + borderRadius_;
     layout_->setContentsMargins(margin, margin, margin, margin);
     setLayout(layout_);
 }

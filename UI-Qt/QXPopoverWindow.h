@@ -24,6 +24,12 @@ public:
     setWidget(QWidget * widget);
 
     qreal
+    boder() const;
+
+    void
+    setBorder(qreal border);
+
+    qreal
     borderRadius() const;
 
     void
@@ -79,5 +85,6 @@ protected:
     QBoxLayout * layout_;
     
     QRect        referenceRect_;
+    qreal        border_{ 0 };
     qreal        borderRadius_{2};
 };
