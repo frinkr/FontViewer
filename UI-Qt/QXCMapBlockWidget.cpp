@@ -2,7 +2,6 @@
 #include "QXConv.h"
 #include "QXDocument.h"
 #include "QXCMapBlockWidget.h"
-#include "QXGlyphListView.h"
 #include "ui_QXCMapBlockWidget.h"
 
 QXCMapBlockWidget::QXCMapBlockWidget(QWidget *parent)
@@ -82,13 +81,13 @@ QXCMapBlockWidget::reloadBlocksCombobox() {
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.type() == QXGCharBook::CMap)
-            ui_->bookComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), static_cast<int>(i));
     }
 
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.type() == QXGCharBook::FullUnicode)
-            ui_->bookComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), static_cast<int>(i));
     }
 
     ui_->bookComboBox->insertSeparator(9999);
@@ -96,7 +95,7 @@ QXCMapBlockWidget::reloadBlocksCombobox() {
     for (size_t i = 0; i < books.size(); ++ i) {
         const auto & book = books[i];
         if (book.type() == QXGCharBook::One)
-            ui_->bookComboBox->addItem(book.name(), i);
+            ui_->bookComboBox->addItem(book.name(), static_cast<int>(i));
     }
 }
 

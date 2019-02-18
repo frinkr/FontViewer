@@ -309,7 +309,6 @@ QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QXCollection
         return delegate_->drawHeader(painter, option);
 
     auto bg = QColor(colors[option.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
-    auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
     painter->setPen(bg);
     QFont font = painter->font();
     font.setPixelSize(option.rect.height() - 2);
@@ -343,6 +342,9 @@ QXCollectionView::QXCollectionView(QWidget *parent)
     widget_ = new QXCollectionViewContentWidget();
     this->setWidget(widget_);
 
+    widget_->setAcceptDrops(true);
+    this->setAcceptDrops(true);
+    
     connect(widget_, &QXCollectionViewContentWidget::clicked,
             this, &QXCollectionView::clicked);
 
@@ -386,27 +388,27 @@ QXCollectionView::onModelReset() {
 }
 
 void
-QXCollectionView::setCellSize(const QSize & size) {
+QXCollectionView::setItemSize(const QSize & size) {
     widget_->itemSize_ = size;
 }
 
 void
-QXCollectionView::setCellSize(int size) {
+QXCollectionView::setItemSize(int size) {
     widget_->itemSize_ = QSize(size, size);
 }
 
 const QSize &
-QXCollectionView::cellSize() const {
+QXCollectionView::itemSize() const {
     return widget_->itemSize_;
 }
 
 void
-QXCollectionView::setCellSpace(int space) {
+QXCollectionView::setItemSpace(int space) {
     widget_->itemSpace_ = QSize(space, space);
 }
 
 int
-QXCollectionView::cellSpace() const {
+QXCollectionView::itemSpace() const {
     return widget_->itemSpace_.width();
 }
 
@@ -424,7 +426,6 @@ void
 QXCollectionView::setHeaderHeight(int height) {
     widget_->headerSize_ = height;
 }
-
 
 int
 QXCollectionView::headerHeight() const {

@@ -52,7 +52,7 @@ public:
     mousePressEvent(QMouseEvent * event) override;
 
     void
-    mouseMoveEvent(QMouseEvent * event);
+    mouseMoveEvent(QMouseEvent * event) override;
 
     void
     mouseDoubleClickEvent(QMouseEvent * event) override;
@@ -160,19 +160,19 @@ public:
     setDelegate(QXCollectionViewDelegate * delegate);
 
     void
-    setCellSize(const QSize & size);
+    setItemSize(const QSize & size);
 
     void
-    setCellSize(int size);
+    setItemSize(int size);
 
     const QSize &
-    cellSize() const;
+    itemSize() const;
 
     void
-    setCellSpace(int space);
+    setItemSpace(int space);
 
     int
-    cellSpace() const;
+    itemSpace() const;
 
     void
     setSectionSpace(int space);

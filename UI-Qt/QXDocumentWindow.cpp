@@ -50,6 +50,8 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
 
     document->setParent(this);
     installEventFilter(this);
+    ui_->glyphCollectionView->widget()->installEventFilter(this);
+    
 }
 
 QXDocumentWindow::~QXDocumentWindow() {
@@ -252,7 +254,7 @@ QXDocumentWindow::dropEvent(QDropEvent * event) {
 
 bool
 QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
-    if (watched == ui_->glyphCollectionView || watched == menuBar_) {
+    if (watched == ui_->glyphCollectionView->widget() || watched == menuBar_) {
         if (event->type() == QEvent::Drop) {
             dropEvent(static_cast<QDropEvent *>(event));
             event->accept();

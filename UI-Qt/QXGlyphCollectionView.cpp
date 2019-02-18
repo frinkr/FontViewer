@@ -6,10 +6,9 @@
 #include "QXGlyphCollectionView.h"
 
 namespace {
-    constexpr int GLYPH_IMAGE_SIZE = 70;
-    constexpr int GLYPH_NAME_HEIGHT = 10;
-
-    Qt::GlobalColor colors[] = {Qt::cyan, Qt::yellow, Qt::magenta, Qt::darkGreen, Qt::darkBlue, Qt::red, Qt::green, Qt::blue, };
+    constexpr int GLYPH_IMAGE_SIZE = 80;
+    constexpr int GLYPH_LABEL_HEIGHT = 10;
+    constexpr int ITEM_SPACE = 12;
 
     class QXGlyphCollectionViewDelegate : public QXCollectionViewDelegate {
     public:
@@ -40,6 +39,18 @@ namespace {
                 painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
 
+            // image
+            if (true) {
+                QSize emSize = glyphEmSize();
+                QRect emRect(0, 0, emSize.width(), emSize.height());
+                
+                QImage image = placeGlyphImage(g, emSize);
+                if (g.face->isScalable() && (option.selected || qApp->darkMode()))
+                    image.invertPixels();
+                QPixmap pixmap = QPixmap::fromImage(image);
+                QRect imageRect = option.rect.adjusted(0, 0, 0, -GLYPH_LABEL_HEIGHT);
+                painter->drawImage(imageRect, image, QRectF(0, 0, image.width(), image.height()));
+            }
             
             // draw the text
             if (true) {
@@ -63,32 +74,16 @@ namespace {
 
                 if (!text.isEmpty()) {
                     painter->setPen(palette.color(hasFocus ? QPalette::Active : QPalette::Inactive, option.selected? QPalette::HighlightedText: QPalette::Text));
-                    QRect textRect = option.rect.adjusted(0, GLYPH_IMAGE_SIZE, 0, 0);
+                    int dx = (ITEM_SPACE - 4) / 2;
+                    QRect textRect = option.rect.adjusted(-dx, 0, dx, 0);
                     painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWrapAnywhere, text);
                 }
             }
-
-            // image
-            if (true) {
-                QSize emSize = glyphEmSize();
-                QRect emRect(0, 0, emSize.width(), emSize.height());
-    
-                QImage image = placeGlyphImage(g, emSize);
-                if (g.face->isScalable() && (option.selected || qApp->darkMode()))
-                    image.invertPixels();
-                QPixmap pixmap = QPixmap::fromImage(image);
-                QRect imageRect = option.rect.adjusted(0, 0, 0, -GLYPH_NAME_HEIGHT);
-                painter->drawImage(imageRect, image, QRectF(0, 0, image.width(), image.height()));
-            }
-
             painter->restore();
-//            painter->drawText(rect, Qt::AlignHCenter | Qt::AlignVCenter, document_->data(index, Qt::DisplayRole).toString());
         }
 
         void
         drawHeader(QPainter * painter, const QXCollectionViewDrawHeaderOption & option) override {
-            auto bg = QColor(colors[option.section % (sizeof(colors) / sizeof(colors[0]))]).toRgb();
-            auto fg = QColor(255 - bg.red(), 255 - bg.green(), 255 - bg.blue());
             painter->save();
             painter->setPen(option.widget->palette().color(option.selected? QPalette::HighlightedText: QPalette::Text));
             if (option.selected) {
@@ -108,8 +103,8 @@ namespace {
 
 QXGlyphCollectionView::QXGlyphCollectionView(QWidget * parent)
     : QXCollectionView(parent){
-    this->setCellSize(QSize(GLYPH_IMAGE_SIZE, GLYPH_IMAGE_SIZE + GLYPH_NAME_HEIGHT));
-    this->setCellSpace(10);
+    this->setItemSize(QSize(GLYPH_IMAGE_SIZE, GLYPH_IMAGE_SIZE + GLYPH_LABEL_HEIGHT));
+    this->setItemSpace(ITEM_SPACE);
     this->setSectionSpace(40);
     setDelegate(new QXGlyphCollectionViewDelegate(this));
 }

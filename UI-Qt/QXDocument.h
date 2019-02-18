@@ -90,8 +90,8 @@ public:
     setName(const QString & name);
 
 private:
-    QString  name_;
     Type     type_;
+    QString  name_;
     FXVector<FXPtr<FXGCharBlock>> blocks_;
 };
 

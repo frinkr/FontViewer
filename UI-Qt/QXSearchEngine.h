@@ -2,10 +2,10 @@
 #include "QXDocument.h"
     
 struct QXSearchResult {
-    bool    found    {false};
-    size_t  book     {0};  // which book
-    size_t  block    {0};  // block in book
-    size_t  index    {0};  // index in block
+    bool  found    {false};
+    int   book     {0};  // which book
+    int   block    {0};  // block in book
+    int   index    {0};  // index in block
 };
 
 /**
