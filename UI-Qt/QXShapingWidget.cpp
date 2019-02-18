@@ -6,6 +6,8 @@
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocument.h"
+#include "QXDocumentWindow.h"
+#include "QXDocumentWindowManager.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
 #include "ui_QXShapingWidget.h"
@@ -41,6 +43,11 @@ QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
 void
 QXShapingGlyphView::setShaper(FXShaper * shaper) {
     shaper_ = shaper;
+}
+
+void
+QXShapingGlyphView::setDocument(QXDocument * document) {
+    document_ = document;
 }
 
 QSize
@@ -229,8 +236,21 @@ QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
 void
 QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
     mousePressEvent(event);
-    if (selectedIndex_ != -1)
-        emit glyphDoubleClicked(shaper_->glyph(selectedIndex_));
+    if (selectedIndex_ != -1) {
+        auto gid = shaper_->glyph(selectedIndex_);
+        
+        QXDocumentWindow * documentWindow = QXDocumentWindowManager::instance()->getDocumentWindow(document_);
+        if (documentWindow) {
+            QRect rect = glyphInteractionRect(selectedIndex_);
+            QRect globalRect(this->mapToGlobal(rect.topLeft()),
+                             this->mapToGlobal(rect.bottomRight()));
+            documentWindow->showGlyphPopover(FXGChar(gid, FXGCharTypeGlyphID),
+                                             globalRect,
+                                             QXPopoverTop);
+        }
+        
+        emit glyphDoubleClicked(gid);
+    }
 }
 
 void
@@ -300,7 +320,7 @@ QXShapingGlyphView::fu2px(fu f) const {
     return shaper_->face()->fontSize() * f / shaper_->face()->upem();
 }
     
-QUShapingWidget::QUShapingWidget(QWidget *parent)
+QUShapingWidget::QUShapingWidget(QWidget * parent)
     : QWidget(parent)
     , ui_(new Ui::QXShapingWidget)
     , document_(nullptr)
@@ -334,7 +354,8 @@ QUShapingWidget::setDocument(QXDocument * document) {
     shaper_ = new FXShaper(document_->face().get());
 
     ui_->glyphView->setShaper(shaper_);
-
+    ui_->glyphView->setDocument(document);
+    
     reloadScriptList();
 }
 
@@ -410,7 +431,7 @@ QUShapingWidget::gotoGlyph(FXGlyphID gid) {
     s.gchar = FXGChar(gid, FXGCharTypeGlyphID);
     document_->search(s);
 }
-    
+
 FXPtr<FXInspector>
 QUShapingWidget::inspector() {
     return document_->face()->inspector();

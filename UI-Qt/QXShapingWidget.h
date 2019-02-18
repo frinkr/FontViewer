@@ -9,11 +9,10 @@ namespace Ui {
     class QXShapingWidget;
 }
 
-class QPaintEvent;
 class FXInspector;
 class FXShaper;
+class QPaintEvent;
 class QXDocument;
-
 
 class QXShapingGlyphView : public QWidget {
     Q_OBJECT
@@ -24,6 +23,9 @@ public:
     void
     setShaper(FXShaper * shaper);
 
+    void
+    setDocument(QXDocument * document);
+    
     QSize
     minimumSizeHint() const;
     
@@ -41,6 +43,7 @@ public:
 
     void
     setFontSize(double fontSize);
+    
 signals:
     void
     glyphDoubleClicked(FXGlyphID gid) const;
@@ -72,6 +75,7 @@ protected:
     int selectedIndex_;
     double fontSize_;    
     FXShaper * shaper_;
+    QXDocument * document_;
 };
 
 class QUShapingWidget : public QWidget {

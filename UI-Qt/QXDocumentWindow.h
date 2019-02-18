@@ -8,6 +8,8 @@
 #include <QMainWindow>
 #include <QPushButton>
 
+#include "QXPopoverWindow.h"
+
 class QAction;
 class QFileDialog;
 class QLineEdit;
@@ -43,6 +45,11 @@ public:
     QXDocument * document() const {
         return document_;
     }
+
+    void
+    showGlyphPopover(const FXGChar & c,
+                     const QRect & rect,
+                     QXPopoverEdges preferedEgdes = QXPopoverAnyEdge);
 
 signals:
     void

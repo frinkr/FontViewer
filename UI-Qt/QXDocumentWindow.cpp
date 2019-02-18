@@ -278,17 +278,21 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
 }
 
 void
+QXDocumentWindow::showGlyphPopover(const FXGChar & c, const QRect & rect, QXPopoverEdges preferedEgdes) {
+    glyphWidget_->setChar(c);
+    glyphPopover_->showRelativeTo(rect, preferedEgdes);
+}
+
+void
 QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
     if (index.item == -1 || index.section == -1)
         return;
-    FXGChar c = document_->charAt(index);
-    glyphWidget_->setChar(c);
-
+    
     QRect rect = ui_->glyphCollectionView->itemRect(index);
     QRect globalRect(ui_->glyphCollectionView->mapToGlobal(rect.topLeft()),
                      ui_->glyphCollectionView->mapToGlobal(rect.bottomRight()));
 
-    glyphPopover_->showRelativeTo(globalRect, QXPopoverBottom);
+    showGlyphPopover(document_->charAt(index), globalRect, QXPopoverBottom);
 }
 
 void
