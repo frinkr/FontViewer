@@ -166,7 +166,7 @@ QXCollectionViewContentWidget::itemRect(const QXCollectionModelIndex & index) co
     int left = contentMargins_.left();
     for (int i = 0; i < index.item % columnCount(); ++ i) 
         left += itemSize_.width() + itemSpace_.width();
-    return QRect(QPoint(left, top), itemSize_);
+    return QRect(QPoint(left, top), itemSize_ + QSize(1, 1));
 }
 
 void

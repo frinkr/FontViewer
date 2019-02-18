@@ -210,7 +210,7 @@ QXDocument::setGlyphLabel(QXGlyphLabel label) {
 
 FXGChar
 QXDocument::charAt(const QXCollectionModelIndex & index) const {
-    return currentCMap().blocks()[index.section]->get(index.item);
+    return currentBook().blocks()[index.section]->get(index.item);
 }
 
 int
