@@ -741,7 +741,7 @@ FXFTStringMicrosoft(FT_UShort encodingId, void * buf, uint32_t bufLen) {
     case TT_MS_ID_SYMBOL_CS: 
         return FXUTF16BE2UTF8(buf, bufLen);
     case TT_MS_ID_PRC:
-        return FXIconv("WINDOWS-936", reinterpret_cast<const char *>(buf), bufLen);
+        return FXIconv("GB18030", reinterpret_cast<const char *>(buf), bufLen);
     case TT_MS_ID_SJIS:
         return FXIconv("SHIFT-JIS", reinterpret_cast<const char *>(buf), bufLen);
     case TT_MS_ID_BIG_5:

@@ -32,6 +32,16 @@ QXEncoding::charFromHexNotation(const QString & str) {
     return FXGCharInvalid;
 }
 
+QString
+QXEncoding::htmlLinkElement(const QUrl & url, const QString & name) {
+    return QString("<a href=\"%1\">%2</a>").arg(url.toString()).arg(name);
+}
+
+QUrl
+QXEncoding::externalUnicodeHexLink(FXChar unicode) {
+    return QString("https://codepoints.net/%1").arg(charHexNotation(FXGChar(unicode, FXGCharTypeUnicode)));
+}
+
 QUrl
 QXEncoding::charHexLink(FXGChar c) {
     return QUrl(QString("fv://go/%1").arg(charHexNotation(c)));

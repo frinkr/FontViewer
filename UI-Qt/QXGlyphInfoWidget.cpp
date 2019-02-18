@@ -18,7 +18,11 @@ namespace {
         
         QMap<QString, QVariant> map;
         map["NAME"] = toQString(glyph.name);
-        map["CHAR"] = QXEncoding::charHexNotation(glyph.character);
+        if (glyph.character.isUnicode()) 
+            map["CHAR"] = QXEncoding::htmlLinkElement(QXEncoding::externalUnicodeHexLink(c), QXEncoding::charHexNotation(glyph.character));
+        else
+            map["CHAR"] = QXEncoding::charHexNotation(glyph.character);
+
         map["ID"] = glyph.gid;
 
         // Metrics
@@ -41,9 +45,9 @@ namespace {
 
         QStringList decompositionLinks;
         for (FXChar d : FXUnicode::decomposition(c)) {
-            decompositionLinks << QString("<a href=\"%1\">%2</a>")
-                .arg(QXEncoding::charHexLink({d, FXGCharTypeUnicode}).toDisplayString())
-                .arg(QXEncoding::charHexNotation({d, FXGCharTypeUnicode}));
+            decompositionLinks << QXEncoding::htmlLinkElement(
+                QXEncoding::charHexLink({d, FXGCharTypeUnicode}).toDisplayString(),
+                QXEncoding::charHexNotation({d, FXGCharTypeUnicode}));
         }
         
         map["UNICODE_DECOMPOSITION"] = isDefined? decompositionLinks.join(", "): QString();
@@ -69,7 +73,8 @@ QXGlyphInfoWidget::QXGlyphInfoWidget(QWidget *parent)
     , char_(FXGCharInvalid) {
     connect(this, &QTextBrowser::anchorClicked,
             this, &QXGlyphInfoWidget::onLinkClicked);
-    setOpenLinks(false);
+    setOpenLinks(true);
+    setOpenExternalLinks(true);
 }
 
 QXDocument *

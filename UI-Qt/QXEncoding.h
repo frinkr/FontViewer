@@ -10,6 +10,12 @@ struct QXEncoding {
     static FXGChar
     charFromHexNotation(const QString & str);
 
+    static QString
+    htmlLinkElement(const QUrl & url, const QString & name);
+
+    static QUrl
+    externalUnicodeHexLink(FXChar unicode);
+    
     static QUrl
     charHexLink(FXGChar c);
 

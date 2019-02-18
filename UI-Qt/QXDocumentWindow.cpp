@@ -288,7 +288,7 @@ QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
     QRect globalRect(ui_->glyphCollectionView->mapToGlobal(rect.topLeft()),
                      ui_->glyphCollectionView->mapToGlobal(rect.bottomRight()));
 
-    glyphPopover_->showRelativeTo(globalRect, QXPopoverTop);
+    glyphPopover_->showRelativeTo(globalRect, QXPopoverBottom);
 }
 
 void

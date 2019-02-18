@@ -20,11 +20,17 @@ namespace {
         
         void
         drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) override {
+            painter->save();
+            painter->setRenderHint(QPainter::HighQualityAntialiasing);
+            
             auto & palette = option.widget->palette();
+            
             // draw the background and focus
             bool hasFocus = option.widget->hasFocus();
             if (option.selected) {
-                painter->fillRect(option.rect, palette.color(hasFocus?QPalette::Active: QPalette::Inactive, QPalette::Highlight));
+                QPainterPath path;
+                path.addRoundedRect(option.rect, 5, 5);
+                painter->fillPath(path, palette.color(hasFocus?QPalette::Active: QPalette::Inactive, QPalette::Highlight));
             }
 
             auto data = document_->data(option.index, QXGlyphRole);
@@ -32,13 +38,10 @@ namespace {
                 return;
 
             const FXGlyph g = qvariant_cast<QXGlyph>(data).g();
-
-            painter->save();
-            painter->setRenderHint(QPainter::HighQualityAntialiasing);
+            
             if (g.face->attributes().format != FXFaceFormatConstant::WinFNT)
                 painter->setRenderHint(QPainter::SmoothPixmapTransform);
-
-
+            
             // image
             if (true) {
                 QSize emSize = glyphEmSize();
