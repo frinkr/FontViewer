@@ -403,6 +403,11 @@ QXCollectionView::itemSize() const {
 }
 
 void
+QXCollectionView::setItemSpace(const QSize & space) {
+    widget_->itemSpace_ = space;
+}
+
+void
 QXCollectionView::setItemSpace(int space) {
     widget_->itemSpace_ = QSize(space, space);
 }

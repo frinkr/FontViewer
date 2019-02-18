@@ -8,7 +8,7 @@
 namespace {
     constexpr int GLYPH_IMAGE_SIZE = 80;
     constexpr int GLYPH_LABEL_HEIGHT = 10;
-    constexpr int ITEM_SPACE = 12;
+    constexpr int HORIZONTAL_ITEM_SPACE = 6;
 
     class QXGlyphCollectionViewDelegate : public QXCollectionViewDelegate {
     public:
@@ -51,7 +51,7 @@ namespace {
                 if (g.face->isScalable() && (option.selected || qApp->darkMode()))
                     image.invertPixels();
                 QPixmap pixmap = QPixmap::fromImage(image);
-                QRect imageRect = option.rect.adjusted(0, 0, 0, -GLYPH_LABEL_HEIGHT);
+                QRect imageRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);
                 painter->drawImage(imageRect, image, QRectF(0, 0, image.width(), image.height()));
             }
             
@@ -72,12 +72,13 @@ namespace {
                     if (!g.gid && document_->charMode())
                         text = charCode;
                     break;
-
                 }
+                if (text.isEmpty() && g.character != FXCharInvalid)
+                    text = charCode;
 
                 if (!text.isEmpty()) {
                     painter->setPen(palette.color(hasFocus ? QPalette::Active : QPalette::Inactive, option.selected? QPalette::HighlightedText: QPalette::Text));
-                    int dx = (ITEM_SPACE - 4) / 2;
+                    int dx = std::max(0, (HORIZONTAL_ITEM_SPACE - 6) / 2);
                     QRect textRect = option.rect.adjusted(-dx, 0, dx, 0);
                     painter->drawText(textRect, Qt::AlignHCenter | Qt::AlignBottom | Qt::TextWrapAnywhere, text);
                 }
@@ -106,8 +107,8 @@ namespace {
 
 QXGlyphCollectionView::QXGlyphCollectionView(QWidget * parent)
     : QXCollectionView(parent){
-    this->setItemSize(QSize(GLYPH_IMAGE_SIZE, GLYPH_IMAGE_SIZE + GLYPH_LABEL_HEIGHT));
-    this->setItemSpace(ITEM_SPACE);
+    this->setItemSize(QSize(GLYPH_IMAGE_SIZE + GLYPH_LABEL_HEIGHT / 2, GLYPH_IMAGE_SIZE + GLYPH_LABEL_HEIGHT / 2));
+    this->setItemSpace(QSize(HORIZONTAL_ITEM_SPACE, HORIZONTAL_ITEM_SPACE + GLYPH_LABEL_HEIGHT * 3./4));
     this->setSectionSpace(40);
     setDelegate(new QXGlyphCollectionViewDelegate(this));
 }

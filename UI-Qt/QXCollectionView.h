@@ -169,6 +169,9 @@ public:
     itemSize() const;
 
     void
+    setItemSpace(const QSize & space);
+
+    void
     setItemSpace(int space);
 
     int
