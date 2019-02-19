@@ -11,11 +11,11 @@
 #include <QImage>
 namespace {
 #ifdef Q_OS_MACOS
-    constexpr qreal BORDER = 0.5;
+    constexpr qreal DEFAULT_BORDER = 0.5;
 #else
     constexpr qreal BORDER = 1;
 #endif
-
+    constexpr qreal DEFAULT_BORDER_RADIUS = 4;
     constexpr qreal POPOVER_ARROW_SIZE = 10;
     bool
     isHorizontal(QXPopoverEdge edge) {
@@ -38,11 +38,17 @@ namespace {
 }
 
 QXPopoverWindow::QXPopoverWindow(QWidget * parent)
-    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint)
+    : QWidget(parent, Qt::Popup
+              | Qt::FramelessWindowHint
+#if defined (Q_OS_WIN)
+              | Qt::NoDropShadowWindowHint
+#endif
+        )
     , edge_(QXPopoverBottom)      
     , widget_(nullptr)
     , layout_(nullptr)
-    , border_(BORDER) {
+    , border_(DEFAULT_BORDER)
+    , borderRadius_(DEFAULT_BORDER_RADIUS) {
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
 }

@@ -86,5 +86,5 @@ protected:
     
     QRect        referenceRect_;
     qreal        border_{ 0 };
-    qreal        borderRadius_{2};
+    qreal        borderRadius_{0};
 };
