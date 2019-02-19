@@ -122,11 +122,14 @@ set(APPLE_SOURCES
   MacHelper.mm
   QXThemedWindowMac.mm
   )
+set(WIN32_SOURCES
+  QXThemedWindowWin.cpp
+  )
 
 if (APPLE)
   set(PLATFORM_SOURCES ${APPLE_SOURCES})
-else()
-  set(PLATFORM_SOURCES ${ALL_SOURCES})
+elseif(WIN32)
+  set(PLATFORM_SOURCES ${WIN32_SOURCES})
 endif()
 
 add_library(UI-Qt

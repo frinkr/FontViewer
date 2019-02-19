@@ -51,20 +51,20 @@ public:
                    QXPopoverEdges preferedEgdes = QXPopoverAnyEdge);
     
 public:
-    virtual QSize
-    sizeHint() const;
+    QSize
+    sizeHint() const override;
 
-    virtual QSize
-    minimumSizeHint() const;
+    QSize
+    minimumSizeHint() const override;
     
-    virtual void
-    resizeEvent(QResizeEvent * event);
+    void
+    resizeEvent(QResizeEvent * event) override;
 
-    virtual void
-    paintEvent(QPaintEvent * event);
+    void
+    paintEvent(QPaintEvent * event) override;
 
-    virtual void
-    showEvent(QShowEvent * event);
+    void
+    showEvent(QShowEvent * event) override;
 
 protected:
     void
@@ -81,6 +81,12 @@ protected:
 
     QPainterPath
     painterPath() const;
+
+protected:
+#if defined(Q_OS_WIN)
+    void
+    updateMask();
+#endif
 protected:
     QXPopoverEdge edge_;
     
