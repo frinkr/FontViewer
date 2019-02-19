@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QPainterPath>
 
 class QBoxLayout;
 
@@ -77,7 +78,9 @@ protected:
 
     QRectF
     contentRect(qreal border) const;
-    
+
+    QPainterPath
+    painterPath() const;
 protected:
     QXPopoverEdge edge_;
     

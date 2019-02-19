@@ -9,14 +9,13 @@
 #include "QXPopoverWindow.h"
 #include <QStyleOptionFrame>
 #include <QImage>
+#include <cmath>
 namespace {
-#ifdef Q_OS_MACOS
-    constexpr qreal DEFAULT_BORDER = 0.5;
-#else
-    constexpr qreal BORDER = 1;
-#endif
-    constexpr qreal DEFAULT_BORDER_RADIUS = 4;
+
+    constexpr qreal DEFAULT_BORDER = 1;
+    constexpr qreal DEFAULT_BORDER_RADIUS = 5;
     constexpr qreal POPOVER_ARROW_SIZE = 10;
+
     bool
     isHorizontal(QXPopoverEdge edge) {
         return edge == QXPopoverLeft || edge == QXPopoverRight;
@@ -35,6 +34,38 @@ namespace {
         else
             return QRect();
     }
+
+
+    void
+    arcToTopLeft(QPainterPath & path, const QPointF & point, qreal radius) {
+        QRectF rect(point, QSizeF(radius * 2, radius * 2));
+        path.arcTo(rect, 90, 90);
+    }
+
+    void
+    arcToTopRight(QPainterPath & path, const QPointF & point, qreal radius) {
+        QRectF rect(point - QPointF(2 * radius, 0),
+                    QSizeF(radius * 2, radius * 2));
+        path.arcTo(rect, 0, 90);
+    }
+
+    void
+    arcToBottomLeft(QPainterPath & path, const QPointF & point, qreal radius) {
+        QRectF rect(point - QPointF(0, 2 * radius),
+                    QSizeF(radius * 2, radius * 2));
+        
+        path.arcTo(rect, 180, 90);
+    }
+
+    void
+    arcToBottomRight(QPainterPath & path, const QPointF & point, qreal radius) {
+        QRectF rect(point - QPointF(2 * radius, 2 * radius),
+                    QSizeF(radius * 2, radius * 2));
+        path.arcTo(rect, 270, 90);
+    }
+
+    
+
 }
 
 QXPopoverWindow::QXPopoverWindow(QWidget * parent)
@@ -158,47 +189,9 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
     p.setBrush(backgroundColor);
     p.setPen(QPen(borderColor, border_));
 
-    QRectF contentRect = this->contentRect(border_);
-    QPainterPath roundRectPath;
-    roundRectPath.addRoundedRect(contentRect, borderRadius_, borderRadius_);
+    QPainterPath roundRectPath = painterPath();
     p.fillPath(roundRectPath, backgroundColor);
     p.drawPath(roundRectPath);
-
-    const QRect refRect(mapFromGlobal(referenceRect_.topLeft()), mapFromGlobal(referenceRect_.bottomRight()));
-
-    QPoint arrowHead, arrowLeft, arrowRight;
-    if (edge_ == QXPopoverBottom) {
-        arrowHead = QPoint(refRect.center().x(), refRect.bottom());
-        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
-        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
-    }
-    else if (edge_ == QXPopoverTop) {
-        arrowHead = QPoint(refRect.center().x(), refRect.top());
-        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
-        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
-    }
-    else if (edge_ == QXPopoverLeft) {
-        arrowHead = QPoint(refRect.left(), refRect.center().y());
-        arrowLeft = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
-        arrowRight = QPoint(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
-    }
-    else {
-        arrowHead = QPoint(refRect.right(), refRect.center().y());
-        arrowLeft = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE);
-        arrowRight = QPoint(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE);
-    }
-
-    QPainterPath arrowPath;
-    arrowPath.moveTo(arrowLeft);
-    arrowPath.lineTo(arrowHead);
-    arrowPath.lineTo(arrowRight);
-    arrowPath.closeSubpath();
-    p.fillPath(arrowPath, backgroundColor);
-    p.drawLine(arrowHead, arrowLeft);
-    p.drawLine(arrowHead, arrowRight);
-    p.setPen(QPen(backgroundColor, std::max(1.0, border_)));
-    p.drawLine(arrowLeft, arrowRight);
-
 }
 
 void
@@ -345,4 +338,131 @@ QXPopoverWindow::contentRect(qreal border) const {
 
     QRectF rect(topLeft, bottomRight);
     return rect.translated(center);
+}
+
+QPainterPath
+QXPopoverWindow::painterPath() const {
+    QRectF contentRect = this->contentRect(border_);
+    
+
+    const QRect refRect(mapFromGlobal(referenceRect_.topLeft()), mapFromGlobal(referenceRect_.bottomRight()));
+
+    qreal arrowRatio = 1; // = H/W
+    QPointF arrowHead, arrowLeft, arrowRight;
+    if (edge_ == QXPopoverBottom) {
+        arrowHead = QPointF(refRect.center().x(), refRect.bottom() + 1);
+        arrowLeft = QPointF(arrowHead.x() - POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() + POPOVER_ARROW_SIZE);
+        arrowRight = QPointF(arrowHead.x() + POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() + POPOVER_ARROW_SIZE);
+    }
+    else if (edge_ == QXPopoverTop) {
+        arrowHead = QPointF(refRect.center().x(), refRect.top());
+        arrowLeft = QPointF(arrowHead.x() + POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() - POPOVER_ARROW_SIZE);
+        arrowRight = QPointF(arrowHead.x() - POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() - POPOVER_ARROW_SIZE);
+    }
+    else if (edge_ == QXPopoverLeft) {
+        arrowHead = QPointF(refRect.left(), refRect.center().y());
+        arrowLeft = QPointF(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE / arrowRatio);
+        arrowRight = QPointF(arrowHead.x() - POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE / arrowRatio);
+    }
+    else {
+        arrowHead = QPointF(refRect.right() + 1, refRect.center().y());
+        arrowLeft = QPointF(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() + POPOVER_ARROW_SIZE / arrowRatio);
+        arrowRight = QPointF(arrowHead.x() + POPOVER_ARROW_SIZE, arrowHead.y() - POPOVER_ARROW_SIZE / arrowRatio);
+    }
+    
+    
+    qreal arrowRadius = borderRadius_ * 1.8;
+    qreal arrowArcDistance = (std::atan(arrowRatio) / 2) * arrowRadius;  // the distance of arrow arc begining to arrowLeft/right
+    qreal radianToDegree = 180 / M_PI;
+    int dx = 0, dy = 0;
+    if (!isHorizontal(edge_)) {
+        if (arrowLeft.x() < contentRect.left() + borderRadius_ + arrowArcDistance)
+            dx = contentRect.left() + borderRadius_ + arrowArcDistance - arrowLeft.x();
+        else if (arrowRight.x() > contentRect.right() - borderRadius_ - arrowArcDistance)
+            dx = contentRect.right() - borderRadius_ - arrowArcDistance - arrowRight.x();
+    }
+    else {
+        if (arrowLeft.y() > contentRect.bottom() - borderRadius_ - arrowArcDistance)
+            dy = contentRect.bottom() - borderRadius_ - arrowArcDistance - arrowLeft.y();
+        else if (arrowRight.y() < contentRect.top() + borderRadius_ + arrowArcDistance)
+            dy = contentRect.top() + borderRadius_ + arrowArcDistance - arrowRight.y();
+    }
+    
+    if (dx || dy) {
+        arrowHead += QPoint(dx, dy);
+        arrowLeft += QPoint(dx, dy);
+        arrowRight += QPoint(dx, dy);
+    }
+    
+    // Add point couter-clock wise
+    QPainterPath roundRectPath;
+    if (edge_ == QXPopoverBottom) {
+        roundRectPath.moveTo(arrowLeft - QPointF(arrowArcDistance, 0));
+        arcToTopLeft(roundRectPath, contentRect.topLeft(), borderRadius_);
+        arcToBottomLeft(roundRectPath, contentRect.bottomLeft(), borderRadius_);
+        arcToBottomRight(roundRectPath, contentRect.bottomRight(), borderRadius_);
+        arcToTopRight(roundRectPath, contentRect.topRight(), borderRadius_);
+        
+        roundRectPath.lineTo(arrowRight + QPointF(arrowArcDistance, 0));
+        roundRectPath.arcTo(QRectF(arrowRight + QPointF(arrowArcDistance - arrowRadius,  -2*arrowRadius), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            270,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.lineTo(arrowHead);
+        roundRectPath.arcTo(QRectF(arrowLeft - QPointF(arrowRadius + arrowArcDistance, 2*arrowRadius), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            270 + std::atan(arrowRatio)*radianToDegree,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.closeSubpath();
+    }
+    else if (edge_ == QXPopoverTop) {
+        roundRectPath.moveTo(arrowLeft + QPointF(arrowArcDistance, 0));
+        arcToBottomRight(roundRectPath, contentRect.bottomRight(), borderRadius_);
+        arcToTopRight(roundRectPath, contentRect.topRight(), borderRadius_);
+        arcToTopLeft(roundRectPath, contentRect.topLeft(), borderRadius_);
+        arcToBottomLeft(roundRectPath, contentRect.bottomLeft(), borderRadius_);
+        
+        roundRectPath.lineTo(arrowRight - QPointF(arrowArcDistance, 0));
+        roundRectPath.arcTo(QRectF(arrowRight - QPointF(arrowArcDistance + arrowRadius, 0), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            90,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.lineTo(arrowHead);
+        roundRectPath.arcTo(QRectF(arrowLeft + QPointF(arrowArcDistance - arrowRadius, 0), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            90 + std::atan(arrowRatio)*radianToDegree,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.closeSubpath();
+    }
+    else if (edge_ == QXPopoverLeft) {
+        roundRectPath.moveTo(arrowLeft + QPointF(0, -arrowArcDistance));
+        arcToTopRight(roundRectPath, contentRect.topRight(), borderRadius_);
+        arcToTopLeft(roundRectPath, contentRect.topLeft(), borderRadius_);
+        arcToBottomLeft(roundRectPath, contentRect.bottomLeft(), borderRadius_);
+        arcToBottomRight(roundRectPath, contentRect.bottomRight(), borderRadius_);
+
+        roundRectPath.lineTo(arrowRight + QPointF(0, arrowArcDistance));
+        roundRectPath.arcTo(QRectF(arrowRight + QPointF(0,  arrowArcDistance - arrowRadius), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            180,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.lineTo(arrowHead);
+        roundRectPath.arcTo(QRectF(arrowLeft - QPointF(0, arrowArcDistance + arrowRadius), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            180 + std::atan(arrowRatio)*radianToDegree,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.closeSubpath();
+    }
+    else {
+        roundRectPath.moveTo(arrowLeft + QPointF(0, arrowArcDistance));
+        arcToBottomLeft(roundRectPath, contentRect.bottomLeft(), borderRadius_);
+        arcToBottomRight(roundRectPath, contentRect.bottomRight(), borderRadius_);
+        arcToTopRight(roundRectPath, contentRect.topRight(), borderRadius_);
+        arcToTopLeft(roundRectPath, contentRect.topLeft(), borderRadius_);
+        
+        roundRectPath.lineTo(arrowRight - QPointF(0, arrowArcDistance));
+        roundRectPath.arcTo(QRectF(arrowRight - QPointF(2*arrowRadius,  arrowArcDistance + arrowRadius), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            0,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.lineTo(arrowHead);
+        roundRectPath.arcTo(QRectF(arrowLeft - QPointF(2*arrowRadius, arrowRadius - arrowArcDistance), QSizeF(2*arrowRadius, 2*arrowRadius)),
+                            90 - std::atan(arrowRatio)*radianToDegree,
+                            -std::atan(arrowRatio)*radianToDegree);
+        roundRectPath.closeSubpath();
+    }
+    return roundRectPath;
 }
