@@ -2,12 +2,13 @@
 #define QUABOUTDIALOG_H
 
 #include <QDialog>
+#include "QXThemedWindow.h"
 
 namespace Ui {
     class QXAboutDialog;
 }
 
-class QXAboutDialog : public QDialog {
+class QXAboutDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:

@@ -41,7 +41,7 @@ namespace {
 }
 
 QXOpenFontDialog::QXOpenFontDialog(QWidget *parent)
-    : QDialog(parent)
+    : QXThemedWindow<QDialog>(parent)
     , ui_(new Ui::QXOpenFontDialog)
     , recentMenu_(nullptr) {
     ui_->setupUi(this);
@@ -144,7 +144,4 @@ QXOpenFontDialog::onFontSelected(const QXFontURI & uri, size_t index) {
 void
 QXOpenFontDialog::showEvent(QShowEvent * event) {
     QDialog::showEvent(event);
-#if defined(Q_OS_MAC)
-    MacHelper::hideTitleBar(this);
-#endif
 }

@@ -2,12 +2,12 @@
 
 #include <QDialog>
 #include "QXDocument.h"
-
+#include "QXThemedWindow.h"
 namespace Ui {
     class QXOpenFontDialog;
 }
 
-class QXOpenFontDialog : public QDialog {
+class QXOpenFontDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:

@@ -33,7 +33,7 @@
 #include "ui_QXDocumentWindow.h"
 
 QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent) 
-    : QMainWindow(parent)
+    : QXThemedWindow<QMainWindow>(parent)
     , ui_(new Ui::QXDocumentWindow)
     , cmapBlockPopover_(nullptr)
     , variablePopover_(nullptr)
@@ -49,7 +49,6 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     initUI();
 
     document->setParent(this);
-    installEventFilter(this);
     ui_->glyphCollectionView->widget()->installEventFilter(this);
     
 }
@@ -267,13 +266,6 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
             return true;
         }
     }
-    else if (watched == this) {
-        if(event->type() == QEvent::Show) {
-#if defined(Q_OS_MAC)
-            MacHelper::hideTitleBar(this);
-#endif
-        }
-    }
     return false;
 }
 
@@ -377,9 +369,9 @@ QXDocumentWindow::onSearchLineEditReturnPressed() {
 void
 QXDocumentWindow::onSearchResult(const QXSearchResult & result, const QString & text) {
     if (!result.found) {
-        QMessageBox::warning(this,
-                             tr("Failed to find glyph"),
-                             tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
+        qApp->warning(this,
+                      tr("Failed to find glyph"),
+                      tr(R"(Expression "%1" doesn't match any glypyh!)").arg(text));
         return;
     }
 

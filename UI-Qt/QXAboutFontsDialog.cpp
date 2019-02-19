@@ -14,9 +14,7 @@ namespace {
         // PS name to files
         FXMap<FXString, FXSet<FXFaceDescriptor>> duplicates;
     };
-
-
-
+    
     FontDbStats
     fontDbStats() {
         FXSet<FXString> allFiles;
@@ -47,7 +45,7 @@ namespace {
 }
 
 QXAboutFontsDialog::QXAboutFontsDialog(QWidget *parent)
-    : QDialog(parent, Qt::Dialog | Qt::WindowStaysOnTopHint)
+    : QXThemedWindow<QDialog>(parent, Qt::Dialog | Qt::WindowStaysOnTopHint)
     , ui(new Ui::QXAboutFontsDialog) {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);

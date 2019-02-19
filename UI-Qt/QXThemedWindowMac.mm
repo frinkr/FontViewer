@@ -1,32 +1,32 @@
-#include <QWidget>
-#include <QVariant>
-#include <QWindow>
 #import <AppKit/AppKit.h>
-#import "MacHelper.h"
+#include <QWidget>
+#include <QWindow>
+#include "QXThemedWindow.h"
 
+bool
+QXThemedWindowInit(QWidget * widget) {
+    NSObject * nativeView = nil;
 
-void
-MacHelper::hideTitleBar(QWidget * widget) {
-    return;
-    if (!widget->property("QXMacTitleBarHidden").isNull())
-        ;//return;
-    
+    QWindow * window = widget->windowHandle();
+    if (window)
+        nativeView = reinterpret_cast<NSObject *>(window->winId());
+    if (!nativeView)
+        nativeView = reinterpret_cast<NSObject *>(widget->winId());
+
     NSWindow * nativeWindow = nil;
-    NSObject * nativeView = reinterpret_cast<NSObject *>(widget->windowHandle()->winId());
     if ([nativeView isKindOfClass:[NSView class]])
         nativeWindow = static_cast<NSView *>(nativeView).window;
     else if ([nativeView isKindOfClass:[NSWindow class]])
         nativeWindow = static_cast<NSWindow *>(nativeView);
 
     if (nativeWindow == nil)
-        return;
-    
+        return false;
+
     nativeWindow.titlebarAppearsTransparent = true;
     QColor background = widget->palette().color(QPalette::Window);
     nativeWindow.backgroundColor = [NSColor colorWithRed:background.redF()
                                                    green:background.greenF()
                                                     blue:background.blueF()
                                                    alpha:1];
-    widget->setProperty("QXMacTitleBarHidden", true);
+    return true;
 }
-

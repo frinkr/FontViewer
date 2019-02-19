@@ -9,6 +9,7 @@
 #include <QPushButton>
 
 #include "QXPopoverWindow.h"
+#include "QXThemedWindow.h"
 
 class QAction;
 class QFileDialog;
@@ -32,7 +33,7 @@ namespace Ui {
     class QXDocumentWindow;
 }
 
-class QXDocumentWindow : public QMainWindow
+class QXDocumentWindow : public QXThemedWindow<QMainWindow>
 {
     friend class QXDocumentWindowManager;
 

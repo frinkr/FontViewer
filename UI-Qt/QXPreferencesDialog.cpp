@@ -16,7 +16,7 @@ namespace {
 }
 
 QXPreferencesDialog::QXPreferencesDialog(QWidget *parent) :
-    QDialog(parent),
+    QXThemedWindow<QDialog>(parent),
     ui_(new Ui::QXPreferencesDialog) {
     ui_->setupUi(this);
 

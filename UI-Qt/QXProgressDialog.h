@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QDialog>
+#include "QXThemedWindow.h"
 
 namespace Ui {
     class QXProgressDialog;
 }
 
-class QXProgressDialog : public QDialog {
+class QXProgressDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:

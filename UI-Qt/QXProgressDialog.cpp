@@ -4,7 +4,7 @@
 #include "ui_QXProgressDialog.h"
 
 QXProgressDialog::QXProgressDialog(QWidget * parent) :
-    QDialog(parent),
+    QXThemedWindow<QDialog>(parent),
     ui_(new Ui::QXProgressDialog) {
     ui_->setupUi(this);
     setMaximumWidth(400);

@@ -26,7 +26,8 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    QXThemedWindowMac.mm
 win32{
         SOURCES += \
                 framelesswindow.cpp
@@ -40,7 +41,8 @@ LIBS += -framework Cocoa
 
 HEADERS += \
         mainwindow.h \
-        framelesswindow.h
+        framelesswindow.h \
+    QXThemedWindow.h
 
 FORMS += \
         mainwindow.ui

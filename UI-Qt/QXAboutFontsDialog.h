@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QDialog>
+#include "QXThemedWindow.h"
 
 namespace Ui {
     class QXAboutFontsDialog;
 }
 
-class QXAboutFontsDialog : public QDialog {
+class QXAboutFontsDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:

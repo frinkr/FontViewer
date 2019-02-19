@@ -18,7 +18,13 @@ public:
 	loadIcon(const QString & path);
 
     bool
-    userRequiredToResetAppData();
+    userRequiredToResetAppData() const;
+
+    bool
+    question(QWidget * parent, const QString & title, const QString & text) const;
+
+    void
+    warning(QWidget * parent, const QString & title, const QString & text) const;
 
 public slots:
     void

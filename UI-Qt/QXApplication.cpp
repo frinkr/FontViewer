@@ -11,6 +11,7 @@
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
+#include "QXThemedWindow.h"
 
 QXApplication::QXApplication(int & argc, char ** argv)
     : QApplication(argc, argv) {
@@ -94,16 +95,35 @@ QXApplication::event(QEvent * event) {
 
 
 bool
-QXApplication::userRequiredToResetAppData() {
+QXApplication::userRequiredToResetAppData() const {
     bool keyPressed = queryKeyboardModifiers().testFlag(Qt::ShiftModifier);
     if (keyPressed) {
-        if (QMessageBox::Yes == QMessageBox::question(
-                nullptr,
-                tr("Reset font database"),
-                tr("Are you sure to reset the database? The font database will be deleted and rebuilt."),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes)) {
-            return true;
-		}
+        return question(
+            nullptr,
+            tr("Reset font database"),
+            tr("Are you sure to reset the database? The font database will be deleted and rebuilt."));
     }
     return false;
+}
+
+bool
+QXApplication::question(QWidget * parent, const QString & title, const QString & text) const {
+    QMessageBox box(parent);
+    box.setWindowTitle(title);
+    box.setText(text);
+    box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    box.setIcon(QMessageBox::Question);
+    QXThemedWindowInit(&box);
+    return box.exec() == QMessageBox::Yes;
+}
+
+void
+QXApplication::warning(QWidget * parent, const QString & title, const QString & text) const {
+    QMessageBox box(parent);
+    box.setWindowTitle(title);
+    box.setText(text);
+    box.setStandardButtons(QMessageBox::Ok);
+    box.setIcon(QMessageBox::Warning);
+    QXThemedWindowInit(&box);
+    box.exec();
 }

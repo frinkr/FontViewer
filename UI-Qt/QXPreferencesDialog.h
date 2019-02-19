@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QDialog>
+#include "QXThemedWindow.h"
 
 namespace Ui {
     class QXPreferencesDialog;
@@ -8,7 +9,7 @@ namespace Ui {
 
 class QListWidgetItem;
 
-class QXPreferencesDialog : public QDialog {
+class QXPreferencesDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:

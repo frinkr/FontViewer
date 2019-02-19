@@ -111,6 +111,7 @@ set(SHARED_SOURCES
   QXShapingWidget.h
   QXTheme.cpp
   QXTheme.h
+  QXThemedWindow.h
   QXToolBar.cpp
   QXToolBar.h
   QXVariableWidget.cpp
@@ -119,6 +120,7 @@ set(SHARED_SOURCES
 set(APPLE_SOURCES
   MacHelper.h
   MacHelper.mm
+  QXThemedWindowMac.mm
   )
 
 if (APPLE)
