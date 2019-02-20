@@ -28,10 +28,6 @@ private slots:
     onFontSelected(const QXFontURI & uri, size_t index);
 
 private:
-    void
-    showEvent(QShowEvent * event);
-    
-private:
     Ui::QXOpenFontDialog * ui_;
     QMenu                * recentMenu_; 
 };

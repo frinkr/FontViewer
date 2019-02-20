@@ -139,9 +139,3 @@ QXOpenFontDialog::onFontSelected(const QXFontURI & uri, size_t index) {
     ui_->textBrowser->setHtml(html->instantialize(templateValues(desc, atts)));
     html->deleteLater();
 }
-
-
-void
-QXOpenFontDialog::showEvent(QShowEvent * event) {
-    QDialog::showEvent(event);
-}

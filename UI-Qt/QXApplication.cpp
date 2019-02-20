@@ -108,22 +108,20 @@ QXApplication::userRequiredToResetAppData() const {
 
 bool
 QXApplication::question(QWidget * parent, const QString & title, const QString & text) const {
-    QMessageBox box(parent);
+    QXThemedWindow<QMessageBox> box(parent);
     box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     box.setIcon(QMessageBox::Question);
-    QXThemedWindowInit(&box);
     return box.exec() == QMessageBox::Yes;
 }
 
 void
 QXApplication::warning(QWidget * parent, const QString & title, const QString & text) const {
-    QMessageBox box(parent);
+    QXThemedWindow<QMessageBox> box(parent);
     box.setWindowTitle(title);
     box.setText(text);
     box.setStandardButtons(QMessageBox::Ok);
     box.setIcon(QMessageBox::Warning);
-    QXThemedWindowInit(&box);
     box.exec();
 }

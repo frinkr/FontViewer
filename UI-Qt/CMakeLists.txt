@@ -112,6 +112,7 @@ set(SHARED_SOURCES
   QXTheme.cpp
   QXTheme.h
   QXThemedWindow.h
+  QXThemedWindow.cpp
   QXToolBar.cpp
   QXToolBar.h
   QXVariableWidget.cpp
@@ -131,9 +132,6 @@ if (APPLE)
   set(PLATFORM_SOURCES ${APPLE_SOURCES})
 elseif(WIN32)
   set(PLATFORM_SOURCES ${WIN32_SOURCES})
-else()
-  set(PLATFORM_SOURCES
-    QXThemedWindow.cpp)
 endif()
 
 add_library(UI-Qt
