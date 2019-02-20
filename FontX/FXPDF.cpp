@@ -1,6 +1,6 @@
 #include <podofo/podofo.h>
 #include "FXPDF.h"
-
+#include <iostream>
 using namespace PoDoFo;
 class FXPDFDocumentImp {
 public:
@@ -10,8 +10,25 @@ public:
 
     bool
     open() {
-        PdfMemDocument doc;
-        PoDoFo::PdfStreamedDocument document(file_.c_str());
+        try {
+            PdfMemDocument doc(file_.c_str());
+            auto extension = doc.GetPdfExtensions();
+            EPdfVersion ver = doc.GetPdfVersion();
+            const PdfVecObjects & objects = doc.GetObjects();
+            for (PdfObject * obj: objects) {
+                if (obj->GetDataType() != ePdfDataType_Dictionary)
+                    continue;
+                
+                if (obj->GetDictionary().GetKey(PdfName::KeyType)->GetName() != PdfName("Font"))
+                    continue;
+                PdfFont * font = doc.GetFont(obj);
+                if (font) {
+                    std::cout << font->IsSubsetting();
+                }
+            }
+        } catch(PdfError err) {
+            std::cout << err.GetError();
+        }
         return true;
     }
 
