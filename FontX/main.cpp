@@ -1,5 +1,6 @@
 #include "FXLib.h"
 #include "FXFace.h"
+#include "FXPDF.h"
 #include <iostream>
 
 std::string getFontFile(const std::string & fileName) {
@@ -20,15 +21,6 @@ int main() {
         assert(face->postscriptName() == "MyriadPro-Regular");
         assert(face->upem() == 1000);
 
-#if 0
-        for (const FXCMap & cm : face->cmaps()) {
-            std::cout << cm.description()  << ": " << std::endl;
-            for (const auto & block : cm.blocks()) {
-                std::cout << " - " << block->name() << ": " << block->size() << std::endl;
-            };
-        }
-#endif
-
         FXCMap cm = face->currentCMap();
         assert(cm.isUnicode());
         for (FXPtr<FXGCharBlock> block : cm.blocks()) {
@@ -44,6 +36,9 @@ int main() {
                           << std::endl;
             }
         }
+        
+        FXPDFDocument doc(getFontFile("SKYR_AN_Vanille_BECHER_v02.pdf"));
+        doc.open();
         
         
     } FXLib::finish();
