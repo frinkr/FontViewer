@@ -9,10 +9,17 @@ public:
     using QObject::QObject;
 
     virtual void
-    onWidgetInit(QWidget * widget) {};
+    onWidgetInit(QWidget * widget) {
+    }
 
     virtual void
-    onWidgetShow(QWidget * widget, QShowEvent * event) {};
+    onWidgetShow(QWidget * widget, QShowEvent * event) {
+    }
+
+    virtual bool
+    onNativeEvent(QWidget * widget, const QByteArray & eventType, void * message, long * result) {
+        return false;
+    }
 
     static QXWindowDecorator *
     createInstance(QObject * parent = nullptr);
@@ -35,6 +42,14 @@ protected:
         Widget::showEvent(event);
         if (decorator_) 
             decorator_->onWidgetShow(this, event);
+    }
+
+    bool
+    nativeEvent(const QByteArray & eventType, void * message, long * result) override {
+        if (decorator_ && decorator_->onNativeEvent(this, eventType, message, result))
+            return true;
+
+        return Widget::nativeEvent(eventType, message, result);
     }
 
 protected:
