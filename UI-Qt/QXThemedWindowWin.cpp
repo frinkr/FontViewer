@@ -1,6 +1,6 @@
 #include "QXThemedWindow.h"
 
-bool
-QXThemedWindowInit(QWidget * widget) {
-    return false;
+QXWindowDecorator *
+QXWindowDecorator::createInstance(QObject * parent) {
+    return new QXWindowDecorator(parent);
 }
