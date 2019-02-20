@@ -2,8 +2,6 @@
 #include <functional>
 #include "FXFace.h"
 
-
-
 class FXFaceDatabase {
 public:
     using ProgressCallback = std::function<bool(size_t current, size_t total, const FXString & file)>;
@@ -30,9 +28,20 @@ public:
 
 public:
     struct FaceItem {
-        size_t           fileHash;
         FXFaceDescriptor desc;
         FXFaceAttributes atts;   
+    };
+
+    struct FoldersHash {
+        size_t   hash {0};
+
+        // map from path to hash
+        FXMap<FXString, size_t> files;
+
+        // map from path to indexes of FaceItem in faces_
+        // NOT saved to file
+        FXMap<FXString, FXVector<size_t>> faces;
+
     };
 
 protected:
@@ -43,19 +52,18 @@ protected:
     load();
 
     bool
-    checkUpdate();
-    
+    checkForUpdate();
+
+    void
+    initDiskHash();
+
 protected:
     FXVector<FXString> folders_;
-    FXSet<FXString>    files_;
     FXString           dbPath_;
 
     FXVector<FaceItem> faces_;
-    size_t             hash_;
 
     ProgressCallback   progress_;
-
-    FXMap<FXString, FXVector<size_t>> hashMap_;
-    //FXVector<FXFaceDescriptor>  faces_;
-    //FXVector<FXFaceAttributes>  attrs_;
+    FoldersHash        dbHash_;
+    FoldersHash        diskHash_;
 };
