@@ -12,3 +12,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+bool
+QXThemedWindowInit(QWidget * widget) {
+    return false;
+}

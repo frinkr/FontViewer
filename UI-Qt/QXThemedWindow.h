@@ -1,6 +1,7 @@
 #pragma once
-
+#include <QMessageBox>
 #include <QWidget>
+#include <type_traits>
 
 class QXWindowDecorator : public QObject{
     Q_OBJECT
@@ -20,20 +21,22 @@ public:
 template <class Widget>
 class QXThemedWindow : public Widget {
 public:
-    using Widget::Widget;
+    template <typename ...Args>
+    QXThemedWindow(Args &&... args)
+        : Widget(std::forward<Args>(args)...){
+        decorator_ = QXWindowDecorator::createInstance(this);
+        if (decorator_) 
+            decorator_->onWidgetInit(this);
+    }
+
 protected:
     void
     showEvent(QShowEvent * event) override {
         Widget::showEvent(event);
-        if (decorator()) decorator()->onWidgetShow(this, event);
+        if (decorator_) 
+            decorator_->onWidgetShow(this, event);
     }
 
-    virtual QXWindowDecorator *
-    decorator() {
-        if (decorator_ == (QXWindowDecorator *)(-1))
-            decorator_ = QXWindowDecorator::createInstance(this);
-        return decorator_;
-    }
 protected:
-    QXWindowDecorator   * decorator_ {(QXWindowDecorator *)(-1)};
+    QXWindowDecorator   * decorator_ {nullptr};
 };
