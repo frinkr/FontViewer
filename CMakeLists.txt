@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project(FontViewer)
 
-set(BUILD_PDF_PLUGIN ON)
-
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -20,7 +18,3 @@ add_definitions(
 add_subdirectory(FontX)
 add_subdirectory(UI-Qt)
 add_subdirectory(App)
-
-if (BUILD_PDF_PLUGIN)
-  add_subdirectory(PDFPlugin)
-endif()

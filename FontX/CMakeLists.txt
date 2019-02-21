@@ -21,6 +21,8 @@ else()
   pkg_check_modules(ICU REQUIRED icu-uc)
 endif()
 
+add_subdirectory(PDF)
+
 add_library(FontX
   STATIC
   FX.h
