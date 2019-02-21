@@ -15,6 +15,7 @@ add_definitions(
   -DFX_RESOURCES_DIR=\"${FX_DIR}/Resources\"
   )
 
+add_subdirectory(3rdParties)
 add_subdirectory(FontX)
 add_subdirectory(UI-Qt)
 add_subdirectory(App)
