@@ -17,7 +17,7 @@ std::string getUCDRoot() {
 
 int main() {
     FXLib::init(getUCDRoot()); {
-        PDFDocument doc(getPDFFile("Lorem.pdf"));
+        PDFDocument doc(getPDFFile("print.pdf"));
         doc.open();
     } FXLib::finish();
     return 0;
