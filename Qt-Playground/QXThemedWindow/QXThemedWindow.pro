@@ -26,8 +26,7 @@ CONFIG += c++11
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
-    QXThemedWindowMac.mm
+        mainwindow.cpp
 win32{
         SOURCES += \
                 framelesswindow.cpp

@@ -23,5 +23,5 @@ QXProgressDialog::setProgress(int value, int maximum, const QString & message) {
 
     QFontMetrics metrics(ui_->label->font());
     ui_->label->setText(metrics.elidedText(message, Qt::ElideMiddle, maximumWidth()));
-    qApp->processEvents();
+    qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
 }
