@@ -22,7 +22,7 @@ else()
 endif()
 
 add_library(FontX
-  SHARED
+  STATIC
   FX.h
   FXTag.h
   FXFT.h
@@ -90,8 +90,8 @@ if (APPLE)
 endif()
 
 #########################################################
-add_executable(FontXCL main.cpp)
-target_link_libraries(FontXCL
+add_executable(FontXTester main.cpp)
+target_link_libraries(FontXTester
   FontX
   ${Boost_LIBRARIES}
   ${FREETYPE_LIBRARIES}

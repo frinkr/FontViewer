@@ -24,13 +24,14 @@ set(PODOFO_BUILD_STATIC ON)
 add_subdirectory(podofo)
 
 add_library(PDFPlugin
-  SHARED
   PDFDocument.h
   PDFDocument.cpp
   )
 
 target_include_directories(PDFPlugin PUBLIC
   ${OPENSSL_INCLUDE_DIR}
+  ${CMAKE_CURRENT_BINARY_DIR}/podofo
+  ${CMAKE_CURRENT_SOURCE_DIR}/podofo
   )
 
 target_link_libraries(PDFPlugin PRIVATE
@@ -43,8 +44,8 @@ target_include_directories(PDFPlugin PUBLIC
 
 
 #########################################################
-add_executable(PDFPluginCL main.cpp)
-target_link_libraries(PDFPluginCL
+add_executable(PDFPluginTester main.cpp)
+target_link_libraries(PDFPluginTester
   FontX
   PDFPlugin
   )

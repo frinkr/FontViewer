@@ -135,7 +135,7 @@ elseif(WIN32)
 endif()
 
 add_library(UI-Qt
-  SHARED
+  STATIC
   ${SHARED_SOURCES}
   ${PLATFORM_SOURCES}
   ${UI}
