@@ -1,6 +1,5 @@
 #include "FXLib.h"
 #include "FXFace.h"
-#include "FXPDF.h"
 #include <iostream>
 
 std::string getFontFile(const std::string & fileName) {
@@ -17,7 +16,6 @@ std::string getUCDRoot() {
 
 int main() {
     FXLib::init(getUCDRoot()); {
-#if 0
         auto face = FXFace::createFace(getFontFile("MyriadPro-Regular.otf"), 0);
         assert(face);
 
@@ -41,11 +39,6 @@ int main() {
                           << std::endl;
             }
         }
-#endif
-        FXPDFDocument doc(getPDFFile("Lorem.pdf"));
-        doc.open();
-        
-        
     } FXLib::finish();
     return 0;
 }

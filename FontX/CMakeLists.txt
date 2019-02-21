@@ -12,7 +12,6 @@ endif()
 find_package(Freetype REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
 find_package(Iconv REQUIRED)
-find_package(OPENSSL REQUIRED)
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
@@ -23,6 +22,7 @@ else()
 endif()
 
 add_library(FontX
+  SHARED
   FX.h
   FXTag.h
   FXFT.h
@@ -38,8 +38,6 @@ add_library(FontX
   FXUnicode.cpp
   FXGlyph.h
   FXGlyph.cpp
-  FXPDF.h
-  FXPDF.cpp
   FXPixmap.h
   FXPixmap.cpp
   FXFaceDatabase.h
@@ -73,7 +71,6 @@ target_include_directories(FontX PUBLIC
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
   ${Iconv_INCLUDE_DIRS}
-  ${OPENSSL_INCLUDE_DIR}
   )
 
 target_link_libraries(FontX
@@ -82,8 +79,6 @@ target_link_libraries(FontX
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
-  ${OpenSSL_LIBRARIES}
-  podofo_static
   )
 
 if (APPLE)
@@ -103,5 +98,4 @@ target_link_libraries(FontXCL
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
-  ${OpenSSL_LIBRARIES}
   )

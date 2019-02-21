@@ -1,6 +1,6 @@
 #pragma once
-#include "FX.h"
-#include "FXFace.h"
+#include "FontX/FX.h"
+#include "FontX/FXFace.h"
 
 class FXPDFDocumentImp;
 

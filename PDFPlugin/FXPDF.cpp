@@ -1,8 +1,8 @@
-#include <podofo/podofo.h>
+#include "podofo/podofo.h"
 #include "FXPDF.h"
 #include <iostream>
 #include <stack>
-#include "FXLog.h"
+#include "FontX/FXLog.h"
 
 
 using namespace PoDoFo;
@@ -233,7 +233,7 @@ void TextExtractor::AddTextElement( double dCurPosX, double dCurPosY,
         //printf("%02x", static_cast<unsigned char>(*pszData) );
         ++pszData;
     }
-    printf("(%.3f,%.3f) %s \n", dCurPosX, dCurPosY, unicode.GetStringUtf8().c_str() );
+    printf("(%.3f,%.3f %s) %s \n", dCurPosX, dCurPosY, pCurFont->GetIdentifier().GetName().c_str(), unicode.GetStringUtf8().c_str() );
 }
 
 
