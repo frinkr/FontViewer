@@ -25,8 +25,8 @@ add_subdirectory(podofo)
 
 add_library(PDFPlugin
   SHARED
-  FXPDF.h
-  FXPDF.cpp
+  PDFDocument.h
+  PDFDocument.cpp
   )
 
 target_include_directories(PDFPlugin PUBLIC

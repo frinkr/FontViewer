@@ -1,6 +1,5 @@
 #include "FontX/FXLib.h"
-#include "FontX/FXFace.h"
-#include "FXPDF.h"
+#include "PDFDocument.h"
 
 #include <iostream>
 
@@ -18,7 +17,7 @@ std::string getUCDRoot() {
 
 int main() {
     FXLib::init(getUCDRoot()); {
-        FXPDFDocument doc(getPDFFile("Lorem.pdf"));
+        PDFDocument doc(getPDFFile("Lorem.pdf"));
         doc.open();
     } FXLib::finish();
     return 0;

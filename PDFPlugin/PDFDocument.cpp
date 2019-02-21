@@ -1,9 +1,8 @@
-#include "podofo/podofo.h"
-#include "FXPDF.h"
 #include <iostream>
 #include <stack>
+#include "podofo/podofo.h"
 #include "FontX/FXLog.h"
-
+#include "PDFDocument.h"
 
 using namespace PoDoFo;
 
@@ -237,9 +236,9 @@ void TextExtractor::AddTextElement( double dCurPosX, double dCurPosY,
 }
 
 
-class FXPDFDocumentImp {
+class PDFDocumentImp {
 public:
-    explicit FXPDFDocumentImp(const FXString & file)
+    explicit PDFDocumentImp(const FXString & file)
         : file_(file) {
     }
 
@@ -261,35 +260,35 @@ private:
 };
 
 
-FXPDFDocument::FXPDFDocument(const FXString & path)
-    : imp_(std::make_unique<FXPDFDocumentImp>(path)) {
+PDFDocument::PDFDocument(const FXString & path)
+    : imp_(std::make_unique<PDFDocumentImp>(path)) {
 }
 
-FXPDFDocument::~FXPDFDocument() {
+PDFDocument::~PDFDocument() {
     
 }
 
 bool
-FXPDFDocument::open() {
+PDFDocument::open() {
     return imp_->open();
 }
 
 bool
-FXPDFDocument::close() {
+PDFDocument::close() {
     return false;
 }
 
 size_t
-FXPDFDocument::fontCount() const {
+PDFDocument::fontCount() const {
     return 0;
 }
 
-FXPDFFontEntry
-FXPDFDocument::fontEntry(size_t index) const {
-    return FXPDFFontEntry();
+PDFFontEntry
+PDFDocument::fontEntry(size_t index) const {
+    return PDFFontEntry();
 }
 
 FXPtr<FXFace>
-FXPDFDocument::createFace(int index) const {
+PDFDocument::createFace(int index) const {
     return nullptr;
 }

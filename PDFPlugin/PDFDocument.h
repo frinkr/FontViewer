@@ -2,18 +2,18 @@
 #include "FontX/FX.h"
 #include "FontX/FXFace.h"
 
-class FXPDFDocumentImp;
+class PDFDocumentImp;
 
-struct FXPDFFontEntry {
+struct PDFFontEntry {
     FXString  name;
     bool      isSubset;
 };
 
-class FXPDFDocument {
+class PDFDocument {
 public:
-    explicit FXPDFDocument(const FXString & path);
+    explicit PDFDocument(const FXString & path);
 
-    ~FXPDFDocument();
+    ~PDFDocument();
 
     bool
     open();
@@ -24,12 +24,12 @@ public:
     size_t
     fontCount() const;
 
-    FXPDFFontEntry
+    PDFFontEntry
     fontEntry(size_t index) const;
 
     FXPtr<FXFace>
     createFace(int index) const;
 
 private:
-    std::unique_ptr<FXPDFDocumentImp> imp_;
+    std::unique_ptr<PDFDocumentImp> imp_;
 };
