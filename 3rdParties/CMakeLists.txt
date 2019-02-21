@@ -1,3 +1,3 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 set(PODOFO_BUILD_LIB_ONLY ON)
-add_subdirectory(podofo-0.9.6)
+add_subdirectory(podofo)

@@ -27,7 +27,12 @@ namespace {
         FcConfigDestroy(fc);
         return ret;
 #else
-        return QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+        QStringList folders = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+#if defined(Q_OS_MAC)
+        if (!folders.contains("/System/Library/Assets") && !folders.contains("/System/Library/Assets/"))
+            folders << "/System/Library/Assets";
+#endif
+        return folders;
 #endif
     }
 

@@ -12,9 +12,7 @@ endif()
 find_package(Freetype REQUIRED)
 find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
 find_package(Iconv REQUIRED)
-find_package(Podofo REQUIRED)
 find_package(OPENSSL REQUIRED)
-
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
@@ -75,7 +73,6 @@ target_include_directories(FontX PUBLIC
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
   ${Iconv_INCLUDE_DIRS}
-  ${Podofo_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
   )
 
@@ -85,8 +82,8 @@ target_link_libraries(FontX
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
-  ${PODOFO_LIBRARIES}
   ${OpenSSL_LIBRARIES}
+  podofo_static
   )
 
 if (APPLE)
@@ -106,6 +103,5 @@ target_link_libraries(FontXCL
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
-  ${Podofo_LIBRARIES}
   ${OpenSSL_LIBRARIES}
   )

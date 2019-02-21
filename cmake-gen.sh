@@ -12,7 +12,7 @@ cd "$DIR/$BUILD"
 
 if [ "$(uname)" == "Darwin" ]; then
     export PKG_CONFIG_PATH="/usr/local/opt/openssl/lib/pkgconfig" # required by Podofo
-    cmake -G Xcode .. -DCMAKE_PREFIX_PATH=`brew --prefix qt`
+    cmake -G "Xcode" .. -DCMAKE_PREFIX_PATH=`brew --prefix qt` -DPODOFO_DIR=/git/github/FontViewer/build
 else
     cmake -G "Eclipse CDT4 - Unix Makefiles" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_ECLIPSE_VERSION=4.7 ../FontViewer
 fi
