@@ -7,12 +7,17 @@ std::string getFontFile(const std::string & fileName) {
     return std::string(FX_RESOURCES_DIR) + "/Fonts/" + fileName;
 }
 
+std::string getPDFFile(const std::string & fileName) {
+    return std::string(FX_RESOURCES_DIR) + "/PDFs/" + fileName;
+}
+
 std::string getUCDRoot() {
     return std::string(FX_RESOURCES_DIR) + "/UCD";
 }
 
 int main() {
     FXLib::init(getUCDRoot()); {
+#if 0
         auto face = FXFace::createFace(getFontFile("MyriadPro-Regular.otf"), 0);
         assert(face);
 
@@ -36,8 +41,8 @@ int main() {
                           << std::endl;
             }
         }
-        
-        FXPDFDocument doc(getFontFile("SKYR_AN_Vanille_BECHER_v02.pdf"));
+#endif
+        FXPDFDocument doc(getPDFFile("Lorem.pdf"));
         doc.open();
         
         
