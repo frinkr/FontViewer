@@ -98,6 +98,55 @@ FT_Error FXFilePathToOpenArgs(const FXString & filePath, FT_Open_Args * args) {
     return FT_Err_Ok;
 };
 
+
+namespace {
+    unsigned long
+    FXStreamRead(FT_Stream       stream,
+                 unsigned long   offset,
+                 unsigned char*  buffer,
+                 unsigned long   count ) {
+        if ( !count && offset > stream->size)
+            return 1;
+
+        FXPtr<FXStream> * s = (FXPtr<FXStream>*)stream->descriptor.pointer;
+        if (stream->pos != offset)
+            (*s)->seek(offset);
+
+        return (unsigned long)(*s)->read(buffer, count);
+    }
+
+    void
+    FXStreamClose( FT_Stream  stream ) {
+        FXPtr<FXStream> * s = (FXPtr<FXStream>*)stream->descriptor.pointer;
+        if (s) {
+            (*s)->close();
+            delete s;
+        }
+        stream->descriptor.pointer = NULL;
+        stream->pathname.pointer   = NULL;
+        stream->size               = 0;
+        stream->base               = NULL;
+        // free the stream created by calloc (FXStreamToOpenArgs)
+        free(stream);
+    }
+
+}
+
+FT_Error FXStreamToOpenArgs(FXPtr<FXStream> stream, FT_Open_Args * args) {
+    memset(args, 0, sizeof(FT_Open_Args));
+
+    FT_Stream ftStream = (FT_Stream)calloc(1, sizeof(FT_StreamRec));
+    ftStream->descriptor.pointer = new FXPtr<FXStream>(stream);
+    ftStream->size = stream->size();
+    ftStream->read = FXStreamRead;
+    ftStream->close = FXStreamClose;
+        
+    args->flags    = FT_OPEN_STREAM;
+    args->pathname = NULL;
+    args->stream   = ftStream;
+    return FT_Err_Ok;
+};
+
 FT_Error FXFTCountFaces(FXFTLibrary lib, const FXString & filePath, size_t & count) {
     FT_Error error = FT_Err_Ok;    
 
@@ -154,3 +203,16 @@ FXFTOpenFace(FXFTLibrary lib, const FXString & filePath, size_t index, FXFTFace 
 
     return FT_Open_Face(lib, &args, FT_Long(index), face);
 }
+
+FT_Error
+FXFTOpenFace(FXFTLibrary lib, FXPtr<FXStream> stream, size_t index, FXFTFace * face) {
+    FT_Error error = FT_Err_Ok;
+    FT_Open_Args  args;
+            
+    error = FXStreamToOpenArgs(stream, &args);
+    if (error)
+        return error;
+
+    return FT_Open_Face(lib, &args, FT_Long(index), face);
+}
+

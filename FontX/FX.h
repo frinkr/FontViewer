@@ -151,3 +151,56 @@ FXMakeRect(T left, T top, T right, T bottom) {
     rect.bottom = bottom;
     return rect;
 }
+
+class FXStream {
+public:
+    virtual ~FXStream() {}
+
+    virtual size_t size() const = 0;
+    virtual size_t pos() const = 0;
+    virtual bool   seek(size_t pos) = 0;
+    virtual size_t read(unsigned char * buffer, size_t count) = 0;
+    virtual void   close() = 0;
+};
+
+class FXMemoryStream : public FXStream {
+public:
+    FXMemoryStream(unsigned char * buffer, size_t length, size_t pos = 0)
+        : buffer_(buffer)
+        , length_(length)
+        , pos_(pos) {
+    }
+
+    size_t
+    size() const override {
+        return length_;
+    }
+
+    size_t
+    pos() const override {
+        return pos_;
+    }
+
+    bool
+    seek(size_t pos) override {
+        pos_ = pos;
+        return true;
+    }
+
+    size_t
+    read(unsigned char * buffer, size_t count) override {
+        size_t c = std::min(count, length_ - pos_);
+        if (c) 
+            memcpy(buffer, buffer_ + pos_, c);
+        return c;
+    }
+
+    void
+    close() override {
+    }
+
+protected:
+    unsigned char * buffer_;
+    size_t          length_;
+    size_t          pos_;
+};

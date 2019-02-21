@@ -7,6 +7,10 @@ FXFilePathToOpenArgs(const FXString & filePath,
                      FT_Open_Args * args);
 
 FT_Error
+FXStreamToOpenArgs(FXPtr<FXStream> stream,
+                   FT_Open_Args * args);
+
+FT_Error
 FXFTCountFaces(FXFTLibrary lib,
                const FXString & filePath,
                size_t & count);
@@ -21,3 +25,10 @@ FXFTOpenFace(FXFTLibrary lib,
              const FXString & filePath,
              size_t index,
              FXFTFace * face);
+
+FT_Error
+FXFTOpenFace(FXFTLibrary lib,
+             FXPtr<FXStream> stream,
+             size_t index,
+             FXFTFace * face);
+

@@ -2,6 +2,7 @@
 #include <stack>
 #include "podofo/podofo.h"
 #include "FontX/FXLog.h"
+#include "FontX/FXFace.h"
 #include "PDFDocument.h"
 using namespace PoDoFo;
 
@@ -78,6 +79,14 @@ public:
                         char * buffer = nullptr;
                         pdf_long bufferLength = 0;
                         stream->GetFilteredCopy(&buffer, &bufferLength);
+                        {
+                            FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
+                            FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
+                            if (face) {
+                                FX_INFO("     UPEM: " << face->upem());
+                            }
+                        }
+                        
                         podofo_free(buffer);
                         
                         FX_INFO("    FontFile3: Compressed Length: " << stream->GetLength() << ", Uncompressed Length: " << bufferLength);

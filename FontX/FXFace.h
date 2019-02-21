@@ -133,6 +133,9 @@ public:
     createFace(const std::string & filePath, size_t index);
 
     static FXPtr<FXFace>
+    createFace(FXPtr<FXStream> stream, size_t faceIndex);
+
+    static FXPtr<FXFace>
     createFace(FXFTFace face);
 public:
     FXFTFace
@@ -247,6 +250,8 @@ public:
 private:
     explicit FXFace(const FXFaceDescriptor & descriptor);
     explicit FXFace(FXFTFace face);
+    explicit FXFace(FXPtr<FXStream> stream, size_t faceIndex);
+
     FXFace(const FXFace &) = delete;
     FXFace & operator=(const FXFace & ) = delete;
 public:    
@@ -282,4 +287,3 @@ protected:
     FXVector<VariableAxis>            variableAxises_;
     FXVector<VariableNamedInstance>   variableNamedInstances_;
 };
-

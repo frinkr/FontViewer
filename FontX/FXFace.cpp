@@ -206,6 +206,14 @@ FXFace::createFace(const std::string & filePath, size_t faceIndex) {
 }
 
 FXPtr<FXFace>
+FXFace::createFace(FXPtr<FXStream> stream, size_t faceIndex) {
+    auto face = FXPtr<FXFace>(new FXFace(stream, faceIndex));
+    if (face->face())
+        return face;
+    return nullptr;
+}
+
+FXPtr<FXFace>
 FXFace::createFace(FXFTFace face) {
     return FXPtr<FXFace>(new FXFace(face));
 }
@@ -221,6 +229,13 @@ FXFace::FXFace(const FXFaceDescriptor & descriptor)
 FXFace::FXFace(FXFTFace face)
     : face_(face) {
     FT_Reference_Face(face_);
+    init();
+}
+
+FXFace::FXFace(FXPtr<FXStream> stream, size_t faceIndex)
+    : face_(nullptr) {
+    if (FXFTOpenFace(FXLib::get(), stream, faceIndex, &face_))
+        return;
     init();
 }
 
