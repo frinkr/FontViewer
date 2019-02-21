@@ -30,6 +30,8 @@ add_library(FontX
   FXFT.h
   FXLib.h
   FXLib.cpp
+  FXLog.h
+  FXLog.cpp
   FXFace.cpp
   FXFace.h
   FXCMap.h
