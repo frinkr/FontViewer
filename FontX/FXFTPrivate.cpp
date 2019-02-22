@@ -105,13 +105,8 @@ namespace {
                  unsigned long   offset,
                  unsigned char*  buffer,
                  unsigned long   count ) {
-        if ( !count && offset > stream->size)
-            return 1;
-
         FXPtr<FXStream> * s = (FXPtr<FXStream>*)stream->descriptor.pointer;
-        if (stream->pos != offset)
-            (*s)->seek(offset);
-
+        (*s)->seek(offset);
         return (unsigned long)(*s)->read(buffer, count);
     }
 

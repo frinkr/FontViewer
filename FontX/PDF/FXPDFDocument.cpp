@@ -93,13 +93,6 @@ public:
                             
                             FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
                             FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
-                            if (!face) {
-                                FILE * file = fopen(tempstr.c_str(), "wb");
-                                fwrite(buffer, bufferLength, 1, file);
-                                fclose(file);
-                                face = FXFace::createFace(tempstr, 0);
-                            }
-                            
                             if (face) {
                                 FX_INFO("\t   face: UPEM: " << face->upem());
                                 FX_INFO("\t   face: PSName: " << face->postscriptName());
