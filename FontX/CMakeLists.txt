@@ -71,6 +71,7 @@ target_include_directories(FontX PUBLIC
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
   ${Iconv_INCLUDE_DIRS}
+  ${CMAKE_SOURCE_DIR}
   )
 
 target_link_libraries(FontX
@@ -79,6 +80,7 @@ target_link_libraries(FontX
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
+  FontXPDF
   )
 
 if (APPLE)

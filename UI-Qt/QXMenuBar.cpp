@@ -11,9 +11,13 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         }, QKeySequence(QKeySequence::Open));
 
         actionOpenFromFile = menuFile->addAction(tr("Open from &File"), []() {
-            QXDocumentWindowManager::instance()->doOpenFontFromFile();
+            QXDocumentWindowManager::instance()->doOpenFontFromFile(QXDocumentWindowManager::FileTypeFilter::Font);
         }, QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_O));
 
+        actionOpenFromPDF = menuFile->addAction(tr("Open Embedded Font from PDF"), [] {
+            QXDocumentWindowManager::instance()->doOpenFontFromFile(QXDocumentWindowManager::FileTypeFilter::PDF);
+        });
+        
         actionClose = menuFile->addAction(tr("&Close"), [parent]() {
             if (parent) parent->close();
         }, QKeySequence(QKeySequence::Close));

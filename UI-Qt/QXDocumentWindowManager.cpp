@@ -20,6 +20,37 @@
 #include "QXMenuBar.h"
 #include "QXOpenFontDialog.h"
 //#include "QXJumpListHelper.h"
+
+namespace {
+    QString fileTypeFilterToString(QXDocumentWindowManager::FileTypeFilter filter) {
+        QString string;
+        switch (filter) {
+        case QXDocumentWindowManager::FileTypeFilter::Font:
+            string = QXDocumentWindowManager::tr("Font files (*.ttf *.otf *.pfa *.pfb)");
+            break;
+        case QXDocumentWindowManager::FileTypeFilter::PDF:
+            string = QXDocumentWindowManager::tr("PDF files (*.pdf)");
+            break;
+        default:
+            string = QXDocumentWindowManager::tr("All Files (*)");
+            break;
+        }
+        return string;
+    }
+
+    QString fileTypeFiltersFullString() {
+        QXDocumentWindowManager::FileTypeFilter filters[] = {
+            QXDocumentWindowManager::FileTypeFilter::Font,
+            QXDocumentWindowManager::FileTypeFilter::PDF,
+            QXDocumentWindowManager::FileTypeFilter::All
+        };
+        QStringList text;
+        for (auto filter : filters)
+            text << fileTypeFilterToString(filter);
+        return text.join(";;");
+    }
+}
+
 QXDocumentWindowManager * QXDocumentWindowManager::instance_ = nullptr;
 
 QXDocumentWindowManager::QXDocumentWindowManager() {
@@ -239,11 +270,12 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
 }
 
 bool
-QXDocumentWindowManager::doOpenFontFromFile() {
+QXDocumentWindowManager::doOpenFontFromFile(FileTypeFilter selectedTypeFilter) {
     QFileDialog openFileDialog(nullptr);
 
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
-    openFileDialog.setNameFilter(tr("Font files (*.ttf *.otf);;All Files (*)"));
+    openFileDialog.setNameFilter(fileTypeFiltersFullString());
+    openFileDialog.selectNameFilter(fileTypeFilterToString(selectedTypeFilter));
 
     if (QDialog::Accepted == openFileDialog.exec()) {
         openFontFile(openFileDialog.selectedFiles()[0]);
@@ -254,7 +286,7 @@ QXDocumentWindowManager::doOpenFontFromFile() {
 
 void
 QXDocumentWindowManager::openFontFile(const QString & filePath) {
-    size_t faceCount = FXCountFaces(toStdString(filePath));
+    size_t faceCount = FXFace::countFaces(toStdString(filePath));
     if (faceCount == 1) {
         QXFontURI uri {filePath, 0};
         openFontURI(uri);
@@ -292,8 +324,6 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
             addToRecents(document);
             QXDocumentWindow * window = createDocumentWindow(document);
             window->show();
-
-
         } else {
             showOpenFontFileError(uri.filePath);
         }

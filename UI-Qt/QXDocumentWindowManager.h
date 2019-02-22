@@ -18,6 +18,12 @@ class QXDocumentWindowManager : public QObject
     Q_OBJECT
 
 public:
+    enum class FileTypeFilter {
+        Font   = 0x01,
+        PDF    = 0x02,
+        All    = 0xFF,
+    };
+public:
     QXDocumentWindowManager();
     ~QXDocumentWindowManager();
 
@@ -63,7 +69,7 @@ public slots:
 
     /* Return true if use selected a font file, false if canceled.*/
     bool
-    doOpenFontFromFile();
+    doOpenFontFromFile(FileTypeFilter selectedTypeFilter = FileTypeFilter::All);
 
     void
     openFontFile(const QString & filePath);

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <cassert>
 #include <algorithm>
-#include <memory>
-#include <string>
-
+#include <cassert>
+#include <functional>
 #include <map>
-#include <vector>
+#include <memory>
 #include <set>
+#include <string>
+#include <vector>
 
 template <typename T>
 using FXPtr = std::shared_ptr<T>;
@@ -154,21 +154,35 @@ FXMakeRect(T left, T top, T right, T bottom) {
 
 class FXStream {
 public:
+    using Byte = unsigned char;
     virtual ~FXStream() {}
 
     virtual size_t size() const = 0;
     virtual size_t pos() const = 0;
     virtual bool   seek(size_t pos) = 0;
-    virtual size_t read(unsigned char * buffer, size_t count) = 0;
+    virtual size_t read(Byte * buffer, size_t count) = 0;
     virtual void   close() = 0;
 };
 
 class FXMemoryStream : public FXStream {
 public:
-    FXMemoryStream(unsigned char * buffer, size_t length, size_t pos = 0)
+    using Deallocator = std::function<void(const Byte *)>;
+
+    FXMemoryStream(const Byte * buffer,
+                   size_t length,
+                   Deallocator deallocator = {nullptr},
+                   size_t pos = 0)
         : buffer_(buffer)
         , length_(length)
+        , deallocator_(deallocator)
         , pos_(pos) {
+    }
+
+    FXMemoryStream & operator=(const FXMemoryStream &) = delete;
+
+    ~FXMemoryStream() {
+        if (deallocator_) 
+            deallocator_(buffer_);
     }
 
     size_t
@@ -188,7 +202,7 @@ public:
     }
 
     size_t
-    read(unsigned char * buffer, size_t count) override {
+    read(Byte * buffer, size_t count) override {
         size_t c = std::min(count, length_ - pos_);
         if (c) 
             memcpy(buffer, buffer_ + pos_, c);
@@ -200,7 +214,8 @@ public:
     }
 
 protected:
-    unsigned char * buffer_;
+    const Byte    * buffer_;
     size_t          length_;
+    Deallocator     deallocator_;
     size_t          pos_;
 };

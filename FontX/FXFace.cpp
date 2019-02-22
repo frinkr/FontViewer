@@ -1,10 +1,11 @@
-#include "FXFace.h"
-#include "FXLib.h"
-#include "FXGlyphCache.h"
-#include "FXFTNames.h"
-#include "FXInspector.h"
-#include "FXFTPrivate.h"
 #include "FXBoostPrivate.h"
+#include "FXFTNames.h"
+#include "FXFTPrivate.h"
+#include "FXFace.h"
+#include "FXGlyphCache.h"
+#include "FXInspector.h"
+#include "FXLib.h"
+#include "FXPDF.h"
 
 namespace {
     template <typename T>
@@ -194,9 +195,15 @@ FXCountFaces(const FXString & filePath) {
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
 	auto face = new FXFace(descriptor);
-	if (!face->face())
-		return FXPtr<FXFace>();
-	return FXPtr<FXFace>(face);
+	if (face->face()) 
+        return FXPtr<FXFace>(face);
+    else
+        delete face;
+
+    FXPDFDocument pdf(descriptor.filePath);
+    if (pdf.open())
+        return pdf.createFace(descriptor.index);
+	return nullptr;
 }
     
 FXPtr<FXFace>
@@ -218,6 +225,21 @@ FXFace::createFace(FXFTFace face) {
     return FXPtr<FXFace>(new FXFace(face));
 }
 
+size_t
+FXFace::countFaces(const std::string & filePath) {
+    size_t count = 0;
+
+    // Try read as font
+    if (!FXFTCountFaces(FXLib::get(), filePath, count))
+        return count;
+
+    // Try read as PDF
+    if (FXPDFDocument::countFaces(filePath, count))
+        return count;
+    return 0;
+}
+
+///////////////////////////////////////////////////
 FXFace::FXFace(const FXFaceDescriptor & descriptor)
 : desc_(descriptor)
 , face_(nullptr) {

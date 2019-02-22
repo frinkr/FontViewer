@@ -13,6 +13,7 @@ public:
     // File menu
     QAction * actionOpen;
     QAction * actionOpenFromFile;
+    QAction * actionOpenFromPDF;
     QAction * actionClose;
     QAction * actionRecent;
     QAction * actionPreferences;

@@ -122,7 +122,7 @@ double
 px2pt(double p, double dpi = FXDefaultDPI);
 
 size_t
-FXCountFaces(const FXString & filePath);
+FXCountFacesDEPREATED(const FXString & filePath);
 
 class FXFace : public std::enable_shared_from_this<FXFace> {
 public:
@@ -137,6 +137,10 @@ public:
 
     static FXPtr<FXFace>
     createFace(FXFTFace face);
+
+    static size_t
+    countFaces(const std::string & filePath);
+
 public:
     FXFTFace
     face() const;

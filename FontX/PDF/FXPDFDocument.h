@@ -12,6 +12,10 @@ struct FXPDFFontInfo {
 
 class FXPDFDocument {
 public:
+    static bool
+    countFaces(const FXString & path, size_t & count);
+
+public:
     explicit FXPDFDocument(const FXString & path);
 
     ~FXPDFDocument();

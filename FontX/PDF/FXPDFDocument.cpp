@@ -81,9 +81,11 @@ public:
         pdf_long bufferLength = 0;
         stream->GetFilteredCopy(&buffer, &bufferLength);
         
-        FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
+        FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength, [](const FXMemoryStream::Byte * data){
+            podofo_free((void*)data);
+        }));
+        
         FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
-        podofo_free(buffer);
         return face;
     }
 
@@ -168,6 +170,17 @@ private:
     PdfMemDocument        document_;
     FXVector<FontEntry>   fonts_;
 };
+
+
+bool
+FXPDFDocument::countFaces(const FXString & path, size_t & count) {
+    FXPDFDocument doc(path);
+    if (doc.open()) {
+        count = doc.fontCount();
+        return true;
+    }
+    return false;
+}
 
 FXPDFDocument::FXPDFDocument(const FXString & path)
     : imp_(std::make_unique<FXPDFDocumentImp>(path)) {
