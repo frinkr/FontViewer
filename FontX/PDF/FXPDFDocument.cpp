@@ -100,6 +100,11 @@ public:
         
         for (const TKeyMap::value_type & kv: pageFontDict.GetKeys()) {
             PdfObject * fontObj = pPage->GetObject()->GetOwner()->GetObject(kv.second->GetReference());
+            if (fontObjects_.find(fontObj) != fontObjects_.end())
+                continue;
+
+            fontObjects_.insert(fontObj);
+
             dumpFontObject(kv.first, kv.second, fontObj);
             
             FontEntry font;
@@ -142,6 +147,7 @@ private:
     PdfMemDocument        document_;
     FXPDFDocument       * parent_{nullptr};
     FXVector<FontEntry>   fonts_;
+    FXSet<PdfObject *>    fontObjects_;
 };
 
 FXPtr<FXPDFDocument>

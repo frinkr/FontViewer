@@ -1,5 +1,7 @@
+#include "FontX/FXFace.h"
 #include "FontX/FXLib.h"
 #include "FontX/FXLog.h"
+#include "FXPDFFace.h"
 #include "FXPDFDocument.h"
 
 #include <iostream>

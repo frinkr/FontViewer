@@ -1,3 +1,4 @@
+
 #include <windows.h>
 #include <WinUser.h>
 #include <windowsx.h>
@@ -27,6 +28,7 @@ namespace {
 
         bool
         onNativeEvent(QWidget * widget, const QByteArray & eventType, void * message, long * result) override {
+            return false;
 #if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
             MSG* msg = *reinterpret_cast<MSG**>(message);
 #else
