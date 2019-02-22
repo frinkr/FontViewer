@@ -13,9 +13,10 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, QWidget
     , filePath_(filePath) {
     ui_->setupUi(this);
 
-    size_t faceCount = FXFace::countFaces(toStdString(filePath));
+    auto initFace = FXFace::createFace(toStdString(filePath), 0);
+    size_t faceCount = initFace? initFace->faceCount(): 0;
     for (size_t i = 0; i < faceCount; ++ i) {
-        auto face = FXFace::createFace(toStdString(filePath), i);
+        auto face = initFace->openFace(i);
         if (face) 
             ui_->listWidget->addItem(QXDocument::faceDisplayName(face));
         else

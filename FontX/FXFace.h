@@ -135,30 +135,33 @@ public:
     static FXPtr<FXFace>
     createFace(FXFTFace face);
 
-    static size_t
-    countFaces(const std::string & filePath);
-
 public:
-    bool
+    virtual bool
     valid() const;
     
     FXFTFace
     face() const;
     
-    size_t
+    virtual size_t
     index() const;
 
-    std::string
+    virtual std::string
     postscriptName() const;
 
-    size_t
+    virtual size_t
     upem() const;
 
-    size_t
+    virtual size_t
     glyphCount() const;
     
-    const FXFaceAttributes &
+    virtual const FXFaceAttributes &
     attributes() const;
+
+    virtual size_t
+    faceCount() const;
+
+    virtual FXPtr<FXFace>
+    openFace(size_t index);
 
 public:
     const std::vector<FXCMap> &
@@ -254,6 +257,7 @@ public:
 protected:
     FXFace();
     explicit FXFace(const FXFaceDescriptor & descriptor);
+    explicit FXFace(const std::string & filePath, size_t index);
     explicit FXFace(FXFTFace face);
     explicit FXFace(FXPtr<FXStream> stream, size_t faceIndex);
 
@@ -277,6 +281,7 @@ protected:
 
 protected:
     FXFaceDescriptor     desc_{};
+    FXPtr<FXStream>      stream_{};
     FXFTFace             face_{nullptr};
 
     double               fontSize_{1.0};

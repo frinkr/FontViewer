@@ -218,21 +218,6 @@ FXFace::createFace(FXFTFace face) {
     return FXPtr<FXFace>(new FXFace(face));
 }
 
-size_t
-FXFace::countFaces(const std::string & filePath) {
-    size_t count = 0;
-
-    // Try read as font
-    if (!FXFTCountFaces(FXLib::get(), filePath, count))
-        return count;
-
-    // Try read as PDF
-    auto pdf = FXPDFDocument::open(filePath);
-    if (pdf)
-        return pdf->fontCount();
-    return 0;
-}
-
 ///////////////////////////////////////////////////
 FXFace::FXFace() {    
 }
@@ -245,6 +230,10 @@ FXFace::FXFace(const FXFaceDescriptor & descriptor)
     init();
 }
 
+FXFace::FXFace(const std::string & filePath, size_t index)
+    : FXFace(FXFaceDescriptor{filePath, index}){
+}
+
 FXFace::FXFace(FXFTFace face)
     : face_(face) {
     FT_Reference_Face(face_);
@@ -252,8 +241,9 @@ FXFace::FXFace(FXFTFace face)
 }
 
 FXFace::FXFace(FXPtr<FXStream> stream, size_t faceIndex)
-    : face_(nullptr) {
-    if (FXFTOpenFace(FXLib::get(), stream, faceIndex, &face_))
+    : stream_(stream)
+    , face_(nullptr) {
+    if (FXFTOpenFace(FXLib::get(), stream_, faceIndex, &face_))
         return;
     init();
 }
@@ -301,6 +291,23 @@ FXFace::attributes() const {
     return atts_;
 }
 
+size_t
+FXFace::faceCount() const {
+    return face_->num_faces;
+}
+
+FXPtr<FXFace>
+FXFace::openFace(size_t index) {
+    FXFace * face = nullptr;
+    if (stream_)
+        face = new FXFace(stream_, index);
+    else
+        face = new FXFace(desc_.filePath, index);
+    if (face->valid())
+        return FXPtr<FXFace>(face);
+    delete face;
+    return nullptr;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //                     CMAPS

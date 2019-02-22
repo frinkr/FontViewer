@@ -2,6 +2,8 @@
 #include "FontX/FXLib.h"
 #include "FontX/FXFTPrivate.h"
 #include "FXPDFFace.h"
+#include "FXPDFDocument.h"
+
 using namespace PoDoFo;
 
 namespace {
@@ -41,6 +43,20 @@ FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
             init();
         }
     }
+}
+
+size_t
+FXPDFFace::faceCount() const {
+    if (document_)
+        return document_->fontCount();
+    return 0;
+}
+
+FXPtr<FXFace>
+FXPDFFace::openFace(size_t index) {
+    if (document_)
+        return document_->createFace(index);
+    return nullptr;
 }
 
 bool

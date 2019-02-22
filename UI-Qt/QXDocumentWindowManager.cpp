@@ -26,7 +26,7 @@ namespace {
         QString string;
         switch (filter) {
         case QXDocumentWindowManager::FileTypeFilter::Font:
-            string = QXDocumentWindowManager::tr("Font files (*.ttf *.otf *.pfa *.pfb)");
+            string = QXDocumentWindowManager::tr("Font files (*.ttf *.otf *.ttc *.pfa *.pfb)");
             break;
         case QXDocumentWindowManager::FileTypeFilter::PDF:
             string = QXDocumentWindowManager::tr("PDF files (*.pdf)");
@@ -286,7 +286,8 @@ QXDocumentWindowManager::doOpenFontFromFile(FileTypeFilter selectedTypeFilter) {
 
 void
 QXDocumentWindowManager::openFontFile(const QString & filePath) {
-    size_t faceCount = FXFace::countFaces(toStdString(filePath));
+    auto initFace = FXFace::createFace(toStdString(filePath), 0);
+    size_t faceCount = initFace? initFace->faceCount(): 0;
     if (faceCount == 1) {
         QXFontURI uri {filePath, 0};
         openFontURI(uri);
