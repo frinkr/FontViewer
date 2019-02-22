@@ -141,7 +141,7 @@ private:
         assert(fontObj->IsDictionary());
 
         FX_INFO(fontId.GetName() << std::string(" : ") << fontRef->GetReference().ToString());
-        
+
         const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
         if (baseFont && baseFont->IsName())
             FX_INFO("    /BaseFont: " << baseFont->GetName().GetName());

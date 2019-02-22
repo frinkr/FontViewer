@@ -26,45 +26,43 @@ add_subdirectory(PDF)
 add_library(FontX
   STATIC
   FX.h
-  FXTag.h
+  FXBoostPrivate.cpp
+  FXBoostPrivate.h
+  FXCMap.cpp
+  FXCMap.h
   FXFT.h
-  FXLib.h
-  FXLib.cpp
-  FXLog.h
-  FXLog.cpp
+  FXFTNames.cpp
+  FXFTNames.h
+  FXFTPrivate.cpp
+  FXFTPrivate.h
   FXFace.cpp
   FXFace.h
-  FXCMap.h
-  FXCMap.cpp
-  FXUnicode.h
-  FXUnicode.cpp
-  FXGlyph.h
-  FXGlyph.cpp
-  FXPixmap.h
-  FXPixmap.cpp
-  FXFaceDatabase.h
   FXFaceDatabase.cpp
-  FXGlyphCache.h
+  FXFaceDatabase.h
+  FXGlyph.cpp
+  FXGlyph.h
   FXGlyphCache.cpp
-  FXShaper.h
-  FXShaper.cpp
-  FXInspector.h
-  FXInspector.cpp
-  FXOT.h
-  FXOT.cpp
-  FXVersion.h
-  FXVersion.cpp
-
-  FXFTPrivate.h
-  FXFTPrivate.cpp
-  FXFTNames.h
-  FXFTNames.cpp
-  
-  FXBoostPrivate.h
-  FXBoostPrivate.cpp
-  
-  FXHBPrivate.h
+  FXGlyphCache.h
   FXHBPrivate.cpp
+  FXHBPrivate.h
+  FXInspector.cpp
+  FXInspector.h
+  FXLib.cpp
+  FXLib.h
+  FXLog.cpp
+  FXLog.h
+  FXOT.cpp
+  FXOT.h
+  FXPDF.h
+  FXPixmap.cpp
+  FXPixmap.h
+  FXShaper.cpp
+  FXShaper.h
+  FXTag.h
+  FXUnicode.cpp
+  FXUnicode.h
+  FXVersion.cpp
+  FXVersion.h
   )
 
 target_include_directories(FontX PUBLIC
