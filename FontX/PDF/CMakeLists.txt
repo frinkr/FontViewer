@@ -19,6 +19,8 @@ add_subdirectory(podofo)
 add_library(FontXPDF
   FXPDFDocument.h
   FXPDFDocument.cpp
+  FXPDFFace.cpp
+  FXPDFFace.h
   )
 
 target_include_directories(FontXPDF PUBLIC

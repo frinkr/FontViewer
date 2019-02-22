@@ -121,9 +121,6 @@ pt2px(double p, double dpi = FXDefaultDPI);
 double
 px2pt(double p, double dpi = FXDefaultDPI);
 
-size_t
-FXCountFacesDEPREATED(const FXString & filePath);
-
 class FXFace : public std::enable_shared_from_this<FXFace> {
 public:
     static FXPtr<FXFace>
@@ -142,6 +139,9 @@ public:
     countFaces(const std::string & filePath);
 
 public:
+    bool
+    valid() const;
+    
     FXFTFace
     face() const;
     
@@ -251,7 +251,8 @@ public:
     FXPtr<FXInspector>
     inspector();
 
-private:
+protected:
+    FXFace();
     explicit FXFace(const FXFaceDescriptor & descriptor);
     explicit FXFace(FXFTFace face);
     explicit FXFace(FXPtr<FXStream> stream, size_t faceIndex);
@@ -259,35 +260,35 @@ private:
     FXFace(const FXFace &) = delete;
     FXFace & operator=(const FXFace & ) = delete;
 public:    
-    ~FXFace();
+    virtual ~FXFace();
     
-private:
-    bool
+protected:
+    virtual bool
     init();
 
-    bool
+    virtual bool
     initAttributes();
 
-    bool
+    virtual bool
     initCMap();
 
-    bool
+    virtual bool
     initVariables();
 
 protected:
-    FXFaceDescriptor     desc_;
-    FXFTFace             face_;
+    FXFaceDescriptor     desc_{};
+    FXFTFace             face_{nullptr};
 
-    double               fontSize_;
-    bool                 scalable_;
-    double               bmScale_;
-    int                  bmStrikeIndex_;
+    double               fontSize_{1.0};
+    bool                 scalable_{false};
+    double               bmScale_{1.0};
+    int                  bmStrikeIndex_{0};
 
-    FXFaceAttributes     atts_;
-    std::vector<FXCMap>  cmaps_;
-    FXPtr<FXGlyphCache>  cache_;
-    FXPtr<FXInspector>   inspector_;
+    FXFaceAttributes     atts_{};
+    std::vector<FXCMap>  cmaps_{};
+    FXPtr<FXGlyphCache>  cache_{};
+    FXPtr<FXInspector>   inspector_{};
 
-    FXVector<VariableAxis>            variableAxises_;
-    FXVector<VariableNamedInstance>   variableNamedInstances_;
+    FXVector<VariableAxis>            variableAxises_{};
+    FXVector<VariableNamedInstance>   variableNamedInstances_{};
 };

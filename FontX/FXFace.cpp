@@ -6,6 +6,7 @@
 #include "FXInspector.h"
 #include "FXLib.h"
 #include "FXPDF.h"
+#include "PDF/FXPDFFace.h"
 
 namespace {
     template <typename T>
@@ -184,25 +185,17 @@ const FXString FXFaceFormatConstant::CFF{"CFF"};
 const FXString FXFaceFormatConstant::WinFNT{"Windows FNT"};
 const FXString FXFaceFormatConstant::Other{"Other"};
 
-size_t
-FXCountFaces(const FXString & filePath) {
-    size_t count;
-    if (!FXFTCountFaces(FXLib::get(), filePath, count))
-        return count;
-    return 0;
-}
-
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
 	auto face = new FXFace(descriptor);
-	if (face->face()) 
+	if (face->valid()) 
         return FXPtr<FXFace>(face);
     else
         delete face;
 
-    FXPDFDocument pdf(descriptor.filePath);
-    if (pdf.open())
-        return pdf.createFace(descriptor.index);
+    FXPtr<FXPDFDocument> pdf = FXPDFDocument::open(descriptor.filePath);
+    if (pdf)
+        return pdf->createFace(descriptor.index);
 	return nullptr;
 }
     
@@ -215,7 +208,7 @@ FXFace::createFace(const std::string & filePath, size_t faceIndex) {
 FXPtr<FXFace>
 FXFace::createFace(FXPtr<FXStream> stream, size_t faceIndex) {
     auto face = FXPtr<FXFace>(new FXFace(stream, faceIndex));
-    if (face->face())
+    if (face->valid())
         return face;
     return nullptr;
 }
@@ -234,12 +227,16 @@ FXFace::countFaces(const std::string & filePath) {
         return count;
 
     // Try read as PDF
-    if (FXPDFDocument::countFaces(filePath, count))
-        return count;
+    auto pdf = FXPDFDocument::open(filePath);
+    if (pdf)
+        return pdf->fontCount();
     return 0;
 }
 
 ///////////////////////////////////////////////////
+FXFace::FXFace() {    
+}
+
 FXFace::FXFace(const FXFaceDescriptor & descriptor)
 : desc_(descriptor)
 , face_(nullptr) {
@@ -269,6 +266,11 @@ FXFace::~FXFace() {
 //////////////////////////////////////////////////////////////////////////////////////////
 //                BASIC GETTERS
 //
+bool
+FXFace::valid() const {
+    return face_ != nullptr;
+}
+
 FXFTFace
 FXFace::face() const {
     return face_;
@@ -298,9 +300,6 @@ const FXFaceAttributes &
 FXFace::attributes() const {
     return atts_;
 }
-
-
-
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
