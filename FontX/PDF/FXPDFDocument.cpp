@@ -1,5 +1,7 @@
 #include <iostream>
 #include <stack>
+#include <boost/filesystem.hpp>
+
 #include "podofo/podofo.h"
 #include "FontX/FXLog.h"
 #include "FontX/FXFace.h"
@@ -72,7 +74,13 @@ public:
                         
             const PdfObject * descriptor = fontObj->GetIndirectKey("FontDescriptor");
             if(descriptor) {
-                if (const PdfObject * fontFile = descriptor->GetIndirectKey("FontFile3")) {
+                const PdfObject * fontFile = descriptor->GetIndirectKey("FontFile");
+                if (!fontFile)
+                    fontFile = descriptor->GetIndirectKey("FontFile2");
+                if (!fontFile)
+                    fontFile = descriptor->GetIndirectKey("FontFile3");
+                
+                if (fontFile) {
                     const PdfStream * stream = fontFile->GetStream();
                     if (stream) {
                         
@@ -80,10 +88,25 @@ public:
                         pdf_long bufferLength = 0;
                         stream->GetFilteredCopy(&buffer, &bufferLength);
                         {
+                            boost::filesystem::path temp = boost::filesystem::unique_path();
+                            const std::string tempstr    = temp.native();  // optional
+                            
                             FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
                             FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
+                            if (!face) {
+                                FILE * file = fopen(tempstr.c_str(), "wb");
+                                fwrite(buffer, bufferLength, 1, file);
+                                fclose(file);
+                                face = FXFace::createFace(tempstr, 0);
+                            }
+                            
                             if (face) {
-                                FX_INFO("     UPEM: " << face->upem());
+                                FX_INFO("\t   face: UPEM: " << face->upem());
+                                FX_INFO("\t   face: PSName: " << face->postscriptName());
+                                FX_INFO("\t   face: GlyphCount: " << face->glyphCount());
+                                FX_INFO("\t   face: Format: " << face->attributes().format);
+                                FX_INFO("\t   face: Family Name: " << face->attributes().names.familyName());
+                                FX_INFO("\t   face: Style Name: " << face->attributes().names.styleName());
                             }
                         }
                         

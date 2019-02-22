@@ -5,15 +5,8 @@ if(POLICY CMP0071)
   cmake_policy(SET CMP0071 NEW)
 endif()
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE AUTOUIC ON)
-set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Network REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 ################################################
