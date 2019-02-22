@@ -4,8 +4,9 @@
 
 class FXPDFDocumentImp;
 
-struct FXPDFFontEntry {
-    FXString  name;
+struct FXPDFFontInfo {
+    FXString  baseFont;
+    FXString  subType;
     bool      isSubset;
 };
 
@@ -24,8 +25,8 @@ public:
     size_t
     fontCount() const;
 
-    FXPDFFontEntry
-    fontEntry(size_t index) const;
+    FXPDFFontInfo
+    fontInfo(size_t index) const;
 
     FXPtr<FXFace>
     createFace(int index) const;

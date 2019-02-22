@@ -10,8 +10,17 @@ using namespace PoDoFo;
 
 class FXPDFDocumentImp {
 public:
+    struct FontEntry {
+        const PdfObject * fontObj;
+        const PdfObject * fileObj;
+    };
+public:
     explicit FXPDFDocumentImp(const FXString & file)
         : file_(file) {
+    }
+
+    ~FXPDFDocumentImp() {
+        close();
     }
 
     bool
@@ -22,12 +31,60 @@ public:
             for( int i = 0; i< nCount; i++) 
                 processPage(i);
             
-            return true;
-            
-        } catch(PdfError err) {
-            std::cout << err.GetError();
+            return true;    
+        }
+        catch(PdfError err) {
+            FX_ERROR("Error (" << err.GetError() << "when paring " << file_);
+            err.PrintErrorMsg();
+            return false;
         }
         return true;
+    }
+
+    bool
+    close() {
+        return true;
+    }
+
+    size_t
+    fontCount() const {
+        return fonts_.size();
+    }
+
+    FXPDFFontInfo
+    fontInfo(size_t index) const {
+        FXPDFFontInfo info;
+        const PdfObject * fontObj = fonts_[index].fontObj;
+        
+        const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
+        if (baseFont && baseFont->IsName())
+            info.baseFont = baseFont->GetName().GetName();
+
+        const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
+        if (subType && subType->IsName())
+            info.subType = subType->GetName().GetName();
+
+        return info;
+    }
+
+    FXPtr<FXFace>
+    createFace(size_t index) {
+        auto & entry = fonts_[index];
+        const PdfObject * fontFile = entry.fileObj;
+        if (!fontFile) return nullptr;
+
+        const PdfStream * stream = fontFile->GetStream();
+        if (!stream)
+            return nullptr;
+        
+        char * buffer = nullptr;
+        pdf_long bufferLength = 0;
+        stream->GetFilteredCopy(&buffer, &bufferLength);
+        
+        FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
+        FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
+        podofo_free(buffer);
+        return face;
     }
 
     void
@@ -35,88 +92,82 @@ public:
         PdfPage* pPage = document_.GetPage(pageIndex);
         
         PdfObject * pageResources = pPage->GetResources();
-        if (!pageResources->GetDictionary().HasKey(PdfName("Font")))
-            return;
         PdfObject * pageFontRes = pageResources->GetIndirectKey(PdfName("Font"));
-        if (!pageFontRes || !pageFontRes->IsDictionary())
+        if (!pageFontRes || !pageFontRes->IsDictionary()) {
+            FX_WARNING("Page " << pageIndex << " doesn't use any fonts");
             return;
+        }
 
         const PdfDictionary & pageFontDict = pageFontRes->GetDictionary();
+        if (pageFontDict.GetKeys().empty()) {
+            FX_WARNING("Page " << pageIndex << " doesn't use any fonts");
+            return;
+        }
+        
         for (const TKeyMap::value_type & kv: pageFontDict.GetKeys()) {
-            PdfName fontId = kv.first;
-            PdfObject * fontRef = kv.second;
-            assert(fontRef->IsReference());
-            FX_INFO(fontId.GetName() << std::string(" : ") << fontRef->GetReference().ToString());
+            PdfObject * fontObj = pPage->GetObject()->GetOwner()->GetObject(kv.second->GetReference());
+            dumpFontObject(kv.first, kv.second, fontObj);
             
-            PdfObject * fontObj = pPage->GetObject()->GetOwner()->GetObject(fontRef->GetReference());
-            assert(fontObj->IsDictionary());
-                        
-            const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
-            if (baseFont && baseFont->IsName())
-                FX_INFO("    /BaseFont: " << baseFont->GetName().GetName());
+            const PdfObject * fontFile = getFontFile(fontObj);
             
-            const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
-            if (subType && subType->IsName())
-                FX_INFO("    /Subtype: " << subType->GetName().GetName());
+            FontEntry font;
+            font.fontObj = fontObj;
+            font.fileObj = fontFile;
+            fonts_.push_back(font);
             
-            const PdfObject * encoding = fontObj->GetIndirectKey("Encoding");
-            if (encoding && encoding->IsName())
-                FX_INFO("    /Encoding: " << encoding->GetName().GetName());
-            
-            const PdfObject * firstChar = fontObj->GetIndirectKey("FirstChar");
-            if (firstChar && firstChar->IsNumber())
-                FX_INFO("    /FirstChar: " << firstChar->GetNumber());
-            
-            const PdfObject * lastChar = fontObj->GetIndirectKey("LastChar");
-            if (lastChar && lastChar->IsNumber())
-                FX_INFO("    /LastChar: " << lastChar->GetNumber());
-            
-                        
-            const PdfObject * descriptor = fontObj->GetIndirectKey("FontDescriptor");
-            if(descriptor) {
-                const PdfObject * fontFile = descriptor->GetIndirectKey("FontFile");
-                if (!fontFile)
-                    fontFile = descriptor->GetIndirectKey("FontFile2");
-                if (!fontFile)
-                    fontFile = descriptor->GetIndirectKey("FontFile3");
-                
-                if (fontFile) {
-                    const PdfStream * stream = fontFile->GetStream();
-                    if (stream) {
-                        
-                        char * buffer = nullptr;
-                        pdf_long bufferLength = 0;
-                        stream->GetFilteredCopy(&buffer, &bufferLength);
-                        {
-                            boost::filesystem::path temp = boost::filesystem::unique_path();
-                            const std::string tempstr    = temp.native();  // optional
-                            
-                            FXPtr<FXStream> fxStream(new FXMemoryStream((unsigned char *)buffer, bufferLength));
-                            FXPtr<FXFace> face = FXFace::createFace(fxStream, 0);
-                            if (face) {
-                                FX_INFO("\t   face: UPEM: " << face->upem());
-                                FX_INFO("\t   face: PSName: " << face->postscriptName());
-                                FX_INFO("\t   face: GlyphCount: " << face->glyphCount());
-                                FX_INFO("\t   face: Format: " << face->attributes().format);
-                                FX_INFO("\t   face: Family Name: " << face->attributes().names.familyName());
-                                FX_INFO("\t   face: Style Name: " << face->attributes().names.styleName());
-                            }
-                        }
-                        
-                        podofo_free(buffer);
-                        
-                        FX_INFO("    FontFile3: Compressed Length: " << stream->GetLength() << ", Uncompressed Length: " << bufferLength);
-                    }
-                }
-            }
+            if (!fontFile)
+                FX_WARNING("    CAN'T load font file" << kv.first.GetName());
         }
     }
+
 private:
-    FXString file_;
+    const PdfObject *
+    getFontFile(PdfObject * fontObj) {
+        const PdfObject * descriptor = fontObj->GetIndirectKey("FontDescriptor");
+        if (!descriptor)
+            return nullptr;
 
-    PdfMemDocument document_;
+        const PdfObject * fontFile = descriptor->GetIndirectKey("FontFile");
+        if (!fontFile)
+            fontFile = descriptor->GetIndirectKey("FontFile2");
+        if (!fontFile)
+            fontFile = descriptor->GetIndirectKey("FontFile3");
+        return fontFile;
+    }
+
+    void
+    dumpFontObject(PdfName fontId, PdfObject * fontRef, PdfObject * fontObj) {
+        assert(fontRef->IsReference());
+        assert(fontObj->IsDictionary());
+
+        FX_INFO(fontId.GetName() << std::string(" : ") << fontRef->GetReference().ToString());
+        
+        const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
+        if (baseFont && baseFont->IsName())
+            FX_INFO("    /BaseFont: " << baseFont->GetName().GetName());
+            
+        const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
+        if (subType && subType->IsName())
+            FX_INFO("    /Subtype: " << subType->GetName().GetName());
+            
+        const PdfObject * encoding = fontObj->GetIndirectKey("Encoding");
+        if (encoding && encoding->IsName())
+            FX_INFO("    /Encoding: " << encoding->GetName().GetName());
+            
+        const PdfObject * firstChar = fontObj->GetIndirectKey("FirstChar");
+        if (firstChar && firstChar->IsNumber())
+            FX_INFO("    /FirstChar: " << firstChar->GetNumber());
+            
+        const PdfObject * lastChar = fontObj->GetIndirectKey("LastChar");
+        if (lastChar && lastChar->IsNumber())
+            FX_INFO("    /LastChar: " << lastChar->GetNumber());
+    }
+
+private:
+    FXString              file_;
+    PdfMemDocument        document_;
+    FXVector<FontEntry>   fonts_;
 };
-
 
 FXPDFDocument::FXPDFDocument(const FXString & path)
     : imp_(std::make_unique<FXPDFDocumentImp>(path)) {
@@ -133,20 +184,20 @@ FXPDFDocument::open() {
 
 bool
 FXPDFDocument::close() {
-    return false;
+    return imp_->close();
 }
 
 size_t
 FXPDFDocument::fontCount() const {
-    return 0;
+    return imp_->fontCount();
 }
 
-FXPDFFontEntry
-FXPDFDocument::fontEntry(size_t index) const {
-    return FXPDFFontEntry();
+FXPDFFontInfo
+FXPDFDocument::fontInfo(size_t index) const {
+    return imp_->fontInfo(index);
 }
 
 FXPtr<FXFace>
 FXPDFDocument::createFace(int index) const {
-    return nullptr;
+    return imp_->createFace(index);
 }
