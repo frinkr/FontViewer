@@ -278,33 +278,33 @@ QXDocumentWindowManager::doOpenFontFromFile(FileTypeFilter selectedTypeFilter) {
     openFileDialog.selectNameFilter(fileTypeFilterToString(selectedTypeFilter));
 
     if (QDialog::Accepted == openFileDialog.exec()) {
-        openFontFile(openFileDialog.selectedFiles()[0]);
-        return true;
+        return openFontFile(openFileDialog.selectedFiles()[0]);
     }
     return false;
 }
 
-void
+bool
 QXDocumentWindowManager::openFontFile(const QString & filePath) {
     auto initFace = FXFace::createFace(toStdString(filePath), 0);
     size_t faceCount = initFace? initFace->faceCount(): 0;
     if (faceCount == 1) {
         QXFontURI uri {filePath, 0};
-        openFontURI(uri, initFace);
+        return openFontURI(uri, initFace);
     }
     else if (faceCount > 1) {
         int index = QXFontCollectionDialog::selectFontIndex(filePath, initFace);
         if (index != -1) {
             QXFontURI uri {filePath, static_cast<size_t>(index)};
-            openFontURI(uri, initFace);
+            return openFontURI(uri, initFace);
         }
     }
     else {
         showOpenFontFileError(filePath);
     }
+    return false;
 }
 
-void
+bool
 QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace) {
     if (openFontDialog_ && openFontDialog_->isVisible())
         openFontDialog_->close();
@@ -316,6 +316,7 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
         window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
         window->activateWindow();
         window->raise();
+        return true;
     }
     else {
         // or open new
@@ -325,8 +326,10 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
             addToRecents(document);
             QXDocumentWindow * window = createDocumentWindow(document);
             window->show();
+            return true;
         } else {
             showOpenFontFileError(uri.filePath);
+            return false;
         }
     }
 }

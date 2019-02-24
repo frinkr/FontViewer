@@ -71,10 +71,10 @@ public slots:
     bool
     doOpenFontFromFile(FileTypeFilter selectedTypeFilter = FileTypeFilter::All);
 
-    void
+    bool
     openFontFile(const QString & filePath);
 
-    void
+    bool
     openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr);
 
 private slots:

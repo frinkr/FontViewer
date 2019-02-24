@@ -98,6 +98,8 @@ FXPDFDocument::createFace(size_t index) {
     if (index >= fonts_.size())
         return nullptr;
     auto face = std::make_shared<FXPDFFace>(shared_from_this(), fonts_[index].fontObject);
+    if (!face->valid())
+        return nullptr;
     openFaces_.insert(face.get());
     return face;
 }
