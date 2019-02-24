@@ -1,6 +1,7 @@
 #include <QListWidgetItem>
 
 #include "FontX/FXFace.h"
+#include "FontX/FXPDF.h"
 
 #include "QXConv.h"
 #include "QXDocument.h"
@@ -15,12 +16,24 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
     if (!initFace)
        initFace = FXFace::createFace(toStdString(filePath), 0);
     size_t faceCount = initFace? initFace->faceCount(): 0;
-    for (size_t i = 0; i < faceCount; ++ i) {
-        auto face = initFace->openFace(i);
-        if (face) 
-            ui_->listWidget->addItem(QXDocument::faceDisplayName(face));
-        else
-            ui_->listWidget->addItem(tr("<INVALID FACE>"));
+
+    FXPtr<FXPDFFace> pdfFace = std::dynamic_pointer_cast<FXPDFFace>(initFace);
+
+    if (pdfFace) {
+        auto pdfDocument = pdfFace->document();
+        for (size_t i = 0; i < faceCount; ++ i) {
+            auto fontInfo = pdfDocument->fontInfo(i);
+            ui_->listWidget->addItem(toQString(fontInfo.baseFont));
+        }
+    }
+    else {
+        for (size_t i = 0; i < faceCount; ++ i) {
+            auto face = initFace->openFace(i);
+            if (face) 
+                ui_->listWidget->addItem(QXDocument::faceDisplayName(face));
+            else
+                ui_->listWidget->addItem(tr("<INVALID FACE>"));
+        }
     }
     ui_->listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_->listWidget->setCurrentRow(0);

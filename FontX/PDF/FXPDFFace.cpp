@@ -73,5 +73,8 @@ bool
 FXPDFFace::init() {
     if(!FXFace::init())
         return false;
+    atts_.desc.filePath = document_->filePath();
+    atts_.desc.index = document_->fontObjectIndex(fontObj_);
+    desc_ = atts_.desc;
     return true;
 }

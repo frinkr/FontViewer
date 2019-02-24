@@ -1,13 +1,18 @@
 #pragma once
 #include "FontX/FX.h"
 
-class FXPDFDocumentImp;
+namespace PoDoFo {
+    class PdfObject;
+    class PdfMemDocument;
+}
+
 class FXPDFFace;
 
 struct FXPDFFontInfo {
-    FXString  baseFont;
-    FXString  subType;
-    bool      isSubset;
+    FXString  baseFont{};
+    FXString  subType{};
+    bool      isSubset{false};
+    const PoDoFo::PdfObject * fontObject {nullptr};
 };
 
 class FXPDFDocument : public std::enable_shared_from_this<FXPDFDocument> {
@@ -42,12 +47,25 @@ public:
     FXPDFFontInfo
     fontInfo(size_t index) const;
 
+    const PoDoFo::PdfObject *
+    fontObject(size_t index) const;
+
+    size_t
+    fontObjectIndex(const PoDoFo::PdfObject *) const;
+
     FXPtr<FXPDFFace>
-    createFace(size_t index) const;
+    createFace(size_t index);
 
     void
     faceDestroyed(FXPDFFace * face);
 
 private:
-    std::unique_ptr<FXPDFDocumentImp> imp_;
+    void
+    processPage(int pageIndex);
+
+private:
+    FXString              file_;
+    FXVector<FXPDFFontInfo>   fonts_;
+    FXSet<const PoDoFo::PdfObject *> fontObjects_;
+    std::unique_ptr<PoDoFo::PdfMemDocument>  document_;
 };
