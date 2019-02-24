@@ -40,7 +40,7 @@ public:
     fontInfo(size_t index) const;
 
     FXPtr<FXPDFFace>
-    createFace(int index) const;
+    createFace(size_t index) const;
 
 private:
     std::unique_ptr<FXPDFDocumentImp> imp_;

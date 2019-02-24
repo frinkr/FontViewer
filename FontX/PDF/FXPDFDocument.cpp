@@ -11,7 +11,7 @@ using namespace PoDoFo;
 
 class FXPDFDocumentImp {
 public:
-    struct FontEntry {
+    struct FontEntry : public FXPDFFontInfo {
         const PdfObject * fontObj;
     };
 public:
@@ -31,14 +31,13 @@ public:
     open() {
         try {
             document_.Load( file_.c_str() );
-            int nCount = document_.GetPageCount();
-            for (int i = 0; i< nCount; i++) 
-                processPage(i);
-            
+            int pageCount = document_.GetPageCount();
+            for (int pageIndex = 0; pageIndex < pageCount; pageIndex ++)
+                processPage(pageIndex);
             return true;    
         }
         catch(PdfError err) {
-            FX_ERROR("Error (" << err.GetError() << "when paring " << file_);
+            FX_ERROR("Failed to open file " << file_ << ", error " << err.GetError());
             err.PrintErrorMsg();
             return false;
         }
@@ -62,22 +61,13 @@ public:
 
     FXPDFFontInfo
     fontInfo(size_t index) const {
-        FXPDFFontInfo info;
-        const PdfObject * fontObj = fonts_[index].fontObj;
-        
-        const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
-        if (baseFont && baseFont->IsName())
-            info.baseFont = baseFont->GetName().GetName();
-
-        const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
-        if (subType && subType->IsName())
-            info.subType = subType->GetName().GetName();
-
-        return info;
+        return fonts_[index];
     }
 
     FXPtr<FXPDFFace>
     createFace(size_t index) {
+        if (index >= fonts_.size())
+            return nullptr;
         return std::make_shared<FXPDFFace>(parent_->shared_from_this(), fonts_[index].fontObj);
     }
 
@@ -105,41 +95,19 @@ public:
 
             fontObjects_.insert(fontObj);
 
-            dumpFontObject(kv.first, kv.second, fontObj);
-            
             FontEntry font;
             font.fontObj = fontObj;
+
+            const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
+            if (baseFont && baseFont->IsName())
+                font.baseFont = baseFont->GetName().GetName();
+
+            const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
+            if (subType && subType->IsName())
+                font.subType = subType->GetName().GetName();
+         
             fonts_.push_back(font);
         }
-    }
-
-private:
-    void
-    dumpFontObject(PdfName fontId, PdfObject * fontRef, PdfObject * fontObj) {
-        assert(fontRef->IsReference());
-        assert(fontObj->IsDictionary());
-
-        FX_INFO(fontId.GetName() << std::string(" : ") << fontRef->GetReference().ToString());
-
-        const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
-        if (baseFont && baseFont->IsName())
-            FX_INFO("    /BaseFont: " << baseFont->GetName().GetName());
-            
-        const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
-        if (subType && subType->IsName())
-            FX_INFO("    /Subtype: " << subType->GetName().GetName());
-            
-        const PdfObject * encoding = fontObj->GetIndirectKey("Encoding");
-        if (encoding && encoding->IsName())
-            FX_INFO("    /Encoding: " << encoding->GetName().GetName());
-            
-        const PdfObject * firstChar = fontObj->GetIndirectKey("FirstChar");
-        if (firstChar && firstChar->IsNumber())
-            FX_INFO("    /FirstChar: " << firstChar->GetNumber());
-            
-        const PdfObject * lastChar = fontObj->GetIndirectKey("LastChar");
-        if (lastChar && lastChar->IsNumber())
-            FX_INFO("    /LastChar: " << lastChar->GetNumber());
     }
 
 private:
@@ -191,6 +159,6 @@ FXPDFDocument::fontInfo(size_t index) const {
 }
 
 FXPtr<FXPDFFace>
-FXPDFDocument::createFace(int index) const {
+FXPDFDocument::createFace(size_t index) const {
     return imp_->createFace(index);
 }

@@ -45,6 +45,11 @@ FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
     }
 }
 
+FXPtr<FXPDFDocument>
+FXPDFFace::document() const {
+    return document_;
+}
+
 size_t
 FXPDFFace::faceCount() const {
     if (document_)

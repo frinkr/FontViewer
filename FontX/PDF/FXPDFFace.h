@@ -18,6 +18,9 @@ public:
     FXPtr<FXFace>
     openFace(size_t index) override;
 
+    FXPtr<FXPDFDocument>
+    document() const;
+
 protected:
     bool
     init() override;
