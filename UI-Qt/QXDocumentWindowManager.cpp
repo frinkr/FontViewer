@@ -290,13 +290,13 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
     size_t faceCount = initFace? initFace->faceCount(): 0;
     if (faceCount == 1) {
         QXFontURI uri {filePath, 0};
-        openFontURI(uri);
+        openFontURI(uri, initFace);
     }
     else if (faceCount > 1) {
-        int index = QXFontCollectionDialog::selectFontIndex(filePath);
+        int index = QXFontCollectionDialog::selectFontIndex(filePath, initFace);
         if (index != -1) {
             QXFontURI uri {filePath, static_cast<size_t>(index)};
-            openFontURI(uri);
+            openFontURI(uri, initFace);
         }
     }
     else {
@@ -305,7 +305,7 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
 }
 
 void
-QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
+QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace) {
     if (openFontDialog_ && openFontDialog_->isVisible())
         openFontDialog_->close();
 
@@ -319,7 +319,7 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri) {
     }
     else {
         // or open new
-        document = QXDocument::openFromURI(uri, this);
+        document = QXDocument::openFromURI(uri, initFace, this);
         if (document) {
             addDocument(document);
             addToRecents(document);

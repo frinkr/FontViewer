@@ -71,9 +71,9 @@ QXGCharBook::setName(const QString & name) {
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 QXDocument *
-QXDocument::openFromURI(const QXFontURI & uri, QObject * parent) {
+QXDocument::openFromURI(const QXFontURI & uri, FXPtr<FXFace> initFace, QObject * parent) {
     QXDocument * document = new QXDocument(uri, parent);
-    if (!document->load()) {
+    if (!document->load(initFace)) {
         document->deleteLater();
         return nullptr;
     }
@@ -83,7 +83,7 @@ QXDocument::openFromURI(const QXFontURI & uri, QObject * parent) {
 QXDocument *
 QXDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * parent) {
     QXFontURI uri{filePath, faceIndex};
-    return openFromURI(uri, parent);
+    return openFromURI(uri, nullptr, parent);
 }
 
 QString
@@ -253,8 +253,11 @@ QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
 }
 
 bool
-QXDocument::load() {
-    face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);
+QXDocument::load(FXPtr<FXFace> initFace) {
+    if (initFace)
+        face_ = initFace->openFace(uri_.faceIndex);
+    else 
+        face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);
     if (!face_)
         return false;
 

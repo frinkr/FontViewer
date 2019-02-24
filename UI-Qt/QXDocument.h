@@ -103,9 +103,11 @@ class QXDocument : public QXCollectionModel
 public:
     /**
      * file loading
+     * @param uri the uri of font
+     * @param initFace the face of already open if any. It will be used to create new face in same file with the uri.faceIndex.
      */
     static QXDocument *
-    openFromURI(const QXFontURI & uri, QObject * parent = nullptr);
+    openFromURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr, QObject * parent = nullptr);
     
     static QXDocument *
     openFromFile(const QString & filePath, size_t faceIndex, QObject * parent = nullptr);
@@ -199,7 +201,7 @@ protected:
     QXDocument(const QXFontURI & uri, QObject * parent);
 
     bool
-    load();
+    load(FXPtr<FXFace> initFace = nullptr);
 
     bool
     loadBooks();

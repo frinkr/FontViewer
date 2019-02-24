@@ -75,7 +75,7 @@ public slots:
     openFontFile(const QString & filePath);
 
     void
-    openFontURI(const QXFontURI & uri);
+    openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr);
 
 private slots:
     void

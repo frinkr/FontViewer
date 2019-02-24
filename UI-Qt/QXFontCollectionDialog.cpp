@@ -7,13 +7,13 @@
 #include "QXFontCollectionDialog.h"
 #include "ui_QXFontCollectionDialog.h"
 
-QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, QWidget * parent) 
+QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<FXFace> initFace, QWidget * parent)
     : QDialog(parent)
     , ui_(new Ui::QXFontCollectionDialog)
     , filePath_(filePath) {
     ui_->setupUi(this);
-
-    auto initFace = FXFace::createFace(toStdString(filePath), 0);
+    if (!initFace)
+       initFace = FXFace::createFace(toStdString(filePath), 0);
     size_t faceCount = initFace? initFace->faceCount(): 0;
     for (size_t i = 0; i < faceCount; ++ i) {
         auto face = initFace->openFace(i);
@@ -36,8 +36,8 @@ QXFontCollectionDialog::selectedIndex() const {
 }
 
 int
-QXFontCollectionDialog::selectFontIndex(const QString & filePath) {
-    QXFontCollectionDialog dialog(filePath);
+QXFontCollectionDialog::selectFontIndex(const QString & filePath, FXPtr<FXFace> openFace) {
+    QXFontCollectionDialog dialog(filePath, openFace);
     if (dialog.exec() == QDialog::Accepted)
         return dialog.selectedIndex();
     return -1;
