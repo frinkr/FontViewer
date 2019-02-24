@@ -9,8 +9,13 @@
 #include "FXPDFDocument.h"
 using namespace PoDoFo;
 
+namespace {
+    FXSet<FXPDFFace*> openFaces_;
+}
+
 class FXPDFDocumentImp {
 public:
+    friend class FXPDFDocument;
     struct FontEntry : public FXPDFFontInfo {
         const PdfObject * fontObj;
     };
@@ -120,6 +125,13 @@ private:
 
 FXPtr<FXPDFDocument>
 FXPDFDocument::open(const FXString & file, const FXSet<size_t> & pages, const FXString & password) {
+    // Find in openFaces_ for document
+    for (FXPDFFace * face: openFaces_) {
+        if (face->document()->filePath() == file)
+            return face->document();
+    }
+
+    // Or create new
     auto doc = std::make_shared<FXPDFDocument>(file, pages, password);
     if (!doc->open())    
         return nullptr;
@@ -143,6 +155,11 @@ FXPDFDocument::close() {
     return imp_->close();
 }
 
+const FXString &
+FXPDFDocument::filePath() const {
+    return imp_->file_;
+}
+
 size_t
 FXPDFDocument::pageCount() const {
     return imp_->pageCount();
@@ -160,5 +177,15 @@ FXPDFDocument::fontInfo(size_t index) const {
 
 FXPtr<FXPDFFace>
 FXPDFDocument::createFace(size_t index) const {
-    return imp_->createFace(index);
+    auto face = imp_->createFace(index);
+    if (face) 
+        openFaces_.insert(face.get());
+    return face;
+}
+
+void
+FXPDFDocument::faceDestroyed(FXPDFFace * face) {
+    auto itr = openFaces_.find(face);
+    if (itr != openFaces_.end())
+        openFaces_.erase(itr);
 }

@@ -22,6 +22,7 @@ namespace {
     }
 
 }
+
 FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
     : document_(document)
     , fontObj_(fontObj) {
@@ -43,6 +44,10 @@ FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
             init();
         }
     }
+}
+
+FXPDFFace::~FXPDFFace() {
+    document_->faceDestroyed(this);
 }
 
 FXPtr<FXPDFDocument>

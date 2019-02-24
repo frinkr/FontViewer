@@ -30,6 +30,9 @@ public:
     bool
     close();
 
+    const FXString &
+    filePath() const;
+
     size_t
     pageCount() const;
 
@@ -41,6 +44,9 @@ public:
 
     FXPtr<FXPDFFace>
     createFace(size_t index) const;
+
+    void
+    faceDestroyed(FXPDFFace * face);
 
 private:
     std::unique_ptr<FXPDFDocumentImp> imp_;

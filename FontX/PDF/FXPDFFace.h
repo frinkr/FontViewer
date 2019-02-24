@@ -12,6 +12,8 @@ class FXPDFFace : public FXFace {
 public:
     FXPDFFace(FXPtr<FXPDFDocument> document, const PoDoFo::PdfObject * fontObj);
 
+    ~FXPDFFace();
+
     size_t
     faceCount() const override;
 
