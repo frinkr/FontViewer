@@ -16,6 +16,7 @@
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
+#include "QXEncoding.h"
 #include "QXFontInfoWidget.h"
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphTableWidget.h"
@@ -62,7 +63,7 @@ QXDocumentWindow::initUI() {
     initWindowTitle();
     initMenu();
     initToolBar();
-    initListView();
+    initCollectionView();
     initGlyphInfoView();
 
     connectSingals();
@@ -84,28 +85,36 @@ void
 QXDocumentWindow::initMenu() {
     menuBar_ = new QXMenuBar(this);
 
-    connect(menuBar_, &QXMenuBar::copyActionTriggered, [this](QAction * action) {
+    connect(menuBar_->actionCopy, &QAction::triggered, [this]() {
         
     });
 
-    connect(menuBar_, &QXMenuBar::searchActionTriggered, [this](QAction * action) {
-        this->onSearchAction();
+    connect(menuBar_->actionSearch, &QAction::triggered, 
+        this, &QXDocumentWindow::onSearchAction);
+
+    connect(menuBar_->actionToolBar, &QAction::toggled, [this](bool checked) {
+        this->ui_->toolBar->setVisible(checked);
     });
+
+    connect(menuBar_->actionStatusBar, &QAction::toggled, [this](bool checked) {
+        this->ui_->statusBar->setVisible(checked);
+    });
+    menuBar_->actionStatusBar->setChecked(false);
 
     connect(menuBar_, &QXMenuBar::glyphLabelActionTriggered, [this](QAction * action, QXGlyphLabel label) {
         document_->setGlyphLabel(label);
     });
 
-    connect(menuBar_, &QXMenuBar::showAllGlyphsActionTiggered, [this](QAction * action) {
-        document_->setCharMode(!action->isChecked());
+    connect(menuBar_->actionShowAllGlyphs, &QAction::toggled, [this](bool checked) {
+        document_->setCharMode(!checked);
     });
 
     connect(document_, &QXDocument::charModeChanged, [this](bool activated) {
         menuBar_->actionShowAllGlyphs->setChecked(!activated);
     });
 
-    connect(menuBar_, &QXMenuBar::fullScreenActionTriggered, [this](QAction * action) {
-        if (action->isChecked())
+    connect(menuBar_->actionFullScreen, &QAction::toggled, [this](bool checked) {
+        if (checked)
             showFullScreen();
         else
             showNormal();
@@ -198,9 +207,14 @@ QXDocumentWindow::initSearchField() {
 }
 
 void
-QXDocumentWindow::initListView() {
+QXDocumentWindow::initCollectionView() {
     ui_->glyphCollectionView->setDocument(document_);
     ui_->glyphCollectionView->setAcceptDrops(true);
+
+    connect(ui_->glyphCollectionView, &QXCollectionView::clicked, 
+        this, &QXDocumentWindow::onGlyphClicked);
+    connect(ui_->glyphCollectionView, &QXCollectionView::doubleClicked,
+        this, &QXDocumentWindow::onGlyphDoubleClicked);
 }
 
 void
@@ -211,16 +225,13 @@ QXDocumentWindow::initGlyphInfoView() {
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
     glyphWidget_->setQUDocument(document_);
+
+    connect(glyphWidget_, &QXGlyphInfoWidget::charLinkClicked,
+        this, &QXDocumentWindow::onCharLinkClicked);
 }
     
 void
 QXDocumentWindow::connectSingals() {
-    connect(ui_->glyphCollectionView, &QXCollectionView::doubleClicked,
-            this, &QXDocumentWindow::onGlyphDoubleClicked);
-
-    connect(glyphWidget_, &QXGlyphInfoWidget::charLinkClicked,
-            this, &QXDocumentWindow::onCharLinkClicked);
-
     connect(document_, &QXDocument::searchDone,
             this, &QXDocumentWindow::onSearchResult);
 }
@@ -273,6 +284,33 @@ void
 QXDocumentWindow::showGlyphPopover(const FXGChar & c, const QRect & rect, QXPopoverEdges preferedEgdes) {
     glyphWidget_->setChar(c);
     glyphPopover_->showRelativeTo(rect, preferedEgdes);
+}
+
+void
+QXDocumentWindow::onGlyphClicked(const QXCollectionModelIndex & index) {
+    // Show info on status bar
+    if (index.item == -1) {
+        // Nothing selected, show file path
+        QString message;
+        if (document_->face()->faceCount() > 1)
+            message = QString("%1: %2").arg(document_->uri().filePath).arg(document_->uri().faceIndex);
+        else
+            message = document_->uri().filePath;
+        ui_->statusBar->showMessage(message);
+    }
+    else {
+        FXGChar c = document_->charAt(index);
+        FXGlyph g = document_->face()->glyph(c);
+        QString message = QString(tr("%1         %2         GID %3         W %4         H %5         HAdv %6         VAdv %7"))
+            .arg(toQString(g.name))
+            .arg(QXEncoding::charHexNotation(c))
+            .arg(g.gid)
+            .arg(g.metrics.width)
+            .arg(g.metrics.height)
+            .arg(g.metrics.horiAdvance)
+            .arg(g.metrics.vertAdvance);
+        ui_->statusBar->showMessage(message);
+    }
 }
 
 void

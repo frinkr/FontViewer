@@ -73,7 +73,7 @@ private:
     initSearchField();
 
     void
-    initListView();
+    initCollectionView();
 
     void
     initGlyphInfoView();
@@ -94,6 +94,9 @@ private:
     eventFilter(QObject * watched, QEvent * event);
 
 private slots:
+    void
+    onGlyphClicked(const QXCollectionModelIndex & index);
+
     void
     onGlyphDoubleClicked(const QXCollectionModelIndex & index);
 

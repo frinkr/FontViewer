@@ -51,16 +51,24 @@ QXMenuBar::QXMenuBar(QWidget * parent)
     }
 
     menuEdit = addMenu(tr("&Edit")); {
-        actionCopy = menuEdit->addAction(tr("&Copy"), [this]() {
-            emit copyActionTriggered(actionCopy);
-        }, QKeySequence(QKeySequence::Copy));
+        actionCopy = menuEdit->addAction(tr("&Copy"));
+        actionCopy->setShortcut(QKeySequence::Copy);
 
-        actionSearch = menuEdit->addAction(tr("&Find"), [this]() {
-            emit searchActionTriggered(actionSearch);
-        }, QKeySequence(QKeySequence::Find));
+        actionSearch = menuEdit->addAction(tr("&Find"));
+        actionSearch->setShortcut(QKeySequence::Find);
     }
 
     menuView = addMenu(tr("&View")); {
+
+        actionToolBar = menuView->addAction(tr("&Tool Bar"));
+        actionToolBar->setCheckable(true);
+        actionToolBar->setChecked(true);
+        actionStatusBar = menuView->addAction(tr("&Status Bar"));
+        actionStatusBar->setCheckable(true);
+        actionStatusBar->setChecked(true);
+
+        menuView->addSeparator();
+
         actionCharacterCode = menuView->addAction(tr("&Character Code"));
         actionCharacterCode->setCheckable(true);
         actionGlyphName = menuView->addAction(tr("&Glyph Name"));
@@ -71,16 +79,14 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         menuView->addSeparator();
 
 #ifndef Q_OS_MAC
-        actionFullScreen = menuView->addAction(tr("&Full Screen"), [this]() {
-            emit fullScreenActionTriggered(actionFullScreen);
-        }, QKeySequence::FullScreen);
+        actionFullScreen = menuView->addAction(tr("&Full Screen"));
+        actionFullScreen->setShortcut(QKeySequence::FullScreen);
         actionFullScreen->setCheckable(true);
 #else
         actionFullScreen = nullptr;
 #endif
-        actionShowAllGlyphs = menuView->addAction(tr("&Show All Glyphs"), [this]() {
-            emit showAllGlyphsActionTiggered(actionShowAllGlyphs);
-        }, QKeySequence(Qt::CTRL | Qt::Key_G));
+        actionShowAllGlyphs = menuView->addAction(tr("&Show All Glyphs"));
+        actionShowAllGlyphs->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
 
         actionShowAllGlyphs->setCheckable(true);
 

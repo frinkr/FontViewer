@@ -24,6 +24,8 @@ public:
     QAction * actionSearch;
 
     // View menu
+    QAction * actionToolBar;
+    QAction * actionStatusBar;
     QAction * actionCharacterCode;
     QAction * actionGlyphName;
     QAction * actionGlyphID;
@@ -52,18 +54,6 @@ signals:
 
     void
     recentFontActionTriggered(QAction * action, const QXFontURI & uri);
-
-    void
-    copyActionTriggered(QAction * action);
-
-    void
-    searchActionTriggered(QAction * action);
-
-    void
-    fullScreenActionTriggered(QAction * action);
-
-    void
-    showAllGlyphsActionTiggered(QAction * action);
 
     void
     glyphLabelActionTriggered(QAction * action, QXGlyphLabel label);
