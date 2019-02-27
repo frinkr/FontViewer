@@ -57,7 +57,7 @@
           <number>3</number>
          </property>
          <item>
-          <widget class="QPushButton" name="filterButton">
+          <widget class="QPushButton" name="optionButton">
            <property name="maximumSize">
             <size>
              <width>22</width>

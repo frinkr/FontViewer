@@ -17,7 +17,7 @@
 namespace {
     constexpr qreal MIN_PREVIEW_FONT_SIZE = 20;
     constexpr qreal MAX_PREVIEW_FONT_SIZE = 200;
-    constexpr qreal DEFAULT_PREVIEW_FONT_SIZE = 50;
+    constexpr qreal DEFAULT_PREVIEW_FONT_SIZE = 30;
     const QString DEFAULT_PRVIEW_TEXT = "The quick fox jumps over the lazy dog";
 
     FXCache<FXFaceDescriptor, FXPtr<FXFace>> faceCache_(50); // cache 50 faces
@@ -52,6 +52,7 @@ namespace {
             painter->save();
             
             painter->setRenderHint(QPainter::HighQualityAntialiasing);
+            painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
             const bool selected = (option.state & QStyle::State_Selected);
             const bool active = (option.state & QStyle::State_Active);
@@ -80,6 +81,10 @@ namespace {
             QString displayName;
             if (nameVariant.canConvert<QString>())
                 displayName = nameVariant.value<QString>();
+            if (selected)
+                painter->setPen(option.palette.highlightedText().color());
+            else
+                painter->setPen(option.palette.text().color());
             if (!displayName.isEmpty())
                 painter->drawText(option.rect.adjusted(iconSize + 2, 0, 0, 0), displayName);
 
@@ -88,7 +93,9 @@ namespace {
             // Draw font path
             int left = option.rect.left() + iconSize + 8 + painter->fontMetrics().horizontalAdvance(displayName);
             if (!selected)
-                painter->setPen(option.palette.text().color().darker());
+                painter->setPen(option.palette.color(QPalette::Disabled, QPalette::Text));
+            else 
+                painter->setPen(option.palette.color(QPalette::HighlightedText));
             painter->drawText(QRect(left, option.rect.top(), option.rect.right() + 99999, option.rect.bottom()),
                               QString("(%1)").arg(toQString(desc.filePath)));
 
@@ -102,8 +109,8 @@ namespace {
             }
             
             if (face) {
-                if (face->isScalable())
-                    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+                if (!face->isScalable())
+                    painter->setRenderHint(QPainter::SmoothPixmapTransform, false);
 
                 auto sample = previewText_.toStdU32String();
 
@@ -179,7 +186,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     , ui_(new Ui::QXFontBrowser) {
     ui_->setupUi(this);
     ui_->openFileButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
-	ui_->filterButton->setIcon(qApp->loadIcon(":/images/filter.png"));
+	ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-right.png"));
     ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
 
     // List view
@@ -253,11 +260,15 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->previewFontSizeSlider->setMinimum(MIN_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setMaximum(MAX_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setValue(DEFAULT_PREVIEW_FONT_SIZE);
-    connect(ui_->filterButton, &QPushButton::clicked, [this]() {
+    connect(ui_->optionButton, &QPushButton::clicked, [this]() {
             if (ui_->previewSettingsGoupBox->isVisible())
                 ui_->previewSettingsGoupBox->hide();
             else
                 ui_->previewSettingsGoupBox->show();
+            if (ui_->previewSettingsGoupBox->isVisible())
+                ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-down.png"));
+            else 
+                ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-right.png"));
         });
     connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontBrowser::updatePreviewSettings);
     connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::updatePreviewSettings);

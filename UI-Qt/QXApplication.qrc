@@ -1,6 +1,10 @@
 <!DOCTYPE RCC><RCC version="1.0">
   <qresource>
     <file alias="images/app.png">../Resources/Images/app.png</file>
+    <file alias="images/arrow-down.png">../Resources/Images/arrow-down.png</file>
+    <file alias="images/arrow-down_d.png">../Resources/Images/arrow-down_d.png</file>
+    <file alias="images/arrow-right.png">../Resources/Images/arrow-right.png</file>
+    <file alias="images/arrow-right_d.png">../Resources/Images/arrow-right_d.png</file>
     <file alias="images/close.png">../Resources/Images/close.png</file>
     <file alias="images/close_d.png">../Resources/Images/close_d.png</file>
     <file alias="images/cmap.png">../Resources/Images/cmap.png</file>
