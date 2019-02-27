@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>462</height>
+    <width>572</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,7 +120,7 @@
             <enum>Qt::NoFocus</enum>
            </property>
            <property name="toolTip">
-            <string>Filter</string>
+            <string>Preview Options</string>
            </property>
            <property name="styleSheet">
             <string notr="true">border: none;</string>

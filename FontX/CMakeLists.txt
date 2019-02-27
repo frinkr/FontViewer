@@ -28,6 +28,7 @@ add_library(FontX
   FX.h
   FXBoostPrivate.cpp
   FXBoostPrivate.h
+  FXCache.h
   FXCMap.cpp
   FXCMap.h
   FXFT.h
@@ -41,8 +42,6 @@ add_library(FontX
   FXFaceDatabase.h
   FXGlyph.cpp
   FXGlyph.h
-  FXGlyphCache.cpp
-  FXGlyphCache.h
   FXHBPrivate.cpp
   FXHBPrivate.h
   FXInspector.cpp

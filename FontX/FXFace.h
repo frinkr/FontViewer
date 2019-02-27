@@ -6,6 +6,7 @@
 
 class FXGlyphCache;
 class FXInspector;
+template <typename Key, typename Value> class FXCache;
 
 struct FXFaceDescriptor {
     FXString  filePath;
@@ -280,6 +281,8 @@ protected:
     initVariables();
 
 protected:
+    using FXGlyphCache = FXCache<FXGlyphID, FXGlyph>;
+    
     FXFaceDescriptor     desc_{};
     FXPtr<FXStream>      stream_{};
     FXFTFace             face_{nullptr};

@@ -283,10 +283,11 @@ QXCollectionViewContentWidget::paintEvent(QPaintEvent * event) {
         sectionTop += sectionHeight(s); // TODO: or sectionTop = rowTop?
         sectionTop = rowTop;
     }
-
+#if 0
     qWarning("QXCollectionViewContentWidget::update => rect: (%d, %d, %d, %d), beginRow: %d, %d, endRow: %d, %d, total updated cells: %d",
              event->rect().left(), event->rect().top(), event->rect().right(), event->rect().bottom(),
         beginRowIndex.section, beginRowIndex.row, endRowIndex.section, endRowIndex.row, updatedCellCount);
+#endif
 }
 
 void

@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QStyledItemDelegate>
 #include <QTimer>
+#include "FontX/FXCache.h"
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocumentWindowManager.h"
@@ -16,8 +17,10 @@ namespace {
     constexpr qreal MIN_PREVIEW_FONT_SIZE = 20;
     constexpr qreal MAX_PREVIEW_FONT_SIZE = 200;
     constexpr qreal DEFAULT_PREVIEW_FONT_SIZE = 50;
-    const QString DEFAULT_PRVIEW_TEXT = "abcdefgh";
+    const QString DEFAULT_PRVIEW_TEXT = "The quick fox jumps over the lazy dog";
 
+    FXCache<FXFaceDescriptor, FXPtr<FXFace>> faceCache_(50); // cache 50 faces
+    
     class QXFontBrowserItemDelegate : public QStyledItemDelegate {
     private:
         qreal    fontSize_ {DEFAULT_PREVIEW_FONT_SIZE};
@@ -82,7 +85,14 @@ namespace {
             
             // Draw sample text
             const FXFaceDescriptor & desc = sourceModel->db()->faceDescriptor(sourceIndex.row());
-            FXPtr<FXFace> face = FXFace::createFace(desc);
+            FXPtr<FXFace> face;
+            if (faceCache_.has(desc))
+                face = faceCache_.get(desc);
+            else {
+                face = FXFace::createFace(desc);
+                faceCache_.put(desc, face);
+            }
+            
             if (face) {
                 auto sample = previewText_.toStdU32String();
 
@@ -106,7 +116,7 @@ namespace {
                         auto img = toQImage(bm);
                         qreal newWidth = sampleFontScale * img.width();
                         img = img.scaledToWidth(newWidth * qApp->devicePixelRatio(), Qt::SmoothTransformation);
-                        if ((face->isScalable() && selected) || qApp->darkMode())
+                        if (face->isScalable() && (selected || qApp->darkMode()))
                             img.invertPixels();
 
                         const qreal left   = pen.x() + bmOffset.x * sampleFontScale;
@@ -118,12 +128,15 @@ namespace {
                                            img);
                     }
                     qreal advPx = pt2px(face->fontSize()) *  sampleFontScale * g.metrics.horiAdvance / face->upem();
-                    //1.0 * img.width() / qApp->devicePixelRatio() / g.metrics.width * g.metrics.horiAdvance;
                     pen += QPoint(advPx, 0);
+                    if (pen.x() > option.rect.right())
+                        break;
                 }
                 
             }
             painter->restore();
+            
+            faceCache_.gc();
         }
 
         QSize
@@ -284,8 +297,14 @@ QXFontBrowser::clearFilter() {
 
 void
 QXFontBrowser::accept() {
-    //clearFilter();
+    faceCache_.clear();
     QDialog::accept();
+}
+
+void
+QXFontBrowser::reject() {
+    faceCache_.clear();
+    QDialog::reject();
 }
 
 QXSortFilterFontListModel *

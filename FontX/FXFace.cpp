@@ -2,7 +2,7 @@
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"
 #include "FXFace.h"
-#include "FXGlyphCache.h"
+#include "FXCache.h"
 #include "FXInspector.h"
 #include "FXLib.h"
 #include "FXPDF.h"
@@ -62,7 +62,12 @@ FXFaceDescriptor::operator==(const FXFaceDescriptor & other) const {
 
 bool
 FXFaceDescriptor::operator<(const FXFaceDescriptor & other) const {
-    return filePath < other.filePath && index< other.index;
+    if (filePath < other.filePath)
+        return true;
+    else if (filePath == other.filePath)
+        return index < other.index;
+    else
+        return false;
 }
 
 bool
@@ -387,9 +392,9 @@ FXFace::selectFontSize(double fontSize) {
             // select the strike which is closest to required size
             const double pixSize = pt2px(fontSize_);
             int strikeIndex = 0;
-            double diff = fabs(pixSize - face_->available_sizes[0].width);
+            double diff = fabs(pixSize - face_->available_sizes[0].height);
             for (int i = 1; i < face_->num_fixed_sizes; ++i) {
-                double ndiff = fabs(pixSize - face_->available_sizes[i].width);
+                double ndiff = fabs(pixSize - face_->available_sizes[i].height);
                 if (ndiff < diff) {
                     strikeIndex = i;
                     diff = ndiff;
@@ -399,7 +404,6 @@ FXFace::selectFontSize(double fontSize) {
             
             bmScale_ = pixSize * 64 / face_->available_sizes[strikeIndex].x_ppem;;
             bmStrikeIndex_ = strikeIndex;
-            fontSize_ /= bmScale_;
         }
         else {
             FT_Set_Char_Size(face_, 0/*same as height*/, fontSize * 64, FXDefaultDPI, FXDefaultDPI);
