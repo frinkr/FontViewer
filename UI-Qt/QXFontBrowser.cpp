@@ -27,8 +27,9 @@ namespace {
             painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
             const bool selected = (option.state & QStyle::State_Selected);
+            const bool active = (option.state & QStyle::State_Active);
             if (selected)
-                painter->fillRect(option.rect, option.palette.highlight());
+                painter->fillRect(option.rect, option.palette.brush(active? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
             else
                 painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
             
@@ -82,7 +83,7 @@ namespace {
                    
                     auto img = toQImage(bm);
                     qreal newWidth = sampleFontScale * img.width();
-                    img = img.scaledToWidth(newWidth, Qt::SmoothTransformation);
+                    img = img.scaledToWidth(newWidth * qApp->devicePixelRatio(), Qt::SmoothTransformation);
                     if ((face->isScalable() && selected) || qApp->darkMode())
                         img.invertPixels();
 
@@ -94,7 +95,7 @@ namespace {
                     painter->drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                                        img);
                                         
-                    qreal advPx = 1.0 * img.width() / g.metrics.width * g.metrics.horiAdvance;
+                    qreal advPx = 1.0 * img.width() / qApp->devicePixelRatio() / g.metrics.width * g.metrics.horiAdvance;
                     pen += QPoint(advPx, 0);
                 }
                 
