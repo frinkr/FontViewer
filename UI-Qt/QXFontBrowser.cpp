@@ -1,6 +1,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QPainter>
+#include <QKeyEvent>
 #include <QStyledItemDelegate>
 #include <QTimer>
 #include "FontX/FXCache.h"
@@ -213,7 +214,8 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->searchLineEdit->setPlaceholderText(tr("Search..."));
     ui_->searchLineEdit->setClearButtonEnabled(true);
     ui_->searchLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-
+    ui_->searchLineEdit->installEventFilter(this);
+    
     QAction * searchIconAction = new QAction(this);
     searchIconAction->setIcon(qApp->loadIcon(":/images/search.png"));
     ui_->searchLineEdit->addAction(searchIconAction, QLineEdit::LeadingPosition);
@@ -332,6 +334,27 @@ QXFontBrowser::reject() {
     faceCache_.clear();
     QDialog::reject();
 }
+
+bool
+QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
+    if (obj == ui_->searchLineEdit && event->type() == QEvent::KeyPress) {
+        QKeyEvent * keyEvent = (QKeyEvent*)event;
+        if (keyEvent->key() == Qt::Key_Down)
+            ;
+        if (keyEvent->modifiers() == Qt::NoModifier && (
+            keyEvent->key() == Qt::Key_Down ||
+            keyEvent->key() == Qt::Key_PageDown ||
+            keyEvent->key() == Qt::Key_Up ||
+            keyEvent->key() == Qt::Key_PageUp)) {
+
+            QKeyEvent * eventCopy = new QKeyEvent(QEvent::KeyPress, keyEvent->key(), Qt::NoModifier);
+            qApp->postEvent(ui_->fontListView, eventCopy);
+        }
+    }
+
+    return QDialog::eventFilter(obj, event);
+}
+
 
 QXSortFilterFontListModel *
 QXFontBrowser::proxyModel() const {

@@ -40,6 +40,10 @@ protected:
     
     void
     reject() override;
+
+    bool
+    eventFilter(QObject * obj, QEvent * event) override;
+
 private:
     QXSortFilterFontListModel *
     proxyModel() const;
