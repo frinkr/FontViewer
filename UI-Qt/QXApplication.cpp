@@ -13,6 +13,8 @@
 #include "QXPreferencesDialog.h"
 #include "QXThemedWindow.h"
 
+const QEvent::Type QXEvent::OpenFontDialog = QEvent::Type(QEvent::registerEventType());
+
 QXApplication::QXApplication(int & argc, char ** argv)
     : QApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
@@ -75,19 +77,16 @@ bool
 QXApplication::event(QEvent * event) {
     if (event->type() == QEvent::FileOpen) {
         // This opens a document using this application from the Finder.
-        QXDocumentWindowManager::instance()->openFontFile(static_cast<QFileOpenEvent *>(event)->file());
+        //QTimer::singleShot(0, [file = static_cast<QFileOpenEvent *>(event)->file()] {
+            QXDocumentWindowManager::instance()->openFontFile(static_cast<QFileOpenEvent *>(event)->file());
+        //});
         return true;
     }
     else if (event->type() == QEvent::ApplicationStateChange) {
         // This open the dialog when clicking the dock
         auto changeEvent = static_cast<QApplicationStateChangeEvent *>(event);
         if (changeEvent->applicationState() == Qt::ApplicationActive)
-            QTimer::singleShot(0, [](){
-                QXDocumentWindowManager::instance()->autoOpenFontDialog();
-            });
-    }
-    else if (event->type() == QEvent::Show) {
-        
+            QXDocumentWindowManager::instance()->autoOpenFontDialog();
     }
     return QApplication::event(event);
 }
@@ -124,4 +123,12 @@ QXApplication::warning(QWidget * parent, const QString & title, const QString & 
     box.setStandardButtons(QMessageBox::Ok);
     box.setIcon(QMessageBox::Warning);
     box.exec();
+}
+
+void
+QXApplication::postCustomEvent(QObject * receiver, QEvent::Type eventType, int priority, bool removePostedEvents) {
+    if (removePostedEvents) 
+        this->removePostedEvents(receiver, eventType);
+    QEvent * event = new QEvent(eventType);
+    postEvent(receiver, event, priority);
 }

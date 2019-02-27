@@ -5,8 +5,11 @@
 
 class QEvent;
 
-class QXApplication : public QApplication
-{
+namespace QXEvent {
+    extern const QEvent::Type OpenFontDialog;
+}
+
+class QXApplication : public QApplication {
 public:
     QXApplication(int & argc, char ** argv);
     ~QXApplication();
@@ -25,6 +28,12 @@ public:
 
     void
     warning(QWidget * parent, const QString & title, const QString & text) const;
+
+    void
+    postCustomEvent(QObject * receiver,
+                    QEvent::Type eventType,
+                    int priority = Qt::NormalEventPriority,
+                    bool removePostedEvents = false);
 
 public slots:
     void

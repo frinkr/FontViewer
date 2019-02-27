@@ -57,6 +57,9 @@ public:
     void
     aboutToShowRecentMenu(QMenu * recentMenu);
 
+    bool
+    event(QEvent * event);
+
 public slots:
     void
     doOpenFontDialog();
@@ -102,6 +105,9 @@ private slots:
 private:
     void
     showOpenFontFileError(const QString & file);
+
+    void
+    closeOpenFontDialog();
 
 private:
     enum {kMaxRecentFiles = 20};

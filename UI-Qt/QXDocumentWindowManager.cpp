@@ -191,6 +191,31 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
     }
 }
 
+bool
+QXDocumentWindowManager::event(QEvent * event) {
+    if (event->type() == QXEvent::OpenFontDialog) {
+        if (documents().empty()) {
+            bool hasWindow = false;
+            for (QWidget * widget: qApp->allWidgets()) {
+                QWidget * window = widget->window();
+                if (window &&
+                    window->isWindow() &&
+                    window->isVisible()
+                    && !qobject_cast<QMenuBar*>(window)
+                    && !qobject_cast<QMenu*>(window))
+                {
+                    hasWindow = true;
+                    break;
+                }
+            }
+            if (!hasWindow)
+                doOpenFontDialog();
+        }
+        return true;
+    }
+    return QObject::event(event);
+}
+
 void
 QXDocumentWindowManager::doOpenFontDialog() {
     if (!openFontDialog_) {
@@ -214,23 +239,7 @@ QXDocumentWindowManager::doOpenFontDialog() {
 
 void
 QXDocumentWindowManager::autoOpenFontDialog() {
-    if (documents().empty()) {
-        bool hasWindow = false;
-        for (QWidget * widget: qApp->allWidgets()) {
-            QWidget * window = widget->window();
-            if (window &&
-                window->isWindow() &&
-                window->isVisible()
-                && !qobject_cast<QMenuBar*>(window)
-                && !qobject_cast<QMenu*>(window))
-            {
-                hasWindow = true;
-                break;
-            }
-        }
-        if (!hasWindow)
-            doOpenFontDialog();
-    }
+    qApp->postCustomEvent(this, QXEvent::OpenFontDialog, Qt::LowEventPriority, true);
 }
 
 void
@@ -292,6 +301,9 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
         return openFontURI(uri, initFace);
     }
     else if (faceCount > 1) {
+#if defined(Q_OS_MAC)
+        closeOpenFontDialog();
+#endif
         int index = QXFontCollectionDialog::selectFontIndex(filePath, initFace);
         if (index != -1) {
             QXFontURI uri {filePath, static_cast<size_t>(index)};
@@ -306,9 +318,8 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
 
 bool
 QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace) {
-    if (openFontDialog_ && openFontDialog_->isVisible())
-        openFontDialog_->close();
-
+    closeOpenFontDialog();
+    
     // check already open
     QXDocument * document = getDocument(uri);
     if (document) {
@@ -360,6 +371,15 @@ QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
                       tr("Error to open file"),
                       tr("The file %1 can't be open.").arg(file),
                       QMessageBox::Ok);
+}
+
+void
+QXDocumentWindowManager::closeOpenFontDialog() {
+    qApp->removePostedEvents(this, QXEvent::OpenFontDialog);
+    if (openFontDialog_ && openFontDialog_->isVisible()) {
+        openFontDialog_->close();
+        qApp->processEvents(QEventLoop::ExcludeUserInputEvents);
+    }
 }
 
 void
