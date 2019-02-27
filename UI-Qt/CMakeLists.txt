@@ -33,6 +33,7 @@ set(UI
   QXAboutFontsDialog.ui
   QXCMapBlockWidget.ui
   QXDocumentWindow.ui
+  QXFontBrowser.ui
   QXFontCollectionDialog.ui
   QXFontInfoWidget.ui
   QXGlyphTableWidget.ui
@@ -55,10 +56,10 @@ set(SHARED_SOURCES
   QXApplication.qrc
   QXCMapBlockWidget.cpp
   QXCMapBlockWidget.h
+  QXCollectionModel.cpp
+  QXCollectionModel.h
   QXCollectionView.cpp
   QXCollectionView.h
-  QXCollectionModel.h
-  QXCollectionModel.cpp
   QXConv.cpp
   QXConv.h
   QXDockTitleBarWidget.cpp
@@ -71,6 +72,8 @@ set(SHARED_SOURCES
   QXDocumentWindowManager.h
   QXEncoding.cpp
   QXEncoding.h
+  QXFontBrowser.cpp
+  QXFontBrowser.h
   QXFontCollectionDialog.cpp
   QXFontCollectionDialog.h
   QXFontComboBox.cpp
@@ -87,8 +90,6 @@ set(SHARED_SOURCES
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
   QXHtmlTemplate.h
-#QXJumpListHelper.cpp
-#QXJumpListHelper.h
   QXMain.cpp
   QXMain.h
   QXMenuBar.cpp
@@ -111,8 +112,8 @@ set(SHARED_SOURCES
   QXShapingWidget.h
   QXTheme.cpp
   QXTheme.h
-  QXThemedWindow.h
   QXThemedWindow.cpp
+  QXThemedWindow.h
   QXToolBar.cpp
   QXToolBar.h
   QXVariableWidget.cpp

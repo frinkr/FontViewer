@@ -50,6 +50,11 @@ pt2px(double p, double dpi) {
     return (p * dpi + 36) / 72.0;
 }
 
+double
+px2pt(double p, double dpi) {
+    return (p * 72 + 36) / dpi;
+}
+
 bool
 FXFaceDescriptor::operator==(const FXFaceDescriptor & other) const {
     return filePath == other.filePath && index == other.index;

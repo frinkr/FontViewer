@@ -16,6 +16,7 @@
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
+#include "QXFontBrowser.h"
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 #include "QXOpenFontDialog.h"
@@ -193,6 +194,13 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 
 void
 QXDocumentWindowManager::doOpenFontDialog() {
+#if 1
+    QXFontBrowser browser(nullptr);
+    if (QDialog::Accepted == browser.exec()) {
+        const QXFontURI fontURI = browser.selectedFont();
+        openFontURI(fontURI);
+    }
+#else
     if (!openFontDialog_) {
         openFontDialog_ = new QXOpenFontDialog(nullptr);
 #if !defined(Q_OS_MAC)
@@ -210,6 +218,7 @@ QXDocumentWindowManager::doOpenFontDialog() {
         const QXFontURI fontURI = openFontDialog_->selectedFont();
         openFontURI(fontURI);
     }
+#endif
 }
 
 void
