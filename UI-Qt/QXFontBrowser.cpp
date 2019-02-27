@@ -55,7 +55,7 @@ namespace {
             const bool selected = (option.state & QStyle::State_Selected);
             const bool active = (option.state & QStyle::State_Active);
             if (selected)
-                painter->fillRect(option.rect, option.palette.brush(active? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
+                painter->fillRect(option.rect, option.palette.brush(QPalette::Active, QPalette::Highlight));
             else
                 painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
             
