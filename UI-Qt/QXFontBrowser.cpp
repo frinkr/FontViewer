@@ -82,9 +82,16 @@ namespace {
                 displayName = nameVariant.value<QString>();
             if (!displayName.isEmpty())
                 painter->drawText(option.rect.adjusted(iconSize + 2, 0, 0, 0), displayName);
-            
-            // Draw sample text
+
             const FXFaceDescriptor & desc = sourceModel->db()->faceDescriptor(sourceIndex.row());
+
+            // Draw font path
+            int left = option.rect.left() + iconSize + 8 + painter->fontMetrics().horizontalAdvance(displayName);
+            painter->setPen(option.palette.text().color().darker());
+            painter->drawText(QRect(left, option.rect.top(), option.rect.right() + 99999, option.rect.bottom()),
+                              QString("(%1)").arg(toQString(desc.filePath)));
+
+            // Draw sample text
             FXPtr<FXFace> face;
             if (faceCache_.has(desc))
                 face = faceCache_.get(desc);
