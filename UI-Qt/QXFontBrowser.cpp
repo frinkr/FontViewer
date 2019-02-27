@@ -13,9 +13,33 @@
 #include "ui_QXFontBrowser.h"
 
 namespace {
+    constexpr qreal MIN_PREVIEW_FONT_SIZE = 20;
+    constexpr qreal MAX_PREVIEW_FONT_SIZE = 200;
+    constexpr qreal DEFAULT_PREVIEW_FONT_SIZE = 50;
+    const QString DEFAULT_PRVIEW_TEXT = "abcdefgh";
+
     class QXFontBrowserItemDelegate : public QStyledItemDelegate {
+    private:
+        qreal    fontSize_ {DEFAULT_PREVIEW_FONT_SIZE};
+        QString  previewText_;
     public:
-        QXFontBrowserItemDelegate(QWidget * parent = 0) : QStyledItemDelegate(parent) {}
+        QXFontBrowserItemDelegate(QWidget * parent = 0)
+            : QStyledItemDelegate(parent)
+            , previewText_(DEFAULT_PRVIEW_TEXT){
+        }
+
+        void
+        setFontSize(qreal fontSize) {
+            fontSize_ = fontSize;
+        }
+
+        void
+        setPreviewText(const QString & previewText) {
+            if (previewText.isEmpty())
+                previewText_ = DEFAULT_PRVIEW_TEXT;
+            else
+                previewText_ = previewText;
+        }
 
         void
         paint(QPainter * painter,
@@ -60,7 +84,7 @@ namespace {
             const FXFaceDescriptor & desc = sourceModel->db()->faceDescriptor(sourceIndex.row());
             FXPtr<FXFace> face = FXFace::createFace(desc);
             if (face) {
-                FXVector<FXChar> sample = {'a', 'b', 'f', 'g', 'x', 'y', 'r'};
+                auto sample = previewText_.toStdU32String();
 
                 const qreal sampleHeight = option.rect.height() - iconSize;
                 const qreal sampleFontSizePx = 0.9 * sampleHeight;
@@ -106,7 +130,7 @@ namespace {
         QSize
         sizeHint(const QStyleOptionViewItem & option,
                  const QModelIndex & index) const override {
-            return QSize(10, 100);
+            return QSize(10, fontSize_ + 30);
         }
     };
 }
@@ -184,6 +208,21 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
         }
     });
 
+    // Preview settings
+    ui_->previewTextEdit->setText(DEFAULT_PRVIEW_TEXT);
+    ui_->previewFontSizeSlider->setMinimum(MIN_PREVIEW_FONT_SIZE);
+    ui_->previewFontSizeSlider->setMaximum(MAX_PREVIEW_FONT_SIZE);
+    ui_->previewFontSizeSlider->setValue(DEFAULT_PREVIEW_FONT_SIZE);
+    connect(ui_->filterButton, &QPushButton::clicked, [this]() {
+            if (ui_->previewSettingsGoupBox->isVisible())
+                ui_->previewSettingsGoupBox->hide();
+            else
+                ui_->previewSettingsGoupBox->show();
+        });
+    connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontBrowser::updatePreviewSettings);
+    connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::updatePreviewSettings);
+    ui_->previewSettingsGoupBox->hide();
+        
     // Add actions
     QAction * searchAction = new QAction(this);
     connect(searchAction, &QAction::triggered, this, &QXFontBrowser::onSearchAction);
@@ -304,3 +343,13 @@ QXFontBrowser::onOpenFileButtonClicked() {
         reject();    
 }
 
+void
+QXFontBrowser::updatePreviewSettings() {
+    QXFontBrowserItemDelegate * delegate = dynamic_cast<QXFontBrowserItemDelegate *>(ui_->fontListView->itemDelegate());
+    if (delegate) {
+        delegate->setFontSize(ui_->previewFontSizeSlider->value());
+        delegate->setPreviewText(ui_->previewTextEdit->text());
+        ui_->fontListView->model()->layoutChanged();
+        scrollToCurrentIndex();
+    }
+}

@@ -70,6 +70,9 @@ private slots:
     void
     scrollToCurrentIndex();
 
+    void
+    updatePreviewSettings();
+
 private:
     Ui::QXFontBrowser * ui_;
     QMenu             * recentMenu_; 
