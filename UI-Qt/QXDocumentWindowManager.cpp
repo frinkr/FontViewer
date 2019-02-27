@@ -194,7 +194,7 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 
 void
 QXDocumentWindowManager::doOpenFontDialog() {
-#if 1
+#if 0
     QXFontBrowser browser(nullptr);
     if (QDialog::Accepted == browser.exec()) {
         const QXFontURI fontURI = browser.selectedFont();
@@ -202,7 +202,7 @@ QXDocumentWindowManager::doOpenFontDialog() {
     }
 #else
     if (!openFontDialog_) {
-        openFontDialog_ = new QXOpenFontDialog(nullptr);
+        openFontDialog_ = new QXFontBrowser(nullptr);
 #if !defined(Q_OS_MAC)
         // This piece of shit makes qApp quit
         connect(openFontDialog_, &QDialog::rejected, this, [this]() {

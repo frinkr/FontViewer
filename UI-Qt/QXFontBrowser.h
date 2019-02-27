@@ -8,10 +8,10 @@ namespace Ui {
     class QXFontBrowser;
 }
 
+class QMenu;
 class QModelIndex;
-
-class QXSortFilterFontListModel;
 class QXFontListModel;
+class QXSortFilterFontListModel;
 
 class QXFontBrowser : public QXThemedWindow<QDialog> {
     Q_OBJECT
@@ -25,6 +25,18 @@ public:
 
     QXFontURI
     selectedFont() const;
+
+    int
+    selectFont(int index);
+
+    int
+    selectFont(const QXFontURI & uri);
+
+    void
+    clearFilter();
+protected:
+    void
+    accept() override;
 
 private:
     QXSortFilterFontListModel *
@@ -43,6 +55,23 @@ private slots:
     void
     onFontDoubleClicked(const QModelIndex & index);
 
+    void
+    onSearchLineEditReturnPressed();
+
+    void
+    onSearchLineEditTextEdited(const QString & text);
+
+    void
+    onSearchAction();
+
+    void
+    onOpenFileButtonClicked();
+
+    void
+    scrollToCurrentIndex();
+
 private:
     Ui::QXFontBrowser * ui_;
+    QMenu             * recentMenu_; 
+
 };

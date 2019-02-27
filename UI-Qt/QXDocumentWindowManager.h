@@ -10,6 +10,7 @@
 
 class QXDocumentWindow;
 class QXOpenFontDialog;
+class QXFontBrowser;
 class QMenu;
 class QString;
 
@@ -114,7 +115,7 @@ private:
     QList<QPointer<QXDocumentWindow> > documentWindows_;
     QList<QPointer<QXDocument> >       documents_;
     bool                               appIsAboutToQuit_ {false};
-    QXOpenFontDialog                 * openFontDialog_ {nullptr};
+    QXFontBrowser                    * openFontDialog_ {nullptr};
 
     static QXDocumentWindowManager   * instance_;
 

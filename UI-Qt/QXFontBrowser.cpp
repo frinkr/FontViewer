@@ -1,10 +1,15 @@
+#include <QAction>
+#include <QMenu>
 #include <QPainter>
 #include <QStyledItemDelegate>
+#include <QTimer>
 #include "QXApplication.h"
 #include "QXConv.h"
+#include "QXDocumentWindowManager.h"
 #include "QXFontBrowser.h"
 #include "QXFontManager.h"
 #include "QXFontComboBox.h"
+#include "QXTheme.h"
 #include "ui_QXFontBrowser.h"
 
 namespace {
@@ -25,7 +30,7 @@ namespace {
             if (selected)
                 painter->fillRect(option.rect, option.palette.highlight());
             else
-                painter->fillRect(option.rect, option.palette.base());
+                painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
             
             const QXSortFilterFontListModel * proxyModel = qobject_cast<const QXSortFilterFontListModel*>(proxyIndex.model());
             const QXFontListModel * sourceModel = qobject_cast<const QXFontListModel *>(proxyModel->sourceModel());
@@ -109,15 +114,90 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     : QXThemedWindow<QDialog>(parent)
     , ui_(new Ui::QXFontBrowser) {
     ui_->setupUi(this);
+    ui_->openFileButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
+	ui_->filterButton->setIcon(qApp->loadIcon(":/images/filter.png"));
+    ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
 
+    // List view
     QSortFilterProxyModel * proxy = new QXSortFilterFontListModel(this);
     proxy->setSourceModel(new QXFontListModel(this));
     ui_->fontListView->setModel(proxy);
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
     proxy->sort(0);
+    connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontBrowser::onFontDoubleClicked);
 
-    connect(ui_->fontListView, &QListView::doubleClicked,
-            this, &QXFontBrowser::onFontDoubleClicked);
+    QXFontManager::instance();
+    QXDocumentWindowManager * mgr = QXDocumentWindowManager::instance();
+    if (mgr->recentFonts().size()) {
+        for (const auto & uri: mgr->recentFonts()) {
+            if (-1 != selectFont(uri))
+                break;
+        }
+    }
+    if (-1 == selectedFontIndex())
+        selectFont(0);
+    
+    // Search Edit
+    ui_->searchLineEdit->setStyleSheet(
+        QString("QLineEdit {border-radius: 13px;}"                      \
+                "QLineEdit:focus { "                                    \
+                "  border:2px solid; "                                  \
+                "  border-radius: 13px; "                               \
+                "  border-color:palette(highlight);}"));
+    ui_->searchLineEdit->setAttribute(Qt::WA_MacShowFocusRect, 0);
+    ui_->searchLineEdit->setMinimumHeight(26);
+    ui_->searchLineEdit->setMinimumWidth(200);
+    ui_->searchLineEdit->setPlaceholderText(tr("Search..."));
+    ui_->searchLineEdit->setClearButtonEnabled(true);
+    ui_->searchLineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    QAction * searchIconAction = new QAction(this);
+    searchIconAction->setIcon(qApp->loadIcon(":/images/search.png"));
+    ui_->searchLineEdit->addAction(searchIconAction, QLineEdit::LeadingPosition);
+    connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontBrowser::onSearchLineEditReturnPressed);
+    connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onSearchLineEditTextEdited);
+
+    // Open File button
+    connect(ui_->openFileButton, &QPushButton::clicked, this, &QXFontBrowser::onOpenFileButtonClicked);
+
+    // Recent button
+    recentMenu_ = new QMenu(ui_->recentButton);
+    ui_->recentButton->setMenu(recentMenu_);
+    connect(recentMenu_, &QMenu::aboutToShow, [this]() {
+        QXDocumentWindowManager::instance()->aboutToShowRecentMenu(recentMenu_);
+        foreach (QAction * action, recentMenu_->actions()) {
+            if (!action->isSeparator() && !action->menu()) {
+                connect(action, &QAction::triggered, [this, action]() {
+                    QVariant data = action->data();
+                    if (data.canConvert<QXFontURI>()) {
+                        QXFontURI uri = data.value<QXFontURI>();
+                        if (-1 == selectFont(uri)) {
+                            QTimer::singleShot(0, [this, uri]() {
+                                QXDocumentWindowManager::instance()->openFontURI(uri);
+                                this->reject();                         
+                            });
+                        }
+                    }
+                });
+            }
+        }
+    });
+
+    // Add actions
+    QAction * searchAction = new QAction(this);
+    connect(searchAction, &QAction::triggered, this, &QXFontBrowser::onSearchAction);
+    searchAction->setShortcuts(QKeySequence::Find);
+    addAction(searchAction);
+
+    QAction * closeAction = new QAction(this);
+    connect(closeAction, &QAction::triggered, this, &QDialog::close);
+    closeAction->setShortcuts(QKeySequence::Close);
+    addAction(closeAction);
+
+    QAction * quitAction = new QAction(this);
+    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    quitAction->setShortcuts(QKeySequence::Quit);
+    addAction(quitAction);
 }
 
 QXFontBrowser::~QXFontBrowser() {
@@ -142,6 +222,33 @@ QXFontBrowser::selectedFont() const {
     return uri;
 }
 
+int
+QXFontBrowser::selectFont(int index) {
+    QModelIndex proxyIndex = proxyModel()->mapFromSource(sourceModel()->index(index));
+    ui_->fontListView->setCurrentIndex(proxyIndex);
+    scrollToCurrentIndex();
+    return selectedFontIndex();
+}
+
+int
+QXFontBrowser::selectFont(const QXFontURI & fontURI) {
+    clearFilter();
+    int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
+    return selectFont(index);
+}
+
+void
+QXFontBrowser::clearFilter() {
+    proxyModel()->clearFilter();
+    ui_->searchLineEdit->clear();
+}
+
+void
+QXFontBrowser::accept() {
+    clearFilter();
+    QDialog::accept();
+}
+
 QXSortFilterFontListModel *
 QXFontBrowser::proxyModel() const {
     return qobject_cast<QXSortFilterFontListModel *>(ui_->fontListView->model());
@@ -152,20 +259,47 @@ QXFontBrowser::sourceModel() const {
     return qobject_cast<QXFontListModel *>(proxyModel()->sourceModel());
 }
 
-void
-QXFontBrowser::onFontDoubleClicked(const QModelIndex & index) {
-    accept();
-    //const QModelIndex sourceIndex = proxyModel()->mapToSource(proxyIndex);
-    //    auto db = 
-}
-
 QModelIndex
 QXFontBrowser::currentProxyIndex() const {
     return ui_->fontListView->currentIndex();
-    
 }
 
 QModelIndex
 QXFontBrowser::currentSourceIndex() const {
     return proxyModel()->mapToSource(currentProxyIndex());
 }
+
+void
+QXFontBrowser::scrollToCurrentIndex() {
+    ui_->fontListView->scrollTo(ui_->fontListView->currentIndex(), QAbstractItemView::PositionAtTop);    
+}
+
+void
+QXFontBrowser::onFontDoubleClicked(const QModelIndex & index) {
+    accept();
+}
+
+void
+QXFontBrowser::onSearchLineEditReturnPressed() {
+}
+
+void
+QXFontBrowser::onSearchLineEditTextEdited(const QString & text) {
+    proxyModel()->setFilter(text);
+    if (!text.isEmpty() || selectedFontIndex() == -1)
+        ui_->fontListView->setCurrentIndex(proxyModel()->index(0, 0));
+    scrollToCurrentIndex();
+}
+
+void
+QXFontBrowser::onSearchAction() {
+    ui_->searchLineEdit->setFocus();
+    ui_->searchLineEdit->selectAll();
+}
+
+void
+QXFontBrowser::onOpenFileButtonClicked() {
+    if (QXDocumentWindowManager::instance()->doOpenFontFromFile())
+        reject();    
+}
+
