@@ -87,8 +87,8 @@ namespace {
                 auto sample = previewText_.toStdU32String();
 
                 const qreal sampleHeight = option.rect.height() - iconSize;
-                const qreal sampleFontSizePx = 0.9 * sampleHeight;
-                const qreal sampleFontSizePt = px2pt(sampleFontSizePx);
+                const qreal sampleFontSizePt = fontSize_;
+                const qreal sampleFontSizePx = pt2px(sampleFontSizePt);
                 const qreal sampleFontScale = sampleFontSizePt / face->fontSize();
 
                 QPointF pen(option.rect.left(), option.rect.top()
@@ -102,24 +102,23 @@ namespace {
                     FXVec2d<int> bmOffset;
                     const double bmScale = face->bmScale();
                     FXPixmapARGB bm = face->pixmap(g.gid, &bmOffset);
-                    if (bm.empty())
-                        continue;
-                   
-                    auto img = toQImage(bm);
-                    qreal newWidth = sampleFontScale * img.width();
-                    img = img.scaledToWidth(newWidth * qApp->devicePixelRatio(), Qt::SmoothTransformation);
-                    if ((face->isScalable() && selected) || qApp->darkMode())
-                        img.invertPixels();
+                    if (!bm.empty()) {
+                        auto img = toQImage(bm);
+                        qreal newWidth = sampleFontScale * img.width();
+                        img = img.scaledToWidth(newWidth * qApp->devicePixelRatio(), Qt::SmoothTransformation);
+                        if ((face->isScalable() && selected) || qApp->darkMode())
+                            img.invertPixels();
 
-                    const qreal left   = pen.x() + bmOffset.x * sampleFontScale;
-                    const qreal bottom = pen.y() - bmOffset.y * sampleFontScale;
-                    const qreal right  = left + bm.width * bmScale * sampleFontScale;
-                    const qreal top    = bottom - bm.height * bmScale * sampleFontScale;
+                        const qreal left   = pen.x() + bmOffset.x * sampleFontScale;
+                        const qreal bottom = pen.y() - bmOffset.y * sampleFontScale;
+                        const qreal right  = left + bm.width * bmScale * sampleFontScale;
+                        const qreal top    = bottom - bm.height * bmScale * sampleFontScale;
 
-                    painter->drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
-                                       img);
-                                        
-                    qreal advPx = 1.0 * img.width() / qApp->devicePixelRatio() / g.metrics.width * g.metrics.horiAdvance;
+                        painter->drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
+                                           img);
+                    }
+                    qreal advPx = pt2px(face->fontSize()) *  sampleFontScale * g.metrics.horiAdvance / face->upem();
+                    //1.0 * img.width() / qApp->devicePixelRatio() / g.metrics.width * g.metrics.horiAdvance;
                     pen += QPoint(advPx, 0);
                 }
                 
@@ -130,7 +129,7 @@ namespace {
         QSize
         sizeHint(const QStyleOptionViewItem & option,
                  const QModelIndex & index) const override {
-            return QSize(10, fontSize_ + 30);
+            return QSize(10, pt2px(fontSize_) + 30);
         }
     };
 }
@@ -285,7 +284,7 @@ QXFontBrowser::clearFilter() {
 
 void
 QXFontBrowser::accept() {
-    clearFilter();
+    //clearFilter();
     QDialog::accept();
 }
 
