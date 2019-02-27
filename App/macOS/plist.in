@@ -32,6 +32,7 @@
 		<key>LSItemContentTypes</key>
 		<array>
 		  <string>public.font</string>
+          <string>com.adobe.pdf</string>
 		</array>
 		<key>CFBundleTypeRole</key>
 		<string>Viewer</string>
