@@ -51,7 +51,6 @@ namespace {
             painter->save();
             
             painter->setRenderHint(QPainter::HighQualityAntialiasing);
-            painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
             const bool selected = (option.state & QStyle::State_Selected);
             const bool active = (option.state & QStyle::State_Active);
@@ -87,7 +86,8 @@ namespace {
 
             // Draw font path
             int left = option.rect.left() + iconSize + 8 + painter->fontMetrics().horizontalAdvance(displayName);
-            painter->setPen(option.palette.text().color().darker());
+            if (!selected)
+                painter->setPen(option.palette.text().color().darker());
             painter->drawText(QRect(left, option.rect.top(), option.rect.right() + 99999, option.rect.bottom()),
                               QString("(%1)").arg(toQString(desc.filePath)));
 
@@ -101,6 +101,9 @@ namespace {
             }
             
             if (face) {
+                if (face->isScalable())
+                    painter->setRenderHint(QPainter::SmoothPixmapTransform);
+
                 auto sample = previewText_.toStdU32String();
 
                 const qreal sampleHeight = option.rect.height() - iconSize;
@@ -117,12 +120,25 @@ namespace {
                     FXGlyph g = face->glyph(c);
 
                     FXVec2d<int> bmOffset;
-                    const double bmScale = face->bmScale();
+                    double bmScale = face->bmScale();
                     FXPixmapARGB bm = face->pixmap(g.gid, &bmOffset);
+                    qreal scaledBmHeight = sampleFontScale * bm.height * bmScale;
+                    qreal scaledBmWidth = sampleFontScale * bm.width * bmScale;
+                    if (!face->isScalable()) {
+                        if (scaledBmHeight >= 0.95 * sampleFontSizePx) {
+                            qreal heightFittingScale = 0.95 * sampleFontSizePx / scaledBmHeight;
+                            scaledBmWidth *= heightFittingScale;
+                            scaledBmHeight = 0.95 * sampleFontSizePx;
+                            bmScale *= heightFittingScale;
+                        }
+
+                        pen.setY(option.rect.top() + iconSize + (sampleFontSizePx + scaledBmHeight) / 2);
+                    }
+
                     if (!bm.empty()) {
                         auto img = toQImage(bm);
-                        qreal newWidth = sampleFontScale * img.width();
-                        img = img.scaledToWidth(newWidth * qApp->devicePixelRatio(), Qt::SmoothTransformation);
+                        img = img.scaledToWidth(scaledBmWidth * qApp->devicePixelRatio(),
+                                                face->isScalable()? Qt::SmoothTransformation: Qt::FastTransformation);
                         if (face->isScalable() && (selected || qApp->darkMode()))
                             img.invertPixels();
 
@@ -135,6 +151,9 @@ namespace {
                                            img);
                     }
                     qreal advPx = pt2px(face->fontSize()) *  sampleFontScale * g.metrics.horiAdvance / face->upem();
+                    if (advPx == 0 || face->upem() == 0)
+                        advPx = scaledBmWidth;
+
                     pen += QPoint(advPx, 0);
                     if (pen.x() > option.rect.right())
                         break;
