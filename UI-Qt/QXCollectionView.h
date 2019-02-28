@@ -129,9 +129,9 @@ private:
 
     friend class QXCollectionView;
 private:
-    QXCollectionModel * model_ {nullptr};
+    QXCollectionModel         * model_ {nullptr};
     QXCollectionViewDelegate  * delegate_ {nullptr};
-    QXCollectionModelIndex   selected_ {-1, -1};
+    QXCollectionModelIndex      selected_ {-1, -1};
 
     QSize     itemSize_;
     QSize     itemSpace_;
@@ -197,6 +197,9 @@ public:
 
     void
     scrollTo(const QXCollectionModelIndex & index);
+
+    QXCollectionModelIndex
+    selectedIndex() const;
 
 signals:
     void

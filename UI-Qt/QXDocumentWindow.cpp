@@ -1,4 +1,5 @@
 #include <QActionGroup>
+#include <QClipboard>
 #include <QDockWidget>
 #include <QDragEnterEvent>
 #include <QDropEvent>
@@ -85,9 +86,8 @@ void
 QXDocumentWindow::initMenu() {
     menuBar_ = new QXMenuBar(this);
 
-    connect(menuBar_->actionCopy, &QAction::triggered, [this]() {
-        
-    });
+    connect(menuBar_->actionCopy, &QAction::triggered,
+            this, &QXDocumentWindow::onCopyAction);
 
     connect(menuBar_->actionSearch, &QAction::triggered, 
         this, &QXDocumentWindow::onSearchAction);
@@ -328,6 +328,15 @@ QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
 void
 QXDocumentWindow::onCharLinkClicked(FXGChar c) {
     //ui_->listView->selectChar(c);
+}
+
+void
+QXDocumentWindow::onCopyAction() {
+    FXGChar c = document_->charAt(ui_->glyphCollectionView->selectedIndex());
+    if (c.isUnicode()) {
+        qApp->clipboard()->setText(QString::fromUcs4(static_cast<uint*>(&c.value), 1));
+        static_assert(sizeof(uint) == sizeof(FXChar), "");
+    }
 }
 
 void

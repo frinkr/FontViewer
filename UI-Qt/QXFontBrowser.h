@@ -60,7 +60,7 @@ private slots:
     onSearchLineEditReturnPressed();
 
     void
-    onSearchLineEditTextEdited(const QString & text);
+    onSearchLineEditTextEdited();
 
     void
     onSearchAction();

@@ -64,7 +64,7 @@ namespace {
             if (selected)
                 painter->fillRect(option.rect, option.palette.brush(QPalette::Active, QPalette::Highlight));
             else
-                painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
+                ;//painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
             
             const QXSortFilterFontListModel * proxyModel = qobject_cast<const QXSortFilterFontListModel*>(proxyIndex.model());
             const QXFontListModel * sourceModel = qobject_cast<const QXFontListModel *>(proxyModel->sourceModel());
@@ -215,13 +215,16 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     
     // Search Edit
     ui_->searchLineEdit->setStyleSheet(
-        QString("QLineEdit {border-radius: 13px;}"                      \
+        QString("QLineEdit { "                                          \
+                "  border: 2px solid; "                                 \
+                "  border-radius: 14px; "                               \
+                "  background-color: palette(base);}"                   \
                 "QLineEdit:focus { "                                    \
-                "  border:2px solid; "                                  \
-                "  border-radius: 13px; "                               \
-                "  border-color:palette(highlight);}"));
+                "  border: 2px solid; "                                 \
+                "  border-radius: 14px; "                               \
+                "  border-color: palette(highlight);}"));
     ui_->searchLineEdit->setAttribute(Qt::WA_MacShowFocusRect, 0);
-    ui_->searchLineEdit->setMinimumHeight(26);
+    ui_->searchLineEdit->setMinimumHeight(28);
     ui_->searchLineEdit->setMinimumWidth(200);
     ui_->searchLineEdit->setPlaceholderText(tr("Search..."));
     ui_->searchLineEdit->setClearButtonEnabled(true);
@@ -399,7 +402,8 @@ QXFontBrowser::onSearchLineEditReturnPressed() {
 }
 
 void
-QXFontBrowser::onSearchLineEditTextEdited(const QString & text) {
+QXFontBrowser::onSearchLineEditTextEdited() {
+    QString text = ui_->searchLineEdit->text();
     proxyModel()->setFilter(text);
     if (!text.isEmpty() || selectedFontIndex() == -1)
         ui_->fontListView->setCurrentIndex(proxyModel()->index(0, 0));

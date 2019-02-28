@@ -108,6 +108,8 @@ set(SHARED_SOURCES
   QXProgressDialog.h
   QXResource.cpp
   QXResource.h
+  QXRichLineEdit.cpp
+  QXRichLineEdit.h
   QXSearchEngine.cpp
   QXSearchEngine.h
   QXShapingWidget.cpp

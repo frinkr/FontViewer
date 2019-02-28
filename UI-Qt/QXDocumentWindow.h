@@ -104,6 +104,9 @@ private slots:
     onCharLinkClicked(FXGChar c);
 
     void
+    onCopyAction();
+
+    void
     onOpenFontAction();
 
     void

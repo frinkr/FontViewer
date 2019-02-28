@@ -457,6 +457,11 @@ QXCollectionView::scrollTo(const QXCollectionModelIndex & index) {
     widget_->update();
 }
 
+QXCollectionModelIndex
+QXCollectionView::selectedIndex() const {
+    return widget_->selected_;
+}
+
 void
 QXCollectionView::onBeginResetModel() {
     
