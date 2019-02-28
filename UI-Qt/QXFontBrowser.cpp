@@ -1,17 +1,17 @@
 #include <QAction>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QPainter>
-#include <QKeyEvent>
 #include <QStyledItemDelegate>
 #include <QTimer>
+
 #include "FontX/FXCache.h"
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocumentWindowManager.h"
 #include "QXFontBrowser.h"
+#include "QXFontListModel.h"
 #include "QXFontManager.h"
-#include "QXFontComboBox.h"
-#include "QXTheme.h"
 #include "ui_QXFontBrowser.h"
 
 namespace {
@@ -182,7 +182,7 @@ namespace {
 }
 
 QXFontBrowser::QXFontBrowser(QWidget * parent)
-    : QXThemedWindow<QDialog>(parent)
+    : QXThemedWindow<QDialog, false>(parent)
     , ui_(new Ui::QXFontBrowser) {
     ui_->setupUi(this);
     ui_->openFileButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
@@ -286,12 +286,17 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     addAction(closeAction);
 
     QAction * quitAction = new QAction(this);
-    connect(quitAction, &QAction::triggered, qApp, &QApplication::quit);
+    connect(quitAction, &QAction::triggered, [this] () {
+        faceCache_.clear();
+        this->close();
+        QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
+    });
     quitAction->setShortcuts(QKeySequence::Quit);
     addAction(quitAction);
 }
 
 QXFontBrowser::~QXFontBrowser() {
+    faceCache_.clear();
     delete ui_;
 }
 
@@ -334,29 +339,18 @@ QXFontBrowser::clearFilter() {
     ui_->searchLineEdit->clear();
 }
 
-void
-QXFontBrowser::accept() {
-    faceCache_.clear();
-    QDialog::accept();
-}
-
-void
-QXFontBrowser::reject() {
-    faceCache_.clear();
-    QDialog::reject();
-}
-
 bool
 QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
     if (obj == ui_->searchLineEdit && event->type() == QEvent::KeyPress) {
         QKeyEvent * keyEvent = (QKeyEvent*)event;
-        if (keyEvent->key() == Qt::Key_Down)
-            ;
-        if (keyEvent->modifiers() == Qt::NoModifier && (
-            keyEvent->key() == Qt::Key_Down ||
-            keyEvent->key() == Qt::Key_PageDown ||
-            keyEvent->key() == Qt::Key_Up ||
-            keyEvent->key() == Qt::Key_PageUp)) {
+
+        if ((keyEvent->modifiers() & ~Qt::KeypadModifier) == Qt::NoModifier &&
+            (keyEvent->key() == Qt::Key_Down ||
+             keyEvent->key() == Qt::Key_PageDown ||
+             keyEvent->key() == Qt::Key_Up ||
+             keyEvent->key() == Qt::Key_PageUp ||
+             keyEvent->key() == Qt::Key_Home ||
+             keyEvent->key() == Qt::Key_End)) {
 
             QKeyEvent * eventCopy = new QKeyEvent(QEvent::KeyPress, keyEvent->key(), Qt::NoModifier);
             qApp->postEvent(ui_->fontListView, eventCopy);
@@ -366,6 +360,11 @@ QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
     return QDialog::eventFilter(obj, event);
 }
 
+void
+QXFontBrowser::closeEvent(QCloseEvent * event) {
+    QXThemedWindow<QDialog, false>::closeEvent(event);
+    faceCache_.clear();
+}
 
 QXSortFilterFontListModel *
 QXFontBrowser::proxyModel() const {

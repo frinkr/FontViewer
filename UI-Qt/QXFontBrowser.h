@@ -13,7 +13,7 @@ class QModelIndex;
 class QXFontListModel;
 class QXSortFilterFontListModel;
 
-class QXFontBrowser : public QXThemedWindow<QDialog> {
+class QXFontBrowser : public QXThemedWindow<QDialog, false> {
     Q_OBJECT
 
 public:
@@ -34,16 +34,13 @@ public:
 
     void
     clearFilter();
-protected:
-    void
-    accept() override;
     
-    void
-    reject() override;
-
+protected:
     bool
     eventFilter(QObject * obj, QEvent * event) override;
 
+    void
+    closeEvent(QCloseEvent * event) override;
 private:
     QXSortFilterFontListModel *
     proxyModel() const;

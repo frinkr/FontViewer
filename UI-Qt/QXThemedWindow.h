@@ -25,28 +25,30 @@ public:
     createInstance(QObject * parent = nullptr);
 };
 
-template <class Widget>
+template <class Widget, bool ApplyTheme = true>
 class QXThemedWindow : public Widget {
 public:
     template <typename ...Args>
     QXThemedWindow(Args &&... args)
         : Widget(std::forward<Args>(args)...){
-        decorator_ = QXWindowDecorator::createInstance(this);
-        if (decorator_) 
-            decorator_->onWidgetInit(this);
+        if (ApplyTheme) {
+            decorator_ = QXWindowDecorator::createInstance(this);
+            if (decorator_) 
+                decorator_->onWidgetInit(this);
+        }
     }
 
 protected:
     void
     showEvent(QShowEvent * event) override {
         Widget::showEvent(event);
-        if (decorator_) 
+        if (ApplyTheme && decorator_) 
             decorator_->onWidgetShow(this, event);
     }
 
     bool
     nativeEvent(const QByteArray & eventType, void * message, long * result) override {
-        if (decorator_ && decorator_->onNativeEvent(this, eventType, message, result))
+        if (ApplyTheme && decorator_ && decorator_->onNativeEvent(this, eventType, message, result))
             return true;
 
         return Widget::nativeEvent(eventType, message, result);

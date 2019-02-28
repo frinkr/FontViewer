@@ -80,6 +80,8 @@ set(SHARED_SOURCES
   QXFontComboBox.h
   QXFontInfoWidget.cpp
   QXFontInfoWidget.h
+  QXFontListModel.cpp
+  QXFontListModel.h
   QXFontManager.cpp
   QXFontManager.h
   QXGlyphCollectionView.cpp

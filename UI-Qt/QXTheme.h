@@ -6,6 +6,7 @@ class QToolBar;
 
 class QXTheme : public QObject{
     Q_OBJECT
+    
 public:
     static QXTheme *
     current();
