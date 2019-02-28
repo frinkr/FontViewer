@@ -13,7 +13,7 @@ class QModelIndex;
 class QXFontListModel;
 class QXSortFilterFontListModel;
 
-class QXFontBrowser : public QXThemedWindow<QDialog, false> {
+class QXFontBrowser : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:
@@ -76,6 +76,8 @@ private slots:
     void
     updatePreviewSettings();
 
+    void
+    quitApplication();
 private:
     Ui::QXFontBrowser * ui_;
     QMenu             * recentMenu_; 

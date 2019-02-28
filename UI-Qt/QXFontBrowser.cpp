@@ -182,7 +182,7 @@ namespace {
 }
 
 QXFontBrowser::QXFontBrowser(QWidget * parent)
-    : QXThemedWindow<QDialog, false>(parent)
+    : QXThemedWindow<QDialog>(parent)
     , ui_(new Ui::QXFontBrowser) {
     ui_->setupUi(this);
     ui_->openFileButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
@@ -286,11 +286,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     addAction(closeAction);
 
     QAction * quitAction = new QAction(this);
-    connect(quitAction, &QAction::triggered, [this] () {
-        faceCache_.clear();
-        this->close();
-        QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
-    });
+    connect(quitAction, &QAction::triggered, this, &QXFontBrowser::quitApplication);
     quitAction->setShortcuts(QKeySequence::Quit);
     addAction(quitAction);
 }
@@ -355,6 +351,10 @@ QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
             QKeyEvent * eventCopy = new QKeyEvent(QEvent::KeyPress, keyEvent->key(), Qt::NoModifier);
             qApp->postEvent(ui_->fontListView, eventCopy);
         }
+        else if (keyEvent == QKeySequence::Quit){
+            quitApplication();
+            return true;
+        }
     }
 
     return QDialog::eventFilter(obj, event);
@@ -362,7 +362,7 @@ QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
 
 void
 QXFontBrowser::closeEvent(QCloseEvent * event) {
-    QXThemedWindow<QDialog, false>::closeEvent(event);
+    QXThemedWindow<QDialog>::closeEvent(event);
     faceCache_.clear();
 }
 
@@ -429,4 +429,11 @@ QXFontBrowser::updatePreviewSettings() {
         ui_->fontListView->model()->layoutChanged();
         scrollToCurrentIndex();
     }
+}
+
+void
+QXFontBrowser::quitApplication() {
+    faceCache_.clear();
+    this->close();
+    QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();    
 }

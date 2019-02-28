@@ -223,6 +223,8 @@ QXDocumentWindowManager::doOpenFontDialog() {
 
 void
 QXDocumentWindowManager::autoOpenFontDialog() {
+    if (appIsAboutToQuit_)
+        return;
     if (documents().empty()) {
         bool hasWindow = false;
         for (QWidget * widget: qApp->allWidgets()) {
@@ -380,5 +382,5 @@ QXDocumentWindowManager::closeAllDocumentsAndQuit() {
     
     QXPreferences::setRecentFonts(recentFonts_);
     appIsAboutToQuit_ = true;
-    qApp->quit();
+    QTimer::singleShot(100, qApp, &QXApplication::quit);
 }
