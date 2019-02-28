@@ -308,6 +308,9 @@ FXFace::faceCount() const {
 
 FXPtr<FXFace>
 FXFace::openFace(size_t index) {
+    if (index == this->index())
+        return this->shared_from_this();
+    
     FXFace * face = nullptr;
     if (stream_)
         face = new FXFace(stream_, index);

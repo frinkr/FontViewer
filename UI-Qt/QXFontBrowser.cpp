@@ -20,16 +20,21 @@ namespace {
     constexpr qreal DEFAULT_PREVIEW_FONT_SIZE = 30;
     const QString DEFAULT_PRVIEW_TEXT = "The quick fox jumps over the lazy dog";
 
-    FXCache<FXFaceDescriptor, FXPtr<FXFace>> faceCache_(50); // cache 50 faces
+    
     
     class QXFontBrowserItemDelegate : public QStyledItemDelegate {
     private:
         qreal    fontSize_ {DEFAULT_PREVIEW_FONT_SIZE};
         QString  previewText_;
+        mutable FXCache<FXFaceDescriptor, FXPtr<FXFace>> faceCache_{50}; // cache 50 faces
     public:
         QXFontBrowserItemDelegate(QWidget * parent = 0)
             : QStyledItemDelegate(parent)
             , previewText_(DEFAULT_PRVIEW_TEXT){
+        }
+
+        ~QXFontBrowserItemDelegate() {
+            faceCache_.clear();   
         }
 
         void
@@ -292,7 +297,6 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
 }
 
 QXFontBrowser::~QXFontBrowser() {
-    faceCache_.clear();
     delete ui_;
 }
 
@@ -358,12 +362,6 @@ QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
     }
 
     return QDialog::eventFilter(obj, event);
-}
-
-void
-QXFontBrowser::closeEvent(QCloseEvent * event) {
-    QXThemedWindow<QDialog>::closeEvent(event);
-    faceCache_.clear();
 }
 
 QXSortFilterFontListModel *
@@ -433,7 +431,6 @@ QXFontBrowser::updatePreviewSettings() {
 
 void
 QXFontBrowser::quitApplication() {
-    faceCache_.clear();
     this->close();
     QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();    
 }

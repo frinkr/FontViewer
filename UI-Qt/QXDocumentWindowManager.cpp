@@ -381,6 +381,8 @@ QXDocumentWindowManager::closeAllDocumentsAndQuit() {
     }
     
     QXPreferences::setRecentFonts(recentFonts_);
+    delete openFontDialog_;
+    openFontDialog_ = nullptr;
     appIsAboutToQuit_ = true;
     QTimer::singleShot(100, qApp, &QXApplication::quit);
 }
