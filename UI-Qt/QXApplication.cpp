@@ -78,17 +78,6 @@ QXApplication::event(QEvent * event) {
         QXDocumentWindowManager::instance()->openFontFile(static_cast<QFileOpenEvent *>(event)->file());
         return true;
     }
-    else if (event->type() == QEvent::ApplicationStateChange) {
-        // This open the dialog when clicking the dock
-        auto changeEvent = static_cast<QApplicationStateChangeEvent *>(event);
-        if (changeEvent->applicationState() == Qt::ApplicationActive)
-            QTimer::singleShot(0, [](){
-                QXDocumentWindowManager::instance()->autoOpenFontDialog();
-            });
-    }
-    else if (event->type() == QEvent::Show) {
-        
-    }
     return QApplication::event(event);
 }
 #endif

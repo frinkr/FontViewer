@@ -6,4 +6,7 @@ class MacHelper {
 public:
     static void
     hideTitleBar(QWidget * widget);
+
+    static void
+    installNSApplicationDelegate();
 };
