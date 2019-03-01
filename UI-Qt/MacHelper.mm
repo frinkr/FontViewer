@@ -32,32 +32,6 @@
 
 @end
 
-
-void
-MacHelper::hideTitleBar(QWidget * widget) {
-    return;
-    if (!widget->property("QXMacTitleBarHidden").isNull())
-        ;//return;
-    
-    NSWindow * nativeWindow = nil;
-    NSObject * nativeView = reinterpret_cast<NSObject *>(widget->windowHandle()->winId());
-    if ([nativeView isKindOfClass:[NSView class]])
-        nativeWindow = static_cast<NSView *>(nativeView).window;
-    else if ([nativeView isKindOfClass:[NSWindow class]])
-        nativeWindow = static_cast<NSWindow *>(nativeView);
-
-    if (nativeWindow == nil)
-        return;
-    
-    nativeWindow.titlebarAppearsTransparent = true;
-    QColor background = widget->palette().color(QPalette::Window);
-    nativeWindow.backgroundColor = [NSColor colorWithRed:background.redF()
-                                                   green:background.greenF()
-                                                    blue:background.blueF()
-                                                   alpha:1];
-    widget->setProperty("QXMacTitleBarHidden", true);
-}
-
 void
 MacHelper::installNSApplicationDelegate() {
     // Initiate shared application and setup delegate so QApplication constructor (ancestor of QtDocBasedApplication) will pick that up as "reflection delegate" (see src/gui/kernel/qapplication_mac.mm)

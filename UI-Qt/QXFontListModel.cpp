@@ -1,9 +1,10 @@
-#include "QXFontListModel.h"
-
+#include <future>
 #include "FontX/FXFaceDatabase.h"
+
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXFontComboBox.h"
+#include "QXFontListModel.h"
 #include "QXFontManager.h"
 
 namespace {
