@@ -30,9 +30,11 @@ namespace {
     
     class QXFontBrowserItemDelegate : public QStyledItemDelegate {
     private:
+        qreal    infoIconSize_{ 20 };
         qreal    fontSize_ {DEFAULT_PREVIEW_FONT_SIZE};
         QString  previewText_;
         mutable FXCache<FXFaceDescriptor, FXPtr<FXFace>> faceCache_{50}; // cache 50 faces
+        mutable QRect    infoIconRect_{};
     public:
         QXFontBrowserItemDelegate(QWidget * parent = 0)
             : QStyledItemDelegate(parent)
@@ -56,6 +58,33 @@ namespace {
                 previewText_ = previewText;
         }
 
+        QRect
+        infoIconRect(const QStyleOptionViewItem & option) const {
+            constexpr qreal rightMargin = 10;
+            qreal right = option.rect.right() - rightMargin;
+            qreal left = right - infoIconSize_;
+            qreal top = option.rect.top() + (option.rect.height() - infoIconSize_) / 2;
+            return QRect(left, top, infoIconSize_, infoIconSize_);
+        }
+
+        bool 
+        editorEvent(QEvent * event, QAbstractItemModel*, const QStyleOptionViewItem & option, const QModelIndex & index)         {
+            if (event->type() == QEvent::MouseButtonRelease)
+            {
+                QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
+
+                QRect rect = infoIconRect(option);
+                if (rect.contains(mouseEvent->pos())) {
+                    QXFontBrowser * window = qobject_cast<QXFontBrowser*>(option.widget->window());
+                    if (window) {
+                        QRect globalRect(option.widget->mapToGlobal(rect.topLeft()), option.widget->mapToGlobal(rect.bottomRight()));
+                        window->showFontInfoPopover(index, globalRect);
+                    }
+                }
+            }
+            return false;
+        }
+
         void
         paint(QPainter * painter,
               const QStyleOptionViewItem & option,
@@ -69,24 +98,26 @@ namespace {
             const bool active = (option.state & QStyle::State_Active);
             if (selected)
                 painter->fillRect(option.rect, option.palette.brush(QPalette::Active, QPalette::Highlight));
-            else
-                ;//painter->fillRect(option.rect, proxyIndex.row() % 2? option.palette.base(): option.palette.alternateBase());
+            else if (option.state & QStyle::State_MouseOver)
+                painter->fillRect(option.rect, option.palette.alternateBase());
             
             const QXSortFilterFontListModel * proxyModel = qobject_cast<const QXSortFilterFontListModel*>(proxyIndex.model());
             const QXFontListModel * sourceModel = qobject_cast<const QXFontListModel *>(proxyModel->sourceModel());
             const QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
 
             // Draw font type icon
-            const int iconSize = painter->fontInfo().pixelSize() * 1.2;
+            const int fontTypeIconSize = painter->fontInfo().pixelSize() * 1.2;
             QVariant iconVariant = proxyModel->data(proxyIndex, Qt::DecorationRole);
             QIcon icon;
             if (iconVariant.canConvert<QIcon>())
                 icon = iconVariant.value<QIcon>();
             if (!icon.isNull()) {
                 QPixmap pixmap = icon.pixmap(painter->fontInfo().pixelSize() * 2);
-                painter->drawPixmap(QRect(option.rect.left(), option.rect.top(), iconSize, iconSize), pixmap);
+                painter->drawPixmap(QRect(option.rect.left(), option.rect.top(), fontTypeIconSize, fontTypeIconSize), pixmap);
             }
             
+            int x = option.rect.left() + 5 + fontTypeIconSize;
+
             // Draw font name
             QVariant nameVariant = proxyModel->data(proxyIndex, Qt::DisplayRole);
             QString displayName;
@@ -97,17 +128,17 @@ namespace {
             else
                 painter->setPen(option.palette.text().color());
             if (!displayName.isEmpty())
-                painter->drawText(option.rect.adjusted(iconSize + 2, 0, 0, 0), displayName);
+                painter->drawText(QRect(x, option.rect.top(), option.rect.width(), option.rect.height()), displayName);
 
             const FXFaceDescriptor & desc = sourceModel->db()->faceDescriptor(sourceIndex.row());
 
             // Draw font path
-            int left = option.rect.left() + iconSize + 8 + painter->fontMetrics().horizontalAdvance(displayName);
+            x += 8 + painter->fontMetrics().horizontalAdvance(displayName);;
             if (!selected)
                 painter->setPen(option.palette.color(QPalette::Disabled, QPalette::Text));
             else 
                 painter->setPen(option.palette.color(QPalette::HighlightedText));
-            painter->drawText(QRect(left, option.rect.top(), option.rect.right() + 99999, option.rect.bottom()),
+            painter->drawText(QRect(x, option.rect.top(), option.rect.width() + 99999, option.rect.height()),
                               QString("(%1)").arg(toQString(desc.filePath)));
 
             // Draw sample text
@@ -125,13 +156,13 @@ namespace {
 
                 auto sample = previewText_.toStdU32String();
 
-                const qreal sampleHeight = option.rect.height() - iconSize;
+                const qreal sampleHeight = option.rect.height() - fontTypeIconSize;
                 const qreal sampleFontSizePt = fontSize_;
                 const qreal sampleFontSizePx = pt2px(sampleFontSizePt);
                 const qreal sampleFontScale = sampleFontSizePt / face->fontSize();
 
                 QPointF pen(option.rect.left(), option.rect.top()
-                            + iconSize
+                            + fontTypeIconSize
                             + (sampleHeight - sampleFontSizePx) / 2
                             + 0.75 * sampleFontSizePx);
                 
@@ -151,7 +182,7 @@ namespace {
                             bmScale *= heightFittingScale;
                         }
 
-                        pen.setY(option.rect.top() + iconSize + (sampleFontSizePx + scaledBmHeight) / 2);
+                        pen.setY(option.rect.top() + fontTypeIconSize + (sampleFontSizePx + scaledBmHeight) / 2);
                     }
 
                     if (!bm.empty()) {
@@ -178,6 +209,28 @@ namespace {
                         break;
                 }
                 
+            }
+
+            // Draw info icon
+            if (option.state & QStyle::State_MouseOver) {
+                QRect iconRect = infoIconRect(option);
+                int x0 = option.rect.center().x() + option.rect.width() / 6;
+                int x1 = option.rect.right() + 3;
+                QLinearGradient gradient(QPoint(x0, option.rect.top()), QPoint(iconRect.right(), option.rect.top())); // diagonal gradient from top-left to bottom-right
+
+                QColor c0 = option.palette.base().color();
+                if (selected)
+                    c0 = option.palette.brush(QPalette::Active, QPalette::Highlight).color();
+                QColor c1 = c0;
+                c0.setAlpha(0);
+                c1.setAlpha(255);
+                gradient.setColorAt(0, c0);
+                gradient.setColorAt(1, c1);
+
+                painter->fillRect(QRect(QPoint(x0, option.rect.top()), QSize(x1 - x0, option.rect.height())), gradient);
+                QIcon infoIcon = qApp->loadIcon(":/images/info.png");
+                
+                painter->drawPixmap(iconRect, infoIcon.pixmap(infoIconSize_, infoIconSize_));
             }
             painter->restore();
             
@@ -223,9 +276,10 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     // List view
     QSortFilterProxyModel * proxy = new QXSortFilterFontListModel(this);
     proxy->setSourceModel(new QXFontListModel(this));
+    proxy->sort(0);
     ui_->fontListView->setModel(proxy);
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
-    proxy->sort(0);
+    ui_->fontListView->setMouseTracking(true);
     connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontBrowser::onFontDoubleClicked);
 
     QXFontManager::instance();
@@ -263,7 +317,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontBrowser::onSearchLineEditReturnPressed);
     connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onSearchLineEditTextEdited);
 
-    // Recent button
+    // Menu button
     QMenu * menu = new QMenu(ui_->menuButton);
     ui_->menuButton->setMenu(menu);
 
@@ -375,6 +429,21 @@ QXFontBrowser::clearFilter() {
     ui_->searchLineEdit->clear();
 }
 
+void
+QXFontBrowser::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) {
+    int row = proxyModel()->mapToSource(index).row();
+    auto & desc = QXFontManager::instance().db()->faceDescriptor(row);
+    auto & atts = QXFontManager::instance().db()->faceAttributes(row);
+    QLabel * labe;
+    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
+    popoverWidget_->setHtml(html->instantialize(templateValues(desc, atts)));
+    html->deleteLater();
+    qreal docHeight = popoverWidget_->document()->documentLayout()->documentSize().height();
+    popoverWidget_->setMinimumHeight(docHeight + 5);
+
+    popover_->showRelativeTo(globalRect, QXPopoverAnyEdge);
+}
+
 bool
 QXFontBrowser::eventFilter(QObject * obj, QEvent * event) {
     if (obj == ui_->searchLineEdit && event->type() == QEvent::KeyPress) {
@@ -427,20 +496,7 @@ QXFontBrowser::scrollToCurrentIndex() {
 
 void
 QXFontBrowser::onFontDoubleClicked(const QModelIndex & index) {
-    int row = proxyModel()->mapToSource(index).row();
-    auto & desc = QXFontManager::instance().db()->faceDescriptor(row);
-    auto & atts = QXFontManager::instance().db()->faceAttributes(row);
-    QLabel * labe;
-    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
-    popoverWidget_->setHtml(html->instantialize(templateValues(desc, atts)));
-    html->deleteLater();
-    qreal docHeight = popoverWidget_->document()->documentLayout()->documentSize().height();
-    popoverWidget_->setMinimumHeight(docHeight + 5);
-
-    QRect rect = ui_->fontListView->visualRect(index);
-    QRect globalRect(ui_->fontListView->mapToGlobal(rect.topLeft()), ui_->fontListView->mapToGlobal(rect.bottomRight()));
-    popover_->showRelativeTo(globalRect, QXPopoverAnyEdge);
-    //accept();
+    accept();
 }
 
 void

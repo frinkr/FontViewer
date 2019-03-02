@@ -37,6 +37,8 @@ public:
     void
     clearFilter();
     
+    void
+    showFontInfoPopover(const QModelIndex & index, const QRect & globalRect);
 protected:
     bool
     eventFilter(QObject * obj, QEvent * event) override;
