@@ -1,8 +1,11 @@
+#include <QAbstractTextDocumentLayout>
 #include <QAction>
 #include <QKeyEvent>
 #include <QMenu>
 #include <QPainter>
 #include <QStyledItemDelegate>
+#include <QTextBrowser>
+#include <QTextDocument>
 #include <QTimer>
 
 #include "FontX/FXCache.h"
@@ -12,6 +15,9 @@
 #include "QXFontBrowser.h"
 #include "QXFontListModel.h"
 #include "QXFontManager.h"
+#include "QXHtmlTemplate.h"
+#include "QXPopoverWindow.h"
+#include "QXResource.h"
 #include "ui_QXFontBrowser.h"
 
 namespace {
@@ -184,15 +190,35 @@ namespace {
             return QSize(10, pt2px(fontSize_) + 30);
         }
     };
+
+    QMap<QString, QVariant>
+    templateValues(const FXFaceDescriptor & desc, const FXFaceAttributes & atts) {
+        QMap<QString, QVariant> map;
+
+        map["FULL_NAME"] = QXDocument::faceDisplayName(atts);
+        map["PS_NAME"] = toQString(atts.names.postscriptName());
+        map["VENDOR"] = toQString(atts.names.vendor());
+        map["VERSION"] = toQString(atts.names.version());
+        map["FILE"] = toQString(desc.filePath);
+        map["INDEX"] = quint32(desc.index);
+
+        map["GLYPH_COUNT"] = quint32(atts.glyphCount);
+        map["UPEM"] = quint32(atts.upem);
+        map["FORMAT"] = toQString(atts.format);
+        map["IS_CID"] = atts.isCID;
+        map["CID"] = toQString(atts.cid);
+        map["IS_OT_VARIANT"] = atts.isOpenTypeVariable;
+        map["IS_MM"] = atts.isMultipleMaster;
+        return map;
+    }
+   
 }
 
 QXFontBrowser::QXFontBrowser(QWidget * parent)
     : QXThemedWindow<QDialog>(parent)
     , ui_(new Ui::QXFontBrowser) {
     ui_->setupUi(this);
-    ui_->openFileButton->setIcon(qApp->loadIcon(":/images/open-font.png"));
-	ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-right.png"));
-    ui_->recentButton->setIcon(qApp->loadIcon(":/images/history.png"));
+    ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
 
     // List view
     QSortFilterProxyModel * proxy = new QXSortFilterFontListModel(this);
@@ -237,12 +263,22 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontBrowser::onSearchLineEditReturnPressed);
     connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onSearchLineEditTextEdited);
 
-    // Open File button
-    connect(ui_->openFileButton, &QPushButton::clicked, this, &QXFontBrowser::onOpenFileButtonClicked);
-
     // Recent button
-    recentMenu_ = new QMenu(ui_->recentButton);
-    ui_->recentButton->setMenu(recentMenu_);
+    QMenu * menu = new QMenu(ui_->menuButton);
+    ui_->menuButton->setMenu(menu);
+
+    menu->addAction(qApp->loadIcon(":/images/preview.png"), tr("Preview Options"), [this]() {
+            if (ui_->previewSettingsGoupBox->isVisible())
+                ui_->previewSettingsGoupBox->hide();
+            else
+                ui_->previewSettingsGoupBox->show();
+        });
+    menu->addAction(qApp->loadIcon(":/images/open.png"), tr("Open Font File"), [this]() {
+            onOpenFileButtonClicked();
+        });
+    menu->addSeparator();
+
+    recentMenu_ = menu->addMenu(qApp->loadIcon(":/images/history.png"), tr("Recents"));
     connect(recentMenu_, &QMenu::aboutToShow, [this]() {
         QXDocumentWindowManager::instance()->aboutToShowRecentMenu(recentMenu_);
         foreach (QAction * action, recentMenu_->actions()) {
@@ -268,20 +304,17 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->previewFontSizeSlider->setMinimum(MIN_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setMaximum(MAX_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setValue(DEFAULT_PREVIEW_FONT_SIZE);
-    connect(ui_->optionButton, &QPushButton::clicked, [this]() {
-            if (ui_->previewSettingsGoupBox->isVisible())
-                ui_->previewSettingsGoupBox->hide();
-            else
-                ui_->previewSettingsGoupBox->show();
-            if (ui_->previewSettingsGoupBox->isVisible())
-                ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-down.png"));
-            else 
-                ui_->optionButton->setIcon(qApp->loadIcon(":/images/arrow-right.png"));
-        });
     connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontBrowser::updatePreviewSettings);
     connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::updatePreviewSettings);
     ui_->previewSettingsGoupBox->hide();
-        
+
+
+    // Popover
+    popover_ = new QXPopoverWindow(this);
+    popoverWidget_ = new QTextBrowser(this);
+    popover_->setWidget(popoverWidget_);
+    popover_->setBorderRadius(0);
+
     // Add actions
     QAction * searchAction = new QAction(this);
     connect(searchAction, &QAction::triggered, this, &QXFontBrowser::onSearchAction);
@@ -394,7 +427,20 @@ QXFontBrowser::scrollToCurrentIndex() {
 
 void
 QXFontBrowser::onFontDoubleClicked(const QModelIndex & index) {
-    accept();
+    int row = proxyModel()->mapToSource(index).row();
+    auto & desc = QXFontManager::instance().db()->faceDescriptor(row);
+    auto & atts = QXFontManager::instance().db()->faceAttributes(row);
+    QLabel * labe;
+    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
+    popoverWidget_->setHtml(html->instantialize(templateValues(desc, atts)));
+    html->deleteLater();
+    qreal docHeight = popoverWidget_->document()->documentLayout()->documentSize().height();
+    popoverWidget_->setMinimumHeight(docHeight + 5);
+
+    QRect rect = ui_->fontListView->visualRect(index);
+    QRect globalRect(ui_->fontListView->mapToGlobal(rect.topLeft()), ui_->fontListView->mapToGlobal(rect.bottomRight()));
+    popover_->showRelativeTo(globalRect, QXPopoverAnyEdge);
+    //accept();
 }
 
 void

@@ -57,114 +57,6 @@
           <number>3</number>
          </property>
          <item>
-          <widget class="QPushButton" name="optionButton">
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>Preview Options</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: none;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="QXApplication.qrc">
-             <normaloff>:/images/filter.png</normaloff>:/images/filter.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="openFileButton">
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Open Font File...</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: none;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="QXApplication.qrc">
-             <normaloff>:/images/open-font.png</normaloff>:/images/open-font.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="recentButton">
-           <property name="maximumSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::NoFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>History</string>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">border: none;</string>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="icon">
-            <iconset resource="QXApplication.qrc">
-             <normaloff>:/images/history.png</normaloff>:/images/history.png</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>22</width>
-             <height>22</height>
-            </size>
-           </property>
-           <property name="autoDefault">
-            <bool>false</bool>
-           </property>
-           <property name="flat">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QPushButton" name="okButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -214,6 +106,53 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QXIconPushButton" name="menuButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>15</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>15</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
+           <property name="toolTip">
+            <string>OK</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">border: none;</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="icon">
+            <iconset resource="QXApplication.qrc">
+             <normaloff>:/images/menu.png</normaloff>:/images/menu.png</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>15</width>
+             <height>22</height>
+            </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
       </layout>
@@ -235,11 +174,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="QLineEdit" name="previewTextEdit">
-          <property name="text">
-           <string>ABCDEFG</string>
-          </property>
-         </widget>
+         <widget class="QLineEdit" name="previewTextEdit"/>
         </item>
         <item row="1" column="0">
          <widget class="QLabel" name="label_2">
@@ -274,6 +209,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QXIconPushButton</class>
+   <extends>QPushButton</extends>
+   <header>QXWidgets.h</header>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="QXApplication.qrc"/>
  </resources>
@@ -285,8 +227,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>474</x>
-     <y>436</y>
+     <x>439</x>
+     <y>24</y>
     </hint>
     <hint type="destinationlabel">
      <x>249</x>

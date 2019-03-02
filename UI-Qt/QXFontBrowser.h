@@ -10,7 +10,9 @@ namespace Ui {
 
 class QMenu;
 class QModelIndex;
+class QTextBrowser;
 class QXFontListModel;
+class QXPopoverWindow;
 class QXSortFilterFontListModel;
 
 class QXFontBrowser : public QXThemedWindow<QDialog> {
@@ -78,6 +80,7 @@ private slots:
     quitApplication();
 private:
     Ui::QXFontBrowser * ui_;
-    QMenu             * recentMenu_; 
-
+    QMenu             * recentMenu_ {nullptr}; 
+    QXPopoverWindow   * popover_ {nullptr};
+    QTextBrowser      * popoverWidget_{ nullptr };
 };

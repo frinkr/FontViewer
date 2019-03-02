@@ -9,6 +9,7 @@
     <file alias="images/close_d.png">../Resources/Images/close_d.png</file>
     <file alias="images/cmap.png">../Resources/Images/cmap.png</file>
     <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
+    <file alias="images/empty.png">../Resources/Images/empty.png</file>
     <file alias="images/filter.png">../Resources/Images/filter.png</file>
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
     <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
@@ -19,6 +20,8 @@
     <file alias="images/history_d.png">../Resources/Images/history_d.png</file>
     <file alias="images/info.png">../Resources/Images/info.png</file>
     <file alias="images/info_d.png">../Resources/Images/info_d.png</file>
+    <file alias="images/menu.png">../Resources/Images/menu.png</file>
+    <file alias="images/menu_d.png">../Resources/Images/menu_d.png</file>
     <file alias="images/minus.png">../Resources/Images/minus.png</file>
     <file alias="images/minus_d.png">../Resources/Images/minus_d.png</file>
     <file alias="images/ok.png">../Resources/Images/ok.png</file>
@@ -34,6 +37,8 @@
     <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
     <file alias="images/postscript.png">../Resources/Images/postscript.png</file>
     <file alias="images/postscript_d.png">../Resources/Images/postscript_d.png</file>
+    <file alias="images/preview.png">../Resources/Images/preview.png</file>
+    <file alias="images/preview_d.png">../Resources/Images/preview_d.png</file>
     <file alias="images/search.png">../Resources/Images/search.png</file>
     <file alias="images/search_d.png">../Resources/Images/search_d.png</file>
     <file alias="images/shape.png">../Resources/Images/shape.png</file>
