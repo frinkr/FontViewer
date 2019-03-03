@@ -168,7 +168,7 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
     auto borderColor = palette().midlight().color();
     
     // Get the frame color
-    if (true) {
+    if (false) {
         QPixmap px(5, 5);
         px.fill();
         QPainter pp(&px);
@@ -184,7 +184,7 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
         borderColor = img.pixel(0, 0);
     }
 
-    p.setBrush(backgroundColor);
+    p.setBrush(borderRadius_? backgroundColor: borderColor);
     p.setPen(QPen(borderColor, border_));
 
     QPainterPath roundRectPath = painterPath();
@@ -222,7 +222,7 @@ QXPopoverWindow::setEdge(QXPopoverEdge edge) {
 
     layout_->setSpacing(0);
     const qreal margin = border_ + borderRadius_;
-    layout_->setContentsMargins(margin, margin, margin, margin);
+    layout_->setContentsMargins(margin + 1, margin + 1, margin, margin);
     setLayout(layout_);
 }
 
@@ -339,16 +339,17 @@ QXPopoverWindow::contentRect(qreal border) const {
 }
 
 QPainterPath
-QXPopoverWindow::painterPath() const {
+QXPopoverWindow::painterPath(bool mask) const {
     QRectF contentRect = this->contentRect(border_);
-    
+    if (!mask)
+        contentRect.adjust(1, 1, 0, 0);
 
     const QRect refRect(mapFromGlobal(referenceRect_.topLeft()), mapFromGlobal(referenceRect_.bottomRight()));
 
     qreal arrowRatio = 1; // = H/W
     QPointF arrowHead, arrowLeft, arrowRight;
     if (edge_ == QXPopoverBottom) {
-        arrowHead = QPointF(refRect.center().x(), refRect.bottom() + 1);
+        arrowHead = QPointF(refRect.center().x(), refRect.bottom() + (mask? 0: 1));
         arrowLeft = QPointF(arrowHead.x() - POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() + POPOVER_ARROW_SIZE);
         arrowRight = QPointF(arrowHead.x() + POPOVER_ARROW_SIZE / arrowRatio, arrowHead.y() + POPOVER_ARROW_SIZE);
     }
@@ -512,7 +513,7 @@ QXPopoverWindow::painterPath() const {
 #if defined(Q_OS_WIN)
 void
 QXPopoverWindow::updateMask() {
-    QPainterPath roundRectPath = painterPath();
+    QPainterPath roundRectPath = painterPath(true);
     QPolygonF polygon = roundRectPath.toFillPolygon();
     setMask(QRegion(polygon.toPolygon(), Qt::WindingFill));    
 }
