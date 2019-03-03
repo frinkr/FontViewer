@@ -69,8 +69,7 @@ namespace {
 
         bool 
         editorEvent(QEvent * event, QAbstractItemModel*, const QStyleOptionViewItem & option, const QModelIndex & index)         {
-            if (event->type() == QEvent::MouseButtonRelease)
-            {
+            if (event->type() == QEvent::MouseButtonRelease) {
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
                 QRect rect = infoIconRect(option);
@@ -212,7 +211,10 @@ namespace {
             }
 
             // Draw info icon
-            if (option.state & QStyle::State_MouseOver) {
+            QXFontBrowser * window = qobject_cast<QXFontBrowser*>(option.widget->window());
+            bool popoverVisible = false;
+            if (window) popoverVisible = window->isFontInfoPopoverVisible();
+            if ((selected && popoverVisible) || (option.state & QStyle::State_MouseOver)) {
                 QRect iconRect = infoIconRect(option);
                 int x0 = option.rect.center().x() + option.rect.width() / 6;
                 int x1 = option.rect.right() + 3;
@@ -442,6 +444,11 @@ QXFontBrowser::showFontInfoPopover(const QModelIndex & index, const QRect & glob
     popoverWidget_->setMinimumHeight(docHeight + 5);
 
     popover_->showRelativeTo(globalRect, QXPopoverAnyEdge);
+}
+
+bool
+QXFontBrowser::isFontInfoPopoverVisible() const {
+    return popover_->isVisible();
 }
 
 bool
