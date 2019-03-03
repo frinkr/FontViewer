@@ -282,7 +282,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->fontListView->setModel(proxy);
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
     ui_->fontListView->setMouseTracking(true);
-    connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontBrowser::onFontDoubleClicked);
+    connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontBrowser::onFontDoubleClicked, Qt::QueuedConnection);
 
     QXFontManager::instance();
     QXDocumentWindowManager * mgr = QXDocumentWindowManager::instance();
