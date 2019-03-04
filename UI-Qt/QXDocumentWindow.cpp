@@ -203,7 +203,14 @@ QXDocumentWindow::initSearchField() {
     searchIconAction->setMenu(searchHistoryMenu);
     searchLineEdit_->addAction(searchIconAction, QLineEdit::LeadingPosition);
     ui_->toolBar->addWidget(searchLineEdit_);
+    
     connect(searchLineEdit_, &QLineEdit::returnPressed, this, &QXDocumentWindow::onSearchLineEditReturnPressed);
+    
+    // Right Margin
+    QWidget * spacer = new QWidget(this);
+    spacer->setFixedWidth(3);
+    spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    ui_->toolBar->addWidget(spacer);
 }
 
 void

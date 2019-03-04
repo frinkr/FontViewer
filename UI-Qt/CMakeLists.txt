@@ -37,7 +37,6 @@ set(UI
   QXFontCollectionDialog.ui
   QXFontInfoWidget.ui
   QXGlyphTableWidget.ui
-  QXOpenFontDialog.ui
   QXPreferencesDialog.ui
   QXProgressDialog.ui
   QXShapingWidget.ui
@@ -76,8 +75,6 @@ set(SHARED_SOURCES
   QXFontBrowser.h
   QXFontCollectionDialog.cpp
   QXFontCollectionDialog.h
-  QXFontComboBox.cpp
-  QXFontComboBox.h
   QXFontInfoWidget.cpp
   QXFontInfoWidget.h
   QXFontListModel.cpp
@@ -96,8 +93,6 @@ set(SHARED_SOURCES
   QXMain.h
   QXMenuBar.cpp
   QXMenuBar.h
-  QXOpenFontDialog.cpp
-  QXOpenFontDialog.h
   QXPopoverWindow.cpp
   QXPopoverWindow.h
   QXPreferences.cpp

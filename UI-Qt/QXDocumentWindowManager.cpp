@@ -19,8 +19,6 @@
 #include "QXFontBrowser.h"
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
-#include "QXOpenFontDialog.h"
-//#include "QXJumpListHelper.h"
 
 namespace {
     QString fileTypeFilterToString(QXDocumentWindowManager::FileTypeFilter filter) {

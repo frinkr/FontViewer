@@ -3,7 +3,7 @@
 
 #include "QXApplication.h"
 #include "QXConv.h"
-#include "QXFontComboBox.h"
+#include "QXDocument.h"
 #include "QXFontListModel.h"
 #include "QXFontManager.h"
 
