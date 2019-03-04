@@ -1,3 +1,8 @@
+#include <stack>
+#include <boost/spirit.hpp>
+#include <boost/spirit/include/phoenix_core.hpp>
+#include <boost/spirit/include/phoenix_operator.hpp>
+
 #include <QAbstractTextDocumentLayout>
 #include <QAction>
 #include <QKeyEvent>
@@ -9,6 +14,7 @@
 #include <QTimer>
 
 #include "FontX/FXCache.h"
+#include "FontX/FXLog.h"
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocumentWindowManager.h"
@@ -269,6 +275,107 @@ namespace {
    
 }
 
+namespace {
+    class FilterExpression {
+    public:
+        bool
+        operator()() const {return false};
+    };
+    
+
+    
+}
+static void testSpirit() {
+    using namespace boost::spirit;
+    using namespace boost::phoenix;
+    using namespace phoenix;
+        
+    auto lex = !(ch_p('+') | ch_p('-'))
+        >> +digit_p
+        >> !(ch_p('.') >> +digit_p)
+        >> !((ch_p('e')|ch_p('E')) >> !(ch_p('+')|ch_p('-'))>>+digit_p);
+    parse_info<> r = parse("-12.33E-10", lex);
+        
+    rule<phrase_scanner_t> variable = ch_p('@') >> (range_p('a', 'z') | range_p('A', 'Z')) >> +alnum_p;
+    r = parse("@ttc", variable);
+        
+    std::vector<double> list;
+    const char * text ="13.4, 234.0, -235,fu";
+    r = parse(text, real_p[push_back_a(list)] % ',', space_p);
+    FX_INFO(text);
+    FX_INFO(std::string(r.stop - text, ' ') << '^');
+        
+    struct calc_closure : boost::spirit::closure<calc_closure, double>
+    {
+        member1 val;
+    };
+        
+    rule<phrase_scanner_t, calc_closure::context_t> factor, term, exp;
+    factor = real_p[factor.val = arg1] | ('(' >> exp[factor.val = arg1] >> ')');
+    term   = factor[term.val = arg1] >> *(('*' >> factor[term.val *= arg1]) | ('/' >> factor[term.val /= arg1]));
+    exp    = term[exp.val = arg1] >> *(('+' >> term[exp.val += arg1]) | ('-' >> term[exp.val -= arg1]));
+        
+    text = "1 + (2 * (3 * (4 + 5)))";
+    double result = 0;
+    r = parse(text, exp[assign_a(result)], space_p);
+        
+    {
+        enum class comparator {
+            lt,
+            eq,
+            gt
+        };
+        
+        enum class key {
+            upem,
+            glyph,
+        };
+        
+        template <typename T1, typename T2, typename T3>
+        struct triple_closure : boost::spirit::closure<calc_closure, T1, T2, T3>{
+            member1 val1;
+            member2 val2;
+            member3 val3;
+        };
+        
+        struct bool_closure : boost::spirit::closure<calc_closure, bool>{
+            member1 val;
+        };
+        
+        struct comp_closure : boost::spirit::closure<calc_closure, comparator>{
+            member1 val;
+        };
+        
+        rule<phrase_scanner_t, bool_closure::context_t> node, exp, term, cmp;
+        rule<phrase_scanner_t, bool_closure::context_t> ttc = str_p("@ttc");
+        rule<phrase_scanner_t, bool_closure::context_t> otvar = str_p("@var");
+        rule<phrase_scanner_t, bool_closure::context_t> mm = str_p("@mm");
+        
+        rule<phrase_scanner_t, typename triple_closure<key, comparator, int>::context_t> upem;
+        cmp = ch_p('>') | ch_p('=') | ch_p('<');
+        upem = str_p("@upem")[upem.val1 = key::upem]
+            >> cmp[upem.val2 = arg1]
+            >> uint_p[upem.va3 = arg1];
+            
+        node = ttc
+            | otvar
+            | mm
+            | upem;
+            
+        term = node | ('(' >> exp >> ')');
+            
+        exp = (term | (str_p("not") >> term)) % (str_p("and") | str_p("or"));
+            
+        bool result = false;
+        r = parse("@upem > 10", upem[assign_a(result)], space_p);
+        r = parse("@ttc and (@mm or (@upem > 10))", exp, space_p);
+        r = parse("(not @ttc) and @upem > 10", exp, space_p);
+            
+        FX_INFO(r.stop);
+    }
+
+}
+
 QXFontBrowser::QXFontBrowser(QWidget * parent)
     : QXThemedWindow<QDialog>(parent)
     , ui_(new Ui::QXFontBrowser) {
@@ -379,6 +486,8 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     connect(quitAction, &QAction::triggered, this, &QXFontBrowser::quitApplication);
     quitAction->setShortcuts(QKeySequence::Quit);
     addAction(quitAction);
+
+    testSpirit();
 }
 
 QXFontBrowser::~QXFontBrowser() {
