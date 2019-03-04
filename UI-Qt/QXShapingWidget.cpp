@@ -1,3 +1,4 @@
+#include <QClipBoard>
 #include <QPainter>
 #include <QMouseEvent>
 #include "FontX/FXInspector.h"
@@ -339,6 +340,8 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doShape);
     connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
             this, &QXShapingWidget::doShape);
+    connect(ui_->copyButton, &QPushButton::clicked,
+            this, &QXShapingWidget::doCopyAction);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
 }
@@ -458,4 +461,10 @@ QXShapingWidget::offFeatures() const {
             features.push_back(item->data(Qt::UserRole).value<FXTag>());
     }
     return features;
+}
+
+void
+QXShapingWidget::doCopyAction() {
+    QString text = QXEncoding::decodeFromHexNotation(ui_->lineEdit->text());
+    qApp->clipboard()->setText(text);
 }

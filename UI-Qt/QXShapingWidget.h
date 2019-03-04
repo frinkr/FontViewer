@@ -101,6 +101,8 @@ public slots:
     void
     gotoGlyph(FXGlyphID gid);
     
+    void
+    doCopyAction();
 private:
     FXPtr<FXInspector>
     inspector();
