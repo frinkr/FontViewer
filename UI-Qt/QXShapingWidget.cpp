@@ -8,6 +8,7 @@
 #include "QXDocument.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
+#include "QXEncoding.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
 #include "ui_QXShapingWidget.h"
@@ -408,7 +409,7 @@ QXShapingWidget::doShape() {
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
 
-    shaper_->shape(toStdString(ui_->lineEdit->text()),
+    shaper_->shape(toStdString(QXEncoding::decodeFromHexNotation(ui_->lineEdit->text())),
                    script,
                    language,
                    FXShappingLTR,

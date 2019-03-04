@@ -1,3 +1,4 @@
+#include <regex>
 #include <QStringList>
 #include "QXEncoding.h"
 
@@ -61,4 +62,30 @@ QXEncoding::charFromLink(const QUrl & link) {
         return charFromHexNotation(path);
     }
     return FXGCharInvalid;
+}
+
+QString
+QXEncoding::decodeFromHexNotation(const QString & str) {
+    std::regex re(R"(([uU]\+|\\[uU]|0x){1}[A-Za-z0-9]{4})");
+    std::string s = str.toStdString();
+    auto matchBegin = std::sregex_iterator(s.begin(), s.end(), re);
+    auto matchEnd = std::sregex_iterator();
+    int lastEnd = 0;
+    QStringList list;
+    for (std::sregex_iterator i = matchBegin; i != matchEnd; ++i) {
+        std::smatch match = *i;
+        int start = match.position();
+        int len = match.length();
+        int end = start + len;
+
+        if (lastEnd != start)
+            list << QString::fromStdString(s.substr(lastEnd, start - lastEnd));
+
+        uint c = QString::fromStdString(s.substr(start + 2, len - 2)).toUInt(nullptr, 16);
+        list << QString::fromUcs4(&c, 1);
+        lastEnd = end;
+    }
+    if (lastEnd != s.length())
+        list << QString::fromStdString(s.substr(lastEnd, s.length() - lastEnd));
+    return list.join("");
 }

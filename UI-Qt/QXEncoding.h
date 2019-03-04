@@ -30,4 +30,7 @@ struct QXEncoding {
 
     static FXVector<unsigned short>
     utf16(FXChar c);
+
+    static QString
+    decodeFromHexNotation(const QString & str);
 };
