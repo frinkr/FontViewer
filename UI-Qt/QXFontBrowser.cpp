@@ -364,13 +364,6 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::updatePreviewSettings);
     ui_->previewSettingsGoupBox->hide();
 
-
-    // Popover
-    popover_ = new QXPopoverWindow(this);
-    popoverWidget_ = new QTextBrowser(this);
-    popover_->setWidget(popoverWidget_);
-    popover_->setBorderRadius(0);
-
     // Add actions
     QAction * searchAction = new QAction(this);
     connect(searchAction, &QAction::triggered, this, &QXFontBrowser::onSearchAction);
@@ -433,22 +426,35 @@ QXFontBrowser::clearFilter() {
 
 void
 QXFontBrowser::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) {
+    if (popover_ == nullptr) {
+        popover_ = new QXPopoverWindow(this);
+        popoverWidget_ = new QTextBrowser(this);
+        popoverWidget_->setFixedWidth(250);
+        popoverWidget_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        popoverWidget_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        popoverWidget_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+        popoverWidget_->setStyleSheet("background-color: palette(window);border: none;");
+        popover_->setWidget(popoverWidget_);
+    }
+    
     int row = proxyModel()->mapToSource(index).row();
     auto & desc = QXFontManager::instance().db()->faceDescriptor(row);
     auto & atts = QXFontManager::instance().db()->faceAttributes(row);
-    QLabel * labe;
+    
     QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
     popoverWidget_->setHtml(html->instantialize(templateValues(desc, atts)));
     html->deleteLater();
+    
     qreal docHeight = popoverWidget_->document()->documentLayout()->documentSize().height();
-    popoverWidget_->setMinimumHeight(docHeight + 5);
-
+    if (docHeight)
+        popoverWidget_->setFixedHeight(docHeight + 2);
+    
     popover_->showRelativeTo(globalRect, QXPopoverAnyEdge);
 }
 
 bool
 QXFontBrowser::isFontInfoPopoverVisible() const {
-    return popover_->isVisible();
+    return popover_ && popover_->isVisible();
 }
 
 bool
