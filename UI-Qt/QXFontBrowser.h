@@ -10,7 +10,9 @@ namespace Ui {
 
 class QMenu;
 class QModelIndex;
+class QTextBrowser;
 class QXFontListModel;
+class QXPopoverWindow;
 class QXSortFilterFontListModel;
 
 class QXFontBrowser : public QXThemedWindow<QDialog> {
@@ -35,6 +37,12 @@ public:
     void
     clearFilter();
     
+    void
+    showFontInfoPopover(const QModelIndex & index, const QRect & globalRect);
+
+    bool
+    isFontInfoPopoverVisible() const;
+
 protected:
     bool
     eventFilter(QObject * obj, QEvent * event) override;
@@ -78,6 +86,7 @@ private slots:
     quitApplication();
 private:
     Ui::QXFontBrowser * ui_;
-    QMenu             * recentMenu_; 
-
+    QMenu             * recentMenu_ {nullptr}; 
+    QXPopoverWindow   * popover_ {nullptr};
+    QTextBrowser      * popoverWidget_{ nullptr };
 };

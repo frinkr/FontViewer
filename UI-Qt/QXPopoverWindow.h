@@ -80,7 +80,7 @@ protected:
     contentRect(qreal border) const;
 
     QPainterPath
-    painterPath() const;
+    painterPath(bool mask = false) const;
 
 protected:
 #if defined(Q_OS_WIN)

@@ -120,6 +120,8 @@ set(SHARED_SOURCES
   QXThemedWindow.h
   QXToolBar.cpp
   QXToolBar.h
+  QXWidgets.cpp
+  QXWidgets.h
   QXVariableWidget.cpp
   QXVariableWidget.h
   )
