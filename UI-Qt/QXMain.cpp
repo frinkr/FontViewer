@@ -14,9 +14,9 @@
 #include "QXPreferences.h"
 #include "QXTheme.h"
 
-#ifdef QU_MAIN
+#ifdef QX_MAIN
 int main(int argc, char * argv[]) {
-    return quMain(argc, argv);
+    return qxMain(argc, argv);
 }
 #endif
 

@@ -78,12 +78,12 @@ protected:
     QXDocument * document_;
 };
 
-class QUShapingWidget : public QWidget {
+class QXShapingWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit QUShapingWidget(QWidget * parent = nullptr);
-    ~QUShapingWidget();
+    explicit QXShapingWidget(QWidget * parent = nullptr);
+    ~QXShapingWidget();
 
     void
     setDocument(QXDocument * document);

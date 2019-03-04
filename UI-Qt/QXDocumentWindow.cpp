@@ -224,7 +224,7 @@ QXDocumentWindow::initGlyphInfoView() {
     glyphWidget_  = new QXGlyphInfoWidget(glyphPopover_);
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
-    glyphWidget_->setQUDocument(document_);
+    glyphWidget_->setDocument(document_);
 
     connect(glyphWidget_, &QXGlyphInfoWidget::charLinkClicked,
         this, &QXDocumentWindow::onCharLinkClicked);
@@ -370,7 +370,7 @@ void
 QXDocumentWindow::onTableAction() {
     if (!tableDockWidget_) {
         tableDockWidget_ = new QDockWidget(tr("Glyphs Table"), this);
-        tableDockWidget_->setWidget(new QUGlyphTableWidget(document_));
+        tableDockWidget_->setWidget(new QxGlyphTableWidget(document_));
         tableDockWidget_->setTitleBarWidget(new QXDockTitleBarWidget(tableDockWidget_));
         addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
     }
@@ -381,7 +381,7 @@ void
 QXDocumentWindow::onShapingAction() {
     if (!shapingDockWidget_) {
         shapingDockWidget_ = new QDockWidget(tr("Shape"), this);
-        QUShapingWidget * widget = new QUShapingWidget(this);
+        QXShapingWidget * widget = new QXShapingWidget(this);
         widget->setDocument(document_);
         shapingDockWidget_->setWidget(widget);
         shapingDockWidget_->setTitleBarWidget(new QXDockTitleBarWidget(shapingDockWidget_));

@@ -83,7 +83,7 @@ QXGlyphInfoWidget::document() const {
 }
 
 void
-QXGlyphInfoWidget::setQUDocument(QXDocument * document) {
+QXGlyphInfoWidget::setDocument(QXDocument * document) {
     document_ = document;
 }
 
@@ -106,7 +106,7 @@ QXGlyphInfoWidget::loadGlyph() {
     qdoc->addResource(QTextDocument::ImageResource,
                       QUrl("fv://glyph.png"), QVariant(image));
     
-    setDocument(qdoc);
+    QTextBrowser::setDocument(qdoc);
     
     QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/GlyphInfoTemplate.html"));
     setHtml(html->instantialize(templateValues(glyph)));

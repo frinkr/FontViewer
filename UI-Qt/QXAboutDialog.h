@@ -1,5 +1,4 @@
-#ifndef QUABOUTDIALOG_H
-#define QUABOUTDIALOG_H
+#pragma once
 
 #include <QDialog>
 #include "QXThemedWindow.h"
@@ -21,5 +20,3 @@ public:
 private:
     Ui::QXAboutDialog *ui;
 };
-
-#endif // QUABOUTDIALOG_H

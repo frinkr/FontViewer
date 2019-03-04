@@ -21,7 +21,7 @@ class QToolButton;
 
 class QXDocument;
 class QXDocumentWindowManager;
-class QUFontInfoWindow;
+class QXFontInfoWindow;
 class QXGlyphInfoWidget;
 class QXMenuBar;
 class QXPopoverWindow;

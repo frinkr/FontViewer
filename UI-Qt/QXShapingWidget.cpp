@@ -26,9 +26,9 @@ namespace {
         return true;
     }
 
-    constexpr int QU_SHAPINGVIEW_MARGIN = 20;
-    constexpr int QU_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
-    constexpr int QU_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
+    constexpr int QX_SHAPINGVIEW_MARGIN = 20;
+    constexpr int QX_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
+    constexpr int QX_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
 
 }
 
@@ -63,9 +63,9 @@ QXShapingGlyphView::sizeHint() const {
     FXFace::AutoFontSize autoFontSize(face, fontSize_);
     
     const int baselineY = baseLinePosition().y();
-    const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QU_SHAPINGVIEW_MARGIN;
+    const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QX_SHAPINGVIEW_MARGIN;
     
-    return QSize(gridCellLeft(5, shaper_->glyphCount()) + QU_SHAPINGVIEW_MARGIN, height);
+    return QSize(gridCellLeft(5, shaper_->glyphCount()) + QX_SHAPINGVIEW_MARGIN, height);
 }
 
 void
@@ -189,7 +189,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
         // row lines
         for (int i = 0; i < 5; ++ i) 
-            painter.drawLine(QU_SHAPINGVIEW_MARGIN, gridCellBottom(i),
+            painter.drawLine(QX_SHAPINGVIEW_MARGIN, gridCellBottom(i),
                        rect().right(), gridCellBottom(i));
         // column lines
         for (int i = 0; i <= shaper_->glyphCount(); ++ i)  {
@@ -201,7 +201,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         
         // headers
         painter.setPen(textPen);
-        painter.drawText(gridCellRect(1, -1).translated(0, QU_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
+        painter.drawText(gridCellRect(1, -1).translated(0, QX_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
         painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
         painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
         painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
@@ -266,7 +266,7 @@ QXShapingGlyphView::baseLinePosition() const {
 
 int
 QXShapingGlyphView::gridCellBottom(int row, int col) const {
-    return rect().height() - QU_SHAPINGVIEW_MARGIN - QU_SHAPINGVIEW_GRID_ROW_HEIGHT * row;
+    return rect().height() - QX_SHAPINGVIEW_MARGIN - QX_SHAPINGVIEW_GRID_ROW_HEIGHT * row;
 }
 
 int
@@ -274,7 +274,7 @@ QXShapingGlyphView::gridCellLeft(int row, int col) const {
     // col == -1: header
     // col == shaper_->glyphCount : last glyph right
     if (col < 0)
-        return QU_SHAPINGVIEW_MARGIN;
+        return QX_SHAPINGVIEW_MARGIN;
     if (row == 0) 
         return (gridCellLeft(1, col) + gridCellLeft(1, col + 1)) / 2;
 
@@ -282,7 +282,7 @@ QXShapingGlyphView::gridCellLeft(int row, int col) const {
     for (int i = 0; i < std::min<int>(col, shaper_->glyphCount()); ++ i) 
         adv += fu2px(shaper_->advance(i).x);
 
-    return QU_SHAPINGVIEW_MARGIN + QU_SHAPINGVIEW_GRID_HEAD_WIDTH + adv;
+    return QX_SHAPINGVIEW_MARGIN + QX_SHAPINGVIEW_GRID_HEAD_WIDTH + adv;
 }
 
 QRect
@@ -320,7 +320,7 @@ QXShapingGlyphView::fu2px(fu f) const {
     return shaper_->face()->fontSize() * f / shaper_->face()->upem();
 }
     
-QUShapingWidget::QUShapingWidget(QWidget * parent)
+QXShapingWidget::QXShapingWidget(QWidget * parent)
     : QWidget(parent)
     , ui_(new Ui::QXShapingWidget)
     , document_(nullptr)
@@ -331,24 +331,24 @@ QUShapingWidget::QUShapingWidget(QWidget * parent)
 
     // connect signals
     connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::activated),
-            this, &QUShapingWidget::reloadFeatureList);
+            this, &QXShapingWidget::reloadFeatureList);
     connect(ui_->featureListWidget, &QListWidget::itemSelectionChanged,
-            this, &QUShapingWidget::doShape);
+            this, &QXShapingWidget::doShape);
     connect(ui_->lineEdit, &QLineEdit::textEdited,
-            this, &QUShapingWidget::doShape);
+            this, &QXShapingWidget::doShape);
     connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
-            this, &QUShapingWidget::doShape);
+            this, &QXShapingWidget::doShape);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
-            this, &QUShapingWidget::gotoGlyph);
+            this, &QXShapingWidget::gotoGlyph);
 }
 
-QUShapingWidget::~QUShapingWidget() {
+QXShapingWidget::~QXShapingWidget() {
     delete shaper_;
     delete ui_;
 }
 
 void
-QUShapingWidget::setDocument(QXDocument * document) {
+QXShapingWidget::setDocument(QXDocument * document) {
     document_ = document;
     delete shaper_;
     shaper_ = new FXShaper(document_->face().get());
@@ -360,7 +360,7 @@ QUShapingWidget::setDocument(QXDocument * document) {
 }
 
 void
-QUShapingWidget::reloadScriptList() {
+QXShapingWidget::reloadScriptList() {
     ui_->langSysComboBox->clear();
 
     const FXVector<FXTag> scripts = inspector()->otScripts();
@@ -382,7 +382,7 @@ QUShapingWidget::reloadScriptList() {
 }
 
 void
-QUShapingWidget::reloadFeatureList() {
+QXShapingWidget::reloadFeatureList() {
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
     const FXVector<FXTag> features =inspector()->otFeatures(script, language);
@@ -401,7 +401,7 @@ QUShapingWidget::reloadFeatureList() {
 }
 
 void
-QUShapingWidget::doShape() {
+QXShapingWidget::doShape() {
     if (!shaper_)
         return;
 
@@ -426,19 +426,19 @@ QUShapingWidget::doShape() {
 }
 
 void
-QUShapingWidget::gotoGlyph(FXGlyphID gid) {
+QXShapingWidget::gotoGlyph(FXGlyphID gid) {
     QXSearch s;
     s.gchar = FXGChar(gid, FXGCharTypeGlyphID);
     document_->search(s);
 }
 
 FXPtr<FXInspector>
-QUShapingWidget::inspector() {
+QXShapingWidget::inspector() {
     return document_->face()->inspector();
 }
 
 FXVector<FXTag>
-QUShapingWidget::onFeatures() const {
+QXShapingWidget::onFeatures() const {
     FXVector<FXTag> features;
     for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
         QListWidgetItem * item = ui_->featureListWidget->item(i);
@@ -449,7 +449,7 @@ QUShapingWidget::onFeatures() const {
 }
 
 FXVector<FXTag>
-QUShapingWidget::offFeatures() const {
+QXShapingWidget::offFeatures() const {
     FXVector<FXTag> features;
     for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
         QListWidgetItem * item = ui_->featureListWidget->item(i);

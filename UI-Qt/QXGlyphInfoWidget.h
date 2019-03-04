@@ -12,7 +12,7 @@ public:
     document() const;
 
     void
-    setQUDocument(QXDocument * document);
+    setDocument(QXDocument * document);
 
     void
     setChar(FXGChar c);

@@ -48,7 +48,7 @@ protected:
     QString      name_;
 };
 
-class QUGlyphTableBitmapDelegate : public QStyledItemDelegate {
+class QXGlyphTableBitmapDelegate : public QStyledItemDelegate {
 public:
     using QStyledItemDelegate::QStyledItemDelegate;
     void 
@@ -110,9 +110,9 @@ namespace {
     }
     
     template <class PointerToMember>
-    class QUGlyphBasicColumn : public QXGlyphTableModelColumn {
+    class QXGlyphBasicColumn : public QXGlyphTableModelColumn {
     public:
-        QUGlyphBasicColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
+        QXGlyphBasicColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
             : QXGlyphTableModelColumn(name, parent)
             , p_(p)
         {}
@@ -126,9 +126,9 @@ namespace {
     };
     
     template <class PointerToMember>
-    class QUGlyphMetricColumn : public QXGlyphTableModelColumn {
+    class QXGlyphMetricColumn : public QXGlyphTableModelColumn {
     public:
-        QUGlyphMetricColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
+        QXGlyphMetricColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
             : QXGlyphTableModelColumn(name, parent)
             , p_(p) {}
 
@@ -141,7 +141,7 @@ namespace {
     };
 
     
-    class QUGlyphCodePointColumn : public QXGlyphTableModelColumn {
+    class QXGlyphCodePointColumn : public QXGlyphTableModelColumn {
     public:
         using QXGlyphTableModelColumn::QXGlyphTableModelColumn;
         QVariant
@@ -152,7 +152,7 @@ namespace {
         }
     };
 
-    class QUGlyphImageColumn : public QXGlyphTableModelColumn {
+    class QXGlyphImageColumn : public QXGlyphTableModelColumn {
     public:
         using QXGlyphTableModelColumn::QXGlyphTableModelColumn;
         QVariant
@@ -164,16 +164,16 @@ namespace {
     };
 
     template <typename PointerToMember>
-    QUGlyphBasicColumn<PointerToMember> *
+    QXGlyphBasicColumn<PointerToMember> *
     makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
-        return new QUGlyphBasicColumn<PointerToMember>(name, p, parent);
+        return new QXGlyphBasicColumn<PointerToMember>(name, p, parent);
     }
 
     
     template <typename PointerToMember>
-    QUGlyphMetricColumn<PointerToMember> *
+    QXGlyphMetricColumn<PointerToMember> *
     makeMetricColumn(const QString & name, PointerToMember p, QObject * parent) {
-        return new QUGlyphMetricColumn<PointerToMember>(name, p, parent);
+        return new QXGlyphMetricColumn<PointerToMember>(name, p, parent);
     }
 
 }
@@ -183,8 +183,8 @@ QXGlyphTableModel::QXGlyphTableModel(QXDocument * document, QObject * parent)
     , document_(document) {
 
     columns_.append(makeBasicColumn(tr("Index"), &FXGlyph::gid, this));
-    columns_.append(new QUGlyphImageColumn(tr("Glyph"), this));
-    columns_.append(new QUGlyphCodePointColumn(tr("Codepoint"), this));
+    columns_.append(new QXGlyphImageColumn(tr("Glyph"), this));
+    columns_.append(new QXGlyphCodePointColumn(tr("Codepoint"), this));
     columns_.append(makeBasicColumn(tr("Char"), &FXGlyph::character, this));
     columns_.append(makeBasicColumn(tr("Name"), &FXGlyph::name, this));
     columns_.append(makeMetricColumn(tr("Width"), &FXGlyphMetrics::width, this));
@@ -264,7 +264,7 @@ QXGlyphTableModel::exportToFile(const QString & filePath) const {
     return true;
 }
 
-QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
+QxGlyphTableWidget::QxGlyphTableWidget(QXDocument * document, QWidget *parent)
     : QWidget(parent)
     , ui_(new Ui::QXGlyphTableWidget)
     , document_(document) {
@@ -277,7 +277,7 @@ QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
     ui_->tableView->setModel(proxyModel);
     
     ui_->tableView->verticalHeader()->hide();
-    ui_->tableView->setItemDelegateForColumn(1, new QUGlyphTableBitmapDelegate(this));
+    ui_->tableView->setItemDelegateForColumn(1, new QXGlyphTableBitmapDelegate(this));
     if (document->face()->glyphCount() < 1000) {
         ui_->tableView->setSortingEnabled(true);   
         ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
@@ -286,18 +286,18 @@ QUGlyphTableWidget::QUGlyphTableWidget(QXDocument * document, QWidget *parent)
     ui_->tableView->setAlternatingRowColors(true);
     
     connect(ui_->pushButton, &QPushButton::clicked,
-            this, &QUGlyphTableWidget::exportToFile);
+            this, &QxGlyphTableWidget::exportToFile);
 
     connect(ui_->tableView, &QTableView::doubleClicked,
-            this, &QUGlyphTableWidget::gotoGlyphAtIndex);
+            this, &QxGlyphTableWidget::gotoGlyphAtIndex);
 }
 
-QUGlyphTableWidget::~QUGlyphTableWidget() {
+QxGlyphTableWidget::~QxGlyphTableWidget() {
     delete ui_;
 }
 
 void
-QUGlyphTableWidget::exportToFile() {
+QxGlyphTableWidget::exportToFile() {
     QString file = QStandardPaths::writableLocation(QStandardPaths::DesktopLocation) + "/" + toQString(document_->face()->postscriptName());
     QString fileName = QFileDialog::getSaveFileName(
         this,
@@ -309,7 +309,7 @@ QUGlyphTableWidget::exportToFile() {
 }
 
 void
-QUGlyphTableWidget::gotoGlyphAtIndex(const QModelIndex & index) {
+QxGlyphTableWidget::gotoGlyphAtIndex(const QModelIndex & index) {
     const QSortFilterProxyModel * proxyModel = qobject_cast<const QSortFilterProxyModel *>(index.model());
     QModelIndex sourceIndex = proxyModel->mapToSource(index);
 

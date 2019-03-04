@@ -44,12 +44,12 @@ protected:
     QVector<QXGlyphTableModelColumn *> columns_;
 };
 
-class QUGlyphTableWidget : public QWidget {
+class QxGlyphTableWidget : public QWidget {
     Q_OBJECT
 
 public:
-    explicit QUGlyphTableWidget(QXDocument * document, QWidget *parent = nullptr);
-    ~QUGlyphTableWidget();
+    explicit QxGlyphTableWidget(QXDocument * document, QWidget *parent = nullptr);
+    ~QxGlyphTableWidget();
                          
 public slots:
     void
