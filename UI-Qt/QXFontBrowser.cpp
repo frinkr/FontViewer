@@ -276,10 +276,19 @@ namespace {
 }
 
 namespace {
+    template <typename T>
+    class expr {
+    public:
+        T value {};
+    };
+    
+    using bool_expr = expr<bool>;
+    
+    
     class FilterExpression {
     public:
         bool
-        operator()() const {return false};
+        operator()() const {return false;};
     };
     
 
@@ -331,31 +340,32 @@ static void testSpirit() {
             glyph,
         };
         
-        template <typename T1, typename T2, typename T3>
-        struct triple_closure : boost::spirit::closure<calc_closure, T1, T2, T3>{
+        struct upem_closure : boost::spirit::closure<upem_closure, comparator, int>{
             member1 val1;
             member2 val2;
-            member3 val3;
         };
         
-        struct bool_closure : boost::spirit::closure<calc_closure, bool>{
+        struct bool_closure : boost::spirit::closure<bool_closure, bool>{
             member1 val;
         };
         
-        struct comp_closure : boost::spirit::closure<calc_closure, comparator>{
+        struct comp_closure : boost::spirit::closure<comp_closure, comparator>{
             member1 val;
         };
         
-        rule<phrase_scanner_t, bool_closure::context_t> node, exp, term, cmp;
+        rule<phrase_scanner_t, bool_closure::context_t> node, exp, term;
         rule<phrase_scanner_t, bool_closure::context_t> ttc = str_p("@ttc");
         rule<phrase_scanner_t, bool_closure::context_t> otvar = str_p("@var");
         rule<phrase_scanner_t, bool_closure::context_t> mm = str_p("@mm");
         
-        rule<phrase_scanner_t, typename triple_closure<key, comparator, int>::context_t> upem;
-        cmp = ch_p('>') | ch_p('=') | ch_p('<');
-        upem = str_p("@upem")[upem.val1 = key::upem]
-            >> cmp[upem.val2 = arg1]
-            >> uint_p[upem.va3 = arg1];
+        rule<phrase_scanner_t, upem_closure::context_t> upem;
+        rule<phrase_scanner_t, comp_closure::context_t> cmp;
+        cmp = ch_p('>')[cmp.val = comparator::gt]
+            | ch_p('=')[cmp.val = comparator::eq]
+            | ch_p('<')[cmp.val = comparator::lt];
+        upem = str_p("@upem")
+            >> cmp[upem.val1 = arg1]
+            >> uint_p[upem.val2 = arg1];
             
         node = ttc
             | otvar
@@ -365,8 +375,10 @@ static void testSpirit() {
         term = node | ('(' >> exp >> ')');
             
         exp = (term | (str_p("not") >> term)) % (str_p("and") | str_p("or"));
-            
-        bool result = false;
+        
+        //std::tuple<comparator, int> result;
+        comparator result;
+        int value;
         r = parse("@upem > 10", upem[assign_a(result)], space_p);
         r = parse("@ttc and (@mm or (@upem > 10))", exp, space_p);
         r = parse("(not @ttc) and @upem > 10", exp, space_p);
