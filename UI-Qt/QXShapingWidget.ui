@@ -24,7 +24,14 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="3">
+   <item row="0" column="1">
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="text">
+      <string>MAY THE FORCE BE WITH YOU!</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
     <widget class="QComboBox" name="fontSizeComboBox">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
@@ -120,6 +127,53 @@
      </item>
     </widget>
    </item>
+   <item row="0" column="3">
+    <widget class="QXIconPushButton" name="menuButton">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>15</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>15</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
+     <property name="toolTip">
+      <string>OK</string>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">border: none;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset resource="QXApplication.qrc">
+       <normaloff>:/images/menu.png</normaloff>:/images/menu.png</iconset>
+     </property>
+     <property name="iconSize">
+      <size>
+       <width>15</width>
+       <height>22</height>
+      </size>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QListWidget" name="featureListWidget">
      <property name="maximumSize">
@@ -130,14 +184,7 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLineEdit" name="lineEdit">
-     <property name="text">
-      <string>MAY THE FORCE BE WITH YOU!</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="1" colspan="5">
+   <item row="1" column="1" colspan="3">
     <widget class="QScrollArea" name="scrollArea">
      <property name="widgetResizable">
       <bool>true</bool>
@@ -148,7 +195,7 @@
         <x>0</x>
         <y>0</y>
         <width>740</width>
-        <height>518</height>
+        <height>519</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
@@ -178,16 +225,22 @@
      </widget>
     </widget>
    </item>
-   <item row="0" column="4">
-    <widget class="QPushButton" name="copyButton">
-     <property name="text">
-      <string>Copy Decoded Text</string>
-     </property>
-    </widget>
-   </item>
   </layout>
+  <action name="actionCopyDecodedText">
+   <property name="text">
+    <string>Copy Decoded Text</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy decoded text to cclipboard</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>QXIconPushButton</class>
+   <extends>QPushButton</extends>
+   <header>QXWidgets.h</header>
+  </customwidget>
   <customwidget>
    <class>QXShapingGlyphView</class>
    <extends>QWidget</extends>
@@ -195,6 +248,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="QXApplication.qrc"/>
+ </resources>
  <connections/>
 </ui>

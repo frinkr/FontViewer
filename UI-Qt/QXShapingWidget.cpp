@@ -1,5 +1,6 @@
 #include <QClipBoard>
 #include <QPainter>
+#include <QMenu>
 #include <QMouseEvent>
 #include "FontX/FXInspector.h"
 #include "FontX/FXShaper.h"
@@ -328,7 +329,7 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     , document_(nullptr)
     , shaper_(nullptr) {
     ui_->setupUi(this);
-
+    ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
     ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
     // connect signals
@@ -340,10 +341,14 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doShape);
     connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
             this, &QXShapingWidget::doShape);
-    connect(ui_->copyButton, &QPushButton::clicked,
+    connect(ui_->actionCopyDecodedText, &QAction::triggered,
             this, &QXShapingWidget::doCopyAction);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
+
+    QMenu * menu = new QMenu(this);
+    menu->addAction(ui_->actionCopyDecodedText);
+    ui_->menuButton->setMenu(menu);
 }
 
 QXShapingWidget::~QXShapingWidget() {
