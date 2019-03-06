@@ -320,7 +320,7 @@ namespace {
         }
     };
 
-    class QXType1Page : public QXFontHtmlTemplatePage {
+    class QXPsFontPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
         void
@@ -409,7 +409,10 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
         pages_.append(new QXWinFNTPage(tr("Windows FNT"), face, this));
     }
     else if (face->attributes().format == FXFaceFormatConstant::Type1) {
-        pages_.append(new QXType1Page(tr("Postscript Type 1"), face, this));
+        pages_.append(new QXPsFontPage(tr("Postscript Type 1"), face, this));
+    }
+    else if (face->attributes().format == FXFaceFormatConstant::CFF) {
+        pages_.append(new QXPsFontPage(tr("CFF"), face, this));
     }
 
     ui->comboBox->clear();
