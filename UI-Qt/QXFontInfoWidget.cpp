@@ -347,11 +347,27 @@ namespace {
             addDataRow(tr("Underline Position"), info.underline_position);
             addDataRow(tr("Underline Thickness"), info.underline_thickness);
 
+            FT_Long error = 0;
             T1_EncodingType encodingType;
-            if (sizeof(encodingType) == FT_Get_PS_Font_Value(ftFace_, PS_DICT_ENCODING_TYPE, 0, &encodingType, sizeof(encodingType)))
+            error = FT_Get_PS_Font_Value(ftFace_, PS_DICT_ENCODING_TYPE, 0, &encodingType, sizeof(encodingType));
+            if (error == sizeof(encodingType))
                 addDataRow(tr("Encoding Type"), encodingTypeToString(encodingType));
             else
                 addDataRow(tr("Encoding Type"), tr("<i>UNKNOWN</i>"));
+
+            addHeadRow(tr("Private Dict"));
+            PS_PrivateRec privateRec;
+            if (!FT_Get_PS_Font_Private(ftFace_, &privateRec)) {
+                addDataRow(tr("Unique ID"), privateRec.unique_id);
+            }
+            
+            FT_UShort stdHw;
+            error = FT_Get_PS_Font_Value(ftFace_, PS_DICT_STD_HW, 0, &stdHw, sizeof(stdHw));
+            if (error == sizeof(stdHw)) {
+                
+            }
+            
+
 
         }
         static QString

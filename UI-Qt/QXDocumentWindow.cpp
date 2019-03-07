@@ -27,6 +27,7 @@
 #include "QXShapingWidget.h"
 #include "QXTheme.h"
 #include "QXVariableWidget.h"
+#include "QXToastMessage.h"
 
 #if defined(Q_OS_MAC)
 #  include "MacHelper.h"
@@ -341,8 +342,13 @@ void
 QXDocumentWindow::onCopyAction() {
     FXGChar c = document_->charAt(ui_->glyphCollectionView->selectedIndex());
     if (c.isUnicode()) {
-        qApp->clipboard()->setText(QString::fromUcs4(static_cast<uint*>(&c.value), 1));
+        QString text = QString::fromUcs4(static_cast<uint*>(&c.value), 1);
+        qApp->clipboard()->setText(text);
         static_assert(sizeof(uint) == sizeof(FXChar), "");
+
+        QXToastMessage * message = new QXToastMessage(this);
+        message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxInformation),
+                              QString(R"("%1" has been copied to clipboard)").arg(text));
     }
 }
 

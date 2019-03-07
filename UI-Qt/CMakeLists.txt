@@ -113,6 +113,8 @@ set(SHARED_SOURCES
   QXTheme.h
   QXThemedWindow.cpp
   QXThemedWindow.h
+  QXToastMessage.cpp
+  QXToastMessage.h
   QXToolBar.cpp
   QXToolBar.h
   QXWidgets.cpp

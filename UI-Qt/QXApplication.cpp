@@ -4,6 +4,7 @@
 #include <QMessageBox>
 #include <QtDebug>
 #include <QtGui>
+#include <QStyle>
 #include <QTimer>
 
 #include "QXAboutDialog.h"
@@ -12,6 +13,7 @@
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
 #include "QXThemedWindow.h"
+#include "QXToastMessage.h"
 
 QXApplication::QXApplication(int & argc, char ** argv)
     : QApplication(argc, argv) {
@@ -107,6 +109,9 @@ QXApplication::question(QWidget * parent, const QString & title, const QString &
 
 void
 QXApplication::warning(QWidget * parent, const QString & title, const QString & text) const {
+    QXToastMessage * message = new QXToastMessage(parent);
+    message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxWarning), text);
+    return;
     QXThemedWindow<QMessageBox> box(parent);
     box.setWindowTitle(title);
     box.setText(text);
