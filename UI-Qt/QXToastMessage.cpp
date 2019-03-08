@@ -1,4 +1,5 @@
 #include <QBoxLayout>
+#include <QGraphicsBlurEffect>
 #include <QFrame>
 #include <QIcon>
 #include <QLabel>
@@ -21,14 +22,15 @@ QXToastMessage::QXToastMessage(QWidget * parent)
     message_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     message_->setWordWrap(true);
     message_->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
-
+    message_->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        
     QBoxLayout * frameLayout = new QBoxLayout(QBoxLayout::TopToBottom);
     frameLayout->addWidget(icon_);
     frameLayout->addWidget(message_);    
     frame->setLayout(frameLayout);
     frame->setFrameStyle(QFrame::Panel | QFrame::Raised);;
     frame->setStyleSheet(".QFrame {border-radius: 6px; background-color: palette(window);}");
-    
+        
     QBoxLayout * lo = new QBoxLayout(QBoxLayout::TopToBottom);
     lo->addWidget(frame);
     setLayout(lo);
@@ -37,7 +39,6 @@ QXToastMessage::QXToastMessage(QWidget * parent)
     setAttribute(Qt::WA_DeleteOnClose);
     setAttribute(Qt::WA_TranslucentBackground);
     setAttribute(Qt::WA_ShowWithoutActivating);
-
 }
 
 void
@@ -46,12 +47,12 @@ QXToastMessage::showToParent(const QIcon & icon, const QString & message) {
     message_->setText(message);
     
     QWidget * parentWindow = parentWidget()->window();
-    move(parentWindow->frameGeometry().center() - QPoint(this->width() / 2,
-                                                         this->height() - parentWindow->frameGeometry().height() / 2));
+    move(QPoint(parentWindow->frameGeometry().center().x() - width() / 2,
+                parentWindow->frameGeometry().bottom() - height() - 50));
     show();
 
-    QTimer::singleShot(2500, this, &QXToastMessage::fadeOut);
-    QTimer::singleShot(3000, this, &QWidget::close);
+    startCloseTimer();
+    startFadeOutTimer();
 }
 
 void
@@ -61,19 +62,78 @@ QXToastMessage::showEvent(QShowEvent * event) {
 }
 
 void
+QXToastMessage::enterEvent(QEvent * event) {
+    QWidget::enterEvent(event);
+    stopFadeOutTimer();
+    stopCloseTimer();
+    setWindowOpacity(opacity_);
+}
+
+void
+QXToastMessage::leaveEvent(QEvent * event) {
+    QWidget::leaveEvent(event);
+    startCloseTimer();
+    startFadeOutTimer();
+}
+
+void
 QXToastMessage::fadeIn() {
     QPropertyAnimation* anim = new QPropertyAnimation(this, "windowOpacity");
     anim->setStartValue(0.0);
-    anim->setEndValue(1.0);
+    anim->setEndValue(opacity_);
     anim->setDuration(500);
     anim->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void
 QXToastMessage::fadeOut() {
-    QPropertyAnimation* anim = new QPropertyAnimation(this, "windowOpacity");
-    anim->setStartValue(1.0);
-    anim->setEndValue(0.0);
-    anim->setDuration(500);
-    anim->start(QAbstractAnimation::DeleteWhenStopped);
+    fadeOutAnimation_ = new QPropertyAnimation(this, "windowOpacity");
+    fadeOutAnimation_->setStartValue(opacity_);
+    fadeOutAnimation_->setEndValue(0.0);
+    fadeOutAnimation_->setDuration(1000);
+    fadeOutAnimation_->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void
+QXToastMessage::startFadeOutTimer() {
+    stopFadeOutTimer();
+    
+    fadeOutTimer_ = new QTimer(this);
+    fadeOutTimer_->setSingleShot(true);
+    fadeOutTimer_->callOnTimeout(this, &QXToastMessage::fadeOut);
+    fadeOutTimer_->start(2000);
+}
+
+void
+QXToastMessage::stopFadeOutTimer() {
+    if (fadeOutTimer_) {
+        fadeOutTimer_->stop();
+        delete fadeOutTimer_;
+        fadeOutTimer_ = nullptr;
+    }
+
+    if (fadeOutAnimation_) {
+        fadeOutAnimation_->stop();
+        delete fadeOutAnimation_;
+        fadeOutAnimation_ = nullptr;
+    }
+}
+
+void
+QXToastMessage::startCloseTimer() {
+    stopCloseTimer();
+    
+    closeTimer_ = new QTimer(this);
+    closeTimer_->setSingleShot(true);
+    closeTimer_->callOnTimeout(this, &QXToastMessage::close);
+    closeTimer_->start(3000);
+}
+
+void
+QXToastMessage::stopCloseTimer() {
+    if (closeTimer_) {
+        closeTimer_->stop();
+        delete closeTimer_;
+        closeTimer_ = nullptr;
+    }
 }

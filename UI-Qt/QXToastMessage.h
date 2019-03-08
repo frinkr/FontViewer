@@ -2,6 +2,8 @@
 
 #include <QWidget>
 class QLabel;
+class QTimer;
+class QPropertyAnimation;
 
 class QXToastMessage: public QWidget {
 public:
@@ -14,6 +16,12 @@ protected:
     void
     showEvent(QShowEvent * event) override;
 
+    void
+    enterEvent(QEvent * event) override;
+
+    void
+    leaveEvent(QEvent * event) override;
+
 private slots:
     void
     fadeIn();
@@ -21,7 +29,22 @@ private slots:
     void
     fadeOut();
 
+    void
+    startFadeOutTimer();
+
+    void
+    stopFadeOutTimer();
+
+    void
+    startCloseTimer();
+
+    void
+    stopCloseTimer();
 private:
     QLabel        *icon_{nullptr};
     QLabel        *message_{nullptr};
+    QPropertyAnimation * fadeOutAnimation_{nullptr};
+    QTimer        *fadeOutTimer_{nullptr};
+    QTimer        *closeTimer_{nullptr};
+    qreal          opacity_{0.9};
 };
