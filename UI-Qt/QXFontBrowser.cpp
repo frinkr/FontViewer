@@ -30,6 +30,7 @@ namespace {
     
     class QXFontBrowserItemDelegate : public QStyledItemDelegate {
     private:
+        qreal    infoIconMargin_{ 10 };
         qreal    infoIconSize_{ 20 };
         qreal    fontSize_ {DEFAULT_PREVIEW_FONT_SIZE};
         QString  previewText_;
@@ -60,8 +61,7 @@ namespace {
 
         QRect
         infoIconRect(const QStyleOptionViewItem & option) const {
-            constexpr qreal rightMargin = 10;
-            qreal right = option.rect.right() - rightMargin;
+            qreal right = option.rect.right() - infoIconMargin_;
             qreal left = right - infoIconSize_;
             qreal top = option.rect.top() + (option.rect.height() - infoIconSize_) / 2;
             return QRect(left, top, infoIconSize_, infoIconSize_);
@@ -216,9 +216,9 @@ namespace {
             if (window) popoverVisible = window->isFontInfoPopoverVisible();
             if ((selected && popoverVisible) || (option.state & QStyle::State_MouseOver)) {
                 QRect iconRect = infoIconRect(option);
-                int x0 = option.rect.center().x() + option.rect.width() / 6;
                 int x1 = option.rect.right() + 3;
-                QLinearGradient gradient(QPoint(x0, option.rect.top()), QPoint(iconRect.right(), option.rect.top())); // diagonal gradient from top-left to bottom-right
+                int x0 = iconRect.left() - infoIconMargin_ * 5;
+                QLinearGradient gradient(QPoint(x0, option.rect.top()), QPoint(option.rect.right(), option.rect.top())); // diagonal gradient from top-left to bottom-right
 
                 QColor c0 = option.palette.base().color();
                 if (selected)
