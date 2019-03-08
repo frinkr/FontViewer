@@ -10,7 +10,7 @@
 #include "QXToastMessage.h"
 
 QXToastMessage::QXToastMessage(QWidget * parent)
-    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint) {
+    : QWidget(parent, Qt::Popup | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint) {
 
     QFrame * frame = new QFrame(this);
     icon_ = new QLabel("Hello", frame);
@@ -29,7 +29,7 @@ QXToastMessage::QXToastMessage(QWidget * parent)
     frameLayout->addWidget(message_);    
     frame->setLayout(frameLayout);
     frame->setFrameStyle(QFrame::Panel | QFrame::Raised);;
-    frame->setStyleSheet(".QFrame {border-radius: 6px; background-color: palette(window);}");
+    frame->setStyleSheet(".QFrame {border: 2px solid palette(midlight); border-radius: 8px; background-color: palette(window);}");
         
     QBoxLayout * lo = new QBoxLayout(QBoxLayout::TopToBottom);
     lo->addWidget(frame);

@@ -13,7 +13,7 @@ if (APPLE)
     main.cpp
     ${RESOURCE_FILES}
     )
-else()
+elseif(WIN32)
   set(
     RESOURCE_FILES
     win32/Resource.h
@@ -21,8 +21,20 @@ else()
   )
   add_executable(
     ${PROJECT_NAME}
+	WIN32
     main.cpp
     ${RESOURCE_FILES}
+    )
+
+  # Disable console in Release
+  #if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  #  set_property(TARGET main PROPERTY WIN32_EXECUTABLE true)
+  #endif()
+
+else()
+  add_executable(
+    ${PROJECT_NAME}
+    main.cpp
     )
 endif()
 
