@@ -4,6 +4,7 @@
 #include <QIcon>
 
 class QEvent;
+class QXSplash;
 
 class QXApplication : public QApplication
 {
@@ -28,6 +29,16 @@ public:
 
 public slots:
     void
+    showSplashScreen();
+
+    void
+    dismissSplashScreen(QWidget * widget = nullptr);
+    
+    void
+    splashScreenShowProgress(int value, int maximum, const QString & message);
+                                                              
+public slots:
+    void
     about() const;
 
     void
@@ -43,6 +54,7 @@ private:
 
 private:
     QMap<QString, QIcon> iconCache_;
+    QXSplash           * splash_ {nullptr};
 };
 
 #if defined(qApp)

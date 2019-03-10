@@ -12,6 +12,7 @@
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
 #include "QXPreferencesDialog.h"
+#include "QXSplash.h"
 #include "QXThemedWindow.h"
 #include "QXToastMessage.h"
 
@@ -119,3 +120,27 @@ QXApplication::warning(QWidget * parent, const QString & title, const QString & 
     box.setIcon(QMessageBox::Warning);
     box.exec();
 }
+
+void
+QXApplication::showSplashScreen() {
+    if (!splash_) {
+        splash_ = new QXSplash(nullptr);
+    }
+    splash_->show();
+}
+
+void
+QXApplication::dismissSplashScreen(QWidget * widget) {
+    if (splash_)
+        splash_->dismiss(widget);
+    splash_->deleteLater();
+    splash_ = nullptr;
+}
+    
+void
+QXApplication::splashScreenShowProgress(int value, int maximum, const QString & message) {
+    if (splash_)
+        splash_->showProgress(value, maximum, message);
+}
+ 
+                                                                            

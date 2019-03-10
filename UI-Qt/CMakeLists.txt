@@ -109,6 +109,8 @@ set(SHARED_SOURCES
   QXSearchEngine.h
   QXShapingWidget.cpp
   QXShapingWidget.h
+  QXSplash.cpp
+  QXSplash.h
   QXTheme.cpp
   QXTheme.h
   QXThemedWindow.cpp

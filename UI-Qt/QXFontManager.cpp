@@ -9,6 +9,7 @@
 #include <QProgressDialog>
 #include <QStandardPaths>
 
+#include "QXApplication.h"
 #include "QXConv.h"
 #include "QXFontManager.h"
 #include "QXPreferences.h"
@@ -102,15 +103,13 @@ QXFontManager::QXFontManager() {
 	const QString dbPath = dbFilePath();
 
 	// Load database.
-	QXProgressDialog * progress = createProgressDialog();
     db_.reset(new FXFaceDatabase(dirs,			
 		dbPath.toUtf8().constData(),
-        [progress](size_t current, size_t total, const FXString & file) {
-            progress->setProgress(static_cast<int>(current), static_cast<int>(total), toQString(file));
+        [](size_t current, size_t total, const FXString & file) {
+            QFileInfo fileInfo(toQString(file));
+            qApp->splashScreenShowProgress(static_cast<int>(current), static_cast<int>(total), fileInfo.fileName());
             return true;
         }
     ));
-    progress->close();
-	delete progress;
 }
 

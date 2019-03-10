@@ -18,7 +18,7 @@ namespace {
 
     size_t hashFile(const FXString & file, size_t hash) {
         boost::hash_combine(hash, file);
-        boost::hash_combine(hash, BST::fileSize(file));
+        boost::hash_combine(hash, BST::lastWriteTime(file));
         return hash;
     }
 

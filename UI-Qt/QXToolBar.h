@@ -9,16 +9,16 @@ public:
 
 protected:
     void
-    mousePressEvent(QMouseEvent * event);
+    mousePressEvent(QMouseEvent * event) override;
 
     void
-    mouseMoveEvent(QMouseEvent * event);
+    mouseMoveEvent(QMouseEvent * event) override;
 
     void
-    mouseReleaseEvent(QMouseEvent * event);
+    mouseReleaseEvent(QMouseEvent * event) override;
 
     void
-    mouseDoubleClickEvent(QMouseEvent * event);
+    mouseDoubleClickEvent(QMouseEvent * event) override;
 
 private:
     QPoint mousePressPos_;

@@ -53,6 +53,7 @@
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
     <file alias="images/warning.png">../Resources/Images/warning.png</file>
     <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
-    
+    <file alias="images/splash.png">../Resources/Images/splash.png</file>
+    <file alias="images/splash-text.png">../Resources/Images/splash-text.png</file>
 </qresource>
 </RCC>

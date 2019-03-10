@@ -34,10 +34,12 @@ int qxMain(int argc, char *argv[]) {
     const bool resetAppData = app.userRequiredToResetAppData();
     if (resetAppData)
         QXPreferences::reset();
-    
+
+
     QXTheme::setCurrent(QXPreferences::theme());
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
-
+    app.showSplashScreen();
+    app.processEvents();
     if (resetAppData) 
         QXFontManager::resetDatabase();
 

@@ -34,6 +34,9 @@ namespace BST {
                 bool recursive,
                 std::function<bool(const FXString &)> handler);
 
+    std::time_t
+    lastWriteTime(const FXString & file);
+
     size_t
     fileSize(const FXString & file);
 

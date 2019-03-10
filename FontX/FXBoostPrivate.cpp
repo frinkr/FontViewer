@@ -64,6 +64,11 @@ namespace BST {
         return true;
     }
     
+    std::time_t
+    lastWriteTime(const FXString & file) {
+        return fs::last_write_time(fs::path(file, UTF8Cvt));
+    }
+
     size_t
     fileSize(const FXString & file) {
         return fs::file_size(fs::path(file, UTF8Cvt));

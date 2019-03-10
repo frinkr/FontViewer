@@ -8,6 +8,7 @@
 #include <QMetaType>
 #include <QtDebug>
 #include <QtGui>
+#include <QSplashScreen>
 
 #include "FontX/FXFace.h"
 
@@ -231,7 +232,8 @@ QXDocumentWindowManager::autoOpenFontDialog() {
                 window->isWindow() &&
                 window->isVisible()
                 && !qobject_cast<QMenuBar*>(window)
-                && !qobject_cast<QMenu*>(window))
+                && !qobject_cast<QMenu*>(window)
+                && !qobject_cast<QSplashScreen*>(window))
             {
                 hasWindow = true;
                 break;
