@@ -13,7 +13,6 @@
 #include "QXConv.h"
 #include "QXFontManager.h"
 #include "QXPreferences.h"
-#include "QXProgressDialog.h"
 
 namespace {
     QStringList _systemFontFolders() {
@@ -36,15 +35,6 @@ namespace {
         return folders;
 #endif
     }
-
-    QXProgressDialog *
-	createProgressDialog() {
-		QXProgressDialog * progress = new QXProgressDialog(nullptr);
-		progress->setWindowModality(Qt::WindowModal);
-		progress->setWindowTitle("Rebuilding font database...");
-		return progress;
-	}
-
 }
 
 void

@@ -38,7 +38,6 @@ set(UI
   QXFontInfoWidget.ui
   QXGlyphTableWidget.ui
   QXPreferencesDialog.ui
-  QXProgressDialog.ui
   QXShapingWidget.ui
   QXVariableWidget.ui
   )
@@ -99,8 +98,6 @@ set(SHARED_SOURCES
   QXPreferences.h
   QXPreferencesDialog.cpp
   QXPreferencesDialog.h
-  QXProgressDialog.cpp
-  QXProgressDialog.h
   QXResource.cpp
   QXResource.h
   QXRichLineEdit.cpp
