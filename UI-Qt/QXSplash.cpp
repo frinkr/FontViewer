@@ -1,5 +1,6 @@
 #include <QPainter>
 #include <QMouseEvent>
+#include <QVariantAnimation>
 
 #include "QXSplash.h"
 #include "QXApplication.h"
@@ -21,7 +22,15 @@ void
 QXSplash::showProgress(int value, int maximum, const QString & message) {
     progress_ = std::make_tuple(value, maximum);
     if (!message.isEmpty())
-    showMessage(message, Qt::AlignHCenter | Qt::AlignBottom, Qt::white);
+        showMessage(message, Qt::AlignHCenter | Qt::AlignBottom, Qt::white);
+    if (maximum && !ani_) {
+        ani_ = new QVariantAnimation(this);
+        ani_->setStartValue(0.0);
+        ani_->setEndValue(1.0);
+        ani_->setDuration(200);
+        ani_->setEasingCurve(QEasingCurve::InQuad);
+        ani_->start();
+    }
     qApp->processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::ExcludeSocketNotifiers);
 }
 
@@ -31,7 +40,7 @@ QXSplash::drawContents(QPainter * painter) {
     painter->setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter->drawPixmap(r.topLeft(), pixmap());
 
-    const qreal progressRadius = rect().width() / 2.0 * 0.75;
+    const qreal progressRadius = rect().width() / 2.0 * 0.65;
     const QRect progressRect(r.center() - QPoint(progressRadius, progressRadius), 
         QSize(progressRadius * 2, progressRadius * 2));
 
@@ -41,8 +50,15 @@ QXSplash::drawContents(QPainter * painter) {
     // Draw app icon
     QRect iconRect = progressRect.adjusted(10, 10, -10, -10);
     if (max) {
-        int size = progressRect.height() / 3;
-        iconRect = QRect(QPoint(progressRect.center().x() - size / 2, progressRect.top() + 20), QSize(size, size));
+        double m = ani_? ani_->currentValue().toDouble(): 1;
+        double n = 1 - m;
+        int size = progressRect.height() / 4;
+        QRect targetRect = QRect(QPoint(progressRect.center().x() - size / 2, progressRect.top() + 20), QSize(size, size));
+        
+        iconRect.setLeft(iconRect.left() * n + targetRect.left() * m);
+        iconRect.setRight(iconRect.right() * n + targetRect.right() * m);
+        iconRect.setTop(iconRect.top() * n + targetRect.top() * m);
+        iconRect.setBottom(iconRect.bottom() * n + targetRect.bottom() * m);
     }
     QPixmap icon = qApp->loadIcon(":/images/splash-text.png").pixmap(iconRect.size());
     painter->drawPixmap(iconRect, icon);
@@ -50,7 +66,7 @@ QXSplash::drawContents(QPainter * painter) {
 
     // Draw progress
     if (max) {
-        painter->setPen(QPen(palette().highlight().color(), 5));
+        painter->setPen(QPen(Qt::white, 5));
         painter->drawArc(progressRect, 0, val / qreal(max) * 360 * 16);
     }
 

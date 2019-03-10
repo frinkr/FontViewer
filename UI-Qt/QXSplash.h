@@ -3,6 +3,8 @@
 #include <tuple>
 #include <QSplashScreen>
 
+class QVariantAnimation;
+
 class QXSplash : public QSplashScreen {
     Q_OBJECT
 public:
@@ -31,4 +33,5 @@ protected:
     QPoint mousePressPos_{};
     bool   movingWindow_{false};
     std::tuple<int, int> progress_{};
+    QVariantAnimation * ani_{ nullptr };
 };
