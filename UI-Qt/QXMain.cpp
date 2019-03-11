@@ -35,7 +35,6 @@ int qxMain(int argc, char *argv[]) {
     if (resetAppData)
         QXPreferences::reset();
 
-
     QXTheme::setCurrent(QXPreferences::theme());
     app.setAttribute(Qt::AA_UseHighDpiPixmaps);
     app.showSplashScreen();
