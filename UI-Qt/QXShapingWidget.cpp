@@ -236,6 +236,12 @@ QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
     }
 }
 
+
+void
+QXShapingGlyphView::mouseMoveEvent(QMouseEvent *event) {
+    mousePressEvent(event);
+}
+
 void
 QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
     mousePressEvent(event);

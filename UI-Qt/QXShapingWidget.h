@@ -27,19 +27,22 @@ public:
     setDocument(QXDocument * document);
     
     QSize
-    minimumSizeHint() const;
+    minimumSizeHint() const override;
     
     QSize
-    sizeHint() const;
+    sizeHint() const override;
     
     void
-    paintEvent(QPaintEvent * event);
+    paintEvent(QPaintEvent * event) override;
 
     void
-    mousePressEvent(QMouseEvent *event);
-
+    mousePressEvent(QMouseEvent *event) override;
+    
     void
-    mouseDoubleClickEvent(QMouseEvent *event);
+    mouseMoveEvent(QMouseEvent *event) override;
+    
+    void
+    mouseDoubleClickEvent(QMouseEvent *event) override;
 
     void
     setFontSize(double fontSize);

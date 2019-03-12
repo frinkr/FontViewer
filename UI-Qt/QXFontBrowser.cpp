@@ -278,7 +278,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     // List view
     QSortFilterProxyModel * proxy = new QXSortFilterFontListModel(this);
     proxy->setSourceModel(new QXFontListModel(this));
-    //proxy->sort(0);
+    proxy->sort(0);
     ui_->fontListView->setModel(proxy);
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
     ui_->fontListView->setMouseTracking(true);

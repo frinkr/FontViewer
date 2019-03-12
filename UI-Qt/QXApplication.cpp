@@ -133,8 +133,8 @@ void
 QXApplication::dismissSplashScreen(QWidget * widget) {
     if (splash_)
         splash_->dismiss(widget);
-    delete splash_;
-    splash_ = nullptr;
+    //delete splash_;
+    //splash_ = nullptr;
 }
     
 void
