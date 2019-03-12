@@ -24,8 +24,8 @@ def gen_win():
     os.system('cmake -G "Visual Studio 15 2017 Win64" -DCMAKE_TOOLCHAIN_FILE=' + os.path.join(vcpkg_home, 'scripts/buildsystems/vcpkg.cmake ') + source_root)
 
 def gen_mac():
-    openssl = subprocess.check_output(['brew', '--prefix', 'openssl']).decode('utf-8').strip()
-    qt = subprocess.check_output(['brew', '--prefix', 'qt']).decode('utf-8').strip()
+    openssl = subprocess.check_output('brew --prefix openssl', shell=True).decode('utf-8').strip()
+    qt = subprocess.check_output('brew --prefix qt', shell=True).decode('utf-8').strip()
     os.environ['PKG_CONFIG_PATH'] = os.path.join(openssl, 'lib/pkgconfig')
     os.chdir(build_root)
     os.system('cmake -G Xcode -DCMAKE_PREFIX_PATH=' + qt + ' ' + source_root)
