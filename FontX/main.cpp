@@ -16,12 +16,14 @@ std::string getUCDRoot() {
 
 int main() {
     FXLib::init(getUCDRoot()); {
-        auto face = FXFace::createFace(getFontFile("MyriadPro-Regular.otf"), 0);
+        auto face = FXFace::createFace(getFontFile("SourceSansVariable-Roman.otf"), 0);
+        FXGlyph g = face->glyph(FXGChar('a'));
         assert(face);
+        return;
 
         assert(face->face());
         assert(face->index() == 0);
-        assert(face->postscriptName() == "MyriadPro-Regular");
+        assert(face->postscriptName() == "SourceSansVariable-Roman");
         assert(face->upem() == 1000);
 
         FXCMap cm = face->currentCMap();

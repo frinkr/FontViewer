@@ -18,7 +18,7 @@ elseif(WIN32)
     RESOURCE_FILES
     win32/Resource.h
     win32/Resource.rc
-  )
+    )
   add_executable(
     ${PROJECT_NAME}
 	WIN32
@@ -69,4 +69,9 @@ if (APPLE)
     
     RESOURCE "${RESOURCE_FILES}"    
     )
+
+  #ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
+  #  POST_BUILD
+  #  COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/CopyLibs.sh "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
+  #)
 endif()

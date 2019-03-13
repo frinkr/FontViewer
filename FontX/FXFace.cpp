@@ -202,10 +202,11 @@ FXFace::createFace(const FXFaceDescriptor & descriptor) {
         return FXPtr<FXFace>(face);
     else
         delete face;
-
+#if FX_HAS_PDF_ADDON
     FXPtr<FXPDFDocument> pdf = FXPDFDocument::open(descriptor.filePath);
     if (pdf)
         return pdf->createFace(descriptor.index);
+#endif
 	return nullptr;
 }
     

@@ -17,6 +17,7 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
        initFace = FXFace::createFace(toStdString(filePath), 0);
     size_t faceCount = initFace? initFace->faceCount(): 0;
 
+#if FX_HAS_PDF_ADDON
     FXPtr<FXPDFFace> pdfFace = std::dynamic_pointer_cast<FXPDFFace>(initFace);
 
     if (pdfFace) {
@@ -26,7 +27,9 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
             ui_->listWidget->addItem(toQString(fontInfo.baseFont));
         }
     }
-    else {
+    else
+#endif
+    {
         for (size_t i = 0; i < faceCount; ++ i) {
             auto face = initFace->openFace(i);
             if (face) 

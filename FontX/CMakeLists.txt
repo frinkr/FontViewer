@@ -21,7 +21,9 @@ else()
   pkg_check_modules(ICU REQUIRED icu-uc)
 endif()
 
-add_subdirectory(PDF)
+if (FX_BUILD_PDF_ADDON)
+  add_subdirectory(PDF)
+endif()
 
 add_library(FontX
   STATIC
@@ -79,15 +81,18 @@ target_link_libraries(FontX
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
   ${Iconv_LIBRARIES}
-  FontXPDF
   )
+
+if (FX_BUILD_PDF_ADDON)
+  target_link_libraries(FontX FontXPDF)
+endif()
 
 if (APPLE)
   target_link_libraries(FontX
     ${ICU_LDFLAGS}
     ${HARFBUZZ_LDFLAGS}
     "-framework CoreServices"
-  )
+    )
 endif()
 
 #########################################################
