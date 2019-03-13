@@ -233,6 +233,7 @@ public:
         FXString          name;
         FXString          psName;
         FXVector<FXFixed> coordinates;
+        bool              isDefault;
     };
 
     const FXVector<VariableAxis> &

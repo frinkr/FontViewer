@@ -664,11 +664,43 @@ FXFace::initVariables() {
         instance.name       = atts_.names.getSFNTName(style->strid);
         instance.psName     = atts_.names.getSFNTName(style->psid);
 
-        for (FT_UInt j = 0; j < var->num_axis; ++ j)
+        bool isDefault = true;
+        for (FT_UInt j = 0; j < var->num_axis; ++ j) {
             instance.coordinates.push_back(style->coords[j]);
-
+            if (style->coords[j] != variableAxises_[j].defaultValue)
+                isDefault = false;
+        }
+        
+        instance.isDefault = isDefault;
         variableNamedInstances_.push_back(instance);
     }
-
+    
+    size_t defaultInstance = -1;
+    for (size_t i = 0; i < variableNamedInstances_.size(); ++ i) {
+        if (variableNamedInstances_[i].isDefault) {
+            defaultInstance = i;
+        }
+    }
+    
+    if (defaultInstance == -1) {
+        // synthersize a default instance
+        VariableNamedInstance instance;
+        instance.index      = 0;
+        instance.name       = "<default>";
+        instance.psName     = postscriptName();
+        instance.isDefault  = true;
+        for (const auto & ax : variableAxises_)
+            instance.coordinates.push_back(ax.defaultValue);
+        variableNamedInstances_.insert(variableNamedInstances_.begin(), instance);
+        
+        for (size_t i = 1; i < variableNamedInstances_.size(); ++ i)
+            variableNamedInstances_[i].index = i;
+        
+        defaultInstance = 0;
+    }
+    
+    // Select the default -- this fixes the crashing on macOS for variable font
+    setCurrentVariableCoordinates(variableNamedInstances_[defaultInstance].coordinates);
+    
     return true;
 }

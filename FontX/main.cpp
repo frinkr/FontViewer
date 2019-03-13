@@ -17,10 +17,7 @@ std::string getUCDRoot() {
 int main() {
     FXLib::init(getUCDRoot()); {
         auto face = FXFace::createFace(getFontFile("SourceSansVariable-Roman.otf"), 0);
-        FXGlyph g = face->glyph(FXGChar('a'));
         assert(face);
-        return;
-
         assert(face->face());
         assert(face->index() == 0);
         assert(face->postscriptName() == "SourceSansVariable-Roman");
