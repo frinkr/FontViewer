@@ -43,21 +43,24 @@ QXVariableWidget::initVariableFont() {
 
     connect(ui_->instanceComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), 
         this, &QXVariableWidget::onComboboxIndexChanged);
-            
-    QFormLayout * layout = new QFormLayout(ui_->axisesWidget);
+    
+    ui_->warningWidget->hide();
+    QFormLayout * layout = ui_->formLayout;
     for (auto & axis : document_->face()->variableAxises()) {
         QLabel * label = new QLabel(toQString(axis.name), this);
         QSlider * slider = new QSlider(Qt::Horizontal, this);
         layout->addRow(label, slider);
+        label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         slider->setMinimum(axis.minValue);
         slider->setMaximum(axis.maxValue);
         slider->setValue(axis.defaultValue);
         slider->setPageStep((axis.maxValue - axis.minValue) / 20);
         slider->setTracking(true);
+        slider->setTickPosition(QSlider::TicksBelow);
+        slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         connect(slider, &QSlider::valueChanged, this, &QXVariableWidget::onSliderValueChanged);
         sliders_.append(slider);
     }
-    ui_->axisesWidget->setLayout(layout);
 
     connect(ui_->buttonBox, &QDialogButtonBox::clicked, this, &QXVariableWidget::onResetButtonClicked);
 
@@ -71,7 +74,7 @@ QXVariableWidget::initNonVariableFont() {
     ui_->instanceComboBox->hide();
     ui_->buttonBox->hide();
 
-    QVBoxLayout * layout = new QVBoxLayout(ui_->axisesWidget);
+    QVBoxLayout * layout = new QVBoxLayout(ui_->warningWidget);
     QPixmap pixmap(":/images/warning.png");
 
     QLabel * icon = new QLabel();
@@ -81,14 +84,14 @@ QXVariableWidget::initNonVariableFont() {
     QLabel * text = new QLabel(
         tr(R"("%1" is not an OpenType variable or multiple master font!)")
         .arg(document_->displayName()), 
-        ui_->axisesWidget);
+        ui_->warningWidget);
     text->setTextFormat(Qt::RichText);
     text->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
     text->setWordWrap(true);
     text->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout->addWidget(icon);
     layout->addWidget(text);
-    ui_->axisesWidget->setLayout(layout);
+    ui_->warningWidget->setLayout(layout);
 }
 
 void
