@@ -27,6 +27,9 @@ public:
     void
     warning(QWidget * parent, const QString & title, const QString & text) const;
 
+    void
+    message(QWidget * parent, const QString & title, const QString & text) const;
+
 public slots:
     void
     showSplashScreen();

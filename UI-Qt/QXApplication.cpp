@@ -112,13 +112,12 @@ void
 QXApplication::warning(QWidget * parent, const QString & title, const QString & text) const {
     QXToastMessage * message = new QXToastMessage(parent);
     message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxWarning), text);
-    return;
-    QXThemedWindow<QMessageBox> box(parent);
-    box.setWindowTitle(title);
-    box.setText(text);
-    box.setStandardButtons(QMessageBox::Ok);
-    box.setIcon(QMessageBox::Warning);
-    box.exec();
+}
+
+void
+QXApplication::message(QWidget * parent, const QString & title, const QString & text) const {
+    QXToastMessage * message = new QXToastMessage(parent);
+    message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxInformation), text);
 }
 
 void
