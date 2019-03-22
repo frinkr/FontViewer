@@ -464,7 +464,8 @@ QXCollectionView::selectedIndex() const {
 
 void
 QXCollectionView::onBeginResetModel() {
-    
+    // Clear the selection
+    widget_->selected_.reset();
 }
 
 void

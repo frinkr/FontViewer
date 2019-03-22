@@ -22,6 +22,12 @@ struct QXCollectionModelIndex {
     isValid() const {
         return section != -1 && item != -1;
     }
+    
+    void
+    reset() {
+        section = -1;
+        item = -1;
+    }
 };
 
 class QXCollectionModel : public QObject {
