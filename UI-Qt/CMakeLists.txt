@@ -128,6 +128,8 @@ set(APPLE_SOURCES
   QXThemedWindowMac.mm
   )
 set(WIN32_SOURCES
+  WinHelper.h
+  WinHelper.cpp
   QXThemedWindowWin.cpp
   )
 

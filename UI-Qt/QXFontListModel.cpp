@@ -78,19 +78,25 @@ namespace {
         bool c0 = str0.contains(f);
         bool c1 = str1.contains(f);
 
-        if (s0 == s1) {
-            if (c0 == c1) {
-                size_t ed0 = uiLevenshteinDistance(str0, f);
-                size_t ed1 = uiLevenshteinDistance(str1, f);
-                return ed0 < ed1;
-            }
-            else {
-                return c0;
-            }
-        }
-        else {
+        if (s0 != s1)
             return s0;
-        }
+
+        if (c0 != c1)
+            return c0;
+
+        QRegExp regex("\\s+");
+
+        size_t ed0 = uiLevenshteinDistance(str0.split(regex, QString::SkipEmptyParts), filter.split(regex, QString::SkipEmptyParts));
+        size_t ed1 = uiLevenshteinDistance(str1.split(regex, QString::SkipEmptyParts), filter.split(regex, QString::SkipEmptyParts));
+        if (ed0 != ed1)
+            return ed0 < ed1;
+
+        ed0 = uiLevenshteinDistance(str0, f);
+        ed1 = uiLevenshteinDistance(str1, f);
+        if (ed0 == ed1)
+            return str0 < str1;
+        return ed0 < ed1;
+            
     }
 }
 

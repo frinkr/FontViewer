@@ -39,3 +39,9 @@ MacHelper::installNSApplicationDelegate() {
     [[NSApplication sharedApplication] setDelegate:[[MacApplicationDelegate alloc] init]];
     [pool release];
 }
+
+void
+MacHelper::revealFileInFinder(const QString & path) {
+    NSArray * fileURLs = [NSArray arrayWithObjects:[NSURL fileURLWithPath:path.toNSString()], nil];
+    [[NSWorkspace sharedWorkspace] activateFileViewerSelectingURLs:fileURLs];
+}

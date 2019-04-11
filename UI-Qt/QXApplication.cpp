@@ -17,6 +17,12 @@
 #include "QXThemedWindow.h"
 #include "QXToastMessage.h"
 
+#if defined(Q_OS_MACOS)
+#  include "MacHelper.h"
+#elif defined(Q_OS_WIN)
+#  include "WinHelper.h"
+#endif
+
 QXApplication::QXApplication(int & argc, char ** argv)
     : QApplication(argc, argv) {
     setOrganizationName("DANIEL JIANG");
@@ -123,36 +129,11 @@ QXApplication::message(QWidget * parent, const QString & title, const QString & 
 
 void
 QXApplication::showInGraphicalShell(QWidget * parent, const QString & path) {
-    const QFileInfo fileInfo(path);
-
 #if defined(Q_OS_WIN)
-    const FileName explorer = Environment::systemEnvironment().searchInPath(QLatin1String("explorer.exe"));
-    if (explorer.isEmpty()) {
-        QMessageBox::warning(parent,
-                             QApplication::translate("Core::Internal",
-                                                     "Launching Windows Explorer Failed"),
-                             QApplication::translate("Core::Internal",
-                                                     "Could not find explorer.exe in path to launch Windows Explorer."));
-        return;
-    }
-    QStringList param;
-    if (!fileInfo.isDir())
-        param += QLatin1String("/select,");
-    param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
-    QProcess::startDetached(explorer.toString(), param);
-
+    WinHelper::showInExplorer(path);
 #elif defined(Q_OS_MACOS)
-    QStringList scriptArgs;
-    scriptArgs << QLatin1String("-e")
-               << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
-        .arg(fileInfo.canonicalFilePath());
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
-    scriptArgs.clear();
-    scriptArgs << QLatin1String("-e")
-               << QLatin1String("tell application \"Finder\" to activate");
-    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    MacHelper::revealFileInFinder(path);
 #else
-
 #endif
 }
 
