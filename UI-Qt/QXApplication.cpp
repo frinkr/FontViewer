@@ -1,11 +1,12 @@
 #include <QApplicationStateChangeEvent>
+#include <QClipBoard>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>
-#include <QtDebug>
-#include <QtGui>
 #include <QStyle>
 #include <QTimer>
+#include <QtDebug>
+#include <QtGui>
 
 #include "QXAboutDialog.h"
 #include "QXAboutFontsDialog.h"
@@ -119,6 +120,47 @@ QXApplication::message(QWidget * parent, const QString & title, const QString & 
     QXToastMessage * message = new QXToastMessage(parent);
     message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxInformation), text);
 }
+
+void
+QXApplication::showInGraphicalShell(QWidget * parent, const QString & path) {
+    const QFileInfo fileInfo(path);
+
+#if defined(Q_OS_WIN)
+    const FileName explorer = Environment::systemEnvironment().searchInPath(QLatin1String("explorer.exe"));
+    if (explorer.isEmpty()) {
+        QMessageBox::warning(parent,
+                             QApplication::translate("Core::Internal",
+                                                     "Launching Windows Explorer Failed"),
+                             QApplication::translate("Core::Internal",
+                                                     "Could not find explorer.exe in path to launch Windows Explorer."));
+        return;
+    }
+    QStringList param;
+    if (!fileInfo.isDir())
+        param += QLatin1String("/select,");
+    param += QDir::toNativeSeparators(fileInfo.canonicalFilePath());
+    QProcess::startDetached(explorer.toString(), param);
+
+#elif defined(Q_OS_MACOS)
+    QStringList scriptArgs;
+    scriptArgs << QLatin1String("-e")
+               << QString::fromLatin1("tell application \"Finder\" to reveal POSIX file \"%1\"")
+        .arg(fileInfo.canonicalFilePath());
+    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+    scriptArgs.clear();
+    scriptArgs << QLatin1String("-e")
+               << QLatin1String("tell application \"Finder\" to activate");
+    QProcess::execute(QLatin1String("/usr/bin/osascript"), scriptArgs);
+#else
+
+#endif
+}
+
+void
+QXApplication::copyTextToClipBoard(const QString & text) {
+    clipboard()->setText(text);
+}
+
 
 void
 QXApplication::showSplashScreen() {

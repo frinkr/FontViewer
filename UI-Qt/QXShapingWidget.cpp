@@ -1,4 +1,3 @@
-#include <QClipBoard>
 #include <QPainter>
 #include <QMenu>
 #include <QMouseEvent>
@@ -477,6 +476,6 @@ QXShapingWidget::offFeatures() const {
 void
 QXShapingWidget::doCopyAction() {
     QString text = QXEncoding::decodeFromHexNotation(ui_->lineEdit->text());
-    qApp->clipboard()->setText(text);
+    qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }

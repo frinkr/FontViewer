@@ -30,6 +30,12 @@ public:
     void
     message(QWidget * parent, const QString & title, const QString & text) const;
 
+    void
+    showInGraphicalShell(QWidget * parent, const QString & path);
+
+    void
+    copyTextToClipBoard(const QString & text);
+
 public slots:
     void
     showSplashScreen();

@@ -65,6 +65,9 @@ private slots:
     onFontDoubleClicked(const QModelIndex & index);
 
     void
+    onFontContextMenuRequested(const QPoint & pos);
+    
+    void
     onSearchLineEditReturnPressed();
 
     void

@@ -68,7 +68,7 @@ namespace {
         }
 
         bool 
-        editorEvent(QEvent * event, QAbstractItemModel*, const QStyleOptionViewItem & option, const QModelIndex & index)         {
+        editorEvent(QEvent * event, QAbstractItemModel*, const QStyleOptionViewItem & option, const QModelIndex & index) override {
             if (event->type() == QEvent::MouseButtonRelease) {
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
 
@@ -94,7 +94,6 @@ namespace {
             painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
             const bool selected = (option.state & QStyle::State_Selected);
-            const bool active = (option.state & QStyle::State_Active);
             if (selected)
                 painter->fillRect(option.rect, option.palette.brush(QPalette::Active, QPalette::Highlight));
             else if (option.state & QStyle::State_MouseOver)
@@ -282,7 +281,9 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->fontListView->setModel(proxy);
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
     ui_->fontListView->setMouseTracking(true);
+    ui_->fontListView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontBrowser::onFontDoubleClicked, Qt::QueuedConnection);
+    connect(ui_->fontListView, &QListView::customContextMenuRequested, this, &QXFontBrowser::onFontContextMenuRequested, Qt::QueuedConnection);
 
     QXFontManager::instance();
     QXDocumentWindowManager * mgr = QXDocumentWindowManager::instance();
@@ -512,6 +513,36 @@ QXFontBrowser::scrollToCurrentIndex() {
 void
 QXFontBrowser::onFontDoubleClicked(const QModelIndex & index) {
     accept();
+}
+
+void
+QXFontBrowser::onFontContextMenuRequested(const QPoint & pos) {
+    auto index = currentSourceIndex();
+    if (index.row() < 0)
+        return;
+    
+    auto & desc = QXFontManager::instance().db()->faceDescriptor(index.row());
+    
+    QPoint globalPos = ui_->fontListView->mapToGlobal(pos);
+    
+    QMenu menu;
+    menu.addAction(tr("Copy File Path"), [desc](){
+        qApp->copyTextToClipBoard(toQString(desc.filePath));
+    });
+    
+    menu.addAction(
+#if defined(Q_OS_WIN)
+                   tr("Show in Explorer"),
+#elif defined(Q_OS_MACOS)
+                   tr("Reveal in Finder"),
+#else
+                   tr("Show in Finder"),
+#endif
+                   [this, desc]() {
+        qApp->showInGraphicalShell(this, toQString(desc.filePath));
+    });
+    
+    menu.exec(globalPos);
 }
 
 void
