@@ -14,7 +14,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 6;
+    constexpr int FACE_DB_VERSION = 8;
 
     size_t hashFile(const FXString & file, size_t hash) {
         boost::hash_combine(hash, file);

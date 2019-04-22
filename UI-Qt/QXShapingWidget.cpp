@@ -325,7 +325,10 @@ QXShapingGlyphView::glyphAtPoint(const QPoint & point) const {
 
 double
 QXShapingGlyphView::fu2px(fu f) const {
-    return shaper_->face()->fontSize() * f / shaper_->face()->upem();
+    if (!shaper_->face()->upem())
+        return shaper_->face()->fontSize();
+    else
+        return shaper_->face()->fontSize() * f / shaper_->face()->upem();
 }
     
 QXShapingWidget::QXShapingWidget(QWidget * parent)

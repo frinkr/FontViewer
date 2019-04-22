@@ -561,7 +561,7 @@ FXFace::initAttributes() {
     const char * format = FT_Get_Font_Format(face_);
     if (format)
         atts_.format = format;
-
+    
     // names
     if (face_->family_name)
         atts_.names.setFamilyName(face_->family_name);
@@ -571,6 +571,11 @@ FXFace::initAttributes() {
     const char * psName = FT_Get_Postscript_Name(face_);
     if (psName)
         atts_.names.setPostscriptName(psName);
+    
+    if (!atts_.upem) {
+        if (!strcmp(psName, "AppleColorEmoji")) atts_.upem = 800;
+        else atts_.upem = 1000;
+    }
     
     FT_UInt sfntCount = FT_Get_Sfnt_Name_Count(face_);
     for (FT_UInt i = 0; i < sfntCount; ++i) {
