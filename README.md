@@ -21,8 +21,8 @@ Checkout the build directory to find the project files.
 ### Usage
 Intuited & Simple
 
-![Alt text](http://i.imgur.com/xJNubF4.png "Select Typeface")
-![Alt text](http://i.imgur.com/LE1mEfS.png "Main Window")
+![Alt text](Resources/Screenshots/FontBrowser.png?raw=true "Font Browser")
+![Alt text](Resources/Screenshots/Main.png?raw=true "Main Window")
 
 ### License
 MIT
