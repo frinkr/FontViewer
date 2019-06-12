@@ -10,9 +10,24 @@ namespace {
     const PdfObject *
     getFontFileObj(const PdfObject * fontObj) {
         const PdfObject * descriptor = fontObj->GetIndirectKey("FontDescriptor");
+        
+        if (!descriptor) {
+            // Type0
+            const PdfObject * descendantFonts = fontObj->GetIndirectKey("DescendantFonts");
+            if (descendantFonts) {
+                const PdfArray & array = descendantFonts->GetArray();
+                if (array.size() == 1) {
+                    const PdfReference & fontRef = array.front().GetReference();
+                    const PdfObject * font = fontObj->GetOwner()->GetObject(fontRef);
+                    if (font)
+                        descriptor = font->GetIndirectKey("FontDescriptor");
+                }
+            }
+        }
+        
         if (!descriptor)
             return nullptr;
-
+        
         const PdfObject * fontFile = descriptor->GetIndirectKey("FontFile");
         if (!fontFile)
             fontFile = descriptor->GetIndirectKey("FontFile2");

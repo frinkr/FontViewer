@@ -247,7 +247,8 @@ void
 FXCMap::initBlocks() {
     auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
     if (fullBlocks.empty()) {
-        FXPtr<FXGCharBlock> nilBlock(new FXNullGCharBlock("NIL"));
+        //new FXCharRangeBlock(0, face_->glyphCount(), FXGCharType::FXGCharTypeGlyphID, "Glyphs");
+        FXPtr<FXGCharBlock> nilBlock(new FXCharRangeBlock(0, face_->glyphCount(), FXGCharType::FXGCharTypeGlyphID, "All Glyphs"));
         blocks_.push_back(nilBlock);
     } else if (!isUnicode()) {
         blocks_ = fullBlocks;
