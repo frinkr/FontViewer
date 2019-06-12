@@ -482,3 +482,10 @@ QXShapingWidget::doCopyAction() {
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }
+
+void
+QXShapingWidget::focusLineEdit(bool selectAll) {
+    ui_->lineEdit->setFocus();
+    if (selectAll)
+        ui_->lineEdit->selectAll();
+}

@@ -106,6 +106,9 @@ public slots:
     
     void
     doCopyAction();
+    
+    void
+    focusLineEdit(bool selectAll = true);
 private:
     FXPtr<FXInspector>
     inspector();
