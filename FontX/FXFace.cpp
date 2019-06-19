@@ -574,7 +574,7 @@ FXFace::initAttributes() {
     if (psName)
         atts_.names.setPostscriptName(psName);
     
-    if (!atts_.upem) {
+    if (!atts_.upem && psName) {
         if (!strcmp(psName, "AppleColorEmoji")) atts_.upem = 800;
         else atts_.upem = 1000;
     }
