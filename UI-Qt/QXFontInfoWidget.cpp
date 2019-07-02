@@ -77,6 +77,7 @@ namespace {
             addDataRow(tr("Style Name"), toQString(faceAtts().names.styleName()));
             addDataRow(tr("Face Flags"), faceFlagsStr(ftFace->face_flags).join("<br>"));
             addDataRow(tr("Style Flags"), styleFlagsStr(ftFace->style_flags).join("<br>"));
+            addDataRow(tr("FS Type Flags"), fsTypeFlagsStr(FT_Get_FSType_Flags(ftFace)).join("<br>"));
             addDataRow(tr("Num Glyph"), static_cast<int>(faceAtts().glyphCount));
             addDataRow(tr("Num Fixed Sizes"), static_cast<int>(ftFace->num_fixed_sizes));
             addDataRow(tr("Num CMaps"), static_cast<int>(ftFace->num_charmaps));
@@ -178,6 +179,24 @@ namespace {
                     list << toQString(kv.second);
             }
             return list;            
+        }
+        
+        static QStringList
+        fsTypeFlagsStr(FT_UShort flags) {
+            static FXMap<FT_Long, FXString> map = {
+                {FT_FSTYPE_INSTALLABLE_EMBEDDING, "INSTALLABLE_EMBEDDING"},
+                {FT_FSTYPE_RESTRICTED_LICENSE_EMBEDDING, "RESTRICTED_LICENSE_EMBEDDING"},
+                {FT_FSTYPE_PREVIEW_AND_PRINT_EMBEDDING, "PREVIEW_AND_PRINT_EMBEDDING"},
+                {FT_FSTYPE_EDITABLE_EMBEDDING, "EDITABLE_EMBEDDING"},
+                {FT_FSTYPE_NO_SUBSETTING, "NO_SUBSETTING"},
+                {FT_FSTYPE_BITMAP_EMBEDDING_ONLY, "BITMAP_EMBEDDING_ONLY"},
+            };
+            QStringList list;
+            for (const auto & kv: map) {
+                if (flags & kv.first)
+                    list << toQString(kv.second);
+            }
+            return list;
         }
     };
 
