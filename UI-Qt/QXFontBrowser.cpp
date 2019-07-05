@@ -318,7 +318,7 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     searchIconAction->setIcon(qApp->loadIcon(":/images/search.png"));
     ui_->searchLineEdit->addAction(searchIconAction, QLineEdit::LeadingPosition);
     connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontBrowser::onSearchLineEditReturnPressed);
-    connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onSearchLineEditTextEdited);
+    connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onFilterChanged);
 
     // Menu button
     QMenu * menu = new QMenu(ui_->menuButton);
@@ -361,8 +361,10 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     ui_->previewFontSizeSlider->setMinimum(MIN_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setMaximum(MAX_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setValue(DEFAULT_PREVIEW_FONT_SIZE);
-    connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontBrowser::updatePreviewSettings);
-    connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::updatePreviewSettings);
+    connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontBrowser::updatePreviewText);
+    connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontBrowser::onPreviewTextChanged);
+    connect(ui_->previewCoverAllCharsCheckBox, &QCheckBox::stateChanged, this, &QXFontBrowser::onFilterChanged);
+        
     ui_->previewSettingsGoupBox->hide();
 
     // Add actions
@@ -505,6 +507,15 @@ QXFontBrowser::currentSourceIndex() const {
     return proxyModel()->mapToSource(currentProxyIndex());
 }
 
+QXFontListFilter
+QXFontBrowser::fontListFilter() const {
+    QXFontListFilter filter;
+    filter.fontName = ui_->searchLineEdit->text();
+    filter.sampleText = ui_->previewTextEdit->text();
+    filter.converAllSampleCharacters = ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked;
+    return filter;
+}
+
 void
 QXFontBrowser::scrollToCurrentIndex() {
     ui_->fontListView->scrollTo(ui_->fontListView->currentIndex(), QAbstractItemView::PositionAtTop);    
@@ -550,10 +561,10 @@ QXFontBrowser::onSearchLineEditReturnPressed() {
 }
 
 void
-QXFontBrowser::onSearchLineEditTextEdited() {
-    QString text = ui_->searchLineEdit->text();
-    proxyModel()->setFilter(text);
-    if (!text.isEmpty() || selectedFontIndex() == -1)
+QXFontBrowser::onFilterChanged() {
+    auto filter = fontListFilter();
+    proxyModel()->setFilter(fontListFilter());
+    if (!filter.fontName.isEmpty() || selectedFontIndex() == -1)
         ui_->fontListView->setCurrentIndex(proxyModel()->index(0, 0));
     scrollToCurrentIndex();
 }
@@ -571,7 +582,15 @@ QXFontBrowser::onOpenFileButtonClicked() {
 }
 
 void
-QXFontBrowser::updatePreviewSettings() {
+QXFontBrowser::onPreviewTextChanged() {
+    updatePreviewText();
+    
+    if (ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked)
+        onFilterChanged();
+}
+
+void
+QXFontBrowser::updatePreviewText() {
     QXFontBrowserItemDelegate * delegate = dynamic_cast<QXFontBrowserItemDelegate *>(ui_->fontListView->itemDelegate());
     if (delegate) {
         delegate->setFontSize(ui_->previewFontSizeSlider->value());

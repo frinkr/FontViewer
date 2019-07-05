@@ -68,8 +68,8 @@ namespace {
      * Return true if left is closer to filter, otherwise false.
      */
     bool
-    lessThanWithFilter(const QString & left, const QString & right, const QString & filter) {
-        QString f = filter.toLower();
+    lessThanWithFilter(const QString & left, const QString & right, const QXFontListFilter & filter) {
+        QString f = filter.fontName.toLower();
         QString str0 = left.toLower();
         QString str1 = right.toLower();
         
@@ -86,8 +86,8 @@ namespace {
 
         QRegExp regex("\\s+");
 
-        size_t ed0 = uiLevenshteinDistance(str0.split(regex, QString::SkipEmptyParts), filter.split(regex, QString::SkipEmptyParts));
-        size_t ed1 = uiLevenshteinDistance(str1.split(regex, QString::SkipEmptyParts), filter.split(regex, QString::SkipEmptyParts));
+        size_t ed0 = uiLevenshteinDistance(str0.split(regex, QString::SkipEmptyParts), f.split(regex, QString::SkipEmptyParts));
+        size_t ed1 = uiLevenshteinDistance(str1.split(regex, QString::SkipEmptyParts), f.split(regex, QString::SkipEmptyParts));
         if (ed0 != ed1)
             return ed0 < ed1;
 
@@ -125,15 +125,10 @@ QXFontListModel::data(const QModelIndex & index, int role) const {
 }
 
 bool
-QXFontListModel::acceptRow(const QString & filter, int row) const {
+QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
     if (filter.isEmpty())
         return true;
     
-    if (acceptWithFilter(displayName(row), filter))
-        return true;
-
-    auto const & atts = attributes(row);
-
     auto searchInNames = [](const FXMap<FXString, FXString> & names, const QString & name) {
         for (const auto it : names) {
             if (toQString(it.second).contains(name, Qt::CaseInsensitive))
@@ -141,10 +136,32 @@ QXFontListModel::acceptRow(const QString & filter, int row) const {
         }
         return false;
     };
-
-    return searchInNames(atts.names.localizedFamilyNames(), filter) ||
-        searchInNames(atts.names.localizedStyleNames(), filter) ||
-        searchInNames(atts.names.localizedPostscriptNames(), filter);
+    
+    // Check names
+    auto const & atts = attributes(row);
+    const bool acceptFontName = filter.fontName.isEmpty() ||
+        acceptWithFilter(displayName(row), filter.fontName) ||
+        searchInNames(atts.names.localizedFamilyNames(), filter.fontName) ||
+        searchInNames(atts.names.localizedStyleNames(), filter.fontName) ||
+        searchInNames(atts.names.localizedPostscriptNames(), filter.fontName);
+    
+    if (!acceptFontName)
+        return false;
+    
+    // Check sample chars
+    if (filter.converAllSampleCharacters && !filter.sampleText.isEmpty()) {
+        const FXFaceDescriptor & desc = db()->faceDescriptor(row);
+        
+        FXPtr<FXFastFace> face = FXFastFace::create(desc);
+        if (!face)
+            return false;
+        for (uint ch : filter.sampleText.toUcs4()) {
+            if (!face->hasGlyphForChar(ch))
+                return false;
+        }
+    }
+    
+    return true;
 }
 
 const FXFaceAttributes &
@@ -196,14 +213,14 @@ QXSortFilterFontListModel::filterAcceptsRow(int sourceRow, const QModelIndex & s
 }
 
 void
-QXSortFilterFontListModel::setFilter(const QString & text) {
-    filter_ = text;
+QXSortFilterFontListModel::setFilter(const QXFontListFilter & filter) {
+    filter_ = filter;
     invalidate();
 }
 
 void
 QXSortFilterFontListModel::clearFilter() {
-    setFilter(QString());
+    filter_.clear();
 }
 
 QXFontListModel *

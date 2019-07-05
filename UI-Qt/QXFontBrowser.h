@@ -3,6 +3,7 @@
 #include <QDialog>
 #include "QXDocument.h"
 #include "QXThemedWindow.h"
+#include "QXFontListModel.h"
 
 namespace Ui {
     class QXFontBrowser;
@@ -60,6 +61,8 @@ private:
     QModelIndex
     currentSourceIndex() const;
 
+    QXFontListFilter
+    fontListFilter() const;
 private slots:
     void
     onFontDoubleClicked(const QModelIndex & index);
@@ -71,7 +74,7 @@ private slots:
     onSearchLineEditReturnPressed();
 
     void
-    onSearchLineEditTextEdited();
+    onFilterChanged();
 
     void
     onSearchAction();
@@ -83,7 +86,10 @@ private slots:
     scrollToCurrentIndex();
 
     void
-    updatePreviewSettings();
+    onPreviewTextChanged();
+    
+    void
+    updatePreviewText();
 
     void
     quitApplication();

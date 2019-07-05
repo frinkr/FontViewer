@@ -301,3 +301,28 @@ protected:
     FXVector<VariableAxis>            variableAxises_{};
     FXVector<VariableNamedInstance>   variableNamedInstances_{};
 };
+
+
+class FXFastFace : public std::enable_shared_from_this<FXFastFace> {
+public:
+    static FXPtr<FXFastFace>
+    create(const FXFaceDescriptor & descriptor);
+    
+    static FXPtr<FXFastFace>
+    create(FXPtr<FXStream> stream, size_t faceIndex);
+    
+protected:
+    explicit FXFastFace(FXFTFace face);
+    
+public:
+    ~FXFastFace();
+    
+    FXGlyphID
+    glyphIDForChar(FXChar ch) const;
+    
+    bool
+    hasGlyphForChar(FXChar ch) const;
+    
+private:
+    FXFTFace             face_{nullptr};
+};

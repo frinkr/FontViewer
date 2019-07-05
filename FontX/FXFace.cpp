@@ -717,3 +717,46 @@ FXFace::initVariables() {
     
     return true;
 }
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////
+// FXFastFace
+
+FXPtr<FXFastFace>
+FXFastFace::create(const FXFaceDescriptor & descriptor) {
+    FXFTFace face = nullptr;
+    if (FXFTOpenFace(FXLib::get(), descriptor.filePath, descriptor.index, &face))
+        return FXPtr<FXFastFace>();
+    return FXPtr<FXFastFace>(new FXFastFace(face));
+}
+
+FXPtr<FXFastFace>
+FXFastFace::create(FXPtr<FXStream> stream, size_t faceIndex) {
+    FXFTFace face = nullptr;
+    if (FXFTOpenFace(FXLib::get(), stream, faceIndex, &face))
+        return FXPtr<FXFastFace>();
+    return FXPtr<FXFastFace>(new FXFastFace(face));
+}
+
+FXFastFace::FXFastFace(FXFTFace face)
+: face_(face) {
+    assert(face);
+    FT_Reference_Face(face_);
+}
+
+FXFastFace::~FXFastFace() {
+    if (face_)
+        FT_Done_Face(face_);
+}
+
+FXGlyphID
+FXFastFace::glyphIDForChar(FXChar ch) const {
+    return FT_Get_Char_Index(face_, ch);
+}
+
+bool
+FXFastFace::hasGlyphForChar(FXChar ch) const {
+    return glyphIDForChar(ch) != 0;
+}

@@ -3,6 +3,22 @@
 #include <QSortFilterProxyModel>
 #include "FontX/FXFaceDatabase.h"
 
+struct QXFontListFilter {
+    QString  fontName;
+    QString  sampleText;
+    bool     converAllSampleCharacters {false};
+    
+    void clear() {
+        fontName.clear();
+        sampleText.clear();
+        converAllSampleCharacters = false;
+    }
+    
+    bool isEmpty() const {
+        return fontName.isEmpty() && (!converAllSampleCharacters && sampleText.isEmpty());
+    }
+};
+
 class QXFontListModel : public QAbstractListModel {
     Q_OBJECT
 public:
@@ -15,7 +31,7 @@ public:
     data(const QModelIndex & index, int role) const;
 
     bool
-    acceptRow(const QString & filter, int row) const;
+    acceptRow(const QXFontListFilter & filter, int row) const;
 public:
     FXPtr<FXFaceDatabase>
     db() const;
@@ -43,7 +59,7 @@ public:
 
 public:
     void
-    setFilter(const QString & text);
+    setFilter(const QXFontListFilter & filter);
 
     void
     clearFilter();
@@ -52,7 +68,7 @@ protected:
     QXFontListModel *
     fontListModel() const;
 protected:
-    QString  filter_;
+    QXFontListFilter  filter_;
     
 };
 
