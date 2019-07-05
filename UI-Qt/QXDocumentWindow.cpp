@@ -340,6 +340,12 @@ QXDocumentWindow::onCharLinkClicked(FXGChar c) {
 
 void
 QXDocumentWindow::onCopyAction() {
+    if (!ui_->glyphCollectionView->hasFocus()) {
+        if (QWidget * focus = qApp->focusWidget())
+            QMetaObject::invokeMethod(focus, "copy", Qt::QueuedConnection);
+        return;
+    }
+    
     FXGChar c = document_->charAt(ui_->glyphCollectionView->selectedIndex());
     if (c.isUnicode()) {
         QString text = QString::fromUcs4(static_cast<uint*>(&c.value), 1);
