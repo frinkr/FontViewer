@@ -341,8 +341,12 @@ QXDocumentWindow::onCharLinkClicked(FXGChar c) {
 void
 QXDocumentWindow::onCopyAction() {
     if (!ui_->glyphCollectionView->hasFocus()) {
-        if (QWidget * focus = qApp->focusWidget())
-            QMetaObject::invokeMethod(focus, "copy", Qt::QueuedConnection);
+        if (QWidget * focus = qApp->focusWidget()) {
+            while (focus && focus->metaObject()->indexOfMethod("copy()") == -1)
+                focus = focus->parentWidget();
+            if (focus)
+                QMetaObject::invokeMethod(focus, "copy", Qt::QueuedConnection);
+        }
         return;
     }
     

@@ -1,6 +1,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QItemDelegate>
+#include <QClipboard>
 #include <QPainter>
 #include <QSortFilterProxyModel>
 #include <QStandardPaths>
@@ -306,6 +307,31 @@ QxGlyphTableWidget::exportToFile() {
 
     if (!fileName.isEmpty())
         model_->exportToFile(fileName);
+}
+
+void
+QxGlyphTableWidget::copy() {
+    QModelIndexList rows = ui_->tableView->selectionModel()->selectedRows();
+    auto model = ui_->tableView->selectionModel()->model();
+    
+    QStringList content;
+    for (QModelIndex row : rows) {
+        auto colCount = model->columnCount();
+        QStringList rowText;
+        for (auto col = 0; col < colCount; ++ col) {
+            auto cell = model->index(row.row(), col);
+            auto cellData = model->data(cell);
+            auto cellText = cellData.toString();
+            if (!cellText.isEmpty())
+                rowText << cellText;
+        }
+        if (!rowText.isEmpty())
+            content << rowText.join('\t');
+    }
+    
+    if (!content.isEmpty()) {
+        qApp->clipboard()->setText(content.join('\n'));
+    }
 }
 
 void

@@ -55,6 +55,9 @@ public slots:
     void
     exportToFile();
 
+    void
+    copy();
+    
 private slots:
     void
     gotoGlyphAtIndex(const QModelIndex & index);
