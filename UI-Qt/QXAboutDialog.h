@@ -7,7 +7,7 @@ namespace Ui {
     class QXAboutDialog;
 }
 
-class QXAboutDialog : public QXThemedWindow<QDialog> {
+class QXAboutDialog : public QXThemedWindow<QDialog, false> {
     Q_OBJECT
 
 public:

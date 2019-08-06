@@ -5,7 +5,7 @@
 #include "ui_QXAboutDialog.h"
 
 QXAboutDialog::QXAboutDialog(QWidget *parent ) :
-    QXThemedWindow<QDialog>(parent),
+    QXThemedWindow<QDialog, false>(parent),
     ui(new Ui::QXAboutDialog) {
     ui->setupUi(this);
 

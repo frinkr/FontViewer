@@ -135,6 +135,6 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         actionAbout->setMenuRole(QAction::AboutRole);
 
         actionAboutFonts = menuHelp->addAction(tr("About Font Database"), qApp, &QXApplication::aboutFonts);
-        actionAboutFonts->setMenuRole(QAction::ApplicationSpecificRole);
+        actionAboutFonts->setMenuRole(QAction::AboutQtRole);
     }
 }
