@@ -514,6 +514,15 @@ FXMacRoman2UTF8(const unsigned char * buffer, size_t bufferLen) {
 
 static FXString
 FXIconv(const FXString & encoding, const char * buffer, size_t bufferLen) {
+    // byte 0 is not valid in MBS, so remove all byte 0
+    char * trimed = (char *)malloc(bufferLen);
+    size_t trimedLen = 0;
+    for (size_t i = 0; i < bufferLen; ++ i) {
+        char c = buffer[i];
+        if (c)
+            trimed[trimedLen++] = c;
+    }
+    
     constexpr size_t BLOCK_SIZE = 128;
     size_t outLen = BLOCK_SIZE;
     char * outBuf = reinterpret_cast<char*>(malloc(outLen));
@@ -524,8 +533,8 @@ FXIconv(const FXString & encoding, const char * buffer, size_t bufferLen) {
             free(outBuf);
             return FXString();
         }
-        char * inBuf = const_cast<char*>(buffer);
-        size_t inLen = bufferLen;
+        char * inBuf = const_cast<char*>(trimed);
+        size_t inLen = trimedLen;
         
         size_t outLenIconv = outLen;
         char * outBufIconv = outBuf;
@@ -550,6 +559,7 @@ FXIconv(const FXString & encoding, const char * buffer, size_t bufferLen) {
 
     FXString ret(outBuf, outLen);
     free(outBuf);
+    free(trimed);
     return ret;
 }
 
