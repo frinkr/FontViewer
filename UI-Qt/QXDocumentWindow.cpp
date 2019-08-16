@@ -114,12 +114,14 @@ QXDocumentWindow::initMenu() {
         menuBar_->actionShowAllGlyphs->setChecked(!activated);
     });
 
-    connect(menuBar_->actionFullScreen, &QAction::toggled, [this](bool checked) {
-        if (checked)
-            showFullScreen();
-        else
-            showNormal();
-    });
+    if (menuBar_->actionFullScreen) {
+        connect(menuBar_->actionFullScreen, &QAction::toggled, [this](bool checked) {
+            if (checked)
+                showFullScreen();
+            else
+                showNormal();
+        });
+    }
 
     setMenuBar(menuBar_);
 
