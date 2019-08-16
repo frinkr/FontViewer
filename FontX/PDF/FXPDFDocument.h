@@ -63,6 +63,12 @@ private:
     void
     processPage(int pageIndex);
 
+    void
+    processResource(const PoDoFo::PdfObject * resource);
+    
+    void
+    processFontResource(const PoDoFo::PdfObject * fontResource);
+    
 private:
     FXString              file_;
     FXVector<FXPDFFontInfo>   fonts_;

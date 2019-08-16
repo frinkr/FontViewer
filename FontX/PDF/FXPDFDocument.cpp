@@ -114,38 +114,56 @@ FXPDFDocument::faceDestroyed(FXPDFFace * face) {
 void
 FXPDFDocument::processPage(int pageIndex) {
     const PdfPage * pPage = document_->GetPage(pageIndex);
-        
-    PdfObject * pageResources = pPage->GetResources();
-    PdfObject * pageFontRes = pageResources->GetIndirectKey(PdfName("Font"));
-    if (!pageFontRes || !pageFontRes->IsDictionary()) {
-        FX_WARNING("Page " << pageIndex << " doesn't use any fonts");
-        return;
-    }
+    if (auto pageRes = pPage->GetResources())
+        processResource(pageRes);
+}
 
-    const PdfDictionary & pageFontDict = pageFontRes->GetDictionary();
-    if (pageFontDict.GetKeys().empty()) {
-        FX_WARNING("Page " << pageIndex << " doesn't use any fonts");
-        return;
+void
+FXPDFDocument::processResource(const PoDoFo::PdfObject * resource) {
+    if (auto fontRes = resource->GetIndirectKey(PdfName("Font")))
+        processFontResource(fontRes);
+    
+    if (auto xobjs = resource->GetIndirectKey(PdfName("XObject"))) {
+        if (xobjs->IsDictionary()) {
+            const PdfDictionary & xobjDict = xobjs->GetDictionary();
+            if (!xobjDict.GetKeys().empty()) {
+                for (const TKeyMap::value_type & kv: xobjDict.GetKeys()) {
+                    PdfObject * xobj = resource->GetOwner()->GetObject(kv.second->GetReference());
+                    if (auto xobjRes = xobj->GetIndirectKey(PdfName("Resources")))
+                        processResource(xobjRes);
+                }
+            }
+        }
     }
-        
-    for (const TKeyMap::value_type & kv: pageFontDict.GetKeys()) {
-        PdfObject * fontObj = pPage->GetObject()->GetOwner()->GetObject(kv.second->GetReference());
+}
+
+void
+FXPDFDocument::processFontResource(const PoDoFo::PdfObject * fontRes) {
+    if (!fontRes || !fontRes->IsDictionary())
+        return;
+    
+    const PdfDictionary & fontDict = fontRes->GetDictionary();
+    if (fontDict.GetKeys().empty())
+        return;
+    
+    for (const TKeyMap::value_type & kv: fontDict.GetKeys()) {
+        PdfObject * fontObj = fontRes->GetOwner()->GetObject(kv.second->GetReference());
         if (fontObjects_.find(fontObj) != fontObjects_.end())
             continue;
-
+        
         fontObjects_.insert(fontObj);
-
+        
         FXPDFFontInfo font;
         font.fontObject = fontObj;
-
+        
         const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
         if (baseFont && baseFont->IsName())
             font.baseFont = baseFont->GetName().GetName();
-
+        
         const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
         if (subType && subType->IsName())
             font.subType = subType->GetName().GetName();
-         
+        
         fonts_.push_back(font);
     }
 }
