@@ -4,6 +4,7 @@
 #include "FontX/FXFT.h"
 #include "FontX/FXFTNames.h"
 #include "FontX/FXTag.h"
+#include "FontX/FXInspector.h"
 
 #include "QXConv.h"
 #include "QXResource.h"
@@ -151,7 +152,6 @@ namespace {
             addDataRow(tr("Underline Position"), static_cast<int>(ftFace_->underline_position));
             addDataRow(tr("Underline Thickness"), static_cast<int>(ftFace_->underline_thickness));
 
-            addEmptyRow();
             addHeadRow(tr("Format"));            
             addDataRow(tr("Format"), toQString(faceAtts().format));
             addDataRow(tr("IsCID"), faceAtts().isCID);
@@ -174,7 +174,6 @@ namespace {
             }
             addDataRow(tr("Tables"), tables.isEmpty()? tr("<i>NOT A SFNT FONT</i>"): tables);
 
-            addEmptyRow();
             addHeadRow(tr("Version"));
             if (os2)
                 addDataRow(tr("Vendor"), QString("<a href=https://www.microsoft.com/typography/links/vendorlist.aspx>%1</a>").arg(toQString(FXString(reinterpret_cast<const char *>(os2->achVendID), 4))));
@@ -578,17 +577,36 @@ namespace {
 
     };
 
-    class QXGSUBPage : public QXFontHtmlTemplatePage {
+    template <FXTag otTable>
+    class QXGSUBGPOSPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
-
+        void
+        loadTableRows() override {
+            FXPtr<FXInspector> inspector = face_->inspector();
+            auto otScripts = inspector->otScripts(otTable);
+            for (auto otScript: otScripts) {
+                tableTemplate_->addLongHeadRow(QString::fromStdString(
+                           FXTag2Str(otScript) + " - " +
+                           QXNames::OTGetScriptFullName(otScript)));
+                
+                auto otLanguages = inspector->otLanguages(otScript, otTable);
+                if (otLanguages.empty())
+                    addDataRow("<i>None</i>", "");
+                
+                for (auto otLanguage : otLanguages) {
+                    auto otFeatures = inspector->otFeatures(otScript, otLanguage, otTable);
+                    std::vector<std::string> otFeatureStrs;
+                    for (auto feat : otFeatures)
+                        otFeatureStrs.push_back(FXTag2Str(feat) + " (" + QXNames::OTGetFeatureFullName(feat) + ")");
+                    addDataRow(QString::fromStdString(FXTag2Str(otLanguage)), fmt::join(otFeatureStrs));
+                }
+            }
+        }
     };
-
-    class QXGPOSPage : public QXFontHtmlTemplatePage {
-    public:
-        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
-
-    };
+    
+    using QXGSUBPage = QXGSUBGPOSPage<FXTableGSUB>;
+    using QXGPOSPage = QXGSUBGPOSPage<FXTableGPOS>;
 
     class QXGlyfPage : public QXFontHtmlTemplatePage {
     public:

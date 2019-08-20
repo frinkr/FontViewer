@@ -64,6 +64,9 @@ QXHtmlTableTemplate::html() {
 
 void
 QXHtmlTableTemplate::addHeadRow(const QString & text) {
+    if (!htmlTableRows_.isEmpty())
+        addEmptyRow();
+    
     QString h = "                                  \
             <tr>                                   \
               <td class=\"key\">                   \
@@ -73,6 +76,22 @@ QXHtmlTableTemplate::addHeadRow(const QString & text) {
             \n";
     htmlTableRows_ += h.arg(text);
 }
+
+void
+QXHtmlTableTemplate::addLongHeadRow(const QString & text) {
+    if (!htmlTableRows_.isEmpty())
+        addEmptyRow();
+    
+    QString h = "                                  \
+            <tr>                                   \
+              <td colspan=\"2\">                   \
+                 <strong>%1</strong>               \
+              </td>                                \
+            </tr>                                  \
+            \n";
+    htmlTableRows_ += h.arg(text);
+}
+
 
 void
 QXHtmlTableTemplate::addEmptyRow() {

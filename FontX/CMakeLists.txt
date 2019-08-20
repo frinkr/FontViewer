@@ -66,6 +66,8 @@ add_library(FontX
   FXVersion.h
   )
 
+set_property(TARGET FontX PROPERTY CXX_STANDARD 17)
+
 target_include_directories(FontX PUBLIC
   ${Boost_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}

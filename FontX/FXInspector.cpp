@@ -237,7 +237,7 @@ namespace {
     FXVector<FXTag>
     getTables(FXTag tag) {
         if (tag == FXOT::MERGED_GSUBGPOS) 
-            return {FXTableGUSB, FXTableGPOS};
+            return {FXTableGSUB, FXTableGPOS};
         else
             return {tag};
     }

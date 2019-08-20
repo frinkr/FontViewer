@@ -76,6 +76,9 @@ public:
     addHeadRow(const QString & text);
 
     void
+    addLongHeadRow(const QString & text);
+    
+    void
     addEmptyRow();
 
     virtual void

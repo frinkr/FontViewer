@@ -17,7 +17,7 @@ FXMakeTag(T a, T b, T c, T d) {
 static_assert(FXMakeTag('G', 'S', 'U', 'B') == 'GSUB', "Check FXTag literals!");
 
 constexpr FXTag FXTableCMAP    = 'cmap';
-constexpr FXTag FXTableGUSB    = 'GSUB';
+constexpr FXTag FXTableGSUB    = 'GSUB';
 constexpr FXTag FXTableGPOS    = 'GPOS';
 constexpr FXTag FXTableGDEF    = 'GDEF';
 constexpr FXTag FXTagInvalid = static_cast<FXTag>(-1);
