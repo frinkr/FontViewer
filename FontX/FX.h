@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/any.hpp>
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -218,4 +219,46 @@ protected:
     size_t          length_;
     Deallocator     deallocator_;
     size_t          pos_;
+};
+
+class FXDict {
+public:
+    using data_type = std::map<std::string, boost::any>;
+    FXDict() {}
+        
+    FXDict(std::initializer_list<typename data_type::value_type> init) {
+        for (const auto & p: init) 
+            set(p.first, p.second);
+    }
+    FXDict(const std::string & key, const boost::any & value) {
+        set(key, value);
+    }
+public:
+    bool
+    has(const std::string & key) const {
+        return data_.find(key) != data_.end();
+    }
+        
+    template <typename T> T
+    get(const std::string & key) const {
+        auto itr = data_.find(key);
+        assert(itr != data_.end());
+        return boost::any_cast<T>(itr->second);
+    }
+        
+    template <typename T> FXDict &
+    set(const std::string & key, const T & value) {
+        data_[key] = boost::any(value);
+        return * this;
+    }
+
+    void
+    clear(const std::string & key) {
+        auto itr = data_.find(key);
+        if (itr != data_.end())
+            data_.erase(itr);
+    }
+
+protected:
+    std::map<std::string, boost::any> data_;
 };

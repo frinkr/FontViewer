@@ -323,6 +323,17 @@ FXFace::openFace(size_t index) {
     return nullptr;
 }
 
+const FXDict &
+FXFace::properties() const {
+    return properties_;
+}
+
+FXDict &
+FXFace::properties() {
+    return properties_;
+}
+
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                     CMAPS
 //

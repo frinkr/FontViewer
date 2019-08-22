@@ -1,10 +1,13 @@
 #include <boost/algorithm/string/join.hpp>
-
+#include <ctime>
 #include <QVBoxLayout>
+#include <QDateTime>
+#include <QTimeZone>
 #include "FontX/FXFT.h"
 #include "FontX/FXFTNames.h"
 #include "FontX/FXTag.h"
 #include "FontX/FXInspector.h"
+#include "FontX/FXPDF.h"
 
 #include "QXConv.h"
 #include "QXResource.h"
@@ -745,6 +748,29 @@ namespace {
             return "<i>UNKNOWN</i>";
         }
     };
+
+#if FX_HAS_PDF_ADDON
+    class QXPdfPage : public QXFontHtmlTemplatePage {
+    public:
+        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
+        void
+        loadTableRows() override {
+            auto & info = face_->properties().get<const FXPDFDocumentInfo &>(FXPDFDocumentInfoKey);
+            addDataRow(tr("Pages"), info.pages);
+            addDataRow(tr("Application"), info.application);
+            addDataRow(tr("Created"), utcTimeToLocal(info.created).toString("M/d/yyyy, h:m:ss AP"));
+            addDataRow(tr("Modified"), utcTimeToLocal(info.modified).toString("M/d/yyyy, h:m:ss AP"));
+        }
+        
+    private:
+        QDateTime utcTimeToLocal(time_t time) {
+            auto dt = QDateTime::fromSecsSinceEpoch(time, Qt::UTC);
+            auto tz = QTimeZone::systemTimeZone();
+            auto local = dt.toLocalTime();
+            return local.addSecs(tz.offsetFromUtc(dt));
+        }
+    };
+#endif
 }
 
 QXFontInfoPage::QXFontInfoPage(const QString & title, FXPtr<FXFace> face, QObject * parent)
@@ -793,7 +819,12 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     else if (face->attributes().format == FXFaceFormatConstant::CFF) {
         pages_.append(new QXPsFontPage(tr("CFF"), face, this));
     }
-
+    
+#if FX_HAS_PDF_ADDON
+    if (face->properties().has(FXPDFDocumentInfoKey)) {
+        pages_.append(new QXPdfPage(tr("PDF"), face, this));
+    }
+#endif
     ui->comboBox->clear();
     foreach(QXFontInfoPage * page, pages_)
         ui->comboBox->addItem(page->title());

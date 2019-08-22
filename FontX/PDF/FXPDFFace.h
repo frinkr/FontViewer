@@ -7,6 +7,8 @@ namespace PoDoFo {
     class PdfObject;
 }
 
+constexpr const char * FXPDFDocumentInfoKey = "info.document.pdf";
+
 class FXPDFDocument;
 class FXPDFFace : public FXFace {
 public:

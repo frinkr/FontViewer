@@ -59,6 +59,8 @@ FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
             init();
         }
     }
+
+    properties_.set(FXPDFDocumentInfoKey, document->documentInfo());
 }
 
 FXPDFFace::~FXPDFFace() {

@@ -147,7 +147,7 @@ add_library(UI-Qt
   ${UI_HEADERS}
   )
 
-set_property(TARGET UI-Qt PROPERTY CXX_STANDARD 17)
+#set_property(TARGET UI-Qt PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(UI-Qt PRIVATE Qt5::Core)
 target_link_libraries(UI-Qt PRIVATE Qt5::Gui)

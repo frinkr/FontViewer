@@ -40,7 +40,8 @@ bool
 FXPDFDocument::open() {
     try {
         document_ = std::make_unique<PdfMemDocument>();
-        document_->Load( file_.c_str() );
+        document_->Load(file_.c_str());
+        loadDocumentInfo();
         int pageCount = document_->GetPageCount();
         for (int pageIndex = 0; pageIndex < pageCount; pageIndex ++)
             processPage(pageIndex);
@@ -57,6 +58,11 @@ FXPDFDocument::open() {
 bool
 FXPDFDocument::close() {
     return true;
+}
+
+const FXPDFDocumentInfo &
+FXPDFDocument::documentInfo() const {
+    return info_;
 }
 
 const FXString &
@@ -109,6 +115,16 @@ FXPDFDocument::faceDestroyed(FXPDFFace * face) {
     auto itr = openFaces_.find(face);
     if (itr != openFaces_.end())
         openFaces_.erase(itr);
+}
+
+bool
+FXPDFDocument::loadDocumentInfo() {
+    info_.pages = document_->GetPageCount();
+    PdfInfo * pdf = document_->GetInfo();
+    info_.application = pdf->GetCreator().GetStringUtf8();
+    info_.created = pdf->GetCreationDate().GetTime();
+    info_.modified = pdf->GetModDate().GetTime();
+    return true;
 }
 
 void

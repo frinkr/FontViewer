@@ -1,4 +1,5 @@
 #pragma once
+#include <ctime>
 #include "FontX/FX.h"
 
 namespace PoDoFo {
@@ -13,6 +14,13 @@ struct FXPDFFontInfo {
     FXString  subType{};
     bool      isSubset{false};
     const PoDoFo::PdfObject * fontObject {nullptr};
+};
+
+struct FXPDFDocumentInfo {
+    std::time_t  created {};
+    std::time_t  modified {};
+    FXString     application {};
+    size_t       pages {};
 };
 
 class FXPDFDocument : public std::enable_shared_from_this<FXPDFDocument> {
@@ -35,6 +43,9 @@ public:
     bool
     close();
 
+    const FXPDFDocumentInfo &
+    documentInfo() const;
+    
     const FXString &
     filePath() const;
 
@@ -60,6 +71,10 @@ public:
     faceDestroyed(FXPDFFace * face);
 
 private:
+
+    bool
+    loadDocumentInfo();
+
     void
     processPage(int pageIndex);
 
@@ -71,6 +86,7 @@ private:
     
 private:
     FXString              file_;
+    FXPDFDocumentInfo     info_;
     FXVector<FXPDFFontInfo>   fonts_;
     FXSet<const PoDoFo::PdfObject *> fontObjects_;
     std::unique_ptr<PoDoFo::PdfMemDocument>  document_;

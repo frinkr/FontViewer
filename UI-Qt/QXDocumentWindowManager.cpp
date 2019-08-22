@@ -213,10 +213,15 @@ QXDocumentWindowManager::doOpenFontDialog() {
         }, Qt::QueuedConnection);
 #endif
     }
-    if (openFontDialog_ && QDialog::Accepted == openFontDialog_->exec()) {
-        const QXFontURI fontURI = openFontDialog_->selectedFont();
-        openFontURI(fontURI);
-    }
+    
+    // The timer makes the QXDocumentWindow's desctructor called ealier, otherwise the 'exec'
+    // will block it.
+    QTimer::singleShot(100, [this]() {
+        if (openFontDialog_ && QDialog::Accepted == openFontDialog_->exec()) {
+            const QXFontURI fontURI = openFontDialog_->selectedFont();
+            openFontURI(fontURI);
+        }
+    });
 #endif
 }
 

@@ -54,8 +54,9 @@ class PODOFO_DOC_API PdfInfo : public PdfElement {
      * info dictionary.
      */
     enum EPdfInfoInitial {
+        ePdfInfoInitial_WriteNone             = 0x00, ///< Write nothing. Default for loaded documents.
         ePdfInfoInitial_WriteCreationTime     = 0x01, ///< Write the creation time (current time). Default for new documents.
-        ePdfInfoInitial_WriteModificationTime = 0x02, ///< Write the modification time (current time). Default for loaded documents.
+        ePdfInfoInitial_WriteModificationTime = 0x02, ///< Write the modification time (current time).
         ePdfInfoInitial_WriteProducer         = 0x04  ///< Write producer key. Default for new documents.
     };
 
@@ -73,7 +74,7 @@ class PODOFO_DOC_API PdfInfo : public PdfElement {
      *  \param eInitial which information should be 
      *         writting initially to the information
      */
-    PdfInfo( PdfObject* pObject, int eInitial = ePdfInfoInitial_WriteModificationTime );
+    PdfInfo( PdfObject* pObject, int eInitial = ePdfInfoInitial_WriteNone );
 
     /** Destructor
      */

@@ -164,6 +164,12 @@ public:
     virtual FXPtr<FXFace>
     openFace(size_t index);
 
+    const FXDict &
+    properties() const;
+
+    FXDict &
+    properties();
+
 public:
     const std::vector<FXCMap> &
     cmaps() const;
@@ -297,6 +303,8 @@ protected:
     std::vector<FXCMap>  cmaps_{};
     FXPtr<FXGlyphCache>  cache_{};
     FXPtr<FXInspector>   inspector_{};
+
+    FXDict               properties_ {};
 
     FXVector<VariableAxis>            variableAxises_{};
     FXVector<VariableNamedInstance>   variableNamedInstances_{};
