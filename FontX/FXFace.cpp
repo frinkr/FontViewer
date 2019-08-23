@@ -75,25 +75,31 @@ FXFaceDescriptor::operator!=(const FXFaceDescriptor & other) const {
     return !operator==(other);
 }
 
-FXString
+const FXString &
 FXFaceNames::familyName() const {
-    return findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
+    if (familyName_.empty())
+        familyName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        familyName_);
+                        defaultFamilyName_);
+    return familyName_;
 }
 
-FXString
+const FXString &
 FXFaceNames::styleName() const {
-    return findSFNTName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
+    if (styleName_.empty())
+        styleName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        styleName_);
+                        defaultStyleName_);
+    return styleName_;
 }
 
-FXString
+const FXString &
 FXFaceNames::postscriptName() const {
-    return findSFNTName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
+    if (postscriptName_.empty())
+        postscriptName_ = findSFNTName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        postscriptName_);
+                        defaultPostscriptName_);
+    return postscriptName_;
 }
 
 FXMap<FXString, FXString>
@@ -112,18 +118,18 @@ FXFaceNames::localizedPostscriptNames() const {
 }
 
 void
-FXFaceNames::setFamilyName(const FXString & name) {
-    familyName_ = name;
+FXFaceNames::setDefaultFamilyName(const FXString & name) {
+    defaultFamilyName_ = name;
 }
 
 void
-FXFaceNames::setStyleName(const FXString & name) {
-    styleName_ = name;
+FXFaceNames::setDefaultStyleName(const FXString & name) {
+    defaultStyleName_ = name;
 }
 
 void
-FXFaceNames::setPostscriptName(const FXString & name) {
-    postscriptName_ = name;
+FXFaceNames::setDefaultPostscriptName(const FXString & name) {
+    defaultPostscriptName_ = name;
 }
 
 FXMap<FXString, FXString>
@@ -577,13 +583,13 @@ FXFace::initAttributes() {
     
     // names
     if (face_->family_name)
-        atts_.names.setFamilyName(face_->family_name);
+        atts_.names.setDefaultFamilyName(face_->family_name);
     if (face_->style_name)
-        atts_.names.setStyleName(face_->style_name);
+        atts_.names.setDefaultStyleName(face_->style_name);
 
     const char * psName = FT_Get_Postscript_Name(face_);
     if (psName)
-        atts_.names.setPostscriptName(psName);
+        atts_.names.setDefaultPostscriptName(psName);
     
     if (!atts_.upem && psName) {
         if (!strcmp(psName, "AppleColorEmoji")) atts_.upem = 800;

@@ -32,23 +32,23 @@ struct FXSFNTName {
 
 class FXFaceNames : public FXVector<FXSFNTName> {
 public:
-    FXString
+    const FXString &
     familyName() const;
 
-    FXString
+    const FXString &
     styleName() const;
 
-    FXString
+    const FXString &
     postscriptName() const;
 
     void
-    setFamilyName(const FXString & name);
+    setDefaultFamilyName(const FXString & name);
 
     void
-    setStyleName(const FXString & name);
+    setDefaultStyleName(const FXString & name);
 
     void
-    setPostscriptName(const FXString & name);
+    setDefaultPostscriptName(const FXString & name);
 
     FXMap<FXString, FXString>
     localizedFamilyNames() const;
@@ -75,9 +75,9 @@ public:
     void serialize(Archive & ar, const unsigned int version) {
         FXVector<FXSFNTName> & vec = *this;
         ar & vec;
-        ar & familyName_;
-        ar & styleName_;
-        ar & postscriptName_;
+        ar & defaultFamilyName_;
+        ar & defaultStyleName_;
+        ar & defaultPostscriptName_;
     }
 protected:
     FXString
@@ -85,9 +85,12 @@ protected:
                  const FXVector<FXString> & languages,
                  const FXString & defaultName = FXString()) const;
     
-    FXString     familyName_;
-    FXString     styleName_;
-    FXString     postscriptName_;
+    mutable FXString     familyName_;
+    mutable FXString     styleName_;
+    mutable FXString     postscriptName_;
+    FXString     defaultFamilyName_;
+    FXString     defaultStyleName_;
+    FXString     defaultPostscriptName_;
     
 };
 

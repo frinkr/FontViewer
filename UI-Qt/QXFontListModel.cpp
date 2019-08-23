@@ -84,10 +84,10 @@ namespace {
         if (c0 != c1)
             return c0;
 
-        QRegExp regex("\\s+");
-
-        size_t ed0 = uiLevenshteinDistance(str0.split(regex, QString::SkipEmptyParts), f.split(regex, QString::SkipEmptyParts));
-        size_t ed1 = uiLevenshteinDistance(str1.split(regex, QString::SkipEmptyParts), f.split(regex, QString::SkipEmptyParts));
+        //QRegExp sep("\\s+");
+        QString sep(" ");
+        size_t ed0 = uiLevenshteinDistance(str0.splitRef(sep, QString::SkipEmptyParts), f.splitRef(sep, QString::SkipEmptyParts));
+        size_t ed1 = uiLevenshteinDistance(str1.splitRef(sep, QString::SkipEmptyParts), f.splitRef(sep, QString::SkipEmptyParts));
         if (ed0 != ed1)
             return ed0 < ed1;
 
