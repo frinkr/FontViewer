@@ -6,6 +6,35 @@
 
 class QXNames {
 public:
+    
+    static std::vector<std::string> HeadGetFlagDescription(uint16_t flag) {
+        static const std::map<size_t, const char *> map = {
+            {0, "Baseline at Y = 0"},
+            {1, "Left sidebearing at X = 0"},
+            {2, "Instructions depends on point size"},
+            {3, "Force ppem to integer values"},
+            {4, "Instructions may alter advance width"},
+            {11, "Font data is ‘lossless’ compressed"},
+            {12, "Font converted"},
+            {13, "Font optimized for ClearType™"},
+            {14, "Last Resort font"},
+        };
+        std::vector<std::string> descs;
+        for (auto kv: map)
+            descs.push_back(std::string(kv.second) + ": " + ((flag & (1 << kv.first))? "YES": "NO"));
+        return descs;
+    }
+    
+    static std::vector<std::string> HeadGetMacStyleDescription(uint16_t flag) {
+        static const char * names[] = {"Bold", "Italic", "Underline", "Outline", "Shadow", "Condensed", "Extended"};
+        std::vector<std::string> descs;
+        for (size_t i = 0; i < sizeof(names)/sizeof(names[0]); ++ i) {
+            if (flag & (1 << i))
+                descs.push_back(names[i]);
+            return descs;
+        }
+    }
+    
     static const char * OS2GetWeightClassName(uint16_t value) {
         switch (value) {
         case 100: return "Thin";

@@ -263,6 +263,38 @@ namespace {
         }
     };
 
+    class QXHeadPage : public QXFontHtmlTemplatePage {
+    public:
+        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
+        
+        void
+        loadTableRows() override {
+            if (TT_Header * head = (TT_Header *)FT_Get_Sfnt_Table(ftFace_, FT_SFNT_HEAD)) {
+                int64_t created = ((head->Created[0] & 0xFFFFFFFF) << 32) + (head->Created[1] & 0xFFFFFFFF);
+                int64_t modified = ((head->Modified[0] & 0xFFFFFFFF) << 32) + (head->Modified[1] & 0xFFFFFFFF);
+                
+                addDataRow(tr("Table Version"), fmt::hexString<uint32_t>(head->Table_Version));
+                addDataRow(tr("Font Version"), fmt::hexString<uint32_t>(head->Font_Revision));
+                addDataRow(tr("CheckSum Adjustment"), fmt::hexString<uint32_t>(head->CheckSum_Adjust));
+                addDataRow(tr("Magic Number"), fmt::hexString<uint32_t>(head->Magic_Number));
+                addDataRow(tr("Flags"), fmt::join(fmt::hexString<uint16_t>(head->Flags), QXNames::HeadGetFlagDescription(head->Flags)));
+                addDataRow(tr("Units Per EM"), head->Units_Per_EM);
+                addDataRow(tr("Created"), ftDateTimeToString(created));
+                addDataRow(tr("Modified"), ftDateTimeToString(modified));
+                addDataRow(tr("xMin"), head->xMin);
+                addDataRow(tr("xMax"), head->xMax);
+                addDataRow(tr("yMin"), head->yMin);
+                addDataRow(tr("yMax"), head->yMax);
+                addDataRow(tr("Mac Style"), fmt::join(fmt::hexString<uint16_t>(head->Mac_Style), QXNames::HeadGetMacStyleDescription(head->Mac_Style)));
+                addDataRow(tr("Lowest Rec PPEM"), head->Lowest_Rec_PPEM);
+                addDataRow(tr("Font Direction"), head->Font_Direction);
+                addDataRow(tr("Index To Loc Format"), head->Index_To_Loc_Format);
+                addDataRow(tr("Glyph Data Format"), head->Glyph_Data_Format);
+            }
+            
+        }
+    };
+    
     class QXHheaPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
@@ -277,7 +309,6 @@ namespace {
                 addDataRow(tr("Advance Width Max"), hhea->advance_Width_Max);
                 addDataRow(tr("Min Left Side Bearing"), hhea->min_Left_Side_Bearing);
                 addDataRow(tr("Min Right Side Bearing"), hhea->min_Right_Side_Bearing);
-                
                 addDataRow(tr("xMax Extent"), hhea->xMax_Extent);
                 addDataRow(tr("Caret Slope Rise"), hhea->caret_Slope_Rise);
                 addDataRow(tr("Caret Slope Run"), hhea->caret_Slope_Run);
@@ -800,6 +831,7 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     pages_.append(new QXFontGeneralPage(tr("General"), face, this));
 
     if (FT_IS_SFNT(face->face())) {
+        pages_.append(new QXHeadPage(tr("head"), face, this));
         pages_.append(new QXHheaPage(tr("hhea"), face, this));
         pages_.append(new QXHmtxPage(tr("hmtx"), face, this));
         pages_.append(new QXNamePage(tr("name"), face, this));
