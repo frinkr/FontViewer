@@ -136,7 +136,7 @@ QXCollectionViewContentWidget::itemAt(const QPoint & pos) const {
     RowIndex rowIndex = rowAt(pos.y());
 
     int yMin = rowTop(rowIndex);
-    int yMax = yMin + rowHeight();
+    //int yMax = yMin + rowHeight();
 
     if (pos.y() < yMin) {
         // header

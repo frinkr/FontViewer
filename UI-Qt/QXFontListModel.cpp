@@ -1,4 +1,5 @@
 #include <future>
+#include <QFileInfo>
 #include "FontX/FXFaceDatabase.h"
 
 #include "QXApplication.h"
@@ -130,7 +131,7 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
         return true;
     
     auto searchInNames = [](const FXMap<FXString, FXString> & names, const QString & name) {
-        for (const auto it : names) {
+        for (const auto & it : names) {
             if (toQString(it.second).contains(name, Qt::CaseInsensitive))
                 return true;
         }
@@ -139,8 +140,10 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
     
     // Check names
     auto const & atts = attributes(row);
+    //auto fileName = QFileInfo(QString::fromStdString(atts.desc.filePath)).baseName();
     const bool acceptFontName = filter.fontName.isEmpty() ||
         acceptWithFilter(displayName(row), filter.fontName) ||
+        //acceptWithFilter(fileName, filter.fontName) ||
         searchInNames(atts.names.localizedFamilyNames(), filter.fontName) ||
         searchInNames(atts.names.localizedStyleNames(), filter.fontName) ||
         searchInNames(atts.names.localizedPostscriptNames(), filter.fontName);

@@ -31,8 +31,8 @@ public:
         for (size_t i = 0; i < sizeof(names)/sizeof(names[0]); ++ i) {
             if (flag & (1 << i))
                 descs.push_back(names[i]);
-            return descs;
         }
+        return descs;
     }
     
     static const char * OS2GetWeightClassName(uint16_t value) {
