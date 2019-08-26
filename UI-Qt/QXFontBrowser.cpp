@@ -510,7 +510,7 @@ QXFontBrowser::currentSourceIndex() const {
 QXFontListFilter
 QXFontBrowser::fontListFilter() const {
     QXFontListFilter filter;
-    filter.fontName = ui_->searchLineEdit->text();
+    filter.fontName = ui_->searchLineEdit->text().trimmed();
     filter.sampleText = ui_->previewTextEdit->text();
     filter.converAllSampleCharacters = ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked;
     return filter;

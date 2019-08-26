@@ -37,7 +37,6 @@ target_include_directories(FontXPDF PUBLIC
   ${CMAKE_SOURCE_DIR}
   )
 
-
 #########################################################
 add_executable(FontXPDFTester main.cpp)
 target_link_libraries(FontXPDFTester

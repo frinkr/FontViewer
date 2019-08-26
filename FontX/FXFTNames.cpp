@@ -446,7 +446,7 @@ FXUTF16BE2UTF8(void * buf, size_t bufLen) {
     return uStr.toUTF8String(u8);
 }
 
-static FXString 
+[[maybe_unused]] static FXString 
 FXUTF16BE2UTF8(const uint16_t * u16Buf, size_t u16Len) {
     FXVector<uint16_t> v;
     v.reserve(u16Len);
@@ -473,7 +473,7 @@ FXUTF162UTF8(const uint16_t * u16Buf, size_t u16Len) {
     return uStr.toUTF8String(u8);
 }
 
-static FXString
+[[maybe_unused]] static FXString
 FXMacRoman2UTF8(const unsigned char * buffer, size_t bufferLen) {
     static const uint16_t uni[128] = {
         /* 0x80 */

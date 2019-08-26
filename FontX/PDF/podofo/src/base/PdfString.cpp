@@ -673,7 +673,7 @@ PdfString PdfString::HexEncode() const
         return *this;
     else
     {
-        std::auto_ptr<PdfFilter> pFilter;
+        std::unique_ptr<PdfFilter> pFilter;
 
         pdf_long                  lLen  = (m_buffer.GetSize() - 1) << 1;
         PdfString             str;
@@ -702,7 +702,7 @@ PdfString PdfString::HexDecode() const
         return *this;
     else
     {
-        std::auto_ptr<PdfFilter> pFilter;
+        std::unique_ptr<PdfFilter> pFilter;
 
         pdf_long                  lLen = m_buffer.GetSize() >> 1;
         PdfString             str;
