@@ -21,8 +21,16 @@ QXSplash::dismiss(QWidget * widget) {
 void
 QXSplash::showProgress(int value, int maximum, const QString & message) {
     progress_ = std::make_tuple(value, maximum);
-    if (!message.isEmpty())
-        showMessage(message, Qt::AlignHCenter | Qt::AlignBottom, Qt::white);
+    message_ = message;
+    
+    const auto now = std::chrono::high_resolution_clock::now();
+    const auto span = std::chrono::duration_cast<std::chrono::duration<double>>(now - lastUpdate_);
+    if (value < maximum && span.count() <= 1 / 20.0)
+        return;
+
+    lastUpdate_ = now;    
+    update();
+
     if (maximum && !ani_) {
         ani_ = new QVariantAnimation(this);
         ani_->setStartValue(0.0);
@@ -71,14 +79,13 @@ QXSplash::drawContents(QPainter * painter) {
     }
 
     // Draw message
-    QString msg = message();
-    if (!msg.isEmpty()) {
+    if (!message_.isEmpty()) {
         QFont font = painter->font();
         font.setPointSize(15);
         painter->setFont(font);
         painter->setPen(Qt::white);
         QRect msgRect(rect().left(), progressRect.top() + progressRect.height() / 3, rect().width(), progressRect.height() * 2 / 3);
-        painter->drawText(rect().adjusted(0, 20, 0, 0), Qt::AlignHCenter | Qt::AlignVCenter, msg);
+        painter->drawText(rect().adjusted(0, 20, 0, 0), Qt::AlignHCenter | Qt::AlignVCenter, message_);
     }
 }
 

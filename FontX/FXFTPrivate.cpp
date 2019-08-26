@@ -48,7 +48,7 @@ namespace {
     
     FT_Error
     streamFromUTF8FilePath(const char * filePath, FT_Stream stream) {
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
+        static std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> convert;
         std::wstring wFilePath = convert.from_bytes(filePath);
         FILE * file = _wfopen(wFilePath.c_str(), L"rb");
 

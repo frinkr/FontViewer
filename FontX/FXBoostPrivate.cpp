@@ -1,9 +1,13 @@
+#include <chrono>
+
 #include <boost/foreach.hpp>
 #include "FXBoostPrivate.h"
 
-namespace BST {
-    fs::detail::utf8_codecvt_facet UTF8Cvt;
+#if BOOST_COMP_MSVC
+#  include <Windows.h>
+#endif
 
+namespace BST {
     FXString
     pathJoin(const FXString & path, const FXString & name) {
         return pathJoin({path, name});
@@ -24,18 +28,18 @@ namespace BST {
     pathConcat(FXString & path, std::initializer_list<FXString> list) {
         if (!list.size()) return path;
 
-        fs::path p(path, UTF8Cvt);
+        fs::path p(fs::u8path(path));
         for (const auto & n : list)
-            p /= fs::path(n, UTF8Cvt);
+            p /= fs::u8path(n);
 
-        path = p.string(UTF8Cvt);
+        path = p.u8string();
         return path;
     }
 
     FXString
     fileName(const FXString & path) {
-        fs::path p(path, UTF8Cvt);
-        return p.filename().string(UTF8Cvt);
+        fs::path p(fs::u8path(path));
+        return p.filename().u8string();
     }
     
     bool
@@ -45,16 +49,15 @@ namespace BST {
         if (directory.empty())
             return true;
         try {
-            fs::path dir(directory, UTF8Cvt); 
-            fs::directory_iterator it(dir), eod;
-            BOOST_FOREACH(fs::path const & p, std::make_pair(it, eod)) {
-                if (recursive && fs::is_directory(p)) {
-                    if (foreachFile(p.string(UTF8Cvt), recursive, handler))
+            const fs::path dir(fs::u8path(directory)); 
+            for (auto & ent: fs::directory_iterator(dir)) {
+                if (recursive && fs::is_directory(ent)) {
+                    if (foreachFile(ent.path().u8string(), recursive, handler))
                         continue;
                     else
                         return false;
                 }
-                if (!handler(p.string(UTF8Cvt)))
+                if (!handler(ent.path().u8string()))
                     return false;
             }
         }
@@ -66,12 +69,21 @@ namespace BST {
     
     std::time_t
     lastWriteTime(const FXString & file) {
-        return fs::last_write_time(fs::path(file, UTF8Cvt));
+        auto time = fs::last_write_time(fs::u8path(file));
+#if BOOST_COMP_MSVC
+        const FILETIME * ft = reinterpret_cast<const FILETIME*>(&time);
+        ULARGE_INTEGER ull;
+        ull.LowPart = ft->dwLowDateTime;
+        ull.HighPart = ft->dwHighDateTime;
+        return ull.QuadPart / 10000000ULL - 11644473600ULL;
+#else
+        return decltype(time)::clock::to_time_t(time);
+#endif
     }
 
     size_t
     fileSize(const FXString & file) {
-        return fs::file_size(fs::path(file, UTF8Cvt));
+        return fs::file_size(fs::u8path(file));
     }
 
     FXString

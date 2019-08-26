@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <tuple>
 #include <QSplashScreen>
 
@@ -33,5 +34,7 @@ protected:
     QPoint mousePressPos_{};
     bool   movingWindow_{false};
     std::tuple<int, int> progress_{};
+    QString message_;
     QVariantAnimation * ani_{ nullptr };
+    std::chrono::high_resolution_clock::time_point lastUpdate_{};
 };

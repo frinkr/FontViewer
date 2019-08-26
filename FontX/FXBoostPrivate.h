@@ -10,9 +10,11 @@
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/detail/utf8_codecvt_facet.hpp>
 
+#include <filesystem>
+
 namespace BST {
-    namespace fs = boost::filesystem;
-    extern fs::detail::utf8_codecvt_facet UTF8Cvt;
+    namespace fs = std::filesystem;
+    extern boost::filesystem::detail::utf8_codecvt_facet UTF8Cvt;
 
     FXString
     pathJoin(const FXString & path, const FXString & name);

@@ -25,7 +25,7 @@
 
 QXApplication::QXApplication(int & argc, char ** argv)
     : QApplication(argc, argv) {
-    setOrganizationName("DANIEL JIANG");
+    setOrganizationName("FontViewer");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");
     
