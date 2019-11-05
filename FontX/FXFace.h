@@ -143,6 +143,9 @@ public:
     virtual bool
     valid() const;
     
+    virtual bool
+    isSubset() const;
+    
     FXFTFace
     face() const;
     
@@ -168,10 +171,10 @@ public:
     openFace(size_t index);
 
     const FXDict &
-    properties() const;
+    userProperties() const;
 
     FXDict &
-    properties();
+    userProperties();
 
 public:
     const std::vector<FXCMap> &

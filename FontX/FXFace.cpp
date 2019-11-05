@@ -278,6 +278,12 @@ FXFace::valid() const {
     return face_ != nullptr;
 }
 
+bool
+FXFace::isSubset() const {
+    return false;
+}
+
+
 FXFTFace
 FXFace::face() const {
     return face_;
@@ -330,12 +336,12 @@ FXFace::openFace(size_t index) {
 }
 
 const FXDict &
-FXFace::properties() const {
+FXFace::userProperties() const {
     return properties_;
 }
 
 FXDict &
-FXFace::properties() {
+FXFace::userProperties() {
     return properties_;
 }
 

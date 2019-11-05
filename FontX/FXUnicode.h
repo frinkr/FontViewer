@@ -81,7 +81,10 @@ public:
 
     static FXVector<uint16_t>
     utf16(FXChar c);
-    
+
+    static FXVector<FXChar>
+    utf8ToUTF32(const FXString & u8);
+
 private:
     static FXPtr<FXUCD>    ucd_;
 };

@@ -40,7 +40,9 @@ public:
 
     FXFace *
     face() const;
-    
+
+    bool
+    hasFallbackShaping() const;
 private:
     FXPtr<FXShaperImp>  imp_;
 };

@@ -72,6 +72,11 @@ FXPDFFace::document() const {
     return document_;
 }
 
+bool
+FXPDFFace::isSubset() const {
+    return true;
+}
+
 size_t
 FXPDFFace::faceCount() const {
     if (document_)

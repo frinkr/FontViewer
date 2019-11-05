@@ -357,6 +357,10 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     QMenu * menu = new QMenu(this);
     menu->addAction(ui_->actionCopyDecodedText);
     ui_->menuButton->setMenu(menu);
+
+    warningAction_ = new QAction(this);
+    warningAction_->setIcon(qApp->loadIcon(":/images/warning.png"));
+    warningAction_->setToolTip(tr("OpenType shaping is not available, fallback to basic shaping."));
 }
 
 QXShapingWidget::~QXShapingWidget() {
@@ -440,6 +444,11 @@ QXShapingWidget::doShape() {
     ui_->glyphView->setFontSize(fontSize);
     ui_->glyphView->updateGeometry();
     ui_->glyphView->update();
+    
+    if (shaper_->hasFallbackShaping())
+        ui_->lineEdit->addAction(warningAction_, QLineEdit::TrailingPosition);
+    else 
+        ui_->lineEdit->removeAction(warningAction_);
 }
 
 void

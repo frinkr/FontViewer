@@ -786,7 +786,7 @@ namespace {
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
         void
         loadTableRows() override {
-            auto & info = face_->properties().get<const FXPDFDocumentInfo &>(FXPDFDocumentInfoKey);
+            auto & info = face_->userProperties().get<const FXPDFDocumentInfo &>(FXPDFDocumentInfoKey);
             addDataRow(tr("Pages"), info.pages);
             addDataRow(tr("Application"), info.application);
             addDataRow(tr("Created"), utcTimeToLocal(info.created).toString("M/d/yyyy, h:m:ss AP"));
@@ -853,7 +853,7 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
     }
     
 #if FX_HAS_PDF_ADDON
-    if (face->properties().has(FXPDFDocumentInfoKey)) {
+    if (face->userProperties().has(FXPDFDocumentInfoKey)) {
         pages_.append(new QXPdfPage(tr("PDF"), face, this));
     }
 #endif

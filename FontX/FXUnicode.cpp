@@ -280,3 +280,16 @@ FXUnicode::utf16(FXChar c) {
     return FXVector<uint16_t>(buf, buf + u.length());
 }
     
+FXVector<FXChar>
+FXUnicode::utf8ToUTF32(const FXString & u8) {
+    icu::UnicodeString u = icu::UnicodeString::fromUTF8(u8);
+
+    UErrorCode error;
+    FXVector<FXChar> u32(u8.size());
+    auto length = u.toUTF32((UChar32*)u32.data(), u32.size(), error);
+    if (!length || U_FAILURE(error))
+        return FXVector<FXChar>();
+    if (length != u32.size())
+        u32.resize(length);
+    return u32;
+}

@@ -16,6 +16,9 @@ public:
 
     ~FXPDFFace();
 
+    bool
+    isSubset() const override;
+
     size_t
     faceCount() const override;
 

@@ -1,5 +1,6 @@
 #include "FXFace.h"
 #include "FXShaper.h"
+#include "FXUnicode.h"
 #include "FXFTPrivate.h"
 #include "FXHBPrivate.h"
 
@@ -21,6 +22,11 @@ struct FXShaperImp {
     }
     
     void reset() {
+        if(hasFallbackShaping_) {
+            delete [] hbGlyphInfos_;
+            delete [] hbGlyphPositions_;
+        }
+        
         if (hbPlan_)
             hb_shape_plan_destroy(hbPlan_);
         hbPlan_ = nullptr;
@@ -32,6 +38,8 @@ struct FXShaperImp {
         hbGlyphCount_ = 0;
         hbGlyphInfos_ = nullptr;
         hbGlyphPositions_ = nullptr;
+
+        hasFallbackShaping_ = false;
     }
     
     void
@@ -44,6 +52,9 @@ struct FXShaperImp {
 
         reset();
 
+        if (text.empty())
+            return;
+        
         if (!hbFont_ || !hbFace_)
             FXHBCreateFontFace(face_, &hbFont_, &hbFace_);
         
@@ -96,10 +107,48 @@ struct FXShaperImp {
         // get result
         hbGlyphInfos_ = hb_buffer_get_glyph_infos(hbBuffer_, &hbGlyphCount_);
         hbGlyphPositions_ = hb_buffer_get_glyph_positions(hbBuffer_, &hbGlyphCount_);
+
+        if (shouldFallback()) {
+            hasFallbackShaping_ = true;
+            fallbackShape(text);
+        }
+        else {
+            hasFallbackShaping_ = false;
+        }
+    }
+
+    bool
+    shouldFallback() const {
+        if (!hbGlyphCount_)
+            return true;
+        
+        for (size_t i = 0; i < hbGlyphCount_; ++ i) {
+            if (hbGlyphInfos_[i].codepoint) // not undef
+                return false;
+        }
+        return true;
+    }
+
+    void
+    fallbackShape(const FXString & text) {
+        auto u32 = FXUnicode::utf8ToUTF32(text);
+        hbGlyphInfos_ = new hb_glyph_info_t[u32.size()];
+        hbGlyphPositions_ = new hb_glyph_position_t[u32.size()];
+        for (size_t i = 0; i < u32.size(); ++ i) {
+            const FXGChar ch(u32[i]);
+            FXGlyph g = face_->glyph(ch);
+            hbGlyphInfos_[i].cluster = i;
+            hbGlyphInfos_[i].codepoint = g.gid;
+            hbGlyphPositions_[i].x_advance = g.metrics.horiAdvance;
+            hbGlyphPositions_[i].y_advance = g.metrics.vertAdvance;
+            hbGlyphPositions_[i].x_offset = 0;
+            hbGlyphPositions_[i].y_offset = 0;
+        }
     }
 
     FXFace * face_;
-    
+
+    bool hasFallbackShaping_ {false};
     hb_font_t * hbFont_;
     hb_face_t * hbFace_;
     hb_buffer_t * hbBuffer_;
@@ -108,6 +157,7 @@ struct FXShaperImp {
     unsigned int  hbGlyphCount_;
     hb_glyph_info_t * hbGlyphInfos_;
     hb_glyph_position_t * hbGlyphPositions_;
+
 };
 
 
@@ -154,3 +204,7 @@ FXShaper::face() const {
     return imp_->face_;
 }
     
+bool
+FXShaper::hasFallbackShaping() const {
+    return imp_->hasFallbackShaping_;
+}

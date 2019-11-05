@@ -122,7 +122,8 @@ private:
 private:
     Ui::QXShapingWidget * ui_;
     QXDocument   * document_;
-    FXShaper     * shaper_;    
+    FXShaper     * shaper_;
+    QAction      * warningAction_;
 };
 
 

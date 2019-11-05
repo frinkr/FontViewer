@@ -140,10 +140,10 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
     
     // Check names
     auto const & atts = attributes(row);
-    //auto fileName = QFileInfo(QString::fromStdString(atts.desc.filePath)).baseName();
+    auto fileName = QFileInfo(QString::fromStdString(atts.desc.filePath)).baseName();
     const bool acceptFontName = filter.fontName.isEmpty() ||
         acceptWithFilter(displayName(row), filter.fontName) ||
-        //acceptWithFilter(fileName, filter.fontName) ||
+        acceptWithFilter(fileName, filter.fontName) ||
         searchInNames(atts.names.localizedFamilyNames(), filter.fontName) ||
         searchInNames(atts.names.localizedStyleNames(), filter.fontName) ||
         searchInNames(atts.names.localizedPostscriptNames(), filter.fontName);
