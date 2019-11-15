@@ -108,6 +108,9 @@ public slots:
     doCopyAction();
     
     void
+    doTogglePanelAction();
+    
+    void
     focusLineEdit(bool selectAll = true);
 private:
     FXPtr<FXInspector>
