@@ -1,4 +1,4 @@
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"
 #include "FXFace.h"

@@ -2,7 +2,6 @@
 #include "FXVersion.h"
 #include "FXFTPrivate.h"
 #include "FXHBPrivate.h"
-#include "FXBoostPrivate.h"
 #include "unicode/uversion.h"
 
 FXString

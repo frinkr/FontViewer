@@ -10,7 +10,7 @@
 
 #include "FXLib.h"
 #include "FXFaceDatabase.h"
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 #include "FXFTPrivate.h"
 
 namespace {
@@ -18,7 +18,7 @@ namespace {
 
     size_t hashFile(const FXString & file, size_t hash) {
         boost::hash_combine(hash, file);
-        boost::hash_combine(hash, BST::lastWriteTime(file));
+        boost::hash_combine(hash, FXFS::lastWriteTime(file));
         return hash;
     }
 
@@ -223,7 +223,7 @@ void
 FXFaceDatabase::initDiskHash() {
     diskHash_ = FoldersHash();
     for(const auto & folder : folders_)
-        BST::foreachFile(folder, true, [this](const FXString & file) {
+        FXFS::foreachFile(folder, true, [this](const FXString & file) {
             diskHash_.hash = hashFile(file, diskHash_.hash);
             diskHash_.files[file] = hashFile(file);
             return true;

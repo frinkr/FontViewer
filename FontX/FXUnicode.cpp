@@ -1,10 +1,11 @@
 #include <iostream>
+#include <fstream>
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
 #include <unicode/unorm2.h>
 #include <unicode/unistr.h>
 #include "FXUnicode.h"
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 
 using namespace std::string_literals;
 
@@ -21,7 +22,7 @@ namespace {
         bool
         readLine(FXString & line) {
             while(std::getline(stream_, line)) {
-                boost::algorithm::trim(line);
+                line = FXStringTrim(line);
                 if (commentChar_ && line.size() && line[0] == commentChar_)
                     continue;
                 if (ignoreBlankLine_ && line.empty())
@@ -34,11 +35,10 @@ namespace {
 
         static bool
         parseLine(const FXString & line, FXCharRange & range, FXString & text) {
-            FXVector<FXString> strs;
-            boost::split(strs, line, boost::is_any_of(";"));
+            FXVector<FXString> strs = FXStringSplit(line, ";"s);
             if (strs.size() == 2) {
-                if (parseCharRange(boost::algorithm::trim_copy(strs[0]), range)) {
-                    text = boost::algorithm::trim_copy(strs[1]);
+                if (parseCharRange(FXStringTrim(strs[0]), range)) {
+                    text = FXStringTrim(strs[1]);
                     return true;
                 }
             }
@@ -163,7 +163,7 @@ FXUCD::categories() const {
 
 FXString
 FXUCD::file(const FXString & name) const {
-    return BST::pathJoin({root_, name});
+    return FXFS::pathJoin({root_, name});
 }
 
 /////////////////////////////////////////////////////////////////////////////////////

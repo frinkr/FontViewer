@@ -1,13 +1,13 @@
 #include <chrono>
 
 #include <boost/foreach.hpp>
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 
-#if BOOST_COMP_MSVC
+#ifdef _MSC_VER
 #  include <Windows.h>
 #endif
 
-namespace BST {
+namespace FXFS {
     FXString
     pathJoin(const FXString & path, const FXString & name) {
         return pathJoin({path, name});
@@ -70,7 +70,7 @@ namespace BST {
     std::time_t
     lastWriteTime(const FXString & file) {
         auto time = fs::last_write_time(fs::u8path(file));
-#if BOOST_COMP_MSVC
+#ifdef _MSC_VER
         const FILETIME * ft = reinterpret_cast<const FILETIME*>(&time);
         ULARGE_INTEGER ull;
         ull.LowPart = ft->dwLowDateTime;
@@ -84,12 +84,5 @@ namespace BST {
     size_t
     fileSize(const FXString & file) {
         return fs::file_size(fs::u8path(file));
-    }
-
-    FXString
-    trim(const FXString & str) {
-        FXString ret(str);
-        boost::algorithm::trim(ret);
-        return ret;
     }
 }

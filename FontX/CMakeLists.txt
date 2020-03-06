@@ -10,7 +10,7 @@ if (APPLE)
 endif()
 
 find_package(Freetype REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem serialization)
+find_package(Boost REQUIRED COMPONENTS serialization)
 find_package(Iconv REQUIRED)
 
 if (WIN32)
@@ -28,11 +28,11 @@ endif()
 add_library(FontX
   STATIC
   FX.h
-  FXBoostPrivate.cpp
-  FXBoostPrivate.h
-  FXCache.h
   FXCMap.cpp
   FXCMap.h
+  FXCache.h
+  FXFS.cpp
+  FXFS.h
   FXFT.h
   FXFTNames.cpp
   FXFTNames.h

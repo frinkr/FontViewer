@@ -1,5 +1,5 @@
 #include "FXFTPrivate.h"
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 
 #if BOOST_COMP_MSVC
 #include <stdio.h>
