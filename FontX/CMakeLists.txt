@@ -10,7 +10,7 @@ if (APPLE)
 endif()
 
 find_package(Freetype REQUIRED)
-find_package(Boost REQUIRED COMPONENTS filesystem regex serialization)
+find_package(Boost REQUIRED COMPONENTS filesystem serialization)
 find_package(Iconv REQUIRED)
 
 if (WIN32)

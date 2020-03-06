@@ -262,3 +262,16 @@ public:
 protected:
     std::map<std::string, boost::any> data_;
 };
+
+
+template <typename S = FXString>
+FXVector<S> FXStringSplit(S line, const S & delimiter) {
+    FXVector<S> strs;
+    size_t pos {};
+    while ((pos = line.find(delimiter)) != std::string::npos) {
+        strs.push_back(line.substr(0, pos));
+        line.erase(0, pos + delimiter.length());
+    }
+    strs.push_back(std::move(line));
+    return strs;
+}

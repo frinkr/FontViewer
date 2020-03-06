@@ -6,6 +6,8 @@
 #include "FXUnicode.h"
 #include "FXBoostPrivate.h"
 
+using namespace std::string_literals;
+
 namespace {
     class FXUCDFileReader {
     public:
@@ -45,8 +47,8 @@ namespace {
 
         static bool
         parseCharRange(const FXString & line, FXCharRange & range) {
-            FXVector<FXString> strs;
-            boost::split_regex(strs, line, boost::regex("\\.\\."));
+            FXVector<FXString> strs = FXStringSplit(line, ".."s);
+            
             if (strs.size() == 1) {
                 FXChar c;
                 if (parseHexChar(strs[0], c)) {
