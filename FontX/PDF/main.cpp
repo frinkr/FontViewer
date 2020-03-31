@@ -38,8 +38,8 @@ int main() {
                     FX_INFO("\t   face: PSName: " << face->postscriptName());
                     FX_INFO("\t   face: GlyphCount: " << face->glyphCount());
                     FX_INFO("\t   face: Format: " << face->attributes().format);
-                    FX_INFO("\t   face: Family Name: " << face->attributes().names.familyName());
-                    FX_INFO("\t   face: Style Name: " << face->attributes().names.styleName());
+                    FX_INFO("\t   face: Family Name: " << face->attributes().sfntNames.familyName());
+                    FX_INFO("\t   face: Style Name: " << face->attributes().sfntNames.styleName());
                 }
                 else {
                     FX_ERROR("\t   Failed to load font " << i);

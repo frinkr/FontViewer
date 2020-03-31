@@ -250,9 +250,9 @@ namespace {
         QMap<QString, QVariant> map;
 
         map["FULL_NAME"] = QXDocument::faceDisplayName(atts);
-        map["PS_NAME"] = toQString(atts.names.postscriptName());
-        map["VENDOR"] = toQString(atts.names.vendor());
-        map["VERSION"] = toQString(atts.names.version());
+        map["PS_NAME"] = toQString(atts.sfntNames.postscriptName());
+        map["VENDOR"] = toQString(atts.sfntNames.vendor());
+        map["VERSION"] = toQString(atts.sfntNames.version());
         map["FILE"] = toQString(desc.filePath);
         map["INDEX"] = quint32(desc.index);
 
@@ -403,7 +403,7 @@ QXFontBrowser::selectedFont() const {
     
     auto desc = QXFontManager::instance().db()->faceDescriptor(row);
     auto atts = QXFontManager::instance().db()->faceAttributes(row);
-    atts.names.familyName();
+    atts.sfntNames.familyName();
     QXFontURI uri{toQString(desc.filePath), desc.index};
     return uri;
 }

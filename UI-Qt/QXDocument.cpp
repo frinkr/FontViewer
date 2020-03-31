@@ -88,19 +88,25 @@ QXDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * p
 
 QString
 QXDocument::faceDisplayName(const FXPtr<FXFace> & face) {
-    return faceDisplayName(face->attributes());
+    if (auto name = faceDisplayName(face->attributes()); !name.isEmpty())
+        return name;
+    
+    if (auto name = face->postscriptName(); !name.empty())
+        return toQString(name);
+    
+    return QString("%1 - %2").arg(QFileInfo(toQString(face->desc().filePath)).fileName(),
+                                  face->desc().index);
 }
 
 QString
 QXDocument::faceDisplayName(const FXFaceAttributes & atts) {
-    QString familyName = toQString(atts.names.familyName());
-    QString styleName = toQString(atts.names.styleName());
+    QString familyName = toQString(atts.sfntNames.familyName());
+    QString styleName = toQString(atts.sfntNames.styleName());
 
     QString fullName;
     if (!familyName.isEmpty())
         fullName = QString("%1 - %2").arg(familyName, styleName);
-    else
-        fullName = QString("%1 - %2").arg(QFileInfo(toQString(atts.desc.filePath)).fileName(), atts.desc.index);
+
     return fullName;
 }
 
@@ -256,10 +262,10 @@ QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
 bool
 QXDocument::load(FXPtr<FXFace> initFace) {
     if (initFace)
-        face_ = initFace->openFace(uri_.faceIndex);
+        face_ = initFace->openBrotherFace(uri_.faceIndex);
     else 
         face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);
-    if (!face_)
+    if (!face_ || !face_->hasValidFaceData())
         return false;
 
     return loadBooks() && initCurrentBook();

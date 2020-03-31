@@ -38,11 +38,11 @@ namespace {
 
 }
 
-FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const PdfObject * fontObj)
+FXPDFFace::FXPDFFace(FXPtr<FXPDFDocument> document, const FXPDFFontInfo & font)
     : document_(document)
-    , fontObj_(fontObj) {
+    , font_(font) {
 
-    const PdfObject * fontFile = getFontFileObj(fontObj_);
+    const PdfObject * fontFile = getFontFileObj(font_.fontObject);
     if (fontFile) {
         const PdfStream * stream = fontFile->GetStream();
         if (stream) {
@@ -72,20 +72,25 @@ FXPDFFace::document() const {
     return document_;
 }
 
+std::string
+FXPDFFace::postscriptName() const {
+    return font_.baseFont;
+}
+
 bool
 FXPDFFace::isSubset() const {
-    return true;
+    return font_.isSubset;
 }
 
 size_t
-FXPDFFace::faceCount() const {
+FXPDFFace::brotherFaceCount() const {
     if (document_)
         return document_->fontCount();
     return 0;
 }
 
 FXPtr<FXFace>
-FXPDFFace::openFace(size_t index) {
+FXPDFFace::openBrotherFace(size_t index) {
     if (document_)
         return document_->createFace(index);
     return nullptr;
@@ -96,7 +101,7 @@ FXPDFFace::init() {
     if(!FXFace::init())
         return false;
     atts_.desc.filePath = document_->filePath();
-    atts_.desc.index = document_->fontObjectIndex(fontObj_);
+    atts_.desc.index = document_->fontObjectIndex(font_.fontObject);
     desc_ = atts_.desc;
     return true;
 }

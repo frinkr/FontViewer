@@ -77,23 +77,23 @@ FXPDFDocument::pageCount() const {
 
 size_t
 FXPDFDocument::fontCount() const {
-    return fonts_.size();
+    return fontsInfo_.size();
 }
 
 FXPDFFontInfo
 FXPDFDocument::fontInfo(size_t index) const {
-    return fonts_[index];
+    return fontsInfo_[index];
 }
 
 const PoDoFo::PdfObject *
 FXPDFDocument::fontObject(size_t index) const {
-    return fonts_[index].fontObject;
+    return fontsInfo_[index].fontObject;
 }
 
 size_t
 FXPDFDocument::fontObjectIndex(const PoDoFo::PdfObject * fontObj) const {
-    for (size_t i = 0; i < fonts_.size(); ++i) {
-        if (fontObj == fonts_[i].fontObject)
+    for (size_t i = 0; i < fontsInfo_.size(); ++i) {
+        if (fontObj == fontsInfo_[i].fontObject)
             return i;
     }
     return -1;
@@ -101,11 +101,9 @@ FXPDFDocument::fontObjectIndex(const PoDoFo::PdfObject * fontObj) const {
 
 FXPtr<FXPDFFace>
 FXPDFDocument::createFace(size_t index) {
-    if (index >= fonts_.size())
+    if (index >= fontsInfo_.size())
         return nullptr;
-    auto face = std::make_shared<FXPDFFace>(shared_from_this(), fonts_[index].fontObject);
-    if (!face->valid())
-        return nullptr;
+    auto face = std::make_shared<FXPDFFace>(shared_from_this(), fontsInfo_[index]);
     openFaces_.insert(face.get());
     return face;
 }
@@ -162,24 +160,29 @@ FXPDFDocument::processFontResource(const PoDoFo::PdfObject * fontRes) {
     if (fontDict.GetKeys().empty())
         return;
     
+
     for (const TKeyMap::value_type & kv: fontDict.GetKeys()) {
         PdfObject * fontObj = fontRes->GetOwner()->GetObject(kv.second->GetReference());
-        if (fontObjects_.find(fontObj) != fontObjects_.end())
-            continue;
-        
-        fontObjects_.insert(fontObj);
         
         FXPDFFontInfo font;
+        font.reference = kv.second->GetReference().ToString();
         font.fontObject = fontObj;
         
         const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
         if (baseFont && baseFont->IsName())
             font.baseFont = baseFont->GetName().GetName();
         
+        // Don't add if exists
+        if (font.baseFont.size()) {
+            if (baseFontsNames_.count(font.baseFont) != 0)
+                continue;
+            baseFontsNames_.insert(font.baseFont);
+        }
+        
         const PdfObject * subType = fontObj->GetIndirectKey("Subtype");
         if (subType && subType->IsName())
             font.subType = subType->GetName().GetName();
         
-        fonts_.push_back(font);
+        fontsInfo_.push_back(font);
     }
 }

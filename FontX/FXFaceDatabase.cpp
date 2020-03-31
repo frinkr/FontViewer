@@ -63,7 +63,7 @@ namespace boost {namespace serialization {
             ar & atts.upem;
             ar & atts.format;
             ar & atts.glyphCount;
-            ar & atts.names;
+            ar & atts.sfntNames;
             ar & atts.ascender;
             ar & atts.descender;
             ar & atts.isCID;

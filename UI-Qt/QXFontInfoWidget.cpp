@@ -137,9 +137,9 @@ namespace {
             addDataRow(tr("Index"), (ftFace_->num_faces > 1)?
                        QString("%1/%2").arg(static_cast<int>(faceAtts().desc.index)).arg(ftFace_->num_faces):
                        QString("%1").arg(static_cast<int>(faceAtts().desc.index)));
-            addDataRow(tr("Postscript"), toQString(faceAtts().names.postscriptName()));
-            addDataRow(tr("Family Name"), toQString(faceAtts().names.familyName()));
-            addDataRow(tr("Style Name"), toQString(faceAtts().names.styleName()));
+            addDataRow(tr("Postscript"), toQString(faceAtts().sfntNames.postscriptName()));
+            addDataRow(tr("Family Name"), toQString(faceAtts().sfntNames.familyName()));
+            addDataRow(tr("Style Name"), toQString(faceAtts().sfntNames.styleName()));
             addDataRow(tr("Face Flags"), faceFlagsStr(ftFace_->face_flags).join("<br>"));
             addDataRow(tr("Style Flags"), styleFlagsStr(ftFace_->style_flags).join("<br>"));
             addDataRow(tr("FS Type Flags"), fsTypeFlagsStr(FT_Get_FSType_Flags(ftFace_)).join("<br>"));
@@ -181,11 +181,11 @@ namespace {
             if (os2)
                 addDataRow(tr("Vendor"), QString("<a href=https://www.microsoft.com/typography/links/vendorlist.aspx>%1</a>").arg(toQString(FXString(reinterpret_cast<const char *>(os2->achVendID), 4))));
             else
-                addDataRow(tr("Vendor"), faceAtts().names.vendor());
-            addDataRow(tr("Version"), faceAtts().names.version());
-            addDataRow(tr("Unique ID"), faceAtts().names.getSFNTName(TT_NAME_ID_UNIQUE_ID));
-            addDataRow(tr("Copyright"), faceAtts().names.getSFNTName(TT_NAME_ID_COPYRIGHT));
-            addDataRow(tr("License"), faceAtts().names.getSFNTName(TT_NAME_ID_LICENSE));
+                addDataRow(tr("Vendor"), faceAtts().sfntNames.vendor());
+            addDataRow(tr("Version"), faceAtts().sfntNames.version());
+            addDataRow(tr("Unique ID"), faceAtts().sfntNames.getSFNTName(TT_NAME_ID_UNIQUE_ID));
+            addDataRow(tr("Copyright"), faceAtts().sfntNames.getSFNTName(TT_NAME_ID_COPYRIGHT));
+            addDataRow(tr("License"), faceAtts().sfntNames.getSFNTName(TT_NAME_ID_LICENSE));
             if (head) {
                 int64_t created = ((head->Created[0] & 0xFFFFFFFF) << 32) + (head->Created[1] & 0xFFFFFFFF);
                 int64_t modified = ((head->Modified[0] & 0xFFFFFFFF) << 32) + (head->Modified[1] & 0xFFFFFFFF);
