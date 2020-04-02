@@ -28,5 +28,6 @@ endif()
 
 # Subdirectories
 add_subdirectory(FontX)
+add_subdirectory(FontXCommandLine)
 add_subdirectory(UI-Qt)
 add_subdirectory(App)
