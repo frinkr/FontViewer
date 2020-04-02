@@ -10,17 +10,25 @@ namespace PoDoFo {
 constexpr const char * FXPDFDocumentInfoKey = "info.document.pdf";
 
 class FXPDFDocument;
+struct FXPDFFontInfo;
+
 class FXPDFFace : public FXFace {
 public:
-    FXPDFFace(FXPtr<FXPDFDocument> document, const PoDoFo::PdfObject * fontObj);
+    FXPDFFace(FXPtr<FXPDFDocument> document, const FXPDFFontInfo & font);
 
     ~FXPDFFace();
 
+    std::string
+    postscriptName() const override;
+    
+    bool
+    isSubset() const override;
+
     size_t
-    faceCount() const override;
+    brotherFaceCount() const override;
 
     FXPtr<FXFace>
-    openFace(size_t index) override;
+    openBrotherFace(size_t index) override;
 
     FXPtr<FXPDFDocument>
     document() const;
@@ -31,5 +39,5 @@ protected:
 
 private:
     FXPtr<FXPDFDocument>      document_;
-    const PoDoFo::PdfObject * fontObj_{nullptr};
+    const FXPDFFontInfo     & font_;
 };

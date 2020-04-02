@@ -262,3 +262,37 @@ public:
 protected:
     std::map<std::string, std::any> data_;
 };
+
+
+template <typename S = FXString>
+FXVector<S> FXStringSplit(S line, const S & delimiter) {
+    FXVector<S> strs;
+    size_t pos {};
+    while ((pos = line.find(delimiter)) != std::string::npos) {
+        strs.push_back(line.substr(0, pos));
+        line.erase(0, pos + delimiter.length());
+    }
+    strs.push_back(std::move(line));
+    return strs;
+}
+
+template <typename S = FXString>
+S FXStringTrimLeft(S s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+        return !std::isspace(ch);
+    }));
+    return s;
+}
+
+template <typename S = FXString>
+S FXStringTrimRight(S s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+        return !std::isspace(ch);
+    }).base(), s.end());
+    return s;
+}
+
+template <typename S = FXString>
+S FXStringTrim(S s) {
+    return FXStringTrimRight(FXStringTrimLeft(s));
+}

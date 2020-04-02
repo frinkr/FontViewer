@@ -20,26 +20,26 @@ std::string getUCDRoot() {
 
 int main() {
     FXLib::init(getUCDRoot()); {
-        FXPDFDocument doc(getPDFFile("print.pdf"));
-        if (doc.open()) {
-            for (size_t i = 0; i < doc.fontCount(); ++ i) {
+        auto doc = std::make_shared<FXPDFDocument>(getPDFFile("print.pdf"));
+        if (doc->open()) {
+            for (size_t i = 0; i < doc->fontCount(); ++ i) {
                 FX_INFO("Font " << i);
 
-                auto info = doc.fontInfo(i); {
+                auto info = doc->fontInfo(i); {
                     FX_INFO("\t   info.baseFont = " << info.baseFont);
                     FX_INFO("\t   info.subType  = " << info.subType);
                     FX_INFO("\t   info.isSubset = " << info.isSubset);
                 }
                 
-                FXPtr<FXFace> face = doc.createFace(i);
+                FXPtr<FXFace> face = doc->createFace(i);
                 if (face) {
                     
                     FX_INFO("\t   face: UPEM: " << face->upem());
                     FX_INFO("\t   face: PSName: " << face->postscriptName());
                     FX_INFO("\t   face: GlyphCount: " << face->glyphCount());
                     FX_INFO("\t   face: Format: " << face->attributes().format);
-                    FX_INFO("\t   face: Family Name: " << face->attributes().names.familyName());
-                    FX_INFO("\t   face: Style Name: " << face->attributes().names.styleName());
+                    FX_INFO("\t   face: Family Name: " << face->attributes().sfntNames.familyName());
+                    FX_INFO("\t   face: Style Name: " << face->attributes().sfntNames.styleName());
                 }
                 else {
                     FX_ERROR("\t   Failed to load font " << i);

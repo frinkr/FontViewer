@@ -30,7 +30,7 @@ struct FXSFNTName {
     FXString     value;
 };
 
-class FXFaceNames : public FXVector<FXSFNTName> {
+class FXFaceSFNTNames : public FXVector<FXSFNTName> {
 public:
     const FXString &
     familyName() const;
@@ -107,7 +107,7 @@ struct FXFaceAttributes {
     size_t           upem { 0 };
     FXString         format;
     size_t           glyphCount { 0 };
-    FXFaceNames      names;
+    FXFaceSFNTNames  sfntNames;
     fu               ascender;
     fu               descender;
     FXRect<fu>       bbox;
@@ -140,8 +140,14 @@ public:
     createFace(FXFTFace face);
 
 public:
+    const FXFaceDescriptor &
+    desc() const;
+    
     virtual bool
-    valid() const;
+    hasValidFaceData() const;
+    
+    virtual bool
+    isSubset() const;
     
     FXFTFace
     face() const;
@@ -162,16 +168,16 @@ public:
     attributes() const;
 
     virtual size_t
-    faceCount() const;
+    brotherFaceCount() const;
 
     virtual FXPtr<FXFace>
-    openFace(size_t index);
+    openBrotherFace(size_t index);
 
     const FXDict &
-    properties() const;
+    userProperties() const;
 
     FXDict &
-    properties();
+    userProperties();
 
 public:
     const std::vector<FXCMap> &
@@ -314,6 +320,7 @@ protected:
 };
 
 
+// Fast face without loading additional data
 class FXFastFace : public std::enable_shared_from_this<FXFastFace> {
 public:
     static FXPtr<FXFastFace>
@@ -333,7 +340,9 @@ public:
     
     bool
     hasGlyphForChar(FXChar ch) const;
-    
+
+    FXFTFace
+    face() const;
 private:
     FXFTFace             face_{nullptr};
 };

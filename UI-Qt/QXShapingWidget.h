@@ -108,6 +108,9 @@ public slots:
     doCopyAction();
     
     void
+    doTogglePanelAction();
+    
+    void
     focusLineEdit(bool selectAll = true);
 private:
     FXPtr<FXInspector>
@@ -122,7 +125,8 @@ private:
 private:
     Ui::QXShapingWidget * ui_;
     QXDocument   * document_;
-    FXShaper     * shaper_;    
+    FXShaper     * shaper_;
+    QAction      * warningAction_;
 };
 
 

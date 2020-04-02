@@ -56,7 +56,7 @@ if (APPLE)
     MACOSX_BUNDLE_BUNDLE_VERSION ${APP_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${APP_VERSION}
     MACOSX_BUNDLE_LONG_VERSION_STRING ${APP_VERSION}
-    MACOSX_BUNDLE_COPYRIGHT "Copyright © 2018 Yuqing Jiang. All rights reserved."
+    MACOSX_BUNDLE_COPYRIGHT "Copyright © 2020 Yuqing Jiang. All rights reserved."
     
     XCODE_ATTRIBUTE_PRODUCT_NAME   ${APP_NAME}
     XCODE_ATTRIBUTE_BUNDLE_IDENTIFIER   "me.frinkr.fontviewer"
@@ -66,12 +66,31 @@ if (APPLE)
     XCODE_ATTRIBUTE_COMBINE_HIDPI_IMAGES "NO"
 
     XCODE_ATTRIBUTE_MACOSX_DEPLOYMENT_TARGET "10.11"
-    
+
+    XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED "NO"
+    XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
+
     RESOURCE "${RESOURCE_FILES}"    
     )
 
-#  ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
-#    POST_BUILD
-#    COMMAND /bin/bash ${CMAKE_CURRENT_SOURCE_DIR}/CopyLibs.sh "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app/Contents/MacOS/${APP_NAME}"
-#  )
+  # Get reference to deployqt
+  macro(FindDeployQt)
+    find_package(Qt5 COMPONENTS Widgets REQUIRED)
+    get_target_property(uic_location Qt5::uic IMPORTED_LOCATION)
+    get_filename_component( _qt_dir ${uic_location} DIRECTORY)
+    set(deployqt "${_qt_dir}/macdeployqt")
+    if(NOT EXISTS ${deployqt})
+      message(FATAL_ERROR "Failed to locate deployqt executable: [${deployqt}]")
+      unset(deployqt)
+    endif()
+  endmacro()
+
+  FindDeployQt()
+
+  ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND "${deployqt}" "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app" "-verbose=2"
+    #"-codesign=V45C82Y9RF"
+  )
+
 endif()

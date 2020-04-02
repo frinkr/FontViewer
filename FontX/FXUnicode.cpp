@@ -1,10 +1,13 @@
 #include <iostream>
+#include <fstream>
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
 #include <unicode/unorm2.h>
 #include <unicode/unistr.h>
 #include "FXUnicode.h"
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
+
+using namespace std::string_literals;
 
 namespace {
     class FXUCDFileReader {
@@ -19,7 +22,7 @@ namespace {
         bool
         readLine(FXString & line) {
             while(std::getline(stream_, line)) {
-                boost::algorithm::trim(line);
+                line = FXStringTrim(line);
                 if (commentChar_ && line.size() && line[0] == commentChar_)
                     continue;
                 if (ignoreBlankLine_ && line.empty())
@@ -32,11 +35,10 @@ namespace {
 
         static bool
         parseLine(const FXString & line, FXCharRange & range, FXString & text) {
-            FXVector<FXString> strs;
-            boost::split(strs, line, boost::is_any_of(";"));
+            FXVector<FXString> strs = FXStringSplit(line, ";"s);
             if (strs.size() == 2) {
-                if (parseCharRange(boost::algorithm::trim_copy(strs[0]), range)) {
-                    text = boost::algorithm::trim_copy(strs[1]);
+                if (parseCharRange(FXStringTrim(strs[0]), range)) {
+                    text = FXStringTrim(strs[1]);
                     return true;
                 }
             }
@@ -45,8 +47,8 @@ namespace {
 
         static bool
         parseCharRange(const FXString & line, FXCharRange & range) {
-            FXVector<FXString> strs;
-            boost::split_regex(strs, line, boost::regex("\\.\\."));
+            FXVector<FXString> strs = FXStringSplit(line, ".."s);
+            
             if (strs.size() == 1) {
                 FXChar c;
                 if (parseHexChar(strs[0], c)) {
@@ -161,7 +163,7 @@ FXUCD::categories() const {
 
 FXString
 FXUCD::file(const FXString & name) const {
-    return BST::pathJoin({root_, name});
+    return FXFS::pathJoin({root_, name});
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -280,3 +282,16 @@ FXUnicode::utf16(FXChar c) {
     return FXVector<uint16_t>(buf, buf + u.length());
 }
     
+FXVector<FXChar>
+FXUnicode::utf8ToUTF32(const FXString & u8) {
+    icu::UnicodeString u = icu::UnicodeString::fromUTF8(u8);
+
+    UErrorCode error;
+    FXVector<FXChar> u32(u8.size());
+    auto length = u.toUTF32((UChar32*)u32.data(), u32.size(), error);
+    if (!length || U_FAILURE(error))
+        return FXVector<FXChar>();
+    if (length != u32.size())
+        u32.resize(length);
+    return u32;
+}

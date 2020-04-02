@@ -1,10 +1,9 @@
 #include "FXOT.h"
-#include "FXBoostPrivate.h"
 
 namespace {
     FXString
     findTagName(const FXMap<FXString, FXString> & map, FXTag tag, bool tagIsKey) {
-        FXString str = BST::trim(FXTag2Str(tag));
+        FXString str = FXStringTrim(FXTag2Str(tag));
         if (tagIsKey) {
             auto itr = map.find(str);
             if (itr != map.end())

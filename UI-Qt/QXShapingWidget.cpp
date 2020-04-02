@@ -351,12 +351,19 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doShape);
     connect(ui_->actionCopyDecodedText, &QAction::triggered,
             this, &QXShapingWidget::doCopyAction);
+    connect(ui_->actionToggleOtPanel, &QAction::triggered,
+            this, &QXShapingWidget::doTogglePanelAction);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
 
     QMenu * menu = new QMenu(this);
     menu->addAction(ui_->actionCopyDecodedText);
+    menu->addAction(ui_->actionToggleOtPanel);
     ui_->menuButton->setMenu(menu);
+
+    warningAction_ = new QAction(this);
+    warningAction_->setIcon(qApp->loadIcon(":/images/warning.png"));
+    warningAction_->setToolTip(tr("OpenType shaping is not available, fallback to basic shaping."));
 }
 
 QXShapingWidget::~QXShapingWidget() {
@@ -440,6 +447,11 @@ QXShapingWidget::doShape() {
     ui_->glyphView->setFontSize(fontSize);
     ui_->glyphView->updateGeometry();
     ui_->glyphView->update();
+    
+    if (shaper_->hasFallbackShaping())
+        ui_->lineEdit->addAction(warningAction_, QLineEdit::TrailingPosition);
+    else 
+        ui_->lineEdit->removeAction(warningAction_);
 }
 
 void
@@ -481,6 +493,14 @@ QXShapingWidget::doCopyAction() {
     QString text = QXEncoding::decodeFromHexNotation(ui_->lineEdit->text());
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
+}
+
+void
+QXShapingWidget::doTogglePanelAction() {
+    if (ui_->leftWidget->isHidden())
+        ui_->leftWidget->show();
+    else
+        ui_->leftWidget->hide();
 }
 
 void

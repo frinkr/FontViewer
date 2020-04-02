@@ -25,8 +25,11 @@ def gen_win():
 
 def gen_mac():
     openssl = subprocess.check_output('brew --prefix openssl', shell=True).decode('utf-8').strip()
+    boost = subprocess.check_output('brew --prefix boost', shell=True).decode('utf-8').strip()
     qt = subprocess.check_output('brew --prefix qt', shell=True).decode('utf-8').strip()
     os.environ['PKG_CONFIG_PATH'] = os.path.join(openssl, 'lib/pkgconfig')
+    os.environ['LDFLAGS'] = '-L' + os.path.join(openssl, 'lib')
+    os.environ['CPPFLAGS'] = '-I' + os.path.join(openssl, 'include')
     os.chdir(build_root)
     os.system('cmake -G Xcode -DCMAKE_PREFIX_PATH=' + qt + ' ' + source_root)
 

@@ -10,6 +10,7 @@ namespace PoDoFo {
 class FXPDFFace;
 
 struct FXPDFFontInfo {
+    FXString  reference {};
     FXString  baseFont{};
     FXString  subType{};
     bool      isSubset{false};
@@ -87,7 +88,7 @@ private:
 private:
     FXString              file_;
     FXPDFDocumentInfo     info_;
-    FXVector<FXPDFFontInfo>   fonts_;
-    FXSet<const PoDoFo::PdfObject *> fontObjects_;
+    FXVector<FXPDFFontInfo>   fontsInfo_;
+    FXSet<FXString>           baseFontsNames_;
     std::unique_ptr<PoDoFo::PdfMemDocument>  document_;
 };

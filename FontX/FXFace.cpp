@@ -1,4 +1,4 @@
-#include "FXBoostPrivate.h"
+#include "FXFS.h"
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"
 #include "FXFace.h"
@@ -76,7 +76,7 @@ FXFaceDescriptor::operator!=(const FXFaceDescriptor & other) const {
 }
 
 const FXString &
-FXFaceNames::familyName() const {
+FXFaceSFNTNames::familyName() const {
     if (familyName_.empty())
         familyName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
@@ -85,7 +85,7 @@ FXFaceNames::familyName() const {
 }
 
 const FXString &
-FXFaceNames::styleName() const {
+FXFaceSFNTNames::styleName() const {
     if (styleName_.empty())
         styleName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
@@ -94,7 +94,7 @@ FXFaceNames::styleName() const {
 }
 
 const FXString &
-FXFaceNames::postscriptName() const {
+FXFaceSFNTNames::postscriptName() const {
     if (postscriptName_.empty())
         postscriptName_ = findSFNTName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
                         {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
@@ -103,37 +103,37 @@ FXFaceNames::postscriptName() const {
 }
 
 FXMap<FXString, FXString>
-FXFaceNames::localizedFamilyNames() const {
+FXFaceSFNTNames::localizedFamilyNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY});
 }
 
 FXMap<FXString, FXString>
-FXFaceNames::localizedStyleNames() const {
+FXFaceSFNTNames::localizedStyleNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY});
 }
 
 FXMap<FXString, FXString>
-FXFaceNames::localizedPostscriptNames() const {
+FXFaceSFNTNames::localizedPostscriptNames() const {
     return findSFNTNames({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME});
 }
 
 void
-FXFaceNames::setDefaultFamilyName(const FXString & name) {
+FXFaceSFNTNames::setDefaultFamilyName(const FXString & name) {
     defaultFamilyName_ = name;
 }
 
 void
-FXFaceNames::setDefaultStyleName(const FXString & name) {
+FXFaceSFNTNames::setDefaultStyleName(const FXString & name) {
     defaultStyleName_ = name;
 }
 
 void
-FXFaceNames::setDefaultPostscriptName(const FXString & name) {
+FXFaceSFNTNames::setDefaultPostscriptName(const FXString & name) {
     defaultPostscriptName_ = name;
 }
 
 FXMap<FXString, FXString>
-FXFaceNames::findSFNTNames(const FXVector<int> & nameIds) const {
+FXFaceSFNTNames::findSFNTNames(const FXVector<int> & nameIds) const {
     FXMap<FXString, FXString> map;
     for (auto itr = cbegin(); itr != cend(); ++ itr) {
         if (itr->value.empty())
@@ -148,7 +148,7 @@ FXFaceNames::findSFNTNames(const FXVector<int> & nameIds) const {
 }
 
 FXString
-FXFaceNames::getSFNTName(int nameId) const {
+FXFaceSFNTNames::getSFNTName(int nameId) const {
     auto names = findSFNTNames({nameId});
     auto itr = names.find("en");
     if (itr != names.end())
@@ -159,18 +159,18 @@ FXFaceNames::getSFNTName(int nameId) const {
 }
 
 FXString
-FXFaceNames::vendor() const {
+FXFaceSFNTNames::vendor() const {
     return getSFNTName(TT_NAME_ID_MANUFACTURER);
 }
 
 FXString
-FXFaceNames::version() const {
+FXFaceSFNTNames::version() const {
     return getSFNTName(TT_NAME_ID_VERSION_STRING);
 }
 
 
 FXString
-FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
+FXFaceSFNTNames::findSFNTName(const FXVector<int> & nameIds,
                           const FXVector<FXString> & languages,
                           const FXString & defaultName) const {
     auto findName = [&] () {
@@ -204,7 +204,7 @@ const FXString FXFaceFormatConstant::Other{"Other"};
 FXPtr<FXFace>
 FXFace::createFace(const FXFaceDescriptor & descriptor) {
 	auto face = new FXFace(descriptor);
-	if (face->valid()) 
+	if (face->hasValidFaceData())
         return FXPtr<FXFace>(face);
     else
         delete face;
@@ -225,7 +225,7 @@ FXFace::createFace(const std::string & filePath, size_t faceIndex) {
 FXPtr<FXFace>
 FXFace::createFace(FXPtr<FXStream> stream, size_t faceIndex) {
     auto face = FXPtr<FXFace>(new FXFace(stream, faceIndex));
-    if (face->valid())
+    if (face->hasValidFaceData())
         return face;
     return nullptr;
 }
@@ -273,10 +273,21 @@ FXFace::~FXFace() {
 //////////////////////////////////////////////////////////////////////////////////////////
 //                BASIC GETTERS
 //
+const FXFaceDescriptor &
+FXFace::desc() const {
+    return desc_;
+}
+
 bool
-FXFace::valid() const {
+FXFace::hasValidFaceData() const {
     return face_ != nullptr;
 }
+
+bool
+FXFace::isSubset() const {
+    return false;
+}
+
 
 FXFTFace
 FXFace::face() const {
@@ -290,7 +301,7 @@ FXFace::index() const {
 
 std::string
 FXFace::postscriptName() const {
-    return atts_.names.postscriptName();
+    return atts_.sfntNames.postscriptName();
 }
 
 size_t
@@ -309,12 +320,12 @@ FXFace::attributes() const {
 }
 
 size_t
-FXFace::faceCount() const {
+FXFace::brotherFaceCount() const {
     return face_->num_faces;
 }
 
 FXPtr<FXFace>
-FXFace::openFace(size_t index) {
+FXFace::openBrotherFace(size_t index) {
     if (index == this->index())
         return this->shared_from_this();
     
@@ -323,19 +334,19 @@ FXFace::openFace(size_t index) {
         face = new FXFace(stream_, index);
     else
         face = new FXFace(desc_.filePath, index);
-    if (face->valid())
+    if (face->hasValidFaceData())
         return FXPtr<FXFace>(face);
     delete face;
     return nullptr;
 }
 
 const FXDict &
-FXFace::properties() const {
+FXFace::userProperties() const {
     return properties_;
 }
 
 FXDict &
-FXFace::properties() {
+FXFace::userProperties() {
     return properties_;
 }
 
@@ -583,13 +594,13 @@ FXFace::initAttributes() {
     
     // names
     if (face_->family_name)
-        atts_.names.setDefaultFamilyName(face_->family_name);
+        atts_.sfntNames.setDefaultFamilyName(face_->family_name);
     if (face_->style_name)
-        atts_.names.setDefaultStyleName(face_->style_name);
+        atts_.sfntNames.setDefaultStyleName(face_->style_name);
 
     const char * psName = FT_Get_Postscript_Name(face_);
     if (psName)
-        atts_.names.setDefaultPostscriptName(psName);
+        atts_.sfntNames.setDefaultPostscriptName(psName);
     
     if (!atts_.upem && psName) {
         if (!strcmp(psName, "AppleColorEmoji")) atts_.upem = 800;
@@ -609,7 +620,7 @@ FXFace::initAttributes() {
         entry.nameId     = sfnt.name_id;
         entry.value      = FXToString(sfnt.platform_id, sfnt.encoding_id, sfnt.string, sfnt.string_len);
 
-        atts_.names.push_back(entry);
+        atts_.sfntNames.push_back(entry);
     }
 
     // cid
@@ -673,7 +684,7 @@ FXFace::initVariables() {
     for (FT_UInt i = 0; i < var->num_axis; ++ i) {
         const FT_Var_Axis * axis = var->axis + i;
         VariableAxis a;
-        a.name     = atts_.names.getSFNTName(axis->strid);
+        a.name     = atts_.sfntNames.getSFNTName(axis->strid);
         a.index    = i;
         a.tag      = axis->tag;
         a.minValue = axis->minimum;
@@ -691,8 +702,8 @@ FXFace::initVariables() {
         const FT_Var_Named_Style * style = var->namedstyle + i;
         VariableNamedInstance instance;
         instance.index      = i;
-        instance.name       = atts_.names.getSFNTName(style->strid);
-        instance.psName     = atts_.names.getSFNTName(style->psid);
+        instance.name       = atts_.sfntNames.getSFNTName(style->strid);
+        instance.psName     = atts_.sfntNames.getSFNTName(style->psid);
 
         bool isDefault = true;
         for (FT_UInt j = 0; j < var->num_axis; ++ j) {
@@ -776,4 +787,9 @@ FXFastFace::glyphIDForChar(FXChar ch) const {
 bool
 FXFastFace::hasGlyphForChar(FXChar ch) const {
     return glyphIDForChar(ch) != 0;
+}
+
+FXFTFace
+FXFastFace::face() const {
+    return face_;
 }
