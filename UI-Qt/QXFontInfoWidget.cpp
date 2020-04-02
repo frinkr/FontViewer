@@ -390,7 +390,7 @@ namespace {
             }
             
             if (rowsNumberLimitReach) {
-                addDataRow(QString("∞"),
+                addDataRow(QString(">_<"),
                            QString("<i>Too Many Glyphs, showing %1, more glyphs ommited</i>").arg(rowsNumberLimit));
             }
         

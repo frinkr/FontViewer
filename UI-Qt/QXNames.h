@@ -16,7 +16,7 @@ public:
             {4, "Instructions may alter advance width"},
             {11, "Font data is ‘lossless’ compressed"},
             {12, "Font converted"},
-            {13, "Font optimized for ClearType™"},
+            {13, "Font optimized for ClearType"},
             {14, "Last Resort font"},
         };
         std::vector<std::string> descs;

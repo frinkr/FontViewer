@@ -1,6 +1,6 @@
 #pragma once
 
-#include <boost/any.hpp>
+#include <any>
 #include <algorithm>
 #include <cassert>
 #include <functional>
@@ -223,14 +223,14 @@ protected:
 
 class FXDict {
 public:
-    using data_type = std::map<std::string, boost::any>;
+    using data_type = std::map<std::string, std::any>;
     FXDict() {}
         
     FXDict(std::initializer_list<typename data_type::value_type> init) {
         for (const auto & p: init) 
             set(p.first, p.second);
     }
-    FXDict(const std::string & key, const boost::any & value) {
+    FXDict(const std::string & key, const std::any & value) {
         set(key, value);
     }
 public:
@@ -243,12 +243,12 @@ public:
     get(const std::string & key) const {
         auto itr = data_.find(key);
         assert(itr != data_.end());
-        return boost::any_cast<T>(itr->second);
+        return std::any_cast<T>(itr->second);
     }
         
     template <typename T> FXDict &
     set(const std::string & key, const T & value) {
-        data_[key] = boost::any(value);
+        data_[key] = std::any(value);
         return * this;
     }
 
@@ -260,5 +260,5 @@ public:
     }
 
 protected:
-    std::map<std::string, boost::any> data_;
+    std::map<std::string, std::any> data_;
 };
