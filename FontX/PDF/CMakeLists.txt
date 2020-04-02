@@ -7,14 +7,7 @@ endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(OpenSSL REQUIRED)
-
-################################################
-# PoDoFo
-set(PODOFO_BUILD_LIB_ONLY ON)
-set(PODOFO_NO_FONTMANAGER ON)
-set(PODOFO_BUILD_STATIC ON)
-add_subdirectory(podofo)
+find_package(PODOFO REQUIRED)
 
 add_library(FontXPDF
   FXPDFDocument.h
@@ -24,14 +17,12 @@ add_library(FontXPDF
   )
 
 target_include_directories(FontXPDF PUBLIC
-  ${OPENSSL_INCLUDE_DIR}
-  ${CMAKE_CURRENT_BINARY_DIR}/podofo
-  ${CMAKE_CURRENT_SOURCE_DIR}/podofo
+  ${PODOFO_INCLUDE_DIR}
   )
 
 target_link_libraries(FontXPDF PRIVATE
   FontX
-  podofo_static)
+  ${PODOFO_LIBRARY})
 
 target_include_directories(FontXPDF PUBLIC
   ${CMAKE_SOURCE_DIR}
