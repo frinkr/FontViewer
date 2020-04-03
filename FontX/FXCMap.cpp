@@ -198,7 +198,7 @@ FXCMap::blocks() const {
 }
 
 const FXVector<FXPtr<FXGCharBlock> > &
-FXCMap::unicodeBlocks() const {
+FXCMap::fullUnicodeBlocks() const {
     assert(isUnicode());
     return FXCMapPlatform::get(platformID_).blocks(encodingID_);
 }

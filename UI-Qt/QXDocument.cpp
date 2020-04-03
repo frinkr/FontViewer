@@ -284,7 +284,7 @@ QXDocument::loadBooks() {
     if (cmap.isUnicode()) {
         // Add Full Unicode blocks
         QXGCharBook fullUnicodeBook(QXGCharBook::FullUnicode, "Full Unicode");
-        for (auto & block : cmap.unicodeBlocks())
+        for (auto & block : cmap.fullUnicodeBlocks())
             fullUnicodeBook.addBlock(block);
         books_.push_back(fullUnicodeBook);
     }

@@ -1,4 +1,3 @@
-#include <boost/algorithm/string/join.hpp>
 #include <ctime>
 #include <QVBoxLayout>
 #include <QDateTime>
@@ -63,7 +62,13 @@ namespace {
         template <typename T>
         std::string
         join(const T & t) {
-            return boost::algorithm::join(joinImp(t), "<br>");
+            auto v = joinImp(t);
+            std::string s;
+            for (size_t i = 0; i < v.size(); ++i) {
+                if (i) s += "<br>";
+                s += v[i];
+            }
+            return s;
         }
 
         template <typename T, typename ...U>

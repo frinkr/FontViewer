@@ -46,54 +46,53 @@ namespace {
 }
 
 namespace cereal  {
-        template <class Archive>
-        void
-        serialize(Archive & ar, FXSFNTName & sfnt) {
-            ar & sfnt.platformId;
-            ar & sfnt.encodingId;
-            ar & sfnt.language;
-            ar & sfnt.nameId;
-            ar & sfnt.value;
-        }
+    template <class Archive>
+    void
+    serialize(Archive & ar, FXSFNTName & sfnt) {
+        ar & sfnt.platformId;
+        ar & sfnt.encodingId;
+        ar & sfnt.language;
+        ar & sfnt.nameId;
+        ar & sfnt.value;
+    }
         
-        template <class Archive>
-        void
-        serialize(Archive & ar, FXFaceDescriptor & desc) {
-            ar & desc.filePath;
-            ar & desc.index;
-        }
+    template <class Archive>
+    void
+    serialize(Archive & ar, FXFaceDescriptor & desc) {
+        ar & desc.filePath;
+        ar & desc.index;
+    }
 
-        template <class Archive>
-        void
-        serialize(Archive & ar, FXFaceAttributes & atts) {
-            ar & atts.desc;
-            ar & atts.upem;
-            ar & atts.format;
-            ar & atts.glyphCount;
-            ar & static_cast<FXVector<FXSFNTName>&>(atts.sfntNames);
-            ar & atts.ascender;
-            ar & atts.descender;
-            ar & atts.isCID;
-            ar & atts.cid;
-            ar & atts.isOpenTypeVariable;
-            ar & atts.isMultipleMaster;
-        }
+    template <class Archive>
+    void
+    serialize(Archive & ar, FXFaceAttributes & atts) {
+        ar & atts.desc;
+        ar & atts.upem;
+        ar & atts.format;
+        ar & atts.glyphCount;
+        ar & static_cast<FXVector<FXSFNTName>&>(atts.sfntNames);
+        ar & atts.ascender;
+        ar & atts.descender;
+        ar & atts.isCID;
+        ar & atts.cid;
+        ar & atts.isOpenTypeVariable;
+        ar & atts.isMultipleMaster;
+    }
         
-        template <class Archive>
-        void
-        serialize(Archive & ar, FXFaceDatabase::FaceItem & item) {
-            ar & item.desc;
-            ar & item.atts;
-        }
+    template <class Archive>
+    void
+    serialize(Archive & ar, FXFaceDatabase::FaceItem & item) {
+        ar & item.desc;
+        ar & item.atts;
+    }
 
 
-        template<class Archive>
-        void 
-        serialize(Archive & ar, FXFaceDatabase::FoldersHash & dbHash)
-        {
-            ar & dbHash.hash;
-            ar & dbHash.files;
-        }
+    template<class Archive>
+    void 
+    serialize(Archive & ar, FXFaceDatabase::FoldersHash & dbHash) {
+        ar & dbHash.hash;
+        ar & dbHash.files;
+    }
 }
 
 

@@ -108,14 +108,15 @@ struct FXFaceAttributes {
     FXString         format;
     size_t           glyphCount { 0 };
     FXFaceSFNTNames  sfntNames;
-    fu               ascender;
-    fu               descender;
+    fu               ascender {};
+    fu               descender {};
     FXRect<fu>       bbox;
 
-    bool             isCID;
-    FXString         cid;
-    bool             isOpenTypeVariable;
-    bool             isMultipleMaster;
+    bool             haveUnicodeCMap {};
+    bool             isCID {};
+    FXString         cid {};
+    bool             isOpenTypeVariable {};
+    bool             isMultipleMaster {};
 };
 
 
