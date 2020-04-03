@@ -574,10 +574,21 @@ FXFace::init() {
     scalable_ = FT_IS_SCALABLE(face_);
     selectFontSize(FXDefaultFontSize);
     cache_.reset(new FXGlyphCache);
-    return
+    bool ok =
         initAttributes() &&
         initCMap() &&
         initVariables();
+    
+    // PostInit
+    if (ok) {
+        for (auto & cm: cmaps_) {
+            if (cm.isUnicode()) {
+                atts_.haveUnicodeCMap = true;
+                break;
+            }
+        }
+    }
+    return ok;
 }
 
 bool

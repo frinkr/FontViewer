@@ -268,11 +268,17 @@ FXUnicode::decomposition(FXChar c, bool nfkd) {
 
 FXVector<uint8_t>
 FXUnicode::utf8(FXChar c) {
+    auto str = utf8Str(c);
+    const uint8_t * buf = (const uint8_t*) &str[0];
+    return FXVector<uint8_t>(buf, buf + str.size());
+}
+
+FXString
+FXUnicode::utf8Str(FXChar c) {
     icu::UnicodeString u((UChar32)c);
     std::string str;
     u.toUTF8String(str);
-    const uint8_t * buf = (const uint8_t*) &str[0];
-    return FXVector<uint8_t>(buf, buf + str.size());
+    return str;
 }
 
 FXVector<uint16_t>

@@ -35,21 +35,21 @@ FCLDatabase::instance() {
 
 
 namespace {
-    FXVector<FXPtr<const FCLDatabaseProcessor>> sDbProcessors;
+    FXVector<FXPtr<FCLDatabaseProcessor>> sDbProcessors;
 }
 
-const FXVector<FXPtr<const FCLDatabaseProcessor>> &
+const FXVector<FXPtr<FCLDatabaseProcessor>> &
 FCLGetDatabaseProcessors() {
     return sDbProcessors;
 }
 
 void
-FCLAddDatabaseProcessors(FXPtr<const FCLDatabaseProcessor> processor) {
+FCLAddDatabaseProcessors(FXPtr<FCLDatabaseProcessor> processor) {
     sDbProcessors.push_back(processor);
 }
 
 
-FXPtr<const FCLDatabaseProcessor>
+FXPtr<FCLDatabaseProcessor>
 FCLFindDatabaseProcessors(const FXString & name) {
     for (auto proc : sDbProcessors) {
         if (proc->name() == name)

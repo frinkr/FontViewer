@@ -192,7 +192,7 @@ public:
     blocks() const;
 
     const FXVector<FXPtr<FXGCharBlock> > &
-    unicodeBlocks() const;
+    fullUnicodeBlocks() const; // Full unicode blocks for this CMAP, not the chars in font.
     
     FXVector<FXChar> 
     charsForGlyph(FXGlyphID gid) const;

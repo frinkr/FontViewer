@@ -79,6 +79,9 @@ public:
     static FXVector<uint8_t>
     utf8(FXChar c);
 
+    static FXString
+    utf8Str(FXChar c);
+    
     static FXVector<uint16_t>
     utf16(FXChar c);
 

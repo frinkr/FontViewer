@@ -9,12 +9,43 @@ namespace {
         }
 
         void
-        processDatabase(FXPtr<const FCLDatabase> db) const override {
+        processDatabase(FXPtr<const FCLDatabase> db) override {
             for (size_t i = 0; i < db->faceCount(); ++ i) {
-                auto & atts = db->faceAttributes(i);
-                FX_INFO(atts.sfntNames.postscriptName());
+                auto & desc = db->faceDescriptor(i);
+                dumpFace(db->createFace(desc));
+            }
+                
+            FX_INFO("====== BIGGEST BLOCK ===== ");
+            FX_INFO("  name: " << biggestBlockName);
+            FX_INFO("  size: " << biggestBlockSize);
+                
+            FX_INFO("====== MOST GLYPH FACE ===== ");
+            FX_INFO("  name: " << mostGlyphFontName);
+            FX_INFO("  size: " << mostGlyphCount);
+
+        }
+
+    private:
+        void dumpFace(FXPtr<FXFace> face) {
+            if (face->glyphCount() > mostGlyphCount) {
+                mostGlyphCount = face->glyphCount();
+                mostGlyphFontName = face->postscriptName();
+            }
+                
+            auto & blocks = face->currentCMap().blocks();
+            for (auto & block: blocks) {
+                if (block->size() > biggestBlockSize) {
+                    biggestBlockSize = block->size();
+                    biggestBlockName = face->postscriptName() + ": " + block->name();
+                }
             }
         }
+            
+    private:
+        size_t   mostGlyphCount {};
+        FXString mostGlyphFontName {};
+        size_t   biggestBlockSize {0};
+        FXString biggestBlockName {};
     };
 
     FCLDatabaseProcessorAutoRegister<FCLPDump> dumpProcessor;

@@ -18,17 +18,17 @@ public:
     name() const = 0;
 
     virtual void
-    processDatabase(FXPtr<const FCLDatabase> db) const = 0; 
+    processDatabase(FXPtr<const FCLDatabase> db) = 0;
 };
 
 
-const FXVector<FXPtr<const FCLDatabaseProcessor>> &
+const FXVector<FXPtr<FCLDatabaseProcessor>> &
 FCLGetDatabaseProcessors();
 
 void
-FCLAddDatabaseProcessors(FXPtr<const FCLDatabaseProcessor> processor);
+FCLAddDatabaseProcessors(FXPtr<FCLDatabaseProcessor> processor);
 
-FXPtr<const FCLDatabaseProcessor>
+FXPtr<FCLDatabaseProcessor>
 FCLFindDatabaseProcessors(const FXString & name);
 
 
