@@ -435,6 +435,7 @@ swap2(T value) {
 
 static FXString 
 FXUTF16BE2UTF8(void * buf, size_t bufLen) {
+    if (!buf || !bufLen) return FXString{};
     const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
     const size_t u16Len = bufLen / 2;
     FXVector<uint16_t> v;
@@ -448,6 +449,7 @@ FXUTF16BE2UTF8(void * buf, size_t bufLen) {
 
 [[maybe_unused]] static FXString 
 FXUTF16BE2UTF8(const uint16_t * u16Buf, size_t u16Len) {
+    if (!u16Buf || !u16Len) return FXString{};
     FXVector<uint16_t> v;
     v.reserve(u16Len);
     for (uint32_t i = 0; i < u16Len; i++)
@@ -459,6 +461,7 @@ FXUTF16BE2UTF8(const uint16_t * u16Buf, size_t u16Len) {
 
 static FXString 
 FXUTF162UTF8(void * buf, size_t bufLen) {
+    if (!buf || !bufLen) return FXString{};
     const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
     const size_t u16Len = bufLen / 2;
     icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
@@ -468,6 +471,7 @@ FXUTF162UTF8(void * buf, size_t bufLen) {
 
 static FXString 
 FXUTF162UTF8(const uint16_t * u16Buf, size_t u16Len) {
+    if (!u16Buf || !u16Len) return FXString{};
     icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
     FXString u8;
     return uStr.toUTF8String(u8);

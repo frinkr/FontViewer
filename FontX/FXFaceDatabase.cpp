@@ -1,12 +1,14 @@
 #include <iostream>
+#include <functional>
 #include <fstream>
 #include <thread>
 #include <chrono>
-#include <boost/serialization/vector.hpp>
-#include <boost/serialization/map.hpp>
-#include <boost/archive/text_oarchive.hpp>
-#include <boost/archive/text_iarchive.hpp>
-#include <boost/functional/hash.hpp>
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/vector.hpp>
+#include <cereal/types/map.hpp>
+#include <cereal/types/string.hpp>
+#include <cereal/types/complex.hpp>
 
 #include "FXLib.h"
 #include "FXFaceDatabase.h"
@@ -14,18 +16,24 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 8;
+    constexpr int FACE_DB_VERSION = 9;
+
+    template <typename T, typename V, typename... Rest>
+    void hashCombine(T & seed, const V& v, Rest... rest) {
+        seed ^= std::hash<V>{}(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+        (hashCombine(seed, rest), ...);
+    }
 
     size_t hashFile(const FXString & file, size_t hash) {
-        boost::hash_combine(hash, file);
-        boost::hash_combine(hash, FXFS::lastWriteTime(file));
+        hashCombine(hash, file);
+        hashCombine(hash, FXFS::lastWriteTime(file));
         return hash;
     }
 
     size_t
     hashFiles(const FXSet<FXString> & files) {
         size_t hash = 0;
-        boost::hash_combine(hash, 0);
+        hashCombine(hash, 0);
         for (const auto & f : files) 
             hash = hashFile(f, hash);
         
@@ -37,11 +45,10 @@ namespace {
     }
 }
 
-namespace boost {namespace serialization {
-
+namespace cereal  {
         template <class Archive>
         void
-        serialize(Archive & ar, FXSFNTName & sfnt, const unsigned int /*version*/) {
+        serialize(Archive & ar, FXSFNTName & sfnt) {
             ar & sfnt.platformId;
             ar & sfnt.encodingId;
             ar & sfnt.language;
@@ -51,19 +58,19 @@ namespace boost {namespace serialization {
         
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceDescriptor & desc, const unsigned int /*version*/) {
+        serialize(Archive & ar, FXFaceDescriptor & desc) {
             ar & desc.filePath;
             ar & desc.index;
         }
 
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceAttributes & atts, const unsigned int /*version*/) {
+        serialize(Archive & ar, FXFaceAttributes & atts) {
             ar & atts.desc;
             ar & atts.upem;
             ar & atts.format;
             ar & atts.glyphCount;
-            ar & atts.sfntNames;
+            ar & static_cast<FXVector<FXSFNTName>&>(atts.sfntNames);
             ar & atts.ascender;
             ar & atts.descender;
             ar & atts.isCID;
@@ -74,19 +81,21 @@ namespace boost {namespace serialization {
         
         template <class Archive>
         void
-        serialize(Archive & ar, FXFaceDatabase::FaceItem & item, const unsigned int /*version*/) {
+        serialize(Archive & ar, FXFaceDatabase::FaceItem & item) {
             ar & item.desc;
             ar & item.atts;
         }
 
-        template <class Archive>
-        void
-        serialize(Archive & ar, FXFaceDatabase::FoldersHash & dbHash, const unsigned int /*version*/) {
+
+        template<class Archive>
+        void 
+        serialize(Archive & ar, FXFaceDatabase::FoldersHash & dbHash)
+        {
             ar & dbHash.hash;
             ar & dbHash.files;
         }
-    }
 }
+
 
 FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath, ProgressCallback progressCallback)
     : folders_(folders)
@@ -176,14 +185,14 @@ bool
 FXFaceDatabase::save() {
     try {
         std::ofstream ofs(dbPath_);
-        boost::archive::text_oarchive ar(ofs);
+        cereal::BinaryOutputArchive ar(ofs);
         ar << FACE_DB_VERSION;
         ar << diskHash_;
         ar << faces_;
         
         return true;
     }
-    catch(const boost::archive::archive_exception &)
+    catch(cereal::Exception ex)
     {}
     return false;
 }
@@ -192,7 +201,7 @@ bool
 FXFaceDatabase::load() {
     try {
         std::ifstream ifs(dbPath_);
-        boost::archive::text_iarchive ia(ifs);
+        cereal::BinaryInputArchive ia(ifs);
 
         // Load and check version
         int dbVersion = -1;
@@ -207,7 +216,7 @@ FXFaceDatabase::load() {
         for (size_t i = 0; i < faces_.size(); ++ i)
             diskHash_.faces[faces_[i].desc.filePath].push_back(i);
     }
-    catch(const boost::archive::archive_exception &) {
+    catch (cereal::Exception ex) {
         return false;
     }
     

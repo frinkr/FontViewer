@@ -1,7 +1,5 @@
 #include <iostream>
 #include <stack>
-#include <boost/filesystem.hpp>
-
 #include "podofo/podofo.h"
 #include "FontX/FXLog.h"
 #include "FontX/FXFace.h"

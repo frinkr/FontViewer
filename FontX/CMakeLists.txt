@@ -10,7 +10,7 @@ if (APPLE)
 endif()
 
 find_package(Freetype REQUIRED)
-find_package(Boost REQUIRED COMPONENTS serialization)
+find_package(cereal REQUIRED)
 find_package(Iconv REQUIRED)
 
 if (WIN32)
@@ -67,7 +67,7 @@ add_library(FontX
   )
 
 target_include_directories(FontX PUBLIC
-  ${Boost_INCLUDE_DIRS}
+  ${cereal_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS}
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
@@ -76,7 +76,6 @@ target_include_directories(FontX PUBLIC
   )
 
 target_link_libraries(FontX
-  ${Boost_LIBRARIES}
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
@@ -99,7 +98,6 @@ endif()
 add_executable(FontXTester main.cpp)
 target_link_libraries(FontXTester
   FontX
-  ${Boost_LIBRARIES}
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}

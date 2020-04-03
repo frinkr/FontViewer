@@ -31,8 +31,5 @@ FXVersion::icu() {
 
 FXString
 FXVersion::boost() {
-    return
-        std::to_string(BOOST_VERSION / 100000) + "." +
-        std::to_string(BOOST_VERSION / 100 % 1000) + "." +
-        std::to_string(BOOST_VERSION % 100);
+    return "BOOST NA";
 }

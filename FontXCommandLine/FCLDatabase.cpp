@@ -31,6 +31,9 @@ namespace {
 
 FXPtr<FCLDatabase>
 FCLDatabase::instance() {
-    static auto inst = std::make_shared<FCLDatabase>(systemFontFolders(), dbFilePath());
+    static auto inst = std::make_shared<FCLDatabase>(systemFontFolders(), dbFilePath(), [](size_t current, size_t total, const FXString& file) {
+        printf("%llu/%llu: %s\n", current, total, file.c_str());
+        return true;
+        });;
     return inst;
 }

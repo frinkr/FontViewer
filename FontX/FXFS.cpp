@@ -1,6 +1,5 @@
 #include <chrono>
 
-#include <boost/foreach.hpp>
 #include "FXFS.h"
 
 #ifdef _MSC_VER
