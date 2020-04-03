@@ -435,6 +435,9 @@ swap2(T value) {
 
 static FXString 
 FXUTF16BE2UTF8(void * buf, size_t bufLen) {
+    if (!buf || !bufLen)
+        return FXString{};
+
     const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
     const size_t u16Len = bufLen / 2;
     FXVector<uint16_t> v;
