@@ -1,21 +1,35 @@
 #include <iostream>
 #include "FCLDatabase.h"
 #include "FontX/FXLib.h"
+#include "FontX/FXLog.h"
 namespace {
     std::string getUCDRoot() {
         return std::string(FX_RESOURCES_DIR) + "/UCD";
     }
 }
 
-int main() {
-    FXLib::init(getUCDRoot());
+int main(int argc, const char ** argv) {
     
-    auto db = FCLDatabase::instance();
-    for (size_t i = 0; i < db->faceCount(); ++ i) {
-        auto desc = db->faceDescriptor(i);
-        auto atts = db->faceAttributes(i);
-        std::cout << atts.sfntNames.postscriptName() << std::endl;
+    if (argc != 2) {
+        FX_ERROR(argv[0] << ": processor");
+        return -1;
     }
-    return 0;
+    
+    if (auto proc = FCLFindDatabaseProcessors(argv[1])) {
+        FXLib::init(getUCDRoot());
+        if (auto db = FCLDatabase::instance()) {
+            proc->processDatabase(db);
+            return 0;
+        }
+        else {
+            FX_ERROR("Failed to load font database.");
+            return -2;
+        }
+    }
+    else {
+        FX_ERROR("Failed to find the processor " << argv[1]);
+        return -1;
+    }
+    
 }
 

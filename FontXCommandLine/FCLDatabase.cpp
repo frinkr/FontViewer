@@ -27,10 +27,33 @@ namespace {
     }
 }
     
-
-
-FXPtr<FCLDatabase>
+FXPtr<const FCLDatabase>
 FCLDatabase::instance() {
     static auto inst = std::make_shared<FCLDatabase>(systemFontFolders(), dbFilePath());
     return inst;
+}
+
+
+namespace {
+    FXVector<FXPtr<const FCLDatabaseProcessor>> sDbProcessors;
+}
+
+const FXVector<FXPtr<const FCLDatabaseProcessor>> &
+FCLGetDatabaseProcessors() {
+    return sDbProcessors;
+}
+
+void
+FCLAddDatabaseProcessors(FXPtr<const FCLDatabaseProcessor> processor) {
+    sDbProcessors.push_back(processor);
+}
+
+
+FXPtr<const FCLDatabaseProcessor>
+FCLFindDatabaseProcessors(const FXString & name) {
+    for (auto proc : sDbProcessors) {
+        if (proc->name() == name)
+            return proc;
+    }
+    return nullptr;
 }
