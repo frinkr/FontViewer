@@ -4,7 +4,7 @@
 #include <thread>
 #include <chrono>
 
-#include <cereal/archives/binary.hpp>
+#include <cereal/archives/portable_binary.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
@@ -184,7 +184,7 @@ bool
 FXFaceDatabase::save() {
     try {
         std::ofstream ofs(dbPath_);
-        cereal::BinaryOutputArchive ar(ofs);
+        cereal::PortableBinaryOutputArchive ar(ofs);
         ar << FACE_DB_VERSION;
         ar << diskHash_;
         ar << faces_;
@@ -200,7 +200,7 @@ bool
 FXFaceDatabase::load() {
     try {
         std::ifstream ifs(dbPath_);
-        cereal::BinaryInputArchive ia(ifs);
+        cereal::PortableBinaryInputArchive ia(ifs);
 
         // Load and check version
         int dbVersion = -1;
