@@ -182,7 +182,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     // draw baseline
     {
         painter.setPen(baseLinePen);
-        painter.drawLine(gridCellLeft(6, -1), baseLineY, rect().right(), baseLineY);
+        painter.drawLine(gridCellLeft(-1, -1), baseLineY, rect().right(), baseLineY);
     }
         
     // draw grid
@@ -190,7 +190,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         painter.setPen(gridPen);
 
         // row lines
-        for (int i = 0; i < 5; ++ i) 
+        for (int i = 0; i < 6; ++ i)
             painter.drawLine(QX_SHAPINGVIEW_MARGIN, gridCellBottom(i),
                        rect().right(), gridCellBottom(i));
         // column lines
@@ -207,7 +207,8 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
         painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
         painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
-
+        painter.drawText(gridCellRect(4, -1), Qt::AlignRight, tr("Index "));
+        
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             FXGlyphID gid = shaper_->glyph(i);
@@ -219,6 +220,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
             painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
             painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(gid));
+            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(i));
         }
     }
 }
@@ -268,8 +270,8 @@ QXShapingGlyphView::setFontSize(double fontSize) {
 
 QPoint
 QXShapingGlyphView::baseLinePosition() const {
-    return QPoint(gridCellLeft(5, 0),
-                  gridCellBottom(5, 0) + fu2px(shaper_->face()->attributes().descender));
+    return QPoint(gridCellLeft(6, 0),
+                  gridCellBottom(6, 0) + fu2px(shaper_->face()->attributes().descender));
 }
 
 int
