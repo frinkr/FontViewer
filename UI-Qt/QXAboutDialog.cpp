@@ -13,7 +13,6 @@ QXAboutDialog::QXAboutDialog(QWidget *parent ) :
     QMap<QString, QVariant> map;
     map["FREETYPE_VERSION"] = toQString(FXVersion::freetype());
     map["HARFBUZZ_VERSION"] = toQString(FXVersion::harfbuzz());
-    map["BOOST_VERSION"] = toQString(FXVersion::boost());
     map["ICU_VERSION"] = toQString(FXVersion::icu());
     map["QT_VERSION"] = toQString(QT_VERSION_STR);
 

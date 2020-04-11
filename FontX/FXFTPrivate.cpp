@@ -1,14 +1,14 @@
 #include "FXFTPrivate.h"
 #include "FXFS.h"
 
-#if BOOST_COMP_MSVC
+#if FX_WIN
 #include <stdio.h>
 #include <locale>
 #include <codecvt>
 #endif
 
 namespace {
-#if BOOST_COMP_MSVC
+#if FX_WIN
     // adapted from freetype/ftsystem.c
     unsigned long
     streamRead( FT_Stream       stream,
@@ -78,7 +78,7 @@ namespace {
 
 FT_Error FXFilePathToOpenArgs(const FXString & filePath, FT_Open_Args * args) {
     memset(args, 0, sizeof(FT_Open_Args));
-#if BOOST_COMP_MSVC
+#if FX_WIN
     FT_Stream stream = (FT_Stream)calloc(1, sizeof(FT_StreamRec));
     FT_Error error = streamFromUTF8FilePath(filePath.c_str(), stream);
     if (error) {

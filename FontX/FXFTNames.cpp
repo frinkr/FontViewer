@@ -1,8 +1,3 @@
-#include <boost/predef.h>
-#if BOOST_OS_MACOS
-#  include <CoreServices/CoreServices.h>
-#endif
-
 #include <map>
 #include <iconv.h>
 #include <boost/predef.h>
@@ -14,6 +9,10 @@
 #include <unicode/uchar.h>
 
 #include "FXFTNames.h"
+
+#if FX_MAC
+#  include <CoreServices/CoreServices.h>
+#endif
 
 typedef struct {
     const FT_UShort	platform_id;
@@ -699,7 +698,7 @@ FXFTStringMacintosh(FT_UShort encodingId, void * string, uint32_t stringLen) {
         return FXIconv("MacRoman", reinterpret_cast<const char *>(string), stringLen);
         //return FXMacRoman2UTF8(reinterpret_cast<const unsigned char *>(string), stringLen);
 
-#if BOOST_OS_MACOS
+#if FX_MAC
     FXString name;
     while (true) {
         OSStatus error = 0;

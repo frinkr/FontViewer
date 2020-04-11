@@ -10,6 +10,14 @@
 #include <string>
 #include <vector>
 
+#if defined(__APPLE__)
+#  define FX_MAC  1
+#elif defined(_WIN32)
+#  define FX_WIN  1
+#elif defined(__linux__)
+#  define FX_LINUX 1
+#endif
+
 template <typename T>
 using FXPtr = std::shared_ptr<T>;
 template <typename T>

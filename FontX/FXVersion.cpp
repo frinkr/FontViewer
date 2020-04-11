@@ -2,7 +2,6 @@
 #include "FXVersion.h"
 #include "FXFTPrivate.h"
 #include "FXHBPrivate.h"
-#include "boost/version.hpp"
 #include "unicode/uversion.h"
 
 FXString
@@ -28,9 +27,4 @@ FXVersion::icu() {
         std::to_string(U_ICU_VERSION_PATCHLEVEL_NUM) + ", Build " +
         std::to_string(U_ICU_VERSION_BUILDLEVEL_NUM) + ", Data " +
         U_ICU_DATA_VERSION;
-}
-
-FXString
-FXVersion::boost() {
-    return "BOOST NA";
 }

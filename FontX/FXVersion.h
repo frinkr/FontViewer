@@ -10,7 +10,4 @@ struct FXVersion {
 
     static FXString
     icu();
-
-    static FXString
-    boost();
 };
