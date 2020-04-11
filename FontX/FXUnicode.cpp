@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
 #include <unicode/unorm2.h>
@@ -287,17 +288,32 @@ FXUnicode::utf16(FXChar c) {
     const uint16_t * buf = (const uint16_t *)u.getBuffer();
     return FXVector<uint16_t>(buf, buf + u.length());
 }
-    
-FXVector<FXChar>
+
+std::u32string
 FXUnicode::utf8ToUTF32(const FXString & u8) {
     icu::UnicodeString u = icu::UnicodeString::fromUTF8(u8);
 
     UErrorCode error;
-    FXVector<FXChar> u32(u8.size());
+    std::u32string u32(u8.size(), 0);
     auto length = u.toUTF32((UChar32*)u32.data(), u32.size(), error);
     if (!length || U_FAILURE(error))
-        return FXVector<FXChar>();
+        return std::u32string();
     if (length != u32.size())
         u32.resize(length);
     return u32;
+}
+
+FXString
+FXUnicode::utf16ToUTF8(const std::u16string_view& u16) {
+    icu::UnicodeString uStr((const uint16_t*)(u16.data()), static_cast<int32_t>(u16.size()));
+    FXString u8;
+    return uStr.toUTF8String(u8);
+}
+
+FXString
+FXUnicode::utf16BEToUTF8(const std::u16string_view& u16BE) {
+    std::u16string u16(u16BE.size(), 0);
+    for (size_t i = 0; i < u16BE.size(); ++i) 
+        u16[i] = FXSwapBytes(u16BE[i]);
+    return utf16ToUTF8(u16);
 }

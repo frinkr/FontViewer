@@ -30,6 +30,7 @@ template <typename K, typename V>
 using FXMap = std::map<K, V>;
 
 using FXString = std::string;
+using FXStringView = std::string_view;
 
 struct FT_LibraryRec_;
 struct FT_FaceRec_;
@@ -303,4 +304,14 @@ S FXStringTrimRight(S s) {
 template <typename S = FXString>
 S FXStringTrim(S s) {
     return FXStringTrimRight(FXStringTrimLeft(s));
+}
+
+template <typename T> T
+FXSwapBytes(T value) {
+    if constexpr (sizeof(T) == 1)
+        return value;
+    else if constexpr (sizeof(T) == 2)
+        return static_cast<T>(((value & 0xff) << 8) + ((value & 0xff00) >> 8));
+    else
+        static_assert(false, "not implemented");
 }

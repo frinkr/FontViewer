@@ -85,8 +85,17 @@ public:
     static FXVector<uint16_t>
     utf16(FXChar c);
 
-    static FXVector<FXChar>
+    static std::u32string
     utf8ToUTF32(const FXString & u8);
+
+    static FXString
+    utf16ToUTF8(const std::u16string_view& u16);
+
+    static FXString
+    utf16BEToUTF8(const std::u16string_view& u16);
+
+    static FXString
+    utf32ToUTF8(const std::u32string_view& u32);
 
 private:
     static FXPtr<FXUCD>    ucd_;

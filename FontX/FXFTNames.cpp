@@ -1,14 +1,8 @@
 #include <map>
 #include <iconv.h>
-#include <boost/predef.h>
-#include <unicode/utypes.h>
-#include <unicode/stringpiece.h>
-#include <unicode/utf8.h>
-#include <unicode/ustring.h>
-#include <unicode/unistr.h>
-#include <unicode/uchar.h>
 
 #include "FXFTNames.h"
+#include "FXUnicode.h"
 
 #if FX_MAC
 #  include <CoreServices/CoreServices.h>
@@ -425,55 +419,28 @@ static const FtLanguage   ftLanguages[] = {
 
 #define NUM_FT_LANGUAGES  (sizeof (ftLanguages) / sizeof (ftLanguages[0]))
 
-
-template <typename T> T
-swap2(T value) {
-    return static_cast<T>(((value & 0xff) << 8) + ((value & 0xff00) >> 8));
-}
-
-
 static FXString 
-FXUTF16BE2UTF8(void * buf, size_t bufLen) {
+FXUTF16BE2UTF8(const uint16_t * buf, size_t bufLen) {
     if (!buf || !bufLen) return FXString{};
-    const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
-    const size_t u16Len = bufLen / 2;
-    FXVector<uint16_t> v;
-    v.reserve(u16Len);
-    for (uint32_t i = 0; i < u16Len; i++)
-        v.push_back(swap2(u16Buf[i]));
-    icu::UnicodeString uStr(&v[0], static_cast<int32_t>(u16Len));
-    FXString u8;
-    return uStr.toUTF8String(u8);
+    const char16_t* u16Buf = reinterpret_cast<const char16_t*>(buf);
+    return FXUnicode::utf16BEToUTF8(std::u16string_view(u16Buf, bufLen));
 }
 
-[[maybe_unused]] static FXString 
-FXUTF16BE2UTF8(const uint16_t * u16Buf, size_t u16Len) {
-    if (!u16Buf || !u16Len) return FXString{};
-    FXVector<uint16_t> v;
-    v.reserve(u16Len);
-    for (uint32_t i = 0; i < u16Len; i++)
-        v.push_back(swap2(u16Buf[i]));
-    icu::UnicodeString uStr(&v[0], static_cast<int32_t>(u16Len));
-    FXString u8;
-    return uStr.toUTF8String(u8);
+static FXString
+FXUTF16BE2UTF8(void* buf, size_t bufLen) {
+    return FXUTF16BE2UTF8(reinterpret_cast<const uint16_t*>(buf), bufLen/2);
+}
+
+static FXString
+FXUTF162UTF8(const uint16_t * buf, size_t bufLen) {
+    if (!buf || !bufLen) return FXString{};
+    const char16_t* u16Buf = reinterpret_cast<const char16_t*>(buf);
+    return FXUnicode::utf16ToUTF8(std::u16string_view(u16Buf, bufLen));
 }
 
 static FXString 
 FXUTF162UTF8(void * buf, size_t bufLen) {
-    if (!buf || !bufLen) return FXString{};
-    const uint16_t * u16Buf = reinterpret_cast<const uint16_t*>(buf);
-    const size_t u16Len = bufLen / 2;
-    icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
-    FXString u8;
-    return uStr.toUTF8String(u8);
-}
-
-static FXString 
-FXUTF162UTF8(const uint16_t * u16Buf, size_t u16Len) {
-    if (!u16Buf || !u16Len) return FXString{};
-    icu::UnicodeString uStr(u16Buf, static_cast<int32_t>(u16Len));
-    FXString u8;
-    return uStr.toUTF8String(u8);
+    return FXUTF162UTF8(reinterpret_cast<const uint16_t*>(buf), bufLen / 2);
 }
 
 [[maybe_unused]] static FXString
