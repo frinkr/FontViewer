@@ -284,9 +284,19 @@ FXUnicode::utf8Str(FXChar c) {
 
 FXVector<uint16_t>
 FXUnicode::utf16(FXChar c) {
-    icu::UnicodeString u((UChar32)c);
-    const uint16_t * buf = (const uint16_t *)u.getBuffer();
-    return FXVector<uint16_t>(buf, buf + u.length());
+    uint16_t h{}, l{};
+    if (c < 0x10000) {
+        l = c;
+    }
+    else {
+        auto t = c - 0x10000;
+        h = (((t << 12) >> 22) + 0xD800);
+        l = (((t << 22) >> 22) + 0xDC00);
+    }
+    if (h)
+        return { h, l };
+    else
+        return { l };
 }
 
 std::u32string
