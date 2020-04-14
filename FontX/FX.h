@@ -306,6 +306,14 @@ S FXStringTrim(S s) {
     return FXStringTrimRight(FXStringTrimLeft(s));
 }
 
+
+template <auto Val, auto Message>
+void safe_static_assert( ) {
+    static_assert(Val);
+}
+
+template <class...> constexpr std::false_type FXDependentFalse{};
+
 template <typename T> T
 FXSwapBytes(T value) {
     if constexpr (sizeof(T) == 1)
@@ -313,5 +321,5 @@ FXSwapBytes(T value) {
     else if constexpr (sizeof(T) == 2)
         return static_cast<T>(((value & 0xff) << 8) + ((value & 0xff00) >> 8));
     else
-        static_assert(false, "not implemented");
+        static_assert(FXDependentFalse<T>, "not implemented");
 }

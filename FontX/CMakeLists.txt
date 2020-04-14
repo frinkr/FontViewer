@@ -93,13 +93,3 @@ if (APPLE)
     "-framework CoreServices"
     )
 endif()
-
-#########################################################
-add_executable(FontXTester main.cpp)
-target_link_libraries(FontXTester
-  FontX
-  ${FREETYPE_LIBRARIES}
-  ${ICU_LIBRARIES}
-  ${HARFBUZZ_LIBRARIES}
-  ${Iconv_LIBRARIES}
-  )
