@@ -660,6 +660,8 @@ FXFace::initCMap() {
         return true;
     }
     
+    std::optional<size_t> firstUnicodeCMapIndex;
+    
     size_t current = currentCMapIndex();
     for (FT_Int i = 0; i < face_->num_charmaps; ++ i)  {
         const bool isValid = selectCMap(i);
@@ -667,9 +669,14 @@ FXFace::initCMap() {
         const FT_CharMap & cm = face_->charmaps[i];
         FXCMap fxcm(this, cm->platform_id, cm->encoding_id, i, isValid);
         cmaps_.push_back(fxcm);
+        
+        if (!firstUnicodeCMapIndex && fxcm.isUnicode())
+            firstUnicodeCMapIndex = i;
     }
     
     selectCMap(current);
+    if (!currentCMap().isUnicode() && firstUnicodeCMapIndex)
+        selectCMap(*firstUnicodeCMapIndex);
     
     return true;
 }

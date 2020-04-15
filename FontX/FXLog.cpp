@@ -6,7 +6,7 @@ namespace {
 
 void
 FXDefaultLogFunc(FXLogLevel level, const FXLogLocation * location, const char * message) {
-    const char * s[4] = {"error", "warning", "info", "info"};
+    const char * s[4] = {"error", "warning", "info", "verbose"};
     printf("FX (%s) : %s", s[(size_t)level], message);
 }
 

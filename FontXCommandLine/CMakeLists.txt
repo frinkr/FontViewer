@@ -11,8 +11,9 @@ add_executable(${PROJECT_NAME}
   FCL.cpp
   FCLDatabase.h
   FCLDatabase.cpp
-  FCLPDump.cpp
-  FCLPDumpKern.cpp
+  FCLDump.cpp
+  FCLDumpKern.cpp
+  FCLPlayground.cpp
   )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -16,7 +16,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 9;
+    constexpr int FACE_DB_VERSION = 10;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {
@@ -73,6 +73,7 @@ namespace cereal  {
         ar & static_cast<FXVector<FXSFNTName>&>(atts.sfntNames);
         ar & atts.ascender;
         ar & atts.descender;
+        ar & atts.haveUnicodeCMap;
         ar & atts.isCID;
         ar & atts.cid;
         ar & atts.isOpenTypeVariable;

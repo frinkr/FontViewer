@@ -5,7 +5,7 @@
 #include "FCLDatabase.h"
 
 namespace {
-    class FCLPDumpKern: public FCLDatabaseProcessor {
+    class FCLDumpKern: public FCLDatabaseProcessor {
     public:
         FXString
         name() const override {
@@ -144,5 +144,5 @@ namespace {
         int  maxKern {0};
     };
 
-    FCLDatabaseProcessorAutoRegister<FCLPDumpKern> dumpProcessor;
+    FCLDatabaseProcessorAutoRegister<FCLDumpKern> dumpProcessor;
 }

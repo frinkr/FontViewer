@@ -2,7 +2,7 @@
 #include "FCLDatabase.h"
 
 namespace {
-    class FCLPDump: public FCLDatabaseProcessor {
+    class FCLDump: public FCLDatabaseProcessor {
         FXString
         name() const override {
             return "dump";
@@ -48,5 +48,5 @@ namespace {
         FXString biggestBlockName {};
     };
 
-    FCLDatabaseProcessorAutoRegister<FCLPDump> dumpProcessor;
+    FCLDatabaseProcessorAutoRegister<FCLDump> dumpProcessor;
 }
