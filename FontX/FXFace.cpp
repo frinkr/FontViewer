@@ -655,8 +655,14 @@ FXFace::initAttributes() {
 bool
 FXFace::initCMap() {
     if (!face_->num_charmaps) {
-        FXCMap fxcm(this, 999, 999, 0, true);
-        cmaps_.push_back(fxcm);
+        if (atts_.isCID) {
+            FXCMap cm(this, atts_.cid, 0, true);
+            cmaps_.push_back(cm);
+        }
+        else {
+            FXCMap fxcm(this, 999, 999, 0, true);
+            cmaps_.push_back(fxcm);
+        }
         return true;
     }
     

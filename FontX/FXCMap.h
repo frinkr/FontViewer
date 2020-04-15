@@ -157,19 +157,26 @@ private:
 class FXCMap {
 public:
     FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t index, bool valid = true);
-
+    FXCMap(FXFace * face, const FXString & cidROS, size_t index, bool valid = true);
+    
     uint16_t
     platformID() const;
 
     uint16_t
     encodingID() const;
 
+    const FXString &
+    cidROS() const;
+
     size_t
     index() const;
 
     bool
     isValid() const;
-    
+
+    bool
+    isCID() const;
+
     bool
     isCurrent() const;
 
@@ -220,16 +227,17 @@ private:
     };
     
 private:
-    FXFace           * face_;
-    size_t             index_;
-    uint16_t           platformID_;
-    uint16_t           encodingID_;
-    bool               valid_;
-    FXVector<FXChar>   glyphMap_;
-    FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_;
-    FXVector<FXCharMapItem> charMap_;
+    FXFace           * face_ {};
+    size_t             index_ {};
+    uint16_t           platformID_ {uint16_t(-1)};
+    uint16_t           encodingID_ {uint16_t(-1)};
+    FXString           cidROS_ {};
+    bool               valid_ {};
+    FXVector<FXChar>   glyphMap_ {};
+    FXMap<FXGlyphID, FXVector<FXChar> > extraGlyphsMap_ {};
+    FXVector<FXCharMapItem> charMap_ {};
 
-    FXVector<FXPtr<FXGCharBlock> > blocks_;
+    FXVector<FXPtr<FXGCharBlock> > blocks_{};
 };
 
 

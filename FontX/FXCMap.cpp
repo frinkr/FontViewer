@@ -137,6 +137,13 @@ FXCMap::FXCMap(FXFace * face, uint16_t platformID, uint16_t encodingID, size_t i
     glyphMap_.push_back(NOT_INIT_MARK);
 }
 
+FXCMap::FXCMap(FXFace * face, const FXString & cidROS, size_t index, bool valid) 
+    : face_(face)
+    , index_(index)
+    , cidROS_(cidROS)
+    , valid_(valid) {
+}
+
 uint16_t
 FXCMap::platformID() const {
     return platformID_;
@@ -147,6 +154,11 @@ FXCMap::encodingID() const {
     return encodingID_;
 }
 
+const FXString &
+FXCMap::cidROS() const {
+    return cidROS_;
+}
+
 size_t
 FXCMap::index() const {
     return index_;
@@ -155,6 +167,11 @@ FXCMap::index() const {
 bool
 FXCMap::isValid() const {
     return valid_;
+}
+
+bool
+FXCMap::isCID() const {
+    return !cidROS_.empty();
 }
 
 bool
@@ -179,11 +196,17 @@ FXCMap::encodingName() const {
 
 std::string
 FXCMap::description() const {
-    return FXGetPlatformName(platformID_) + " - " + FXGetEncodingName(platformID_, encodingID_);
+    if (isCID())
+        return cidROS_;
+    else
+        return FXGetPlatformName(platformID_) + " - " + FXGetEncodingName(platformID_, encodingID_);
 }
 
 bool
 FXCMap::isUnicode() const {
+    if (isCID())
+        return false;
+
     return platformID_ == TT_PLATFORM_APPLE_UNICODE
         || (platformID_ == TT_PLATFORM_MICROSOFT && (encodingID_ == TT_MS_ID_UNICODE_CS || encodingID_ == TT_MS_ID_UCS_4 || encodingID_ == TT_MS_ID_SYMBOL_CS))
         ;
@@ -205,6 +228,10 @@ FXCMap::fullUnicodeBlocks() const {
     
 FXVector<FXChar>
 FXCMap::charsForGlyph(FXGlyphID gid) const {
+    if (isCID()) {
+        return {FXChar(gid)}; // GID is CID
+    }
+    
     FXVector<FXChar> ret;
         
     if (glyphMap_.size() && (glyphMap_[0] == NOT_INIT_MARK)) {
@@ -234,6 +261,10 @@ FXCMap::charsForGlyph(FXGlyphID gid) const {
 
 FXGlyphID
 FXCMap::glyphForChar(FXChar c) const {
+    if (isCID()) {
+        return FXGlyphID(c); // CID is GID
+    }
+    
     auto itr = std::lower_bound(charMap_.begin(), charMap_.end(), c, [](const FXCharMapItem & item, FXChar c) {
         return item.c < c;
     });
@@ -245,6 +276,12 @@ FXCMap::glyphForChar(FXChar c) const {
 
 void
 FXCMap::initBlocks() {
+    if (isCID()) {
+        FXPtr<FXGCharBlock> nilBlock(new FXCharRangeBlock(0, face_->glyphCount(), FXGCharType::FXGCharTypeGlyphID, cidROS_));
+        blocks_.push_back(nilBlock);
+        return;
+    }
+
     auto & fullBlocks = FXCMapPlatform::get(platformID_).blocks(encodingID_);
     if (fullBlocks.empty()) {
         //new FXCharRangeBlock(0, face_->glyphCount(), FXGCharType::FXGCharTypeGlyphID, "Glyphs");
@@ -309,6 +346,9 @@ FXCMap::initBlocks() {
 
 bool
 FXCMap::initGlyphsMap() {
+    if (isCID())
+        return true;
+    
     glyphMap_.clear();
     
     FXAutoCMap acm(face_, index_);
