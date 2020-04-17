@@ -2,13 +2,14 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaType>
+#include <QSplashScreen>
 #include <QtDebug>
 #include <QtGui>
-#include <QSplashScreen>
 
 #include "FontX/FXFace.h"
 
@@ -286,7 +287,7 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
 }
 
 bool
-QXDocumentWindowManager::doOpenFontFromFile(FileTypeFilter selectedTypeFilter) {
+QXDocumentWindowManager::doNativeOpenFileDialog(FileTypeFilter selectedTypeFilter) {
     QFileDialog openFileDialog(nullptr);
 
     openFileDialog.setFileMode(QFileDialog::ExistingFile);
@@ -295,6 +296,19 @@ QXDocumentWindowManager::doOpenFontFromFile(FileTypeFilter selectedTypeFilter) {
 
     if (QDialog::Accepted == openFileDialog.exec()) {
         return openFontFile(openFileDialog.selectedFiles()[0]);
+    }
+    return false;
+}
+
+bool
+QXDocumentWindowManager::doFastOpenFontDialog() {
+    QInputDialog dialog(nullptr);
+    dialog.setInputMode(QInputDialog::TextInput);
+    dialog.setWindowTitle(tr("Open Font File"));
+    dialog.setLabelText(tr("Please input the font path:"));
+    if (dialog.exec() == QDialog::Accepted) {
+        if (auto text = dialog.textValue(); !text.isEmpty())
+            return openFontFile(text);
     }
     return false;
 }

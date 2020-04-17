@@ -366,7 +366,10 @@ QXDocumentWindow::onCopyAction() {
 
 void
 QXDocumentWindow::onOpenFontAction() {
-    QXDocumentWindowManager::instance()->doOpenFontDialog();
+    if (qApp->queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
+        QXDocumentWindowManager::instance()->doFastOpenFontDialog();
+    else
+        QXDocumentWindowManager::instance()->doOpenFontDialog();
 }
 
 void

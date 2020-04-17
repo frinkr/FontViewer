@@ -577,7 +577,7 @@ QXFontBrowser::onSearchAction() {
 
 void
 QXFontBrowser::onOpenFileButtonClicked() {
-    if (QXDocumentWindowManager::instance()->doOpenFontFromFile())
+    if (QXDocumentWindowManager::instance()->doNativeOpenFileDialog())
         reject();    
 }
 

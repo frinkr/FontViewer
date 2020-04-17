@@ -70,8 +70,11 @@ public slots:
 
     /* Return true if use selected a font file, false if canceled.*/
     bool
-    doOpenFontFromFile(FileTypeFilter selectedTypeFilter = FileTypeFilter::All);
+    doNativeOpenFileDialog(FileTypeFilter selectedTypeFilter = FileTypeFilter::All);
 
+    bool
+    doFastOpenFontDialog();
+    
     bool
     openFontFile(const QString & filePath);
 
