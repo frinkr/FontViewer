@@ -1,9 +1,10 @@
 #pragma once
 
-#include <any>
 #include <algorithm>
+#include <any>
 #include <cassert>
 #include <functional>
+#include <iterator>
 #include <map>
 #include <memory>
 #include <set>
@@ -28,6 +29,10 @@ template <typename T>
 using FXSet = std::set<T>;
 template <typename K, typename V>
 using FXMap = std::map<K, V>;
+template <typename T>
+using FXOpt = std::optional<T>;
+template <typename T>
+FXOpt<T> FXNone {};
 
 using FXString = std::string;
 using FXStringView = std::string_view;
@@ -229,6 +234,7 @@ protected:
     Deallocator     deallocator_;
     size_t          pos_;
 };
+
 
 class FXDict {
 public:

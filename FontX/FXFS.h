@@ -1,5 +1,6 @@
 #pragma once
 #include "FX.h"
+#include "FXIterator.h"
 #include <filesystem>
 
 namespace FXFS {
@@ -31,6 +32,18 @@ namespace FXFS {
     size_t
     fileSize(const FXString & file);
 }
+
+class FXFileInDirectoryIterator : public FXContainerIterator<FXVector, FXString> {
+public:
+    FXFileInDirectoryIterator(const FXString & dir, bool recursive = true) {
+        FXVector<FXString> files;
+        FXFS::foreachFile(dir, recursive, [&files](const auto & file) {
+            files.push_back(file);
+            return true;
+        });
+        setList(std::move(files));
+    }
+};
 
 
 

@@ -2,7 +2,7 @@
 
 #include "FXFS.h"
 
-#ifdef _MSC_VER
+#if FX_WIN
 #  include <Windows.h>
 #endif
 

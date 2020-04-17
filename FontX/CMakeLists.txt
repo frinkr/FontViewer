@@ -31,6 +31,8 @@ add_library(FontX
   FXCMap.cpp
   FXCMap.h
   FXCache.h
+  FXFontFileIterator.cpp
+  FXFontFileIterator.h
   FXFS.cpp
   FXFS.h
   FXFT.h
@@ -91,5 +93,6 @@ if (APPLE)
     ${ICU_LDFLAGS}
     ${HARFBUZZ_LDFLAGS}
     "-framework CoreServices"
+    "-framework CoreText"
     )
 endif()

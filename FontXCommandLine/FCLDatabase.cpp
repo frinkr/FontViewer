@@ -11,6 +11,8 @@ namespace {
 #if defined(Q_OS_MAC)
         if (!folders.contains("/System/Library/Assets") && !folders.contains("/System/Library/Assets/"))
             folders << "/System/Library/Assets";
+        if (!folders.contains("/System/Library/AssetsV2") && !folders.contains("/System/Library/AssetsV2/"))
+            folders << "/System/Library/AssetsV2";
 #endif
         
         FXVector<FXString> dirs;
