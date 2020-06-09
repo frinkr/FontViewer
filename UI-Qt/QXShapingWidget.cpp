@@ -476,6 +476,7 @@ QXShapingWidget::onFeatures() const {
         if (item->isSelected())
             features.push_back(item->data(Qt::UserRole).value<FXTag>());
     }
+    features.push_back('locl');
     return features;
 }
 

@@ -23,6 +23,12 @@ public:
     FXPtr<FXFace>
     createFace(const FXFaceDescriptor & descriptor) const;
 
+    FXOpt<size_t>
+    findIndex(const FXString & psName) const;
+
+    FXOpt<FXFaceDescriptor>
+    findDescriptor(const FXString & psName) const;
+
     void
     rescan();
 

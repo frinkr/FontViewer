@@ -2,6 +2,9 @@
 #include "FCLDatabase.h"
 #include "FontX/FXLib.h"
 #include "FontX/FXLog.h"
+#include "FontX/FXFS.h"
+#include "FontX/FXFontFileIterator.h"
+
 namespace {
     std::string getUCDRoot() {
         return std::string(FX_RESOURCES_DIR) + "/UCD";
@@ -9,6 +12,21 @@ namespace {
 }
 
 int main(int argc, const char ** argv) {
+
+    if (false)
+    {
+        FXFileInDirectoryIterator itr("/Users/frinkr/Library/Fonts");
+        while (auto file = itr.next())
+            FX_ERROR(*file);
+    }
+    if (false)
+    {
+        auto itr = FXCreateSystemFontFileIterator();
+        while (auto file = itr->next())
+            FX_ERROR(*file);
+        
+    }
+    
     
     if (argc != 2) {
         FX_ERROR(argv[0] << ": processor");

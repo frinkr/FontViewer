@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
   FCLDump.cpp
   FCLDumpKern.cpp
   FCLPlayground.cpp
+  FCLDumpTextInShape.cpp
   )
 
 target_include_directories(${PROJECT_NAME} PUBLIC

@@ -301,7 +301,7 @@ QXDocumentWindowManager::doNativeOpenFileDialog(FileTypeFilter selectedTypeFilte
 }
 
 bool
-QXDocumentWindowManager::doFastOpenFontDialog() {
+QXDocumentWindowManager::doQuickOpenFontDialog() {
     QInputDialog dialog(nullptr);
     dialog.setInputMode(QInputDialog::TextInput);
     dialog.setWindowTitle(tr("Open Font File"));

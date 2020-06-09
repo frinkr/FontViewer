@@ -73,7 +73,7 @@ public slots:
     doNativeOpenFileDialog(FileTypeFilter selectedTypeFilter = FileTypeFilter::All);
 
     bool
-    doFastOpenFontDialog();
+    doQuickOpenFontDialog();
     
     bool
     openFontFile(const QString & filePath);

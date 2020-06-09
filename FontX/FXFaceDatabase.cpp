@@ -135,6 +135,28 @@ FXFaceDatabase::createFace(const FXFaceDescriptor & descriptor) const {
     return FXFace::createFace(descriptor);
 }
 
+FXOpt<size_t>
+FXFaceDatabase::findIndex(const FXString & psName) const {
+    for (size_t i = 0; i < faces_.size(); ++ i) {
+        auto & f =  faces_[i];
+        if (f.atts.sfntNames.postscriptName() == psName)
+            return i;
+        for (auto [lang, name]: f.atts.sfntNames.localizedPostscriptNames()) {
+            if (name == psName)
+                return i;
+        }
+    }
+    return FXNone<size_t>;
+}
+
+FXOpt<FXFaceDescriptor>
+FXFaceDatabase::findDescriptor(const FXString & psName) const {
+    if (auto idx = findIndex(psName))
+        return faceDescriptor(*idx);
+    else
+        return FXNone<FXFaceDescriptor>;
+}
+
 void
 FXFaceDatabase::rescan() {
     FXVector<FaceItem> faces;
