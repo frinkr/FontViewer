@@ -1,5 +1,5 @@
 #include <QApplicationStateChangeEvent>
-#include <QClipBoard>
+#include <QClipboard>
 #include <QFile>
 #include <QFileInfo>
 #include <QMessageBox>

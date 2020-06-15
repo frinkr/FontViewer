@@ -66,18 +66,18 @@ namespace FXFS {
         return true;
     }
     
+    template <typename TP>
+    std::time_t to_time_t(TP tp)
+    {
+        using namespace std::chrono;
+        auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
+                + system_clock::now());
+        return system_clock::to_time_t(sctp);
+    }
+
     std::time_t
     lastWriteTime(const FXString & file) {
-        auto time = fs::last_write_time(fs::u8path(file));
-#ifdef _MSC_VER
-        const FILETIME * ft = reinterpret_cast<const FILETIME*>(&time);
-        ULARGE_INTEGER ull;
-        ull.LowPart = ft->dwLowDateTime;
-        ull.HighPart = ft->dwHighDateTime;
-        return ull.QuadPart / 10000000ULL - 11644473600ULL;
-#else
-        return decltype(time)::clock::to_time_t(time);
-#endif
+        return to_time_t(fs::last_write_time(fs::u8path(file)));
     }
 
     size_t

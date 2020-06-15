@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstring>
+#include <cmath>
 #include <algorithm>
 #include <any>
 #include <cassert>
