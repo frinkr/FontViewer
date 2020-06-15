@@ -33,7 +33,7 @@ namespace {
 FXPtr<const FCLDatabase>
 FCLDatabase::instance() {
     static auto inst = std::make_shared<FCLDatabase>(systemFontFolders(), dbFilePath(), [](size_t current, size_t total, const FXString& file) {
-        FX_VERBOSE_INFO(current << "/" << total << ": caching " << file);
+        //FX_VERBOSE_INFO(current << "/" << total << ": caching " << file);
         return true;
     });;
     return inst;

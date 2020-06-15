@@ -49,15 +49,43 @@ namespace {
 
 
 namespace {
-    class FCLDumpR: public FCLDatabaseProcessor {
+    class FCLDumpH: public FCLDatabaseProcessor {
     public:
         FXString
         name() const override {
-            return "dump_r";
+            return "dump_h";
         }
 
         void
         processDatabase(FXPtr<const FCLDatabase> db) override {
+            struct FontInfo {
+                std::string name;
+                int d;
+                int upem;
+            };
+            std::vector<FontInfo> infos;
+            for (size_t i = 0; i < db->faceCount(); ++ i) {
+                if (true || db->faceAttributes(i).upem == 1000) {
+                    auto face = db->createFace(db->faceDescriptor(i));
+                    auto d = face->glyph('d');
+                    if (!d.gid)continue;
+                    FontInfo info;
+                    info.name = face->postscriptName();
+                    info.d = d.metrics.horiBearingY;
+                    info.upem = face->upem();
+                    infos.push_back(info);
+                }
+            }
+            
+            std::sort(infos.begin(), infos.end(), [](auto & a, auto & b) {
+                return (a.d * 1000.0 / a.upem) < (b.d * 1000.0 / a.upem);
+            });
+            for (auto & info: infos) {
+                FX_INFO(info.name << ',' << info.d << ',' << info.upem);
+            }
+            
+            return;
+            
             if (auto desc1 = db->findDescriptor("MyriadPro-Regular")) {   
                 if (auto desc2 = db->findDescriptor("Alphabeta")) {
                     auto face1 = db->createFace(*desc1);
@@ -92,5 +120,5 @@ namespace {
         
     };
 
-    FCLDatabaseProcessorAutoRegister<FCLDumpR> dumpRProcessor;
+    FCLDatabaseProcessorAutoRegister<FCLDumpH> dumpHProcessor;
 }
