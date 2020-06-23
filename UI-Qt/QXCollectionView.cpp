@@ -441,8 +441,8 @@ QXCollectionView::headerHeight() const {
 QRect
 QXCollectionView::itemRect(const QXCollectionModelIndex & index) const {
     QRect rect = widget_->itemRect(index);
-    return QRect(widget_->mapToParent(rect.topLeft()),
-                 widget_->mapToParent(rect.bottomRight()));
+    return QRect(widget_->mapTo(this, rect.topLeft()),
+                 widget_->mapTo(this, rect.bottomRight()));
 }
 
 void
