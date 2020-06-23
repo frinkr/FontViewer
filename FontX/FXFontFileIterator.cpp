@@ -69,6 +69,7 @@ FXPtr<FXFileIterator> FXCreateSystemFontFileIterator() {
 #if FX_MAC
     return std::make_shared<FXMacFontFileIterator>();
 #else
-    static_assert(false, "not implemented");
+    return FXPtr<FXFileIterator>{};
+    //static_assert(false, "not implemented");
 #endif
 }

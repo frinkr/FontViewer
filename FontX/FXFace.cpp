@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "FXFS.h"
 #include "FXFTNames.h"
 #include "FXFTPrivate.h"

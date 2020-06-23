@@ -7,7 +7,7 @@ endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(PODOFO REQUIRED)
+find_package(PoDoFo REQUIRED)
 
 add_library(FontXPDF
   FXPDFDocument.h
