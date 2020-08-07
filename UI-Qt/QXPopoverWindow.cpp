@@ -162,7 +162,7 @@ QXPopoverWindow::resizeEvent(QResizeEvent * event) {
 void
 QXPopoverWindow::paintEvent(QPaintEvent * event) {
     QPainter p(this);
-    p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::Antialiasing);
 
     auto backgroundColor = palette().window().color();
     auto borderColor = palette().midlight().color();

@@ -45,7 +45,7 @@ QXSplash::showProgress(int value, int maximum, const QString & message) {
 void
 QXSplash::drawContents(QPainter * painter) {
     QRect r = rect();
-    painter->setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    painter->setRenderHints(QPainter::Antialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     painter->drawPixmap(r.topLeft(), pixmap());
 
     const qreal progressRadius = rect().width() / 2.0 * 0.65;

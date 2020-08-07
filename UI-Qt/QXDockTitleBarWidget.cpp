@@ -58,7 +58,7 @@ QXDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     //return QWidget::paintEvent(event);
     QPainter p(this);
 
-    p.setRenderHints(QPainter::HighQualityAntialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     
     //QRect rect(0, 0, width(), height());
     //p.fillRect(rect, palette().color(QPalette::Normal, QPalette::Window));

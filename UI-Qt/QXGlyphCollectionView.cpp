@@ -1,5 +1,5 @@
 #include <QPainter>
-
+#include <QPainterPath>
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXEncoding.h"
@@ -21,7 +21,7 @@ namespace {
         void
         drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) override {
             painter->save();
-            painter->setRenderHint(QPainter::HighQualityAntialiasing);
+            painter->setRenderHint(QPainter::Antialiasing);
             
             auto & palette = option.widget->palette();
             

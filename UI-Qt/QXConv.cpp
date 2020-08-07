@@ -65,7 +65,7 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
     
     QPainter p(&out);
     if (g.face->isScalable())
-        p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::HighQualityAntialiasing);
+        p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
 
     const double r = g.face->isScalable()? 0.8: 0.618;
     double wr, hr;

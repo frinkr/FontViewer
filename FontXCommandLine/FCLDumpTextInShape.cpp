@@ -65,7 +65,7 @@ namespace {
             };
             std::vector<FontInfo> infos;
             for (size_t i = 0; i < db->faceCount(); ++ i) {
-                if (true || db->faceAttributes(i).upem == 1000) {
+                if (db->faceAttributes(i).upem == 1000) {
                     auto face = db->createFace(db->faceDescriptor(i));
                     auto d = face->glyph('d');
                     if (!d.gid)continue;

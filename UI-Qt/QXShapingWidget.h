@@ -4,6 +4,7 @@
 #include <QWidget>
 
 #include "FontX/FXTag.h"
+#include "FontX/FXShaper.h"
 
 namespace Ui {
     class QXShapingWidget;
@@ -122,6 +123,8 @@ private:
     FXVector<FXTag>
     offFeatures() const;
     
+    FXShappingBidiOptions
+    bidiOptions() const;
 private:
     Ui::QXShapingWidget * ui_;
     QXDocument   * document_;

@@ -106,7 +106,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     FXFace * face = shaper_->face();
     FXFace::AutoFontSize autoFontSize(face, fontSize_);
 
-    painter.setRenderHint(QPainter::HighQualityAntialiasing);
+    painter.setRenderHint(QPainter::Antialiasing);
     if (face->attributes().format != FXFaceFormatConstant::WinFNT)
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
@@ -351,6 +351,8 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doShape);
     connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
             this, &QXShapingWidget::doShape);
+    connect(ui_->bidiComboBox, &QComboBox::currentTextChanged,
+                this, &QXShapingWidget::doShape);
     connect(ui_->actionCopyDecodedText, &QAction::triggered,
             this, &QXShapingWidget::doCopyAction);
     connect(ui_->actionToggleOtPanel, &QAction::triggered,
@@ -438,6 +440,7 @@ QXShapingWidget::doShape() {
                    script,
                    language,
                    FXShappingLTR,
+                   bidiOptions(),
                    onFeatures(),
                    offFeatures());
 
@@ -489,6 +492,21 @@ QXShapingWidget::offFeatures() const {
             features.push_back(item->data(Qt::UserRole).value<FXTag>());
     }
     return features;
+}
+
+FXShappingBidiOptions
+QXShapingWidget::bidiOptions() const {
+    
+    auto dir = ui_->bidiComboBox->currentIndex();
+    
+    FXShappingBidiOptions bidiOpts {};
+    bidiOpts.bidiActivated = (dir != 3);
+    bidiOpts.breakOnLevelChange = true;
+    bidiOpts.breakOnScriptChange = true;
+    bidiOpts.resolveScripts = true;
+    bidiOpts.direction = dir == 0? FXBidiDirection::AUTO : (dir == 1? FXBidiDirection::LTR: FXBidiDirection::RTL);
+    
+    return bidiOpts;
 }
 
 void

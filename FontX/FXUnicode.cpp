@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-
+#include <codecvt>
 #include <unicode/uchar.h>
 #include <unicode/uscript.h>
 #include <unicode/unorm2.h>
@@ -301,6 +301,9 @@ FXUnicode::utf16(FXChar c) {
 
 std::u32string
 FXUnicode::utf8ToUTF32(const FXString & u8) {
+    std::wstring_convert<std::codecvt_utf8<char32_t>, char32_t> conv;
+    return conv.from_bytes(u8);
+    
     icu::UnicodeString u = icu::UnicodeString::fromUTF8(u8);
 
     UErrorCode error;

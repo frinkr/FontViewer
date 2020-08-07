@@ -90,7 +90,7 @@ namespace {
               const QModelIndex & proxyIndex) const override {
             painter->save();
             
-            painter->setRenderHint(QPainter::HighQualityAntialiasing);
+            painter->setRenderHint(QPainter::Antialiasing);
             painter->setRenderHint(QPainter::SmoothPixmapTransform);
 
             const bool selected = (option.state & QStyle::State_Selected);

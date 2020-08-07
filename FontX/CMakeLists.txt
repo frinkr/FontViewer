@@ -12,6 +12,7 @@ endif()
 find_package(Freetype REQUIRED)
 find_package(cereal REQUIRED)
 find_package(Iconv REQUIRED)
+find_package(fribidi REQUIRED)
 
 if (WIN32)
   find_package(ICU REQUIRED uc)
@@ -70,6 +71,7 @@ add_library(FontX
 
 target_include_directories(FontX PUBLIC
   ${cereal_INCLUDE_DIRS}
+  ${FRIBIDI_INCLUDE_DIR}
   ${FREETYPE_INCLUDE_DIRS}
   ${HARFBUZZ_INCLUDE_DIRS}
   ${ICU_INCLUDE_DIRS}
@@ -78,6 +80,7 @@ target_include_directories(FontX PUBLIC
   )
 
 target_link_libraries(FontX
+  ${FRIBIDI_LIBRARY}
   ${FREETYPE_LIBRARIES}
   ${ICU_LIBRARIES}
   ${HARFBUZZ_LIBRARIES}
