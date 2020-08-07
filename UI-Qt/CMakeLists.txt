@@ -39,6 +39,7 @@ set(UI
   QXGlyphTableWidget.ui
   QXPreferencesDialog.ui
   QXShapingWidget.ui
+  QXShapingOptionsWidget.ui
   QXVariableWidget.ui
   )
 
@@ -106,6 +107,8 @@ set(SHARED_SOURCES
   QXSearchEngine.h
   QXShapingWidget.cpp
   QXShapingWidget.h
+  QXShapingOptionsWidget.cpp
+  QXShapingOptionsWidget.h
   QXSplash.cpp
   QXSplash.h
   QXTheme.cpp

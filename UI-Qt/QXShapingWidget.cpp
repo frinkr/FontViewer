@@ -12,6 +12,7 @@
 #include "QXEncoding.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
+#include "QXShapingOptionsWidget.h"
 #include "ui_QXShapingWidget.h"
 
 namespace {
@@ -339,7 +340,7 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     , document_(nullptr)
     , shaper_(nullptr) {
     ui_->setupUi(this);
-    ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
+    //ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
     ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
     // connect signals
@@ -349,25 +350,31 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doShape);
     connect(ui_->lineEdit, &QLineEdit::textEdited,
             this, &QXShapingWidget::doShape);
-    connect(ui_->fontSizeComboBox, &QComboBox::currentTextChanged,
-            this, &QXShapingWidget::doShape);
-    connect(ui_->bidiComboBox, &QComboBox::currentTextChanged,
-                this, &QXShapingWidget::doShape);
-    connect(ui_->actionCopyDecodedText, &QAction::triggered,
-            this, &QXShapingWidget::doCopyAction);
-    connect(ui_->actionToggleOtPanel, &QAction::triggered,
-            this, &QXShapingWidget::doTogglePanelAction);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
 
-    QMenu * menu = new QMenu(this);
-    menu->addAction(ui_->actionCopyDecodedText);
-    menu->addAction(ui_->actionToggleOtPanel);
-    ui_->menuButton->setMenu(menu);
+    connect(ui_->menuButton, &QPushButton::clicked,
+            this, &QXShapingWidget::showOptionsPopover);
 
     warningAction_ = new QAction(this);
     warningAction_->setIcon(qApp->loadIcon(":/images/warning.png"));
     warningAction_->setToolTip(tr("OpenType shaping is not available, fallback to basic shaping."));
+
+
+    // Popover
+    optionsPopover_ = new QXPopoverWindow(this);
+    optionsWidget_ = new QXShapingOptionsWidget(this);
+    optionsPopover_->setWidget(optionsWidget_);
+
+    connect(optionsWidget_, &QXShapingOptionsWidget::togglePanelButtonClicked,
+            this, &QXShapingWidget::doTogglePanelAction);
+
+    connect(optionsWidget_, &QXShapingOptionsWidget::copyTextButtonClicked,
+            this, &QXShapingWidget::doCopyAction);
+
+    connect(optionsWidget_, &QXShapingOptionsWidget::optionsChanged,
+            this, &QXShapingWidget::doShape);
+
 }
 
 QXShapingWidget::~QXShapingWidget() {
@@ -433,6 +440,8 @@ QXShapingWidget::doShape() {
     if (!shaper_)
         return;
 
+    auto options = optionsWidget_->options();
+    
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
 
@@ -440,16 +449,11 @@ QXShapingWidget::doShape() {
                    script,
                    language,
                    FXShappingLTR,
-                   bidiOptions(),
+                   options.bidi,
                    onFeatures(),
                    offFeatures());
 
-    bool ok = false;
-    double fontSize = ui_->fontSizeComboBox->currentText().toDouble(&ok);
-    if (!ok)
-        fontSize = 100;
-    
-    ui_->glyphView->setFontSize(fontSize);
+    ui_->glyphView->setFontSize(options.fontSize);
     ui_->glyphView->updateGeometry();
     ui_->glyphView->update();
     
@@ -494,21 +498,6 @@ QXShapingWidget::offFeatures() const {
     return features;
 }
 
-FXShappingBidiOptions
-QXShapingWidget::bidiOptions() const {
-    
-    auto dir = ui_->bidiComboBox->currentIndex();
-    
-    FXShappingBidiOptions bidiOpts {};
-    bidiOpts.bidiActivated = (dir != 3);
-    bidiOpts.breakOnLevelChange = true;
-    bidiOpts.breakOnScriptChange = true;
-    bidiOpts.resolveScripts = true;
-    bidiOpts.direction = dir == 0? FXBidiDirection::AUTO : (dir == 1? FXBidiDirection::LTR: FXBidiDirection::RTL);
-    
-    return bidiOpts;
-}
-
 void
 QXShapingWidget::doCopyAction() {
     QString text = QXEncoding::decodeFromHexNotation(ui_->lineEdit->text());
@@ -529,4 +518,9 @@ QXShapingWidget::focusLineEdit(bool selectAll) {
     ui_->lineEdit->setFocus();
     if (selectAll)
         ui_->lineEdit->selectAll();
+}
+
+void 
+QXShapingWidget::showOptionsPopover() {
+    optionsPopover_->showRelativeTo(ui_->menuButton, QXPopoverTop);
 }

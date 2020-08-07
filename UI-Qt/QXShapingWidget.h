@@ -6,6 +6,8 @@
 #include "FontX/FXTag.h"
 #include "FontX/FXShaper.h"
 
+#include "QXShapingOptionsWidget.h"
+
 namespace Ui {
     class QXShapingWidget;
 }
@@ -14,6 +16,8 @@ class FXInspector;
 class FXShaper;
 class QPaintEvent;
 class QXDocument;
+class QXShapingOptionsWidget;
+class QXPopoverWindow;
 
 class QXShapingGlyphView : public QWidget {
     Q_OBJECT
@@ -113,7 +117,12 @@ public slots:
     
     void
     focusLineEdit(bool selectAll = true);
+
+    void
+    showOptionsPopover();
+    
 private:
+        
     FXPtr<FXInspector>
     inspector();
 
@@ -123,13 +132,14 @@ private:
     FXVector<FXTag>
     offFeatures() const;
     
-    FXShappingBidiOptions
-    bidiOptions() const;
 private:
     Ui::QXShapingWidget * ui_;
     QXDocument   * document_;
     FXShaper     * shaper_;
     QAction      * warningAction_;
+    
+    QXShapingOptionsWidget * optionsWidget_{};
+    QXPopoverWindow * optionsPopover_{};
 };
 
 
