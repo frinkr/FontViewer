@@ -29,6 +29,9 @@ public:
     setShaper(FXShaper * shaper);
 
     void
+    setOptions(const QXShapingOptions & options);
+    
+    void
     setDocument(QXDocument * document);
     
     QSize
@@ -48,9 +51,6 @@ public:
     
     void
     mouseDoubleClickEvent(QMouseEvent *event) override;
-
-    void
-    setFontSize(double fontSize);
     
 signals:
     void
@@ -83,6 +83,7 @@ protected:
     int selectedIndex_;
     double fontSize_;    
     FXShaper * shaper_;
+    QXShapingOptions options_{};
     QXDocument * document_;
 };
 

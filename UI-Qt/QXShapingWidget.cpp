@@ -38,7 +38,6 @@ namespace {
 QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
     : QWidget(parent)
     , selectedIndex_(-1)
-    , fontSize_(100)
     , shaper_(nullptr) {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -46,6 +45,11 @@ QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
 void
 QXShapingGlyphView::setShaper(FXShaper * shaper) {
     shaper_ = shaper;
+}
+
+void
+QXShapingGlyphView::setOptions(const QXShapingOptions & options) {
+    options_ = options;
 }
 
 void
@@ -63,7 +67,7 @@ QXShapingGlyphView::sizeHint() const {
     if (!shaper_)
         return QWidget::sizeHint();
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, fontSize_);
+    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
     
     const int baselineY = baseLinePosition().y();
     const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QX_SHAPINGVIEW_MARGIN;
@@ -105,7 +109,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
       | 
     */
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, fontSize_);
+    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
 
     painter.setRenderHint(QPainter::Antialiasing);
     if (face->attributes().format != FXFaceFormatConstant::WinFNT)
@@ -166,6 +170,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     }
 
     // draw glyph boundary
+    if (options_.showGlyphsBoundary)
     {
         int penX = baseLineX;
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
@@ -229,7 +234,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 void
 QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, fontSize_);
+    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
 
     int index = glyphAtPoint(event->pos());
     if (selectedIndex_ != index) {
@@ -262,11 +267,6 @@ QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
         
         emit glyphDoubleClicked(gid);
     }
-}
-
-void
-QXShapingGlyphView::setFontSize(double fontSize) {
-    fontSize_ = fontSize;
 }
 
 QPoint
@@ -453,7 +453,7 @@ QXShapingWidget::doShape() {
                    onFeatures(),
                    offFeatures());
 
-    ui_->glyphView->setFontSize(options.fontSize);
+    ui_->glyphView->setOptions(options);
     ui_->glyphView->updateGeometry();
     ui_->glyphView->update();
     

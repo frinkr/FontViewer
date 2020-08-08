@@ -9,7 +9,8 @@ namespace Ui {
 }
 
 struct QXShapingOptions {
-    double fontSize {12};
+    double fontSize {100};
+    bool showGlyphsBoundary {true};
     FXShappingBidiOptions bidi {};
 };
     

@@ -9,6 +9,9 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     connect(ui->fontSizeComboBox, &QComboBox::currentTextChanged,
             this, &QXShapingOptionsWidget::optionsChanged);
 
+    connect(ui->showGlyphsBoundaryCheckBox, &QCheckBox::toggled,
+            this, &QXShapingOptionsWidget::optionsChanged);
+    
     connect(ui->bidiGroupBox, & QGroupBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
 
@@ -44,6 +47,7 @@ QXShapingOptionsWidget::options() const {
     
     QXShapingOptions opts;
     opts.fontSize = fontSize;
+    opts.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
     
     auto dir = ui->bidiDirectionComboBox->currentIndex();
     
