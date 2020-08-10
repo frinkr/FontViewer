@@ -1,0 +1,5 @@
+1. Split the logical text by script and embedding level into BidiRuns
+2. Shape each BidiRun by direction -> glyphs of RTL text are reversed
+3. Reverse the glyphs of RTL BidiRun -> This created a list of glyphs in logical order
+4. Line break as usual
+5. For each line, reorder the glyphs according to the bidi types and levels
