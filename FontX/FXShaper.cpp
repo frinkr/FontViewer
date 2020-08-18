@@ -131,7 +131,7 @@ struct FXShaperImp {
                     run.textBegin = lastCharIndex;
                     run.textEnd = i;
                     run.script = hbScripts[lastCharIndex];
-                    run.direction = bidiLevels[lastCharIndex] & 1? HB_DIRECTION_RTL: HB_DIRECTION_LTR;
+                    run.direction = FRIBIDI_LEVEL_IS_RTL(bidiLevels[lastCharIndex])? HB_DIRECTION_RTL: HB_DIRECTION_LTR;
                     
                     bidiRuns.push_back(run);
                     lastCharIndex = i;
@@ -229,7 +229,10 @@ struct FXShaperImp {
                 glyphIndexBase += bidiRun.glyphCount;
             }
             
-            
+            FXVector<int> hbGIDs;
+            for (auto & g: hbGlyphInfos) {
+                hbGIDs.push_back(g.codepoint);
+            }
             // Reorder glyphs
             
             FXVector<FriBidiStrIndex> map(u32BidiTextLength, 0);
@@ -254,7 +257,9 @@ struct FXShaperImp {
         
         
         //////////////////////////////////////////////////////////////////////////////////////
-        
+        hb_direction_t dir = HB_DIRECTION_LTR;
+        if (bidiOpts.direction == FXBidiDirection::RTL)
+            dir = HB_DIRECTION_RTL;
         
         
         
@@ -270,7 +275,7 @@ struct FXShaperImp {
         else
             hb_buffer_set_script(hbBuffer_, hb_ot_tag_to_script(script));
         hb_buffer_set_language(hbBuffer_, hb_ot_tag_to_language(language));
-        hb_buffer_set_direction(hbBuffer_, (hb_direction_t)direction);
+        hb_buffer_set_direction(hbBuffer_, (hb_direction_t)dir);
         hb_buffer_add_utf8(hbBuffer_, text.c_str(), text.length(), 0, text.length());
         //hb_buffer_add_utf32(hbBuffer_, (const uint32_t *)u32Bidi.c_str(), u32Bidi.length(), 0, u32Bidi.length());
     
