@@ -1,13 +1,13 @@
-find_package(PkgConfig)
-pkg_check_modules(FRIBIDI QUIET fribidi)
+if (FRIBIDI_INCLUDE_DIR AND FRIBIDI_LIBRARY)
+  set(FRIBIDI_FOUND TRUE)
+else (FRIBIDI_INCLUDE_DIR AND FRIBIDI_LIBRARY)
+  find_path(FRIBIDI_INCLUDE_DIR fribidi/fribidi.h)
+  find_library(FRIBIDI_LIBRARY NAMES fribidi)
 
-find_path(FRIBIDI_INCLUDE_DIR
-          NAMES fribidi/fribidi.h)
+  include(FindPackageHandleStandardArgs)
+  find_package_handle_standard_args(FRIBIDI DEFAULT_MSG FRIBIDI_LIBRARY FRIBIDI_INCLUDE_DIR)
 
-find_library(FRIBIDI_LIBRARY NAMES fribidi)
-
-if (NOT FRIBIDI_FOUND)
-  message(STATUS "GNU FriBidi not found")
-else()
-  message(STATUS "Found GNU FriBidi: ${FRIBIDI_LIBRARY}")
-endif (NOT FRIBIDI_FOUND)
+  set(FRIBIDI_LIBRARIES ${FRIBIDI_LIBRARY})
+  
+  mark_as_advanced(FRIBIDI_LIBRARY FRIBIDI_INCLUDE_DIR)  
+endif (FRIBIDI_INCLUDE_DIR AND FRIBIDI_LIBRARY)

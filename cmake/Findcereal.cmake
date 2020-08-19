@@ -15,7 +15,3 @@ include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(cereal DEFAULT_MSG CEREAL_INCLUDE_DIR)
 
 mark_as_advanced(CEREAL_INCLUDE_DIR)
-
-if(CEREAL_FOUND)
-  message(STATUS "Cereal found (include: ${CEREAL_INCLUDE_DIRS})")
-endif(CEREAL_FOUND)
