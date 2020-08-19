@@ -7,9 +7,6 @@ endif()
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-find_package(PoDoFo REQUIRED)
-find_package(MuPdf REQUIRED)
-
 add_library(FontXPDF
   FXPDFDocument.h
   FXPDFDocument.cpp
@@ -17,16 +14,37 @@ add_library(FontXPDF
   FXPDFFace.h
   )
 
-target_include_directories(FontXPDF PUBLIC
-  ${PODOFO_INCLUDE_DIR}
-  ${MUPDF_INCLUDE_DIR}
-  )
+# PoDoFo
+set(FX_USE_SYSTERM_PODOFO OFF)
 
-target_link_libraries(FontXPDF PRIVATE
-  FontX
-  ${PODOFO_LIBRARY}
-  ${MUPDF_LIBRARY}
-  )
+if (FX_USE_SYSTERM_PODOFO)
+  find_package(PoDoFo REQUIRED)
+  
+  target_include_directories(FontXPDF PUBLIC
+    ${PODOFO_INCLUDE_DIR}
+    )
+
+  target_link_libraries(FontXPDF PRIVATE
+    FontX
+    ${PODOFO_LIBRARY}
+    )
+  
+else(FX_USE_SYSTERM_PODOFO)
+  set(PODOFO_BUILD_LIB_ONLY ON)
+  set(PODOFO_NO_FONTMANAGER ON)
+  set(PODOFO_BUILD_STATIC ON)
+  add_subdirectory(podofo)
+  
+  target_include_directories(FontXPDF PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/podofo
+    ${CMAKE_CURRENT_SOURCE_DIR}/podofo/src
+    )
+
+  target_link_libraries(FontXPDF PRIVATE
+    FontX
+    podofo_static
+    )
+endif(FX_USE_SYSTERM_PODOFO)
 
 target_include_directories(FontXPDF PUBLIC
   ${CMAKE_SOURCE_DIR}
