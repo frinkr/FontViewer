@@ -8,6 +8,7 @@ endif()
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 find_package(PoDoFo REQUIRED)
+find_package(MuPdf REQUIRED)
 
 add_library(FontXPDF
   FXPDFDocument.h
@@ -18,11 +19,14 @@ add_library(FontXPDF
 
 target_include_directories(FontXPDF PUBLIC
   ${PODOFO_INCLUDE_DIR}
+  ${MUPDF_INCLUDE_DIR}
   )
 
 target_link_libraries(FontXPDF PRIVATE
   FontX
-  ${PODOFO_LIBRARY})
+  ${PODOFO_LIBRARY}
+  ${MUPDF_LIBRARY}
+  )
 
 target_include_directories(FontXPDF PUBLIC
   ${CMAKE_SOURCE_DIR}

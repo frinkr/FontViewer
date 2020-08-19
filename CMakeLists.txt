@@ -17,7 +17,7 @@ add_definitions(
   )
 
 # PDF
-set(FX_BUILD_PDF_ADDON OFF)
+set(FX_BUILD_PDF_ADDON ON)
 
 if (FX_BUILD_PDF_ADDON)
 add_definitions(
