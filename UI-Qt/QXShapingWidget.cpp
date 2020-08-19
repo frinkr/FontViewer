@@ -1,6 +1,9 @@
 #include <QPainter>
 #include <QMenu>
+#include <QLineEdit>
 #include <QMouseEvent>
+#include <QTextStream>
+
 #include "FontX/FXInspector.h"
 #include "FontX/FXShaper.h"
 
@@ -29,6 +32,22 @@ namespace {
         return true;
     }
 
+
+    QStringList
+    loadSamples() {
+        QFile inputFile(":/shaping-samples.txt");
+        QStringList samples;
+        if (inputFile.open(QIODevice::ReadOnly)) {
+            QTextStream in(&inputFile);
+            while (!in.atEnd()) {
+                QString line = in.readLine();
+                samples << line;
+            }
+            inputFile.close();
+        }
+        return samples;
+    }
+    
     constexpr int QX_SHAPINGVIEW_MARGIN = 20;
     constexpr int QX_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
     constexpr int QX_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
@@ -341,17 +360,17 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     , shaper_(nullptr) {
     ui_->setupUi(this);
     ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
-
+    ui_->textComboBox->addItems(loadSamples());
+        
     // connect signals
     connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::activated),
             this, &QXShapingWidget::reloadFeatureList);
     connect(ui_->featureListWidget, &QListWidget::itemSelectionChanged,
             this, &QXShapingWidget::doShape);
-    connect(ui_->lineEdit, &QLineEdit::textEdited,
+    connect(ui_->textComboBox, &QComboBox::editTextChanged,
             this, &QXShapingWidget::doShape);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
-
     connect(ui_->menuButton, &QPushButton::clicked,
             this, &QXShapingWidget::showOptionsPopover);
 
@@ -445,7 +464,7 @@ QXShapingWidget::doShape() {
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
 
-    shaper_->shape(toStdString(QXEncoding::decodeFromHexNotation(ui_->lineEdit->text())),
+    shaper_->shape(toStdString(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText())),
                    script,
                    language,
                    FXShappingLTR,
@@ -458,9 +477,9 @@ QXShapingWidget::doShape() {
     ui_->glyphView->update();
     
     if (shaper_->hasFallbackShaping())
-        ui_->lineEdit->addAction(warningAction_, QLineEdit::TrailingPosition);
+        ui_->textComboBox->lineEdit()->addAction(warningAction_, QLineEdit::TrailingPosition);
     else 
-        ui_->lineEdit->removeAction(warningAction_);
+        ui_->textComboBox->lineEdit()->removeAction(warningAction_);
 }
 
 void
@@ -500,7 +519,7 @@ QXShapingWidget::offFeatures() const {
 
 void
 QXShapingWidget::doCopyAction() {
-    QString text = QXEncoding::decodeFromHexNotation(ui_->lineEdit->text());
+    QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }
@@ -515,9 +534,9 @@ QXShapingWidget::doTogglePanelAction() {
 
 void
 QXShapingWidget::focusLineEdit(bool selectAll) {
-    ui_->lineEdit->setFocus();
+    ui_->textComboBox->setFocus();
     if (selectAll)
-        ui_->lineEdit->selectAll();
+        ui_->textComboBox->lineEdit()->selectAll();
 }
 
 void 

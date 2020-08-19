@@ -93,4 +93,16 @@ if (APPLE)
   #  #"-codesign=V45C82Y9RF"
   #)
 
+  ADD_CUSTOM_COMMAND(TARGET ${PROJECT_NAME}
+    POST_BUILD
+    COMMAND
+    "${CMAKE_CURRENT_LIST_DIR}/DeployQtWrapper.sh"
+    "\${CONFIGURATION}"
+    "${deployqt}"
+    "${CMAKE_CURRENT_BINARY_DIR}/\${CONFIGURATION}/${APP_NAME}.app"
+    "-verbose=2"
+    "-codesign=V45C82Y9RF"
+  )
+  
+
 endif()

@@ -50,7 +50,11 @@ QXFontManager::dbFilePath() {
     QDir folder(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
     if (!folder.exists())
         folder.mkpath(".");
-	return folder.filePath("FontViewer.db");
+#ifdef QT_DEBUG
+    return folder.filePath("FontViewer.DEBUG.db");
+#else
+    return folder.filePath("FontViewer.db");
+#endif
 }
 
 

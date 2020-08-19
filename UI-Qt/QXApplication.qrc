@@ -55,5 +55,6 @@
     <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
     <file alias="images/splash.png">../Resources/Images/splash.png</file>
     <file alias="images/splash-text.png">../Resources/Images/splash-text.png</file>
+    <file alias="shaping-samples.txt">../Resources/shaping-samples.txt</file>
 </qresource>
 </RCC>

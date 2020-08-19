@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stack>
+#include <mupdf/fitz.h>
 #include "podofo/podofo.h"
 #include "FontX/FXLog.h"
 #include "FontX/FXFace.h"

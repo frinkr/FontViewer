@@ -15,23 +15,29 @@ namespace {
 
         void
         processDatabase(FXPtr<const FCLDatabase> db) override {
+            size_t d_count = 0;
             for (size_t i = 0; i < db->faceCount(); ++ i) {
                 auto & desc = db->faceDescriptor(i);
                 auto & atts = db->faceAttributes(i);
-                dump_d(db->createFace(desc));
+                if (dump_d(db->createFace(desc)))
+                    ++ d_count;
             }
+            
+            FX_INFO(">>>>> " << d_count << " / " << db->faceCount());
             
         }
 
     private:
-        void dump_d(FXPtr<FXFace> face) {
+        bool dump_d(FXPtr<FXFace> face) {
             if (face->cmaps().empty() || !face->currentCMap().isUnicode())
-                return;
+                return false;
             if (!face->upem())
-                return;
+                return false;
             if (auto glyph = face->glyph('d'); glyph.gid != FXGIDNotDef) {
                 FX_INFO(face->postscriptName() << ": " <<  nomalizeFontUnit(face, glyph.metrics.horiBearingY));
+                return true;
             }
+            return false;
         }
         int nomalizeFontUnit(FXPtr<FXFace> face, fu f) {
             return static_cast<int>(std::round(f * 1000.0 / face->upem()));
