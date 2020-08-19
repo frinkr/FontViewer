@@ -61,19 +61,22 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QPushButton" name="menuButton">
+      <widget class="QXIconPushButton" name="menuButton">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <property name="toolTip">
+        <string>Shaping Options...</string>
+       </property>
        <property name="text">
         <string/>
        </property>
        <property name="icon">
         <iconset resource="QXApplication.qrc">
-         <normaloff>:/images/truetype.png</normaloff>:/images/truetype.png</iconset>
+         <normaloff>:/images/truetype_d.png</normaloff>:/images/truetype_d.png</iconset>
        </property>
       </widget>
      </item>
@@ -87,7 +90,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>733</width>
+          <width>740</width>
           <height>505</height>
          </rect>
         </property>
@@ -128,6 +131,11 @@
    <extends>QWidget</extends>
    <header>QXShapingWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QXIconPushButton</class>
+   <extends>QPushButton</extends>
+   <header>QXWidgets.h</header>
   </customwidget>
  </customwidgets>
  <resources>

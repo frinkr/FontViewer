@@ -340,7 +340,6 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     , document_(nullptr)
     , shaper_(nullptr) {
     ui_->setupUi(this);
-    //ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
     ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
     // connect signals
@@ -360,6 +359,7 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     warningAction_->setIcon(qApp->loadIcon(":/images/warning.png"));
     warningAction_->setToolTip(tr("OpenType shaping is not available, fallback to basic shaping."));
 
+    ui_->menuButton->setIcon(qApp->loadIcon(":/images/truetype.png"));
 
     // Popover
     optionsPopover_ = new QXPopoverWindow(this);
