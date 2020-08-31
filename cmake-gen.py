@@ -17,11 +17,8 @@ if not os.path.exists(build_root):
     os.makedirs(build_root)
 
 def gen_win():
-    vcpkg_home = os.environ['VCPKG_HOME'] if 'VCPKG_HOME' in os.environ else None
-    if vcpkg_home == None or len(vcpkg_home) == 0:
-        raise OSError('Environment variable VCPKG_HOME is not defined')
     os.chdir(build_root)
-    os.system('cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE=' + os.path.join(vcpkg_home, 'scripts/buildsystems/vcpkg.cmake ') + source_root)
+    os.system('cmake -G "Visual Studio 16 2019" -A x64 ' + source_root)
 
 def gen_mac():
     openssl = subprocess.check_output('brew --prefix openssl', shell=True).decode('utf-8').strip()

@@ -38,7 +38,8 @@ else()
     )
 endif()
 
-target_link_libraries(${PROJECT_NAME} FontX UI-Qt)
+find_package(Qt5Core REQUIRED)
+target_link_libraries(${PROJECT_NAME} FontX UI-Qt Qt5::Core)
 
 if (APPLE)
   
@@ -106,3 +107,8 @@ if (APPLE)
   
 
 endif()
+
+# Copy Resources
+include(${CMAKE_SOURCE_DIR}/cmake/Resources.cmake)
+CopyResource(${CMAKE_SOURCE_DIR}/Resources/UCD)
+CopyResource(${CMAKE_SOURCE_DIR}/Resources/Html)

@@ -2,7 +2,7 @@
 #include <QTextStream>
 
 #include "QXHtmlTemplate.h"
-#include "QXResource.h"
+#include "QXResources.h"
 
 QXHtmlTemplate *
 QXHtmlTemplate::createFromFile(const QString & file, QObject * parent) {
@@ -49,7 +49,7 @@ QXHtmlTemplate::readTemplate() const {
 
 QXHtmlTableTemplate::QXHtmlTableTemplate(QObject * parent)
     : QObject(parent) {
-    htmlTemplate_ = QXHtmlTemplate::createFromFile(QXResource::path("/Html/template.html"), this);
+    htmlTemplate_ = QXHtmlTemplate::createFromFile(QXResources::path("Html/template.html"), this);
 }
 
 QString

@@ -17,6 +17,9 @@ add_executable(${PROJECT_NAME}
   FCLDumpTextInShape.cpp
   )
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+  FCL_RESOURCES_DIR=\"${PROJECT_SOURCE_DIR}/Resources\")
+
 target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_SOURCE_DIR}
   )

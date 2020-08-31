@@ -5,7 +5,7 @@
 #include "QXConv.h"
 #include "QXHtmlTemplate.h"
 #include "QXEncoding.h"
-#include "QXResource.h"
+#include "QXResources.h"
 
 #include <QImage>
 #include <QTextDocument>
@@ -108,7 +108,7 @@ QXGlyphInfoWidget::loadGlyph() {
     
     QTextBrowser::setDocument(qdoc);
     
-    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/GlyphInfoTemplate.html"));
+    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResources::path("Html/GlyphInfoTemplate.html"));
     setHtml(html->instantialize(templateValues(glyph)));
     html->deleteLater();
 }

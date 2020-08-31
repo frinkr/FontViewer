@@ -5,13 +5,14 @@
 #else
 #  include "QXTheme.h"
 #endif
-
+#include "FontX/FXLib.h"
 #include "QXApplication.h"
 #include "QXDocument.h"
 #include "QXDocumentWindowManager.h"
 #include "QXFontManager.h"
 #include "QXMain.h"
 #include "QXPreferences.h"
+#include "QXResources.h"
 #include "QXTheme.h"
 
 #ifdef QX_MAIN
@@ -29,6 +30,7 @@ int qxMain(int argc, char *argv[]) {
     QXApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/images/app.png"));
 
+    FXLib::init(QXResources::path("UCD").toStdString());
     QXPreferences::load();
 
     const bool resetAppData = app.userRequiredToResetAppData();
@@ -59,6 +61,9 @@ int qxMain(int argc, char *argv[]) {
     }  
 
     int code = app.exec();
+
     QXPreferences::save();
+    FXLib::finish();
+
     return code;
 }

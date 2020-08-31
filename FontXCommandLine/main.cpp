@@ -4,10 +4,11 @@
 #include "FontX/FXLog.h"
 #include "FontX/FXFS.h"
 #include "FontX/FXFontFileIterator.h"
+#include <sys/types.h>
 
 namespace {
     std::string getUCDRoot() {
-        return std::string(FX_RESOURCES_DIR) + "/UCD";
+        return std::string(FCL_RESOURCES_DIR) + "/UCD";
     }
 }
 

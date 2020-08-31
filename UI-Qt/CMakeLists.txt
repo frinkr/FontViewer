@@ -99,8 +99,8 @@ set(SHARED_SOURCES
   QXPreferences.h
   QXPreferencesDialog.cpp
   QXPreferencesDialog.h
-  QXResource.cpp
-  QXResource.h
+  QXResources.cpp
+  QXResources.h
   QXRichLineEdit.cpp
   QXRichLineEdit.h
   QXSearchEngine.cpp

@@ -9,7 +9,7 @@
 #include "FontX/FXPDF.h"
 
 #include "QXConv.h"
-#include "QXResource.h"
+#include "QXResources.h"
 #include "QXHtmlTemplate.h"
 #include "QXFontInfoWidget.h"
 #include "QXNames.h"

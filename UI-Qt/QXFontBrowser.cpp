@@ -17,7 +17,7 @@
 #include "QXFontManager.h"
 #include "QXHtmlTemplate.h"
 #include "QXPopoverWindow.h"
-#include "QXResource.h"
+#include "QXResources.h"
 #include "ui_QXFontBrowser.h"
 
 namespace {
@@ -446,7 +446,7 @@ QXFontBrowser::showFontInfoPopover(const QModelIndex & index, const QRect & glob
     auto & desc = QXFontManager::instance().db()->faceDescriptor(row);
     auto & atts = QXFontManager::instance().db()->faceAttributes(row);
     
-    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResource::path("/Html/FontInfoTemplate.html"));
+    QXHtmlTemplate * html = QXHtmlTemplate::createFromFile(QXResources::path("Html/FontInfoTemplate.html"));
     popoverWidget_->setHtml(html->instantialize(templateValues(desc, atts)));
     html->deleteLater();
     
