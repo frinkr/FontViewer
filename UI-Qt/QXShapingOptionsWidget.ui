@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>298</height>
+    <width>489</width>
+    <height>309</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -234,21 +234,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QPushButton" name="copyTextButton">
-       <property name="text">
-        <string>Copy Decoded Text</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="togglePanelPushButton">
-       <property name="text">
-        <string>Toggle Panel</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
+      <spacer name="horizontalSpacer_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
@@ -260,10 +246,45 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <widget class="QPushButton" name="copyTextButton">
+       <property name="toolTip">
+        <string>Copy Decoded Text</string>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="icon">
+        <iconset resource="QXApplication.qrc">
+         <normaloff>:/images/truetype.png</normaloff>:/images/truetype.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>30</width>
+         <height>30</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>188</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="QXApplication.qrc"/>
+ </resources>
  <connections/>
 </ui>

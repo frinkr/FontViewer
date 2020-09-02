@@ -105,6 +105,6 @@ QXPreferencesDialog::accept() {
     }
 
     QXPreferences::setTheme(ui_->themeCombobox->currentText());
-
+    QXTheme::setCurrent(QXPreferences::theme());
     QDialog::accept();
 }

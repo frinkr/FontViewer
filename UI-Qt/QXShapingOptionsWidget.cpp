@@ -1,3 +1,4 @@
+#include "QXApplication.h"
 #include "QXShapingOptionsWidget.h"
 #include "ui_QXShapingOptionsWidget.h"
 
@@ -29,9 +30,8 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
         
     connect(ui->copyTextButton, &QPushButton::clicked,
             this, &QXShapingOptionsWidget::copyTextButtonClicked);
-        
-    connect(ui->togglePanelPushButton, &QPushButton::clicked,
-            this, &QXShapingOptionsWidget::togglePanelButtonClicked);
+
+    ui->copyTextButton->setIcon(qApp->loadIcon(":/images/truetype.png"));
 }
 
 QXShapingOptionsWidget::~QXShapingOptionsWidget() {

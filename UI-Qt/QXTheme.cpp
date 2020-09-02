@@ -1,6 +1,7 @@
 #include <QApplication>
 #include <QMenuBar>
 #include <QPalette>
+#include <QStyle>
 #include <QStyleFactory>
 #include <QToolBar>
 
@@ -35,7 +36,10 @@ namespace {
 
         void
         applyToApplication() override {
-            qApp->setStyle(QStyleFactory::create("Fusion"));
+            auto style = QStyleFactory::create("Fusion");
+
+            qApp->setStyle(style);// QStyleFactory::create("Fusion"));
+            qApp->setPalette(style->standardPalette());
         }
     };
 

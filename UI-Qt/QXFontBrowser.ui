@@ -107,7 +107,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QXIconPushButton" name="menuButton">
+          <widget class="QXIconButton" name="menuButton">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -218,9 +218,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QXIconPushButton</class>
+   <class>QXIconButton</class>
    <extends>QPushButton</extends>
-   <header>QXWidgets.h</header>
+   <header>QXIconButton.h</header>
   </customwidget>
  </customwidgets>
  <resources>

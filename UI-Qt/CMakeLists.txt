@@ -89,6 +89,10 @@ set(SHARED_SOURCES
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
   QXHtmlTemplate.h
+  QXIconButton.cpp
+  QXIconButton.h
+  QXIconEngine.cpp
+  QXIconEngine.h
   QXMain.cpp
   QXMain.h
   QXMenuBar.cpp
@@ -119,8 +123,6 @@ set(SHARED_SOURCES
   QXToastMessage.h
   QXToolBar.cpp
   QXToolBar.h
-  QXWidgets.cpp
-  QXWidgets.h
   QXVariableWidget.cpp
   QXVariableWidget.h
   )

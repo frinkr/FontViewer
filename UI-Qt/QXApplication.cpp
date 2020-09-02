@@ -12,6 +12,7 @@
 #include "QXAboutFontsDialog.h"
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
+#include "QXIconEngine.h"
 #include "QXPreferencesDialog.h"
 #include "QXSplash.h"
 #include "QXThemedWindow.h"
@@ -47,16 +48,7 @@ QXApplication::loadIcon(const QString & path) {
     if (itr != iconCache_.end())
         return itr.value();
 
-    QIcon icon;
-	if (darkMode()) {
-		QFileInfo fi(path);
-		QString d = fi.dir().filePath(fi.baseName() + "_d." + fi.completeSuffix());
-		fi = QFileInfo(d);
-		if (fi.exists())
-			icon = QIcon(d);
-	}
-    if (icon.isNull())
-        icon = QIcon(path);
+    QIcon icon(new QXIconEngine(path));
     iconCache_.insert(path, icon);
     return icon;
 }
