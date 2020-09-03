@@ -4,11 +4,13 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QToolBar>
+#include <QSettings>
 
 #include <memory>
 #include "QXTheme.h"
 
 namespace {
+
     class QXSystemTheme : public QXTheme {
     public:
         static QString
@@ -19,6 +21,15 @@ namespace {
         QString
         name() override {
             return staticName();
+        }
+
+        void
+        applyToApplication() override {
+#ifdef Q_OS_WIN
+            auto style = QStyleFactory::create("windowsvista");
+#endif
+            qApp->setStyle(style);
+            qApp->setPalette(style->standardPalette());
         }
     };
 
@@ -211,26 +222,26 @@ namespace {
             QPalette p;
 
             // Normal
-            p.setColor(QPalette::Window,          d(0x00));
-            p.setColor(QPalette::Background,      d(0x00));
-            p.setColor(QPalette::WindowText,      d(0xFF));
-            p.setColor(QPalette::Foreground,      d(0xFF));
-            p.setColor(QPalette::Base,            d(0x10));
-            p.setColor(QPalette::AlternateBase,   d(0x20));
-            p.setColor(QPalette::ToolTipBase,     d(0xFF));
-            p.setColor(QPalette::ToolTipText,     d(0xFF));
-            p.setColor(QPalette::Text,            d(0xFF));
-            p.setColor(QPalette::Button,          d(0x20));
+            p.setColor(QPalette::Window,          gray(0x00));
+            p.setColor(QPalette::Background,      gray(0x00));
+            p.setColor(QPalette::WindowText,      gray(0xFF));
+            p.setColor(QPalette::Foreground,      gray(0xFF));
+            p.setColor(QPalette::Base,            gray(0x10));
+            p.setColor(QPalette::AlternateBase,   gray(0x20));
+            p.setColor(QPalette::ToolTipBase,     gray(0xFF));
+            p.setColor(QPalette::ToolTipText,     gray(0xFF));
+            p.setColor(QPalette::Text,            gray(0xFF));
+            p.setColor(QPalette::Button,          gray(0x20));
 
-            p.setColor(QPalette::ButtonText,      d(0xFF));
-            p.setColor(QPalette::BrightText,      d(0xFF));
-            p.setColor(QPalette::Light,           d(0x30));
-            p.setColor(QPalette::Midlight,        d(0x28));
-            p.setColor(QPalette::Dark,            d(0x10));
-            p.setColor(QPalette::Mid,             d(0x18));
-            p.setColor(QPalette::Shadow,          d(0x05));
+            p.setColor(QPalette::ButtonText,      gray(0xFF));
+            p.setColor(QPalette::BrightText,      gray(0xFF));
+            p.setColor(QPalette::Light,           gray(0x30));
+            p.setColor(QPalette::Midlight,        gray(0x28));
+            p.setColor(QPalette::Dark,            gray(0x10));
+            p.setColor(QPalette::Mid,             gray(0x18));
+            p.setColor(QPalette::Shadow,          gray(0x05));
             p.setColor(QPalette::Highlight,       QColor(42, 130, 218));
-            p.setColor(QPalette::HighlightedText, d(0xFF));
+            p.setColor(QPalette::HighlightedText, gray(0xFF));
             p.setColor(QPalette::Link,            QColor(42, 130, 218));
             p.setColor(QPalette::LinkVisited,     QColor(42, 130, 218));
 
@@ -242,16 +253,55 @@ namespace {
             p.setColor(QPalette::Disabled, QPalette::WindowText,      Qt::gray);
 
             // Inactive
-            p.setColor(QPalette::Inactive, QPalette::Highlight,       d(0x40));
+            p.setColor(QPalette::Inactive, QPalette::Highlight,       gray(0x40));
             return p;
         }
 
         static QColor
-        d(int level) {
+        gray(int level) {
             return QColor(level, level,level);
         }
     };
 
+    class QXThemeCreatorInterface {
+    public:
+        virtual ~QXThemeCreatorInterface() {}
+
+        virtual QString
+        themeName() const = 0;
+        
+        virtual QXTheme *
+        createTheme() const = 0;
+    };
+    
+    template <class Theme>
+    class QXThemeCreator : public QXThemeCreatorInterface{
+    public:
+
+        QString
+        themeName() const override {
+            return Theme::staticName();
+        }
+        
+        QXTheme *
+        createTheme() const override {
+            return new Theme;
+        }
+    };
+
+    const QList<QXThemeCreatorInterface*> &
+    themeCreatorList() {
+        static QList<QXThemeCreatorInterface*> list;
+        if (list.empty()) {
+            list.append(new QXThemeCreator<QXSystemTheme>);
+            list.append(new QXThemeCreator<QXFusionTheme>);
+            list.append(new QXThemeCreator<QXDarkFusionTheme>);
+            list.append(new QXThemeCreator<QXBlueFusionTheme>);
+            list.append(new QXThemeCreator<QXBlackFusionTheme>);
+        }
+        return list;
+    }
+        
 
     std::unique_ptr<QXTheme> currentTheme_;
 }
@@ -264,12 +314,8 @@ QXTheme::current() {
 QStringList
 QXTheme::availableThemes() {
     QStringList list;
-    list << QXSystemTheme::staticName()
-         << QXFusionTheme::staticName()
-         << QXDarkFusionTheme::staticName()
-         << QXBlueFusionTheme::staticName()
-         << QXBlackFusionTheme::staticName()
-        ;
+    for (auto themeCreator: themeCreatorList()) 
+        list << themeCreator->themeName();
 
     return list;
 }
@@ -282,15 +328,9 @@ QXTheme::setCurrent(const QString & current) {
 
 QXTheme *
 QXTheme::getTheme(const QString & name) {
-    if (name == QXSystemTheme::staticName())
-        return new QXSystemTheme;
-    if (name == QXFusionTheme::staticName())
-        return new QXFusionTheme;
-    if (name == QXDarkFusionTheme::staticName())
-        return new QXDarkFusionTheme;
-    if (name == QXBlueFusionTheme::staticName())
-        return new QXBlueFusionTheme;
-    if (name == QXBlackFusionTheme::staticName())
-        return new QXBlackFusionTheme;
+    for (auto themeCreator : themeCreatorList()) {
+        if (themeCreator->themeName() == name)
+            return themeCreator->createTheme();
+    }
     return new QXSystemTheme;;
 }

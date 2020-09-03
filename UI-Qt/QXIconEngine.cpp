@@ -44,9 +44,9 @@ QXIconEngine::pixmap(const QSize & size,
             pixmap = QPixmap(GetDarkIconFile());
         else
             pixmap = QPixmap(filePath_);
-        //QIcon icon(pixmap);
+        QIcon icon(pixmap);
         pixmap = pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        cache_.insert(key, pixmap);// icon.pixmap(size, mode, state);
+        cache_.insert(key, icon.pixmap(size, mode, state));
     }
         
     return cache_.value(key);
