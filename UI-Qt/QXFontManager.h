@@ -20,6 +20,9 @@ public:
     FXPtr<FXFaceDatabase>
     db() const;
 
+    double
+    dbInitSeconds() const;
+    
     const QStringList &
     systemFontFolders() const;
 
@@ -41,4 +44,5 @@ private:
     QStringList             systemFontFolders_;
     QStringList             userFontFolders_;
     FXPtr<FXFaceDatabase>   db_;
+    double                  dbInitSeconds_ {};
 };

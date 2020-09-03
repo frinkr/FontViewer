@@ -29,6 +29,7 @@ endif()
 add_library(FontX
   STATIC
   FX.h
+  FXBenchmark.h
   FXCMap.cpp
   FXCMap.h
   FXCache.h

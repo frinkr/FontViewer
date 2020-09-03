@@ -384,6 +384,8 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
     addAction(quitAction);
 
     qApp->dismissSplashScreen(this);
+    
+    setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(QXFontManager::instance().dbInitSeconds()));
 }
 
 QXFontBrowser::~QXFontBrowser() {

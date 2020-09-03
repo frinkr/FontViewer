@@ -9,6 +9,7 @@
 #include <QProgressDialog>
 #include <QStandardPaths>
 
+#include "FontX/FXBenchmark.h"
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXFontManager.h"
@@ -69,6 +70,11 @@ QXFontManager::db() const {
     return db_;
 }
 
+double
+QXFontManager::dbInitSeconds() const {
+    return dbInitSeconds_;
+}
+
 const QStringList &
 QXFontManager::systemFontFolders() const {
     return systemFontFolders_;
@@ -95,8 +101,9 @@ QXFontManager::QXFontManager() {
         dirs.push_back(toStdString(QDir::toNativeSeparators(dir)));
 
 	const QString dbPath = dbFilePath();
-
+    
 	// Load database.
+    FXBenchmark bm {};
     db_.reset(new FXFaceDatabase(dirs,			
 		dbPath.toUtf8().constData(),
         [](size_t current, size_t total, const FXString & file) {
@@ -105,5 +112,6 @@ QXFontManager::QXFontManager() {
             return true;
         }
     ));
+    dbInitSeconds_ = bm.time().count();
 }
 
