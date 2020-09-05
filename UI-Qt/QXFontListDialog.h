@@ -6,7 +6,7 @@
 #include "QXFontListModel.h"
 
 namespace Ui {
-    class QXFontBrowser;
+    class QXFontListDialog;
 }
 
 class QMenu;
@@ -16,12 +16,12 @@ class QXFontListModel;
 class QXPopoverWindow;
 class QXSortFilterFontListModel;
 
-class QXFontBrowser : public QXThemedWindow<QDialog> {
+class QXFontListDialog : public QXThemedWindow<QDialog> {
     Q_OBJECT
 
 public:
-    explicit QXFontBrowser(QWidget * parent = nullptr);
-    ~QXFontBrowser();
+    explicit QXFontListDialog(QWidget * parent = nullptr);
+    ~QXFontListDialog();
 
     int
     selectedFontIndex() const;
@@ -94,7 +94,7 @@ private slots:
     void
     quitApplication();
 private:
-    Ui::QXFontBrowser * ui_;
+    Ui::QXFontListDialog * ui_;
     QMenu             * recentMenu_ {nullptr}; 
     QXPopoverWindow   * popover_ {nullptr};
     QTextBrowser      * popoverWidget_{ nullptr };

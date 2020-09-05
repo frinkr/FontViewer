@@ -18,7 +18,7 @@
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
-#include "QXFontBrowser.h"
+#include "QXFontListDialog.h"
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 
@@ -195,14 +195,14 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 void
 QXDocumentWindowManager::doOpenFontDialog() {
 #if 0
-    QXFontBrowser browser(nullptr);
+    QXFontListDialog browser(nullptr);
     if (QDialog::Accepted == browser.exec()) {
         const QXFontURI fontURI = browser.selectedFont();
         openFontURI(fontURI);
     }
 #else
     if (!openFontDialog_) {
-        openFontDialog_ = new QXFontBrowser(nullptr);
+        openFontDialog_ = new QXFontListDialog(nullptr);
 #if !defined(Q_OS_MAC)
         // This piece of shit makes qApp quit
         connect(openFontDialog_, &QDialog::rejected, this, [this]() {
