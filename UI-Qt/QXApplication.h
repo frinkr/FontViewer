@@ -5,6 +5,7 @@
 
 class QEvent;
 class QXSplash;
+class FXBenchmark;
 
 class QXApplication : public QApplication
 {
@@ -36,6 +37,9 @@ public:
     void
     copyTextToClipBoard(const QString & text);
 
+    FXBenchmark &
+    benchmark();
+               
 public slots:
     void
     showSplashScreen();
@@ -64,6 +68,7 @@ private:
 private:
     QMap<QString, QIcon> iconCache_;
     QXSplash           * splash_ {nullptr};
+    FXBenchmark        * benchmark_ {nullptr};
 };
 
 #if defined(qApp)

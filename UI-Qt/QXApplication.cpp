@@ -8,6 +8,7 @@
 #include <QtDebug>
 #include <QtGui>
 
+#include "FontX/FXBenchmark.h"
 #include "QXAboutDialog.h"
 #include "QXAboutFontsDialog.h"
 #include "QXApplication.h"
@@ -134,6 +135,12 @@ QXApplication::copyTextToClipBoard(const QString & text) {
     clipboard()->setText(text);
 }
 
+FXBenchmark &
+QXApplication::benchmark() {
+    if (!benchmark_)
+        benchmark_ = new FXBenchmark(false);
+    return *benchmark_;
+}
 
 void
 QXApplication::showSplashScreen() {

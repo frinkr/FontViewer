@@ -9,6 +9,7 @@
 #include <QTimer>
 
 #include "FontX/FXCache.h"
+#include "FontX/FXBenchmark.h"
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocumentWindowManager.h"
@@ -385,7 +386,11 @@ QXFontBrowser::QXFontBrowser(QWidget * parent)
 
     qApp->dismissSplashScreen(this);
     
-    setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(QXFontManager::instance().dbInitSeconds()));
+    setWindowTitle(QString("%1 (bm %2s/%3s)")
+        .arg(windowTitle())
+        .arg(QXFontManager::instance().dbInitSeconds(), 0, 'f', 2)
+        .arg(qApp->benchmark().time().count(), 0, 'f', 2));
+    //setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(qApp->benchmark().time().count()));
 }
 
 QXFontBrowser::~QXFontBrowser() {

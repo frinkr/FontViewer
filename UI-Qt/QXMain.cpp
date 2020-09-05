@@ -6,6 +6,7 @@
 #  include "QXTheme.h"
 #endif
 #include "FontX/FXLib.h"
+#include "FontX/FXBenchmark.h"
 #include "QXApplication.h"
 #include "QXDocument.h"
 #include "QXDocumentWindowManager.h"
@@ -28,6 +29,7 @@ int qxMain(int argc, char *argv[]) {
     Q_INIT_RESOURCE(QXApplication);
     
     QXApplication app(argc, argv);
+    app.benchmark().start();
     app.setWindowIcon(QIcon(":/images/app.png"));
 
     FXLib::init(QXResources::path("UCD").toStdString());
