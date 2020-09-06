@@ -16,14 +16,23 @@ toStdString(const QString & str);
 QImage
 toQImage(const FXPixmapARGB & bm);
 
+QImage
+toQImage(const FXPixmapGray & bm);
+
+QImage
+toQImage(const FXGlyphImage & im);
+
 QSize
 glyphEmSize();
 
 QImage
-placeGlyphImage(const FXGlyph & g, const QSize & emSize);
+drawGlyphImage(const FXGlyphImage & img, const QSize & emSize);
 
 QImage
 unicodeCharImage(FXChar c, const QSize & emSize);
 
 QString
 ftDateTimeToString(int64_t value);
+
+bool
+needInvertImage(const QImage & img, bool selected, bool darkMode);

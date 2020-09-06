@@ -225,8 +225,8 @@ public:
     FXGlyph
     glyph(FXGChar c);
 
-    FXPixmapARGB
-    pixmap(FXGlyphID gid, FXVec2d<int> * offset = nullptr);
+    FXGlyphImage
+    glyphImage(FXGlyphID gid, FXVec2d<int> * offset = nullptr);
 
     /**
      * return the chars which maps to the gid in current cmap

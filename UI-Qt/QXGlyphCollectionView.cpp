@@ -47,8 +47,9 @@ namespace {
                 QSize emSize = glyphEmSize();
                 QRect emRect(0, 0, emSize.width(), emSize.height());
                 
-                QImage image = placeGlyphImage(g, emSize);
-                if (g.face->isScalable() && (option.selected || qApp->darkMode()))
+                FXGlyphImage bm = g.glyphImage();
+                QImage image = drawGlyphImage(bm, emSize);
+                if (bm.mode != FXGlyphImage::kColor && (option.selected || qApp->darkMode()))
                     image.invertPixels();
                 QPixmap pixmap = QPixmap::fromImage(image);
                 QRect imageRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);

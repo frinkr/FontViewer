@@ -21,10 +21,10 @@ namespace {
         }
     }
     
-    FXPixmapARGB
+    FXGlyphImage
     loadPixmap(FT_Bitmap ftBm) {
         FXPixmapARGB bm(ftBm.width, ftBm.rows);
-
+        FXGlyphImage::Mode mode {FXGlyphImage::kGrayscale};
         
         if (ftBm.pixel_mode == FT_PIXEL_MODE_GRAY) {
             forEachPixel(ftBm, 1, [&bm](int x, int y, unsigned char * p) {
@@ -32,18 +32,21 @@ namespace {
             });
         }
         else if (ftBm.pixel_mode == FT_PIXEL_MODE_BGRA) {
+            mode = FXGlyphImage::kColor;
             forEachPixel(ftBm, 4, [&bm](int x, int y, unsigned char * p) {
                 bm.setPixel(x, y, makeARGB(*(p+3), *(p+2), *(p+1), *p));
             });
         }
         else if (ftBm.pixel_mode == FT_PIXEL_MODE_MONO) {
+            mode = FXGlyphImage::kMono;
             forEachPixel(ftBm, 0, [&bm](int x, int y, unsigned char * row) {
                 unsigned char * b = row + x / 8;
                 bool v = (*b) & (1 << (7 - (x % 8)));
-                bm.setPixel(x, y, v? FXBlack: FXWhite);
+                bm.setPixel(x, y, v? FXBlack: FXTransparent);
             });
         }
-        return bm;
+        
+        return FXGlyphImage {bm, mode};
     }
 }
 
@@ -499,8 +502,8 @@ FXFace::glyph(FXGChar gc) {
     return glyph;
 }
 
-FXPixmapARGB
-FXFace::pixmap(FXGlyphID gid, FXVec2d<int> * offset) {
+FXGlyphImage
+FXFace::glyphImage(FXGlyphID gid, FXVec2d<int> * offset) {
     FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
     if (offset) {
         offset->x = face_->glyph->bitmap_left;

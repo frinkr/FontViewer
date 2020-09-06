@@ -59,7 +59,6 @@ add_library(FontX
   FXOT.cpp
   FXOT.h
   FXPDF.h
-  FXPixmap.cpp
   FXPixmap.h
   FXShaper.cpp
   FXShaper.h

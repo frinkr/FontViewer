@@ -103,7 +103,6 @@ FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXStrin
     , dbPath_(dbPath)
     , progress_(progressCallback) {
     
-    //folders_.clear();
     initDiskHash();
 
     if (!load() || (diskHash_.hash && diskHash_.hash != dbHash_.hash)) {

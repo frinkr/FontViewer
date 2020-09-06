@@ -170,9 +170,9 @@ namespace {
 
                     FXVec2d<int> bmOffset;
                     double bmScale = face->bmScale();
-                    FXPixmapARGB bm = face->pixmap(g.gid, &bmOffset);
-                    qreal scaledBmHeight = sampleFontScale * bm.height * bmScale;
-                    qreal scaledBmWidth = sampleFontScale * bm.width * bmScale;
+                    FXGlyphImage bm = face->glyphImage(g.gid, &bmOffset);
+                    qreal scaledBmHeight = sampleFontScale * bm.height() * bmScale;
+                    qreal scaledBmWidth = sampleFontScale * bm.width() * bmScale;
                     if (!face->isScalable()) {
                         if (scaledBmHeight >= 0.95 * sampleFontSizePx) {
                             qreal heightFittingScale = 0.95 * sampleFontSizePx / scaledBmHeight;
@@ -188,13 +188,13 @@ namespace {
                         auto img = toQImage(bm);
                         img = img.scaledToWidth(scaledBmWidth * qApp->devicePixelRatio(),
                                                 face->isScalable()? Qt::SmoothTransformation: Qt::FastTransformation);
-                        if (face->isScalable() && (selected || qApp->darkMode()))
+                        if (bm.mode != FXGlyphImage::kColor && (selected || qApp->darkMode()))
                             img.invertPixels();
 
                         const qreal left   = pen.x() + bmOffset.x * sampleFontScale;
                         const qreal bottom = pen.y() - bmOffset.y * sampleFontScale;
-                        const qreal right  = left + bm.width * bmScale * sampleFontScale;
-                        const qreal top    = bottom - bm.height * bmScale * sampleFontScale;
+                        const qreal right  = left + bm.width() * bmScale * sampleFontScale;
+                        const qreal top    = bottom - bm.height() * bmScale * sampleFontScale;
 
                         painter->drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                                            img);

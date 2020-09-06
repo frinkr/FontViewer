@@ -40,10 +40,16 @@ QXIconEngine::pixmap(const QSize & size,
     PixmapCacheKey key{ qApp->darkMode(), size, mode, state };
     if (!cache_.contains(key)) {
         QPixmap pixmap;
-        if (key.darkMode)
-            pixmap = QPixmap(GetDarkIconFile());
-        else
-            pixmap = QPixmap(filePath_);
+        if (key.darkMode) {
+            if (pm0_.isNull())
+                pm0_ = QPixmap(GetDarkIconFile());
+            pixmap = pm0_;
+        }
+        else {
+            if (pm1_.isNull())
+                pm1_ = QPixmap(filePath_);
+            pixmap = pm1_;
+        }
         QIcon icon(pixmap);
         pixmap = pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         cache_.insert(key, icon.pixmap(size, mode, state));
