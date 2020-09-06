@@ -38,9 +38,13 @@ QXApplication::QXApplication(int & argc, char ** argv)
 
 bool
 QXApplication::darkMode() const {
-	QColor textColor = palette().color(QPalette::Normal, QPalette::Text);
+	return isDarkColor(palette().color(QPalette::Normal, QPalette::Text));
+}
+
+bool
+QXApplication::isDarkColor(const QColor & color) const {
     QColor gray(55, 55, 55);
-    return textColor.toRgb().value() > gray.value();
+    return color.toRgb().value() > gray.value();
 }
 
 QIcon

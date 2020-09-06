@@ -23,7 +23,15 @@ public:
 
     virtual void
     mousePressEvent(QMouseEvent * event);
+
+private slots:
+    void
+    onFocusChanged(QWidget * old, QWidget * now);
+
 private:
     QRectF
     closeIconRect();
+
+private:
+    bool haveFocus_{};
 };

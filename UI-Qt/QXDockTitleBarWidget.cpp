@@ -10,7 +10,7 @@
 #include "QXDockTitleBarWidget.h"
 
 namespace {
-    int TITLE_BAR_HEIGHT = 18;
+    int TITLE_BAR_HEIGHT = 23;
 }
 QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     : QWidget(parent) {
@@ -31,6 +31,8 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
         QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
         dockWidget->hide();
     });
+
+    connect(qApp, &QApplication::focusChanged, this, &QXDockTitleBarWidget::onFocusChanged);
 
     layout->addSpacing(5);
     layout->addWidget(closeButton);
@@ -63,24 +65,61 @@ QXDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     //QRect rect(0, 0, width(), height());
     //p.fillRect(rect, palette().color(QPalette::Normal, QPalette::Window));
 
-    //QColor color = palette().color(QPalette::Normal, QPalette::Window);
-    //color = color.darker();
-    //QBrush brush(color, Qt::Dense2Pattern);
-    //p.fillRect(rect, brush);
+    // Background color
+    QColor bgColor;
+    if (haveFocus_)
+        bgColor = palette().color(QPalette::Active, QPalette::Highlight);
+    else
+        bgColor = palette().color(QPalette::Normal, QPalette::Window);
+
+    p.fillRect(rect(), bgColor);
+
 
     // close icon
     //QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
     //p.drawPixmap(closeIconRect(), closeIcon, closeIcon.rect());
 
     // title
-    p.setPen(palette().color(QPalette::Normal, QPalette::Text));
+    QColor fgColor;
+    if (haveFocus_)
+        fgColor = palette().color(QPalette::Active, QPalette::HighlightedText);
+    else
+        fgColor = palette().color(QPalette::Normal, QPalette::Text);
+    p.setPen(fgColor);
     QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
     p.drawText(rect(), Qt::AlignCenter, dockWidget->windowTitle());
+
+    
+    // Grab bar
+    QFontMetrics fm(p.font());
+    int titleWidth = fm.horizontalAdvance(dockWidget->windowTitle());
+
+    float kHoriMargin = 5;
+    float kVertMargin = TITLE_BAR_HEIGHT / 4;
+    float barWidth = (width() - titleWidth) / 2 - 2 * kHoriMargin;
+    float barHeight = TITLE_BAR_HEIGHT - 2 * kVertMargin;
+    QRect leftRect(kHoriMargin, kVertMargin, barWidth, barHeight);
+    QRect rightRect(width() - barWidth - kHoriMargin, kVertMargin, barWidth, barHeight);
+    p.fillRect(leftRect, QBrush(qApp->darkMode()? bgColor.lighter(): bgColor.darker(), Qt::Dense7Pattern));
+    p.fillRect(rightRect, QBrush(qApp->darkMode()? bgColor.lighter(): bgColor.darker(), Qt::Dense7Pattern));
 }
 
 void
 QXDockTitleBarWidget::mousePressEvent(QMouseEvent * event) {
     QWidget::mousePressEvent(event);
+}
+
+void
+QXDockTitleBarWidget::onFocusChanged(QWidget * old, QWidget * now) {
+    QDockWidget* dockWidget = qobject_cast<QDockWidget*>(parentWidget());
+    QWidget * parent = now;
+    while (parent && parent != dockWidget)
+        parent = parent->parentWidget();
+
+    if (haveFocus_ != (parent == dockWidget)) {
+        haveFocus_ = !haveFocus_;
+        update();
+    }
 }
 
 QRectF

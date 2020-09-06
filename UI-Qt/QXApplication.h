@@ -16,6 +16,9 @@ public:
 	bool
 	darkMode() const;
 
+    bool
+    isDarkColor(const QColor & color) const;
+
 	QIcon
 	loadIcon(const QString & path);
 
