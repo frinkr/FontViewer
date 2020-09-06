@@ -170,7 +170,7 @@ namespace {
 
                     FXVec2d<int> bmOffset;
                     double bmScale = face->bmScale();
-                    FXGlyphImage bm = face->glyphImage(g.gid, &bmOffset);
+                    FXGlyphImage bm = face->glyphImage(g.gid);
                     qreal scaledBmHeight = sampleFontScale * bm.height() * bmScale;
                     qreal scaledBmWidth = sampleFontScale * bm.width() * bmScale;
                     if (!face->isScalable()) {
@@ -191,8 +191,8 @@ namespace {
                         if (bm.mode != FXGlyphImage::kColor && (selected || qApp->darkMode()))
                             img.invertPixels();
 
-                        const qreal left   = pen.x() + bmOffset.x * sampleFontScale;
-                        const qreal bottom = pen.y() - bmOffset.y * sampleFontScale;
+                        const qreal left   = pen.x() + bm.offset.x * sampleFontScale;
+                        const qreal bottom = pen.y() - bm.offset.y * sampleFontScale;
                         const qreal right  = left + bm.width() * bmScale * sampleFontScale;
                         const qreal top    = bottom - bm.height() * bmScale * sampleFontScale;
 
@@ -235,8 +235,6 @@ namespace {
                 painter->drawPixmap(iconRect, infoIcon.pixmap(infoIconSize_, infoIconSize_));
             }
             painter->restore();
-            
-            faceCache_.gc();
         }
 
         QSize

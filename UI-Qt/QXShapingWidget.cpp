@@ -165,15 +165,14 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             const FXVec2d<fu> off = shaper_->offset(i);
 
             const double bmScale = face->bmScale();
-            FXVec2d<int> bmOffset;
             
-            FXGlyphImage bm = face->glyphImage(gid, &bmOffset);
+            FXGlyphImage bm = face->glyphImage(gid);
             QImage img = toQImage(bm);
             if (face->isScalable() && ((i == selectedIndex_) || qApp->darkMode()))
                 img.invertPixels();
 
-            const int left = penX + bmOffset.x;
-            const int bottom = penY - bmOffset.y;
+            const int left = penX + bm.offset.x;
+            const int bottom = penY - bm.offset.y;
             const int right = left + bm.width() * bmScale + fu2px(off.x);
             const int top = bottom - bm.height() * bmScale - fu2px(off.y);
 

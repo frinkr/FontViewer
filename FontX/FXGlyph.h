@@ -37,9 +37,11 @@ struct FXGlyphImage {
         kMono,
     };
 
-    FXPixmapARGB pixmap {};
-    Mode mode {kGrayscale};
+    FXPixmapARGB     pixmap {};
+    Mode             mode {kGrayscale};
+    FXVec2d<int>     offset {};
 
+    
     bool empty() const {
         return pixmap.empty();
     }
