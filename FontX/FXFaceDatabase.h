@@ -6,8 +6,12 @@ class FXFaceDatabase {
 public:
     using ProgressCallback = std::function<bool(size_t current, size_t total, const FXString & file)>;
 public:
-    explicit FXFaceDatabase(const FXVector<FXString> & folders, const FXString & dbPath, ProgressCallback progressCallback = ProgressCallback{});
-
+    explicit FXFaceDatabase(const FXVector<FXString> & folders,
+                            const FXString & dbPath,
+                            ProgressCallback progressCallback = ProgressCallback{});
+    
+    explicit FXFaceDatabase(const FXString & dbPath);
+    
     size_t
     faceCount() const;
 
@@ -29,10 +33,8 @@ public:
     FXOpt<FXFaceDescriptor>
     findDescriptor(const FXString & psName) const;
 
-    void
-    rescan();
-
 public:
+
     struct FaceItem {
         FXFaceDescriptor desc;
         FXFaceAttributes atts;   
@@ -57,19 +59,18 @@ protected:
     bool
     load();
 
-    bool
-    checkForUpdate();
-
     void
+    rescan();
+    
+    bool
     initDiskHash();
 
 protected:
-    FXVector<FXString> folders_;
-    FXString           dbPath_;
+    FXVector<FXString> folders_ {};
+    FXString           dbPath_ {};
+    FXVector<FaceItem> faces_ {};
 
-    FXVector<FaceItem> faces_;
-
-    ProgressCallback   progress_;
-    FoldersHash        dbHash_;
-    FoldersHash        diskHash_;
+    ProgressCallback   progress_ {};
+    FoldersHash        dbHash_ {};
+    FoldersHash        diskHash_ {};
 };

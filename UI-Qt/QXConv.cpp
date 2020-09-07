@@ -6,9 +6,9 @@
 #include "FontX/FXUnicode.h"
 
 namespace {
-    void
-    deleteFXPixmapARGB(void * bm) {
-        delete (FXPixmapARGB*)bm;
+    template <typename T> void
+    deleteFXPixmap(void * bm) {
+        delete (T*)bm;
     }
 }
 QString
@@ -38,10 +38,28 @@ toQImage(const FXPixmapARGB & bm) {
                  bm.width,
                  bm.height,
                  QImage::Format_ARGB32,
-                 deleteFXPixmapARGB,
+                 &deleteFXPixmap<FXPixmapARGB>,
                  ref);
 #endif
     return image;
+}
+
+QImage
+toQImage(const FXPixmapGray & bm) {
+    FXPixmapGray* ref = new FXPixmapGray(bm); // make a new ref
+    QImage image(reinterpret_cast<uchar*>(bm.buffer),
+        bm.width,
+        bm.height,
+        bm.pitch,
+        QImage::Format_Alpha8,
+        &deleteFXPixmap<FXPixmapGray>,
+        ref);
+    return image;
+}
+
+QImage
+toQImage(const FXGlyphImage & im) {
+    return toQImage(im.pixmap);
 }
 
 QSize
@@ -51,8 +69,8 @@ glyphEmSize() {
 }
 
 QImage
-placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
-    QImage image = toQImage(g.pixmap());
+drawGlyphImage(const FXGlyphImage & img, const QSize & emSize) {
+    QImage image = toQImage(img);
 
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());
@@ -64,10 +82,10 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
         return out;
     
     QPainter p(&out);
-    if (g.face->isScalable())
+    if (img.isSmoothScalable())
         p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
 
-    const double r = g.face->isScalable()? 0.8: 0.618;
+    const double r = img.isSmoothScalable()? 0.8: 0.618;
     double wr, hr;
     if (image.width() > image.height()) {
         wr = r;
@@ -82,7 +100,7 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
                   (1 - hr) / 2 * emSize.height(),
                   emSize.width() * wr,
                   emSize.height() * hr);
-    if (g.face->isScalable()) {
+    if (img.isSmoothScalable()) {
         // if the image is too small to full-fill outRect, let's keep the orignal size
         if ((outRect.width() > imageRect.width()) && (outRect.height() > imageRect.height()))
             outRect = QRect((emSize.width() - imageRect.width()) / 2,
@@ -91,7 +109,7 @@ placeGlyphImage(const FXGlyph & g, const QSize & emSize) {
                             imageRect.height());
     }
     p.drawImage(outRect, image, imageRect);
-
+    p.end();
     out.setDevicePixelRatio(2);
     return out;
 }
@@ -129,4 +147,12 @@ ftDateTimeToString(int64_t value) {
     static QDateTime epoch(QDate(1904, 01, 01), QTime(0, 0, 0), Qt::UTC);
 
     return epoch.addSecs(value).toString("yyyy-MM-dd HH:mm:ss t");
+}
+
+bool
+needInvertImage(const QImage & img, bool selected, bool darkMode) {
+    if (img.format() == QImage::Format_ARGB32)
+        return false;
+
+    return selected || darkMode;
 }

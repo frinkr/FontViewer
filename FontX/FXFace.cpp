@@ -21,10 +21,10 @@ namespace {
         }
     }
     
-    FXPixmapARGB
+    FXGlyphImage
     loadPixmap(FT_Bitmap ftBm) {
         FXPixmapARGB bm(ftBm.width, ftBm.rows);
-
+        FXGlyphImage::Mode mode {FXGlyphImage::kGrayscale};
         
         if (ftBm.pixel_mode == FT_PIXEL_MODE_GRAY) {
             forEachPixel(ftBm, 1, [&bm](int x, int y, unsigned char * p) {
@@ -32,18 +32,21 @@ namespace {
             });
         }
         else if (ftBm.pixel_mode == FT_PIXEL_MODE_BGRA) {
+            mode = FXGlyphImage::kColor;
             forEachPixel(ftBm, 4, [&bm](int x, int y, unsigned char * p) {
                 bm.setPixel(x, y, makeARGB(*(p+3), *(p+2), *(p+1), *p));
             });
         }
         else if (ftBm.pixel_mode == FT_PIXEL_MODE_MONO) {
+            mode = FXGlyphImage::kMono;
             forEachPixel(ftBm, 0, [&bm](int x, int y, unsigned char * row) {
                 unsigned char * b = row + x / 8;
                 bool v = (*b) & (1 << (7 - (x % 8)));
-                bm.setPixel(x, y, v? FXBlack: FXWhite);
+                bm.setPixel(x, y, v? FXBlack: FXTransparent);
             });
         }
-        return bm;
+        
+        return FXGlyphImage {bm, mode, {}};
     }
 }
 
@@ -445,6 +448,7 @@ FXFace::selectFontSize(double fontSize) {
             FT_Set_Char_Size(face_, 0/*same as height*/, fontSize * 64, FXDefaultDPI, FXDefaultDPI);
         }
     }
+
     return fontSize_;
 }
 
@@ -468,8 +472,8 @@ FXFace::glyph(FXGChar gc) {
     }
 
     // lookup in cache
-    if (cache_->has(gid)) {
-        FXGlyph glyph = cache_->get(gid);
+    if (glyphCache_->has(gid)) {
+        FXGlyph glyph = glyphCache_->get(gid);
         glyph.character = {c, currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther};
         return glyph;
     }
@@ -495,18 +499,24 @@ FXFace::glyph(FXGChar gc) {
         glyph.name = glyphName;
 
     // put into cache
-    cache_->put(gid, glyph);
+    glyphCache_->put(gid, glyph);
     return glyph;
 }
 
-FXPixmapARGB
-FXFace::pixmap(FXGlyphID gid, FXVec2d<int> * offset) {
+FXGlyphImage
+FXFace::glyphImage(FXGlyphID gid) {
+    if (fontSize_ == FXDefaultFontSize && glyphImageCache_->has(gid))
+        return glyphImageCache_->get(gid);
+    
     FT_Load_Glyph(face_, gid, FT_LOAD_RENDER | FT_LOAD_COLOR);
-    if (offset) {
-        offset->x = face_->glyph->bitmap_left;
-        offset->y = face_->glyph->bitmap_top - face_->glyph->bitmap.rows;
-    }
-    return loadPixmap(face_->glyph->bitmap);
+
+    auto image = loadPixmap(face_->glyph->bitmap);
+    image.offset.x = face_->glyph->bitmap_left;
+    image.offset.y = face_->glyph->bitmap_top - face_->glyph->bitmap.rows;
+    
+    if (fontSize_ == FXDefaultFontSize)
+        glyphImageCache_->put(gid, image);
+    return image;
 }
 
 FXVector<FXChar>
@@ -551,13 +561,14 @@ FXFace::setCurrentVariableCoordinates(const FXVector<FXFixed> & coords) {
         const_cast<FT_Fixed *>(reinterpret_cast<const FT_Fixed *>(&coords[0]))
         );
     
-    cache_->clear();
+    clearCache();
     return true;
 }
 
 void
 FXFace::resetVariableCoordinates() {
     FT_Set_Var_Design_Coordinates(face_, 0, nullptr);
+    clearCache();
 }
 
 
@@ -575,7 +586,8 @@ bool
 FXFace::init() {
     scalable_ = FT_IS_SCALABLE(face_);
     selectFontSize(FXDefaultFontSize);
-    cache_.reset(new FXGlyphCache);
+    glyphCache_.reset(new FXGlyphCache(5000));
+    glyphImageCache_.reset(new FXGlyphImageCache(1000));
     bool ok =
         initAttributes() &&
         initCMap() &&
@@ -772,7 +784,13 @@ FXFace::initVariables() {
     return true;
 }
 
-
+void
+FXFace::clearCache() {
+    if (glyphCache_)
+        glyphCache_->clear();
+    if (glyphImageCache_)
+        glyphImageCache_->clear();
+}
 
 
 /////////////////////////////////////////////////////////////////////////////

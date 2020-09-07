@@ -22,6 +22,16 @@ struct FXFaceDescriptor {
     operator!=(const FXFaceDescriptor & other) const;
 };
 
+namespace std {
+    template<> struct hash<FXFaceDescriptor> {
+        std::size_t operator()(FXFaceDescriptor const& desc) const noexcept {
+            std::size_t h1 = std::hash<std::string>{}(desc.filePath);
+            std::size_t h2 = std::hash<size_t>{}(desc.index);
+            return h1 ^ (h2 << 1);
+        }
+    };
+}
+
 struct FXSFNTName {
     uint16_t     platformId;
     uint16_t     encodingId;
@@ -225,8 +235,8 @@ public:
     FXGlyph
     glyph(FXGChar c);
 
-    FXPixmapARGB
-    pixmap(FXGlyphID gid, FXVec2d<int> * offset = nullptr);
+    FXGlyphImage
+    glyphImage(FXGlyphID gid);
 
     /**
      * return the chars which maps to the gid in current cmap
@@ -297,8 +307,12 @@ protected:
     virtual bool
     initVariables();
 
+    void
+    clearCache();
+
 protected:
     using FXGlyphCache = FXCache<FXGlyphID, FXGlyph>;
+    using FXGlyphImageCache = FXCache<FXGlyphID, FXGlyphImage>;
     
     FXFaceDescriptor     desc_{};
     FXPtr<FXStream>      stream_{};
@@ -311,7 +325,8 @@ protected:
 
     FXFaceAttributes     atts_{};
     std::vector<FXCMap>  cmaps_{};
-    FXPtr<FXGlyphCache>  cache_{};
+    FXPtr<FXGlyphCache>  glyphCache_{};
+    FXPtr<FXGlyphImageCache> glyphImageCache_{};
     FXPtr<FXInspector>   inspector_{};
 
     FXDict               properties_ {};

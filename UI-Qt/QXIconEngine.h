@@ -39,6 +39,7 @@ private:
 
 private:
     QString   filePath_;
+    QPixmap   pm0_{}, pm1_{};
     QMap<PixmapCacheKey, QPixmap> cache_;
 };
 

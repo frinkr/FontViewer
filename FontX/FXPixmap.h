@@ -102,7 +102,11 @@ public:
     empty() const {
         return !width || !height || !buffer;
     }
-        
+
+    explicit operator bool() const {
+        return !empty();
+    }
+    
     void
     setPixel(PosType x, PosType y, ColorType color) {
         if (!validPosition(x, y))
@@ -163,5 +167,7 @@ constexpr FXARGB FXGreen  = makeRGB(0, 0xff, 0);
 constexpr FXARGB FXBlue   = makeRGB(0, 0, 0xff);
 constexpr FXARGB FXBlack  = makeRGB(0, 0, 0);
 constexpr FXARGB FXWhite  = makeRGB(0xff, 0xff, 0xff);
+constexpr FXARGB FXTransparent = makeARGB(0, 0, 0, 0);
 
 using FXPixmapARGB = FXPixmap<FXARGB>;
+using FXPixmapGray = FXPixmap<FXGray>;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QXFontBrowser</class>
- <widget class="QDialog" name="QXFontBrowser">
+ <class>QXFontListDialog</class>
+ <widget class="QDialog" name="QXFontListDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -230,7 +230,7 @@
   <connection>
    <sender>okButton</sender>
    <signal>clicked()</signal>
-   <receiver>QXFontBrowser</receiver>
+   <receiver>QXFontListDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">

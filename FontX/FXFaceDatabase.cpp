@@ -5,6 +5,7 @@
 #include <chrono>
 
 #include <cereal/archives/portable_binary.hpp>
+#include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
 #include <cereal/types/string.hpp>
@@ -16,7 +17,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 10;
+    constexpr int FACE_DB_VERSION = 11;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {
@@ -101,9 +102,17 @@ FXFaceDatabase::FXFaceDatabase(const FXVector<FXString> & folders, const FXStrin
     : folders_(folders)
     , dbPath_(dbPath)
     , progress_(progressCallback) {
+    
     initDiskHash();
-    if (!load() || checkForUpdate())
+
+    if (!load() || (diskHash_.hash && diskHash_.hash != dbHash_.hash)) {
         rescan();
+        save();
+    }
+}
+
+FXFaceDatabase::FXFaceDatabase(const FXString & dbPath)
+    : FXFaceDatabase({}, dbPath, nullptr) {
 }
 
 size_t
@@ -159,6 +168,11 @@ FXFaceDatabase::findDescriptor(const FXString & psName) const {
 
 void
 FXFaceDatabase::rescan() {
+    
+    // Rebuild face indexes in diskHash_
+    for (size_t i = 0; i < faces_.size(); ++i)
+        diskHash_.faces[faces_[i].desc.filePath].push_back(i);
+
     FXVector<FaceItem> faces;
 
     size_t current = 0;
@@ -200,14 +214,13 @@ FXFaceDatabase::rescan() {
 
     faces_ = faces;
     dbHash_ = FoldersHash(); // don't need it anymore
-    save();
 }
 
 bool
 FXFaceDatabase::save() {
     try {
         std::ofstream ofs(dbPath_);
-        cereal::PortableBinaryOutputArchive ar(ofs);
+        cereal::JSONOutputArchive ar(ofs);
         ar << FACE_DB_VERSION;
         ar << diskHash_;
         ar << faces_;
@@ -223,7 +236,7 @@ bool
 FXFaceDatabase::load() {
     try {
         std::ifstream ifs(dbPath_);
-        cereal::PortableBinaryInputArchive ia(ifs);
+        cereal::JSONInputArchive ia(ifs);
 
         // Load and check version
         int dbVersion = -1;
@@ -233,10 +246,6 @@ FXFaceDatabase::load() {
         
         ia >> dbHash_;
         ia >> faces_;
-        
-        // Rebuild face indexes in diskHash_
-        for (size_t i = 0; i < faces_.size(); ++ i)
-            diskHash_.faces[faces_[i].desc.filePath].push_back(i);
     }
     catch (cereal::Exception ex) {
         return false;
@@ -246,11 +255,6 @@ FXFaceDatabase::load() {
 }
 
 bool
-FXFaceDatabase::checkForUpdate() {
-    return dbHash_.hash != diskHash_.hash;
-}
-
-void
 FXFaceDatabase::initDiskHash() {
     diskHash_ = FoldersHash();
     for(const auto & folder : folders_)
@@ -259,4 +263,6 @@ FXFaceDatabase::initDiskHash() {
             diskHash_.files[file] = hashFile(file);
             return true;
         });
+    
+    return diskHash_.hash != 0;
 }

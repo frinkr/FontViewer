@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 #include "FX.h"
 #include "FXPixmap.h"
 
@@ -28,6 +29,36 @@ struct FXGlyphMetrics {
     }
 };
 
+
+struct FXGlyphImage {
+    enum Mode {
+        kColor,
+        kGrayscale,
+        kMono,
+    };
+
+    FXPixmapARGB     pixmap {};
+    Mode             mode {kGrayscale};
+    FXVec2d<int>     offset {};
+
+    
+    bool empty() const {
+        return pixmap.empty();
+    }
+
+    int width() const {
+        return pixmap.width;
+    }
+
+    int height() const {
+        return pixmap.height;
+    }
+
+    bool isSmoothScalable() const {
+        return mode != kMono;
+    }
+};
+
 struct FXGlyph {
     FXFace          * face;
     FXGlyphID         gid;
@@ -35,6 +66,6 @@ struct FXGlyph {
     FXGChar           character; // isChar() returns true
     FXGlyphMetrics    metrics;
     
-    FXPixmapARGB
-    pixmap() const;
+    FXGlyphImage
+    glyphImage() const;
 };

@@ -8,6 +8,7 @@
 #include <QtDebug>
 #include <QtGui>
 
+#include "FontX/FXBenchmark.h"
 #include "QXAboutDialog.h"
 #include "QXAboutFontsDialog.h"
 #include "QXApplication.h"
@@ -37,9 +38,13 @@ QXApplication::QXApplication(int & argc, char ** argv)
 
 bool
 QXApplication::darkMode() const {
-	QColor textColor = palette().color(QPalette::Normal, QPalette::Text);
+	return isDarkColor(palette().color(QPalette::Normal, QPalette::Text));
+}
+
+bool
+QXApplication::isDarkColor(const QColor & color) const {
     QColor gray(55, 55, 55);
-    return textColor.toRgb().value() > gray.value();
+    return color.toRgb().value() > gray.value();
 }
 
 QIcon
@@ -134,6 +139,12 @@ QXApplication::copyTextToClipBoard(const QString & text) {
     clipboard()->setText(text);
 }
 
+FXBenchmark &
+QXApplication::benchmark() {
+    if (!benchmark_)
+        benchmark_ = new FXBenchmark(false);
+    return *benchmark_;
+}
 
 void
 QXApplication::showSplashScreen() {
