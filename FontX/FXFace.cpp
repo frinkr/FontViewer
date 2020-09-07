@@ -322,12 +322,12 @@ FXFace::attributes() const {
 }
 
 size_t
-FXFace::brotherFaceCount() const {
+FXFace::faceCount() const {
     return face_->num_faces;
 }
 
 FXPtr<FXFace>
-FXFace::openBrotherFace(size_t index) {
+FXFace::openFace(size_t index) {
     if (index == this->index())
         return this->shared_from_this();
     

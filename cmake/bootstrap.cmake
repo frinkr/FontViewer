@@ -13,7 +13,7 @@ if (WIN32)
   endif()
   
 elseif (APPLE)
-  message(FATAL_ERROR "Not implemented")
+  # message(FATAL_ERROR "Not implemented")
   # Qt
   # OpenSSL
 elseif (UNIX)

@@ -15,15 +15,16 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
     ui_->setupUi(this);
     if (!initFace)
        initFace = FXFace::createFace(toStdString(filePath), 0);
-    size_t faceCount = initFace? initFace->brotherFaceCount(): 0;
+    size_t faceCount = initFace? initFace->faceCount(): 0;
     for (size_t i = 0; i < faceCount; ++ i) {
-        auto face = initFace->openBrotherFace(i);
+        auto face = initFace->openFace(i);
         if (face)
-            ui_->listWidget->addItem(QXDocument::faceDisplayName(face));
+            (new QListWidgetItem(QXDocument::faceDisplayName(face), ui_->listWidget))->setData(Qt::UserRole, int(i));
         else
             ui_->listWidget->addItem(tr("<INVALID FACE>"));
     }
 
+    ui_->listWidget->sortItems();
     ui_->listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     ui_->listWidget->setCurrentRow(0);
 }
@@ -34,7 +35,7 @@ QXFontCollectionDialog::~QXFontCollectionDialog() {
 
 int
 QXFontCollectionDialog::selectedIndex() const {
-    return ui_->listWidget->currentRow();
+    return ui_->listWidget->currentItem()->data(Qt::UserRole).toInt();
 }
 
 int

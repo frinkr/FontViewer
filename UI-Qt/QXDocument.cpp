@@ -262,7 +262,7 @@ QXDocument::QXDocument(const QXFontURI & uri, QObject * parent)
 bool
 QXDocument::load(FXPtr<FXFace> initFace) {
     if (initFace)
-        face_ = initFace->openBrotherFace(uri_.faceIndex);
+        face_ = initFace->openFace(uri_.faceIndex);
     else 
         face_ = FXFace::createFace(toStdString(uri_.filePath), uri_.faceIndex);
     if (!face_ || !face_->hasValidFaceData())

@@ -302,7 +302,7 @@ QXDocumentWindow::onGlyphClicked(const QXCollectionModelIndex & index) {
     if (index.item == -1) {
         // Nothing selected, show file path
         QString message;
-        if (document_->face()->brotherFaceCount() > 1)
+        if (document_->face()->faceCount() > 1)
             message = QString("%1: %2").arg(document_->uri().filePath).arg(document_->uri().faceIndex);
         else
             message = document_->uri().filePath;

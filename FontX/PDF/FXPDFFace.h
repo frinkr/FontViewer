@@ -25,10 +25,10 @@ public:
     isSubset() const override;
 
     size_t
-    brotherFaceCount() const override;
+    faceCount() const override;
 
     FXPtr<FXFace>
-    openBrotherFace(size_t index) override;
+    openFace(size_t index) override;
 
     FXPtr<FXPDFDocument>
     document() const;

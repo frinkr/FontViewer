@@ -83,14 +83,14 @@ FXPDFFace::isSubset() const {
 }
 
 size_t
-FXPDFFace::brotherFaceCount() const {
+FXPDFFace::faceCount() const {
     if (document_)
         return document_->fontCount();
     return 0;
 }
 
 FXPtr<FXFace>
-FXPDFFace::openBrotherFace(size_t index) {
+FXPDFFace::openFace(size_t index) {
     if (document_)
         return document_->createFace(index);
     return nullptr;

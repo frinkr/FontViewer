@@ -169,10 +169,10 @@ public:
     attributes() const;
 
     virtual size_t
-    brotherFaceCount() const;
+    faceCount() const;
 
     virtual FXPtr<FXFace>
-    openBrotherFace(size_t index);
+    openFace(size_t index);
 
     const FXDict &
     userProperties() const;

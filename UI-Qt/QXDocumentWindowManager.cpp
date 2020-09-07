@@ -316,7 +316,7 @@ QXDocumentWindowManager::doQuickOpenFontDialog() {
 bool
 QXDocumentWindowManager::openFontFile(const QString & filePath) {
     auto initFace = FXFace::createFace(toStdString(filePath), 0);
-    size_t faceCount = initFace? initFace->brotherFaceCount(): 0;
+    size_t faceCount = initFace? initFace->faceCount(): 0;
     if (faceCount == 1) {
         QXFontURI uri {filePath, 0};
         return openFontURI(uri, initFace);
