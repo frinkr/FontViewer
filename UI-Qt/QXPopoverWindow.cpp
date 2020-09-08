@@ -77,6 +77,7 @@ QXPopoverWindow::QXPopoverWindow(QWidget * parent)
     , borderRadius_(DEFAULT_BORDER_RADIUS) {
     setAttribute(Qt::WA_TranslucentBackground);
     setAutoFillBackground(false);
+    setFocusPolicy(Qt::StrongFocus);
 }
 
 void

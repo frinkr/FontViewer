@@ -125,6 +125,12 @@ private slots:
     onFontInfoAction();
 
     void
+    onOpenFontInSameFileAction();
+
+    void
+    onFontListItemDoubleClicked(int index);
+    
+    void
     onSearchAction();
 
     void
@@ -152,6 +158,8 @@ private:
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
+    QAction         * openFontInSameFileAction_;
+    QXPopoverWindow * openFontInSameFilePopover_;
     QLineEdit       * searchLineEdit_;
 
     QXPopoverWindow   * glyphPopover_;

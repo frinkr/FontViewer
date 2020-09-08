@@ -11,6 +11,8 @@
 #include <QToolButton>
 #include <QWidgetAction>
 
+#include "FontX/FXPDF.h"
+
 #include "QXApplication.h"
 #include "QXCMapBlockWidget.h"
 #include "QXConv.h"
@@ -18,6 +20,7 @@
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
 #include "QXEncoding.h"
+#include "QXFontCollectionDialog.h"
 #include "QXFontInfoWidget.h"
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphTableWidget.h"
@@ -43,6 +46,7 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
+    , openFontInSameFilePopover_(nullptr)
     , glyphPopover_(nullptr)
     , glyphWidget_(nullptr)
     , document_(document)
@@ -158,6 +162,18 @@ QXDocumentWindow::initToolBar() {
 		qApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QXDocumentWindow::onFontInfoAction);
 
+    // There are multiple faces in this file
+   if (auto face = document()->face(); face->faceCount()) {
+       bool isPDF = false;
+#if FX_HAS_PDF_ADDON
+       isPDF = face->userProperties().has(FXPDFDocumentInfoKey);
+#endif
+       //isPDF = false;
+       openFontInSameFileAction_ = toolBar->addAction(
+           qApp->loadIcon(isPDF?":/images/pdf.png": ":/images/font-list.png"), tr("Open Face in Same File"),
+           this, &QXDocumentWindow::onOpenFontInSameFileAction);
+   }
+    
     QWidget * spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     toolBar->addWidget(spacer);
@@ -432,6 +448,28 @@ QXDocumentWindow::onFontInfoAction() {
     toggleDockWidget(infoDockWidget_);
 }
 
+void
+QXDocumentWindow::onOpenFontInSameFileAction() {
+    if (!openFontInSameFilePopover_) {
+        openFontInSameFilePopover_ = new QXPopoverWindow(this);
+        QXFontCollectionWidget * widget = new QXFontCollectionWidget;
+        connect(widget, &QXFontCollectionWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
+        widget->setDocument(document_);
+        openFontInSameFilePopover_->setWidget(widget);
+    }
+    if (auto widget = dynamic_cast<QXFontCollectionWidget*>(openFontInSameFilePopover_->widget())) 
+        widget->setCurrentFace(document()->face()->index());
+    
+    openFontInSameFilePopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
+}
+
+void
+QXDocumentWindow::onFontListItemDoubleClicked(int index) {
+    QXFontURI uri = document()->uri();
+    uri.faceIndex = index;
+    QXDocumentWindowManager::instance()->openFontURI(uri); 
+}
+    
 void
 QXDocumentWindow::onSearchAction() {
     searchLineEdit_->setFocus();

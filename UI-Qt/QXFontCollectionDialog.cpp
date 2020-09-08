@@ -8,6 +8,85 @@
 #include "QXFontCollectionDialog.h"
 #include "ui_QXFontCollectionDialog.h"
 
+
+namespace {
+    void
+    loadFaceList(QListWidget * listWidget, FXPtr<FXFace> currFace) {
+        listWidget->clear();
+        
+        if (!currFace)
+            return;
+        
+        size_t faceCount = currFace->faceCount();
+        for (size_t i = 0; i < faceCount; ++ i) {
+            auto face = currFace->openFace(i);
+            if (face) {
+                auto item = new QListWidgetItem(QXDocument::faceDisplayName(face), listWidget);
+                item->setData(Qt::UserRole, int(i));
+                
+                if (i == currFace->index())
+                    listWidget->setCurrentItem(item);
+            }
+            else
+                listWidget->addItem(QXFontCollectionDialog::tr("<INVALID FACE>"));
+        }
+
+        listWidget->sortItems();
+        listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    }
+}
+
+void
+QXFontCollectionWidget::setDocument(QXDocument * document) {
+    document_ = document;
+    reload();
+}
+
+void
+QXFontCollectionWidget::setCurrentFace(int index) {
+    for (int i = 0; i < list_->count(); ++ i) {
+        auto item = list_->item(i);
+        if (itemData(item) == index) {
+            list_->setCurrentItem(item);
+            break;
+        }
+    }
+}
+
+int
+QXFontCollectionWidget::currentFace() const {
+    return itemData(list_->currentItem());
+}
+
+void
+QXFontCollectionWidget::reload() {
+    if (!list_) {
+        list_ = new QListWidget(this);
+        connect(list_, &QListWidget::itemDoubleClicked, this, &QXFontCollectionWidget::onListItemDoubleClicked);
+        
+        QVBoxLayout * layout = new QVBoxLayout(this);
+        layout->setMargin(0);
+        layout->addWidget(list_);
+        setLayout(layout);
+    }
+
+    auto currFace = document_->face();
+    loadFaceList(list_, currFace);
+}
+
+void
+QXFontCollectionWidget::onListItemDoubleClicked(QListWidgetItem * item) {
+    if (auto index = itemData(item); index != -1)
+        emit fontDoubleClicked(index);
+}
+
+int
+QXFontCollectionWidget::itemData(QListWidgetItem * item) const {
+    bool ok = false;
+    auto index = item->data(Qt::UserRole).toInt(&ok);
+    return ok? index: -1;
+}
+
 QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<FXFace> initFace, QWidget * parent)
     : QDialog(parent)
     , ui_(new Ui::QXFontCollectionDialog)
@@ -15,17 +94,7 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
     ui_->setupUi(this);
     if (!initFace)
        initFace = FXFace::createFace(toStdString(filePath), 0);
-    size_t faceCount = initFace? initFace->faceCount(): 0;
-    for (size_t i = 0; i < faceCount; ++ i) {
-        auto face = initFace->openFace(i);
-        if (face)
-            (new QListWidgetItem(QXDocument::faceDisplayName(face), ui_->listWidget))->setData(Qt::UserRole, int(i));
-        else
-            ui_->listWidget->addItem(tr("<INVALID FACE>"));
-    }
-
-    ui_->listWidget->sortItems();
-    ui_->listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
+    loadFaceList(ui_->listWidget, initFace);
     ui_->listWidget->setCurrentRow(0);
 }
 

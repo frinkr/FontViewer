@@ -10,7 +10,7 @@
 #include "QXDockTitleBarWidget.h"
 
 namespace {
-    int TITLE_BAR_HEIGHT = 23;
+    int TITLE_BAR_HEIGHT = 21;
 }
 QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     : QWidget(parent) {

@@ -52,7 +52,8 @@ QXIconEngine::pixmap(const QSize & size,
         }
         QIcon icon(pixmap);
         pixmap = pixmap.scaled(size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        cache_.insert(key, icon.pixmap(size, mode, state));
+        //cache_.insert(key, icon.pixmap(size, mode, state));
+        cache_.insert(key, pixmap);
     }
         
     return cache_.value(key);

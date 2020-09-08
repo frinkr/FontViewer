@@ -27,6 +27,8 @@ namespace {
         applyToApplication() override {
 #ifdef Q_OS_WIN
             auto style = QStyleFactory::create("windowsvista");
+#elif defined(Q_OS_MAC)
+            auto style = QStyleFactory::create("macintosh");
 #endif
             qApp->setStyle(style);
             qApp->setPalette(style->standardPalette());

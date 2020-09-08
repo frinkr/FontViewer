@@ -10,6 +10,10 @@
     <file alias="images/cmap.png">../Resources/Images/cmap.png</file>
     <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
     <file alias="images/empty.png">../Resources/Images/empty.png</file>
+    <file alias="images/pdf.png">../Resources/Images/pdf.png</file>  
+    <file alias="images/pdf_d.png">../Resources/Images/pdf_d.png</file>
+    <file alias="images/font-list.png">../Resources/Images/font-list.png</file>
+    <file alias="images/font-list_d.png">../Resources/Images/font-list_d.png</file>
     <file alias="images/filter.png">../Resources/Images/filter.png</file>
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
     <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
