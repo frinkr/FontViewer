@@ -45,7 +45,9 @@ set(UI
 
 qt5_wrap_ui(UI_HEADERS ${UI})
 
-set(SHARED_SOURCES 
+set(SHARED_SOURCES
+  score_match.cpp
+  score_match.h
   QXAboutDialog.cpp
   QXAboutDialog.h
   QXAboutFontsDialog.cpp
