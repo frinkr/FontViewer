@@ -18,7 +18,7 @@ namespace {
 
         MatchOptions opt;
         opt.case_sensitive = true;
-        opt.max_gap = 10;
+        opt.max_gap = 20;
         opt.smart_case = true;
         return score_match(s.c_str(), nullptr, f.c_str(), nullptr, opt);
     }
@@ -30,7 +30,7 @@ namespace {
         if (s.contains(filter))
             return true;
 
-        return fuzzMatch(s, f) > 0.3;
+        return fuzzMatch(s, f) > 0.1;
     }
 
     /**
@@ -41,8 +41,11 @@ namespace {
         QString f = filter.fontName.toLower();
         QString str0 = left.toLower();
         QString str1 = right.toLower();
-
-        return fuzzMatch(str0, f) < fuzzMatch(str1, f);
+        bool s0 = str0.startsWith(f);
+        bool s1 = str1.startsWith(f);
+        if (s0 != s1)
+            return s0;
+        return fuzzMatch(str0, f) > fuzzMatch(str1, f);
     }
 }
 
