@@ -107,6 +107,9 @@ private:
     void
     showOpenFontFileError(const QString & file);
 
+    QXDocumentWindow *
+    activeDocumentWindow() const;
+    
 private:
     enum {kMaxRecentFiles = 20};
 

@@ -355,7 +355,13 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
             addDocument(document);
             addToRecents(document);
             QXDocumentWindow * window = createDocumentWindow(document);
-            window->show();
+            if (auto activeWindow = activeDocumentWindow()) {
+                window->show();
+                window->move(activeWindow->pos() + QPoint(50, 50));
+            }
+            else {
+                window->show();
+            }
             return true;
         } else {
             showOpenFontFileError(uri.filePath);
@@ -391,6 +397,16 @@ QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
                       tr("The file %1 can't be open.").arg(file),
                       QMessageBox::Ok);
 }
+
+QXDocumentWindow *
+QXDocumentWindowManager::activeDocumentWindow() const {
+    for (auto window : documentWindows_) {
+        if (window->isActiveWindow())
+            return window;
+    }
+    return nullptr;
+}
+    
 
 void
 QXDocumentWindowManager::closeAllDocumentsAndQuit() {

@@ -163,7 +163,7 @@ QXDocumentWindow::initToolBar() {
         this, &QXDocumentWindow::onFontInfoAction);
 
     // There are multiple faces in this file
-   if (auto face = document()->face(); face->faceCount()) {
+   if (auto face = document()->face(); face->faceCount() > 1) {
        bool isPDF = false;
 #if FX_HAS_PDF_ADDON
        isPDF = face->userProperties().has(FXPDFDocumentInfoKey);
@@ -465,6 +465,7 @@ QXDocumentWindow::onOpenFontInSameFileAction() {
 
 void
 QXDocumentWindow::onFontListItemDoubleClicked(int index) {
+    openFontInSameFilePopover_->hide();
     QXFontURI uri = document()->uri();
     uri.faceIndex = index;
     QXDocumentWindowManager::instance()->openFontURI(uri); 
