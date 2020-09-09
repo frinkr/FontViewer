@@ -7,6 +7,7 @@
 #include "QXDocument.h"
 #include "QXFontListModel.h"
 #include "QXFontManager.h"
+#include "QXPreferences.h"
 #include "score_match.h"
 
 namespace {
@@ -126,7 +127,7 @@ QXFontListModel::attributes(size_t index) const {
 QString
 QXFontListModel::displayName(size_t index) const {
     auto const & attrs = attributes(index);
-    return QXDocument::faceDisplayName(attrs);
+    return QXDocument::faceDisplayName(attrs, QXPreferences::fontNameLanguage());
 }
 
 QIcon

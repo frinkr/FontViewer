@@ -6,6 +6,7 @@
 #include "QXConv.h"
 #include "QXDocument.h"
 #include "QXFontCollectionDialog.h"
+#include "QXPreferences.h"
 #include "ui_QXFontCollectionDialog.h"
 
 
@@ -21,7 +22,7 @@ namespace {
         for (size_t i = 0; i < faceCount; ++ i) {
             auto face = currFace->openFace(i);
             if (face) {
-                auto item = new QListWidgetItem(QXDocument::faceDisplayName(face), listWidget);
+                auto item = new QListWidgetItem(QXDocument::faceDisplayName(face, QXPreferences::fontNameLanguage()), listWidget);
                 item->setData(Qt::UserRole, int(i));
                 
                 if (i == currFace->index())

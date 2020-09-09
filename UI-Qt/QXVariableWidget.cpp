@@ -10,6 +10,7 @@
 
 #include "QXConv.h"
 #include "QXDocument.h"
+#include "QXPreferences.h"
 #include "QXVariableWidget.h"
 #include "ui_QXVariableWidget.h"
 
@@ -83,7 +84,7 @@ QXVariableWidget::initNonVariableFont() {
 
     QLabel * text = new QLabel(
         tr(R"("%1" is not an OpenType variable or multiple master font!)")
-        .arg(document_->displayName()), 
+        .arg(document_->displayName(QXPreferences::fontNameLanguage())), 
         ui_->warningWidget);
     text->setTextFormat(Qt::RichText);
     text->setAlignment(Qt::AlignHCenter | Qt::AlignTop);

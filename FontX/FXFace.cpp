@@ -80,12 +80,22 @@ FXFaceDescriptor::operator!=(const FXFaceDescriptor & other) const {
     return !operator==(other);
 }
 
+static FXVector<FXFaceLanguage> sSFNTLanguageSearchOrder{
+    FXFaceLanguages::zhCN, 
+    FXFaceLanguages::zhHK, 
+    FXFaceLanguages::zhTW, 
+    FXFaceLanguages::zhSG, 
+    FXFaceLanguages::ja, 
+    FXFaceLanguages::ko, 
+    FXFaceLanguages::en
+};
+
 const FXString &
 FXFaceSFNTNames::familyName() const {
     if (familyName_.empty())
         familyName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
-                        {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        defaultFamilyName_);
+                                   sSFNTLanguageSearchOrder,
+                                   defaultFamilyName_);
     return familyName_;
 }
 
@@ -93,8 +103,8 @@ const FXString &
 FXFaceSFNTNames::styleName() const {
     if (styleName_.empty())
         styleName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
-                        {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        defaultStyleName_);
+                                  sSFNTLanguageSearchOrder,
+                                  defaultStyleName_);
     return styleName_;
 }
 
@@ -102,22 +112,22 @@ const FXString &
 FXFaceSFNTNames::postscriptName() const {
     if (postscriptName_.empty())
         postscriptName_ = findSFNTName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
-                        {"zh-cn", "zh-hk", "zh-tw", "zh-sg", "zh", "ja", "ko", "en"},
-                        defaultPostscriptName_);
+                                       sSFNTLanguageSearchOrder,
+                                       defaultPostscriptName_);
     return postscriptName_;
 }
 
-FXHashMap<FXString, FXString>
+FXHashMap<FXFaceLanguage, FXString>
 FXFaceSFNTNames::localizedFamilyNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY});
 }
 
-FXHashMap<FXString, FXString>
+FXHashMap<FXFaceLanguage, FXString>
 FXFaceSFNTNames::localizedStyleNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY});
 }
 
-FXHashMap<FXString, FXString>
+FXHashMap<FXFaceLanguage, FXString>
 FXFaceSFNTNames::localizedPostscriptNames() const {
     return findSFNTNames({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME});
 }
@@ -137,9 +147,9 @@ FXFaceSFNTNames::setDefaultPostscriptName(const FXString & name) {
     defaultPostscriptName_ = name;
 }
 
-FXHashMap<FXString, FXString>
+FXHashMap<FXFaceLanguage, FXString>
 FXFaceSFNTNames::findSFNTNames(const FXVector<int> & nameIds) const {
-    FXHashMap<FXString, FXString> map;
+    FXHashMap<FXFaceLanguage, FXString> map;
     for (auto itr = cbegin(); itr != cend(); ++ itr) {
         if (itr->value.empty())
             continue;
@@ -176,7 +186,7 @@ FXFaceSFNTNames::version() const {
 
 FXString
 FXFaceSFNTNames::findSFNTName(const FXVector<int> & nameIds,
-                          const FXVector<FXString> & languages,
+                          const FXVector<FXFaceLanguage> & languages,
                           const FXString & defaultName) const {
     auto findName = [&] () {
         for (auto itr = cbegin(); itr != cend(); ++ itr) {
@@ -184,7 +194,7 @@ FXFaceSFNTNames::findSFNTName(const FXVector<int> & nameIds,
                 continue;
             for (int nameId : nameIds) {
                 if (itr->nameId == nameId) {
-                    for (const FXString & lang: languages) {
+                    for (const FXFaceLanguage & lang: languages) {
                         if (itr->language == lang)
                             return itr->value;
                     }

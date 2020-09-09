@@ -125,3 +125,8 @@ void
 QXPreferences::setTheme(const QString & theme) {
     json["theme"] = theme;
 }
+
+std::string
+QXPreferences::fontNameLanguage() {
+    return "zh-cn";
+}

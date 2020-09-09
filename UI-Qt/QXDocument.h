@@ -1,4 +1,5 @@
 #pragma once
+#include <string_view>
 #include <QAbstractListModel>
 #include <QImage>
 
@@ -97,6 +98,7 @@ private:
 
 using QXGCharBooks = FXVector<QXGCharBook>;
 
+
 class QXDocument : public QXCollectionModel
 {
     Q_OBJECT
@@ -113,10 +115,10 @@ public:
     openFromFile(const QString & filePath, size_t faceIndex, QObject * parent = nullptr);
 
     static QString
-    faceDisplayName(const FXPtr<FXFace> & face);
+    faceDisplayName(const FXPtr<FXFace> & face, const FXFaceLanguage & language);
 
     static QString
-    faceDisplayName(const FXFaceAttributes & atts);
+    faceDisplayName(const FXFaceAttributes & atts, const FXFaceLanguage & language);
 
 public:
     const QXFontURI &
@@ -126,7 +128,7 @@ public:
     face() const;
 
     QString
-    displayName() const;
+    displayName(const FXFaceLanguage & language) const;
 public slots:
     bool
     selectCMap(size_t index);

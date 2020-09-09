@@ -32,12 +32,25 @@ namespace std {
     };
 }
 
+using FXFaceLanguage = FXString;
+class FXFaceLanguages {
+public:
+    static const inline FXFaceLanguage en { "en" };
+    static const inline FXFaceLanguage zh { "zh" };
+    static const inline FXFaceLanguage zhCN { "zh-cn" };
+    static const inline FXFaceLanguage zhHK { "zh-hk" };
+    static const inline FXFaceLanguage zhTW { "zh-tw" };
+    static const inline FXFaceLanguage zhSG { "zh-sg" };
+    static const inline FXFaceLanguage ja { "ja" };
+    static const inline FXFaceLanguage ko { "ko" };
+};
+
 struct FXSFNTName {
-    uint16_t     platformId;
-    uint16_t     encodingId;
-    FXString     language;
-    uint16_t     nameId;
-    FXString     value;
+    uint16_t           platformId;
+    uint16_t           encodingId;
+    FXFaceLanguage     language;
+    uint16_t           nameId;
+    FXString           value;
 };
 
 class FXFaceSFNTNames : public FXVector<FXSFNTName> {
@@ -60,16 +73,16 @@ public:
     void
     setDefaultPostscriptName(const FXString & name);
 
-    FXHashMap<FXString, FXString>
+    FXHashMap<FXFaceLanguage, FXString>
     localizedFamilyNames() const;
 
-    FXHashMap<FXString, FXString>
+    FXHashMap<FXFaceLanguage, FXString>
     localizedStyleNames() const;
 
-    FXHashMap<FXString, FXString>
+    FXHashMap<FXFaceLanguage, FXString>
     localizedPostscriptNames() const;
 
-    FXHashMap<FXString, FXString>
+    FXHashMap<FXFaceLanguage, FXString>
     findSFNTNames(const FXVector<int> & nameIds) const;
 
     FXString
@@ -92,7 +105,7 @@ public:
 protected:
     FXString
     findSFNTName(const FXVector<int> & nameIds,
-                 const FXVector<FXString> & languages,
+                 const FXVector<FXFaceLanguage> & languages,
                  const FXString & defaultName = FXString()) const;
     
     mutable FXString     familyName_;

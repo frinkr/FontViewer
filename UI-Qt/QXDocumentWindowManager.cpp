@@ -272,7 +272,7 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
     QXRecentFontItem item;
     item.filePath  = document->uri().filePath;
     item.faceIndex = document->uri().faceIndex;
-    item.fullName  = QXDocument::faceDisplayName(document->face()->attributes());
+    item.fullName  = QXDocument::faceDisplayName(document->face()->attributes(), FXFaceLanguages::en);
 
     // add or move to front
     int index = recentFonts_.indexOf(item);

@@ -33,6 +33,9 @@ public:
     static void
     setTheme(const QString & theme);
 
+    static std::string
+    fontNameLanguage();
+
 private:
     using QObject::QObject;
 };

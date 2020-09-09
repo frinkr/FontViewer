@@ -87,27 +87,33 @@ QXDocument::openFromFile(const QString & filePath, size_t faceIndex, QObject * p
 }
 
 QString
-QXDocument::faceDisplayName(const FXPtr<FXFace> & face) {
-    if (auto name = faceDisplayName(face->attributes()); !name.isEmpty())
-        return name;
-    
-    if (auto name = face->postscriptName(); !name.empty())
-        return toQString(name);
-    
-    return QString("%1 - %2").arg(QFileInfo(toQString(face->desc().filePath)).fileName(),
-                                  face->desc().index);
+QXDocument::faceDisplayName(const FXPtr<FXFace> & face, const FXFaceLanguage & language) {
+    return faceDisplayName(face->attributes(), language);
 }
 
 QString
-QXDocument::faceDisplayName(const FXFaceAttributes & atts) {
-    QString familyName = toQString(atts.sfntNames.familyName());
-    QString styleName = toQString(atts.sfntNames.styleName());
+QXDocument::faceDisplayName(const FXFaceAttributes & atts, const FXFaceLanguage & language) {
+    QString familyName = toQString(atts.sfntNames.localizedFamilyNames()[language]);
+    QString styleName = toQString(atts.sfntNames.localizedStyleNames()[language]);
 
-    QString fullName;
-    if (!familyName.isEmpty())
-        fullName = QString("%1 - %2").arg(familyName, styleName);
+    if (familyName.isEmpty())
+        familyName = toQString(atts.sfntNames.familyName());
+    if (styleName.isEmpty())
+        styleName = toQString(atts.sfntNames.styleName());
+    
+    if (familyName.isEmpty() && language != FXFaceLanguages::en)
+        return faceDisplayName(atts, FXFaceLanguages::en);
+    
+    if (!familyName.isEmpty()) {
+        if (styleName.isEmpty())
+            return familyName;
+        return QString("%1 - %2").arg(familyName, styleName);
+    }
+    if (auto name = atts.sfntNames.postscriptName(); !name.empty())
+        return toQString(name);
 
-    return fullName;
+    return QFileInfo(toQString(atts.desc.filePath)).baseName();
+
 }
 
 FXPtr<FXFace>
@@ -116,8 +122,8 @@ QXDocument::face() const {
 }
 
 QString
-QXDocument::displayName() const {
-    return faceDisplayName(face_->attributes());
+QXDocument::displayName(const FXFaceLanguage & language) const {
+    return faceDisplayName(face_->attributes(), language);
 }
 
 bool
