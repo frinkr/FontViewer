@@ -79,7 +79,7 @@ void
 QXDocumentWindow::initWindowTitle() {
     const QString & filePath = document_->uri().filePath;
     setWindowFilePath(filePath);
-    setWindowTitle(document_->displayName(QXPreferences::fontNameLanguage()));
+    setWindowTitle(document_->displayName(QXPreferences::fontDisplayLanguage()));
 
 #if defined (Q_OS_MAC)
     QFileInfo fi(filePath);

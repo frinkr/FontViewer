@@ -2,6 +2,8 @@
 #include <QListWidgetItem>
 #include <QMessageBox>
 
+#include "FontX/FXFace.h"
+
 #include "QXApplication.h"
 #include "QXFontManager.h"
 #include "QXPreferences.h"
@@ -38,6 +40,11 @@ QXPreferencesDialog::QXPreferencesDialog(QWidget *parent) :
     // Theme combobox
     ui_->themeCombobox->addItems(QXTheme::availableThemes());
     ui_->themeCombobox->setCurrentText(QXPreferences::theme());
+
+    auto languages = { FXFaceLanguages::en, FXFaceLanguages::zhCN, FXFaceLanguages::ja, FXFaceLanguages::ko };
+    for (auto & lang : languages) 
+        ui_->fontLanguageCombobox->addItem(QString::fromStdString(lang));
+    ui_->fontLanguageCombobox->setCurrentText(QString::fromStdString(QXPreferences::fontDisplayLanguage()));
 }
 
 QXPreferencesDialog::~QXPreferencesDialog() {
@@ -106,5 +113,7 @@ QXPreferencesDialog::accept() {
 
     QXPreferences::setTheme(ui_->themeCombobox->currentText());
     QXTheme::setCurrent(QXPreferences::theme());
+
+    QXPreferences::setFontDisplayLanguage(ui_->fontLanguageCombobox->currentText().toStdString());
     QDialog::accept();
 }

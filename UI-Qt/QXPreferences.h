@@ -34,8 +34,11 @@ public:
     setTheme(const QString & theme);
 
     static std::string
-    fontNameLanguage();
+    fontDisplayLanguage();
 
+    static void
+    setFontDisplayLanguage(const std::string & language);
+    
 private:
     using QObject::QObject;
 };

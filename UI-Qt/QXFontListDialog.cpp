@@ -248,7 +248,7 @@ namespace {
     templateValues(const FXFaceDescriptor & desc, const FXFaceAttributes & atts) {
         QMap<QString, QVariant> map;
 
-        map["FULL_NAME"] = QXDocument::faceDisplayName(atts, QXPreferences::fontNameLanguage());
+        map["FULL_NAME"] = QXDocument::faceDisplayName(atts, QXPreferences::fontDisplayLanguage());
         map["PS_NAME"] = toQString(atts.sfntNames.postscriptName());
         map["VENDOR"] = toQString(atts.sfntNames.vendor());
         map["VERSION"] = toQString(atts.sfntNames.version());

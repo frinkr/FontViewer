@@ -127,6 +127,14 @@ QXPreferences::setTheme(const QString & theme) {
 }
 
 std::string
-QXPreferences::fontNameLanguage() {
-    return "zh-cn";
+QXPreferences::fontDisplayLanguage() {
+    if (json["fontDisplayLanguage"].isString())
+        return json["fontDisplayLanguage"].toString().toStdString();
+    
+    return "en";
+}
+
+void
+QXPreferences::setFontDisplayLanguage(const std::string & language) {
+    json["fontDisplayLanguage"] = QString::fromStdString(language);
 }

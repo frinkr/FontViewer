@@ -127,7 +127,7 @@ QXFontListModel::attributes(size_t index) const {
 QString
 QXFontListModel::displayName(size_t index) const {
     auto const & attrs = attributes(index);
-    return QXDocument::faceDisplayName(attrs, QXPreferences::fontNameLanguage());
+    return QXDocument::faceDisplayName(attrs, QXPreferences::fontDisplayLanguage());
 }
 
 QIcon
