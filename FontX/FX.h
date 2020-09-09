@@ -1,17 +1,18 @@
 #pragma once
 
-#include <cstring>
-#include <cmath>
 #include <algorithm>
 #include <any>
 #include <cassert>
+#include <cmath>
+#include <cstring>
 #include <functional>
 #include <iterator>
-#include <optional>
 #include <map>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #if defined(__APPLE__)
@@ -32,6 +33,8 @@ template <typename T>
 using FXSet = std::set<T>;
 template <typename K, typename V>
 using FXMap = std::map<K, V>;
+template <typename K, typename V>
+using FXHashMap = std::unordered_map<K, V>;
 template <typename T>
 using FXOpt = std::optional<T>;
 template <typename T>

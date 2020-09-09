@@ -78,7 +78,7 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
     if (filter.isEmpty())
         return true;
     
-    auto searchInNames = [](const FXMap<FXString, FXString> & names, const QString & name) {
+    auto searchInNames = [](const FXHashMap<FXString, FXString> & names, const QString & name) {
         for (const auto & it : names) {
             if (toQString(it.second).contains(name, Qt::CaseInsensitive))
                 return true;

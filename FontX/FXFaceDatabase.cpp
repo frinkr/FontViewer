@@ -8,6 +8,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
+#include <cereal/types/unordered_map.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/complex.hpp>
 
@@ -17,7 +18,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 11;
+    constexpr int FACE_DB_VERSION = 12;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {

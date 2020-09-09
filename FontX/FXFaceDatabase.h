@@ -44,11 +44,11 @@ public:
         size_t   hash {0};
 
         // map from path to hash
-        FXMap<FXString, size_t> files;
+        FXHashMap<FXString, size_t> files;
 
         // map from path to indexes of FaceItem in faces_
         // NOT saved to file
-        FXMap<FXString, FXVector<size_t>> faces;
+        FXHashMap<FXString, FXVector<size_t>> faces;
 
     };
 

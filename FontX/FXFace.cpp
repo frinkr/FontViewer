@@ -107,17 +107,17 @@ FXFaceSFNTNames::postscriptName() const {
     return postscriptName_;
 }
 
-FXMap<FXString, FXString>
+FXHashMap<FXString, FXString>
 FXFaceSFNTNames::localizedFamilyNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY});
 }
 
-FXMap<FXString, FXString>
+FXHashMap<FXString, FXString>
 FXFaceSFNTNames::localizedStyleNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY});
 }
 
-FXMap<FXString, FXString>
+FXHashMap<FXString, FXString>
 FXFaceSFNTNames::localizedPostscriptNames() const {
     return findSFNTNames({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME});
 }
@@ -137,9 +137,9 @@ FXFaceSFNTNames::setDefaultPostscriptName(const FXString & name) {
     defaultPostscriptName_ = name;
 }
 
-FXMap<FXString, FXString>
+FXHashMap<FXString, FXString>
 FXFaceSFNTNames::findSFNTNames(const FXVector<int> & nameIds) const {
-    FXMap<FXString, FXString> map;
+    FXHashMap<FXString, FXString> map;
     for (auto itr = cbegin(); itr != cend(); ++ itr) {
         if (itr->value.empty())
             continue;

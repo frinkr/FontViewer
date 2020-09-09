@@ -60,16 +60,16 @@ public:
     void
     setDefaultPostscriptName(const FXString & name);
 
-    FXMap<FXString, FXString>
+    FXHashMap<FXString, FXString>
     localizedFamilyNames() const;
 
-    FXMap<FXString, FXString>
+    FXHashMap<FXString, FXString>
     localizedStyleNames() const;
 
-    FXMap<FXString, FXString>
+    FXHashMap<FXString, FXString>
     localizedPostscriptNames() const;
 
-    FXMap<FXString, FXString>
+    FXHashMap<FXString, FXString>
     findSFNTNames(const FXVector<int> & nameIds) const;
 
     FXString
