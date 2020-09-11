@@ -12,6 +12,19 @@
 #include <QDebug>
 
 namespace {
+
+    QString toQString2(FXEastAsianWidth ea) {
+        switch(ea) {
+        default:
+        case FXEastAsianWidth::neutral: return "neutral";
+        case FXEastAsianWidth::ambiguous: return "ambiguous";
+        case FXEastAsianWidth::halfWidth: return "half width";
+        case FXEastAsianWidth::fullWidth: return "full width";
+        case FXEastAsianWidth::narrow: return "narrow";
+        case FXEastAsianWidth::wide: return "wide";            
+        }
+    }
+    
     QMap<QString, QVariant>
     templateValues(const FXGlyph & glyph) {
         const FXChar c = glyph.character.value;
@@ -42,6 +55,7 @@ namespace {
         map["UNICODE_SCRIPT"] = isDefined? toQString(FXUnicode::script(c)) : QString();
         map["UNICODE_AGE"] = isDefined? toQString(FXUnicode::age(c)) : QString();
         map["UNICODE_GENERAL_CATEGORY"] = isDefined? toQString(FXUnicode::category(c).fullName): QString();
+        map["UNICODE_EAST_ASIAN_WIDTH"] = isDefined? toQString2(FXUnicode::eastAsianWidth(c)): QString();
 
         QStringList decompositionLinks;
         for (FXChar d : FXUnicode::decomposition(c)) {

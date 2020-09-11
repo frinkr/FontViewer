@@ -24,7 +24,7 @@ enum class FXEastAsianWidth {
     halfWidth,
     fullWidth,
     narrow,
-    width
+    wide
 };
 
 extern FXUCDBlock FXUCDInvalidBlock;
