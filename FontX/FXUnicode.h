@@ -18,6 +18,15 @@ struct FXCharCategory {
     FXString   fullName;
 };
 
+enum class FXEastAsianWidth {
+    neutral,
+    ambiguous,
+    halfWidth,
+    fullWidth,
+    narrow,
+    width
+};
+
 extern FXUCDBlock FXUCDInvalidBlock;
 
 class FXUCD {
@@ -76,6 +85,9 @@ public:
     static FXVector<FXChar>
     decomposition(FXChar c, bool nfkd = false);
 
+    static FXEastAsianWidth
+    eastAsianWidth(FXChar c);
+    
     static FXVector<uint8_t>
     utf8(FXChar c);
 

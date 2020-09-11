@@ -244,6 +244,11 @@ FXUnicode::category(FXChar c) {
     return dummy;
 }
 
+FXEastAsianWidth
+FXUnicode::eastAsianWidth(FXChar c) {
+    return (FXEastAsianWidth)u_getIntPropertyValue(c, UCHAR_EAST_ASIAN_WIDTH);
+}
+
 FXVector<FXChar>
 FXUnicode::decomposition(FXChar c, bool nfkd) {
     UErrorCode error = U_ZERO_ERROR;
