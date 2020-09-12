@@ -194,13 +194,6 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 
 void
 QXDocumentWindowManager::doOpenFontDialog() {
-#if 0
-    QXFontListDialog browser(nullptr);
-    if (QDialog::Accepted == browser.exec()) {
-        const QXFontURI fontURI = browser.selectedFont();
-        openFontURI(fontURI);
-    }
-#else
     if (!openFontDialog_) {
         openFontDialog_ = new QXFontListDialog(nullptr);
 #if !defined(Q_OS_MAC)
@@ -223,7 +216,6 @@ QXDocumentWindowManager::doOpenFontDialog() {
             openFontURI(fontURI);
         }
     });
-#endif
 }
 
 void
@@ -260,11 +252,10 @@ QXDocumentWindowManager::onDocumentWindowAboutToClose(QXDocumentWindow * window)
 void
 QXDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
     Q_UNUSED(obj);
-#ifdef Q_OS_MAC
+
     // show Open Font dialog if no document open
     if (!appIsAboutToQuit_ && documents_.empty())
-        doOpenFontDialog();
-#endif    
+        doOpenFontDialog();  
 }
 
 void
