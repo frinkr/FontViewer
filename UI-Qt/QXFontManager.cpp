@@ -1,7 +1,7 @@
+
 #if UIQT_USE_FONTCONFIG
 #  include <fontconfig/fontconfig.h>
 #endif
-
 
 #include <QDir>
 #include <QLabel>
@@ -14,6 +14,10 @@
 #include "QXConv.h"
 #include "QXFontManager.h"
 #include "QXPreferences.h"
+
+#if defined(Q_OS_WIN)
+#include <Shlobj.h>
+#endif
 
 namespace {
     QStringList _systemFontFolders() {
@@ -29,12 +33,26 @@ namespace {
         return ret;
 #else
         QStringList folders = QStandardPaths::standardLocations(QStandardPaths::FontsLocation);
+
+        QStringList alterFolders;
 #if defined(Q_OS_MAC)
-        if (!folders.contains("/System/Library/Assets") && !folders.contains("/System/Library/Assets/"))
-            folders << "/System/Library/Assets";
+        alterFolders << "/System/Library/Assets";
+#elif defined(Q_OS_WIN)
+        wchar_t localAppData[MAX_PATH];
+        SHGetSpecialFolderPathW(0, localAppData, CSIDL_LOCAL_APPDATA, FALSE);
+
+        auto fonts = pathJoin(QString::fromWCharArray(localAppData), "Microsoft", "Windows", "Fonts");
+        if (QDir dir(fonts); dir.exists())
+            alterFolders << fonts;
+            
 #endif
+#endif
+
+        for(auto & folder: alterFolders) {
+            if (!folders.contains(folder))
+                folders << folder;
+        }
         return folders;
-#endif
     }
 }
 
