@@ -18,13 +18,15 @@ public:
         , height(0)
         , pitch(0)
         , buffer(nullptr)
-        , ref(0){}
+        , ref(0)
+        , properties(new FXDict){}
 
     FXPixmap(PosType w, PosType h)
         : width(w)
         , height(h)
         , buffer(nullptr)
         , ref(nullptr)
+        , properties(new FXDict)
     {
         pitch = width * sizeof(ColorType);
 
@@ -40,6 +42,7 @@ public:
         , pitch(other.pitch)
         , buffer(other.buffer)
         , ref(other.ref)
+        , properties(other.properties)
     {
         if (ref)
             ++ *ref;
@@ -51,6 +54,7 @@ public:
         , pitch(other.pitch)
         , buffer(other.buffer)
         , ref(other.ref)
+        , properties(std::move(other.properties))
     {
         other.ref = nullptr;
         other.buffer = nullptr;
@@ -84,6 +88,7 @@ public:
         std::swap(pitch, other.pitch);
         std::swap(ref, other.ref);
         std::swap(buffer, other.buffer);
+        std::swap(properties, other.properties);
         return *this;
     }
     
@@ -129,11 +134,11 @@ public:
     }
         
 public:
-    PosType     width {};
-    PosType     height {};
-    PosType     pitch {};
-    ColorType * buffer {};
-
+    PosType         width {};
+    PosType         height {};
+    PosType         pitch {};
+    ColorType    *  buffer {};
+    FXPtr<FXDict>   properties {};
 protected:
     size_t  * ref {};
 };

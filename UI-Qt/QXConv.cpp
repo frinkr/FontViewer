@@ -1,6 +1,7 @@
 #include <QDateTime>
 #include <QPainter>
 
+#include "QXApplication.h"
 #include "QXConv.h"
 #include "FontX/FXFace.h"
 #include "FontX/FXUnicode.h"
@@ -22,17 +23,7 @@ toStdString(const QString & str) {
 }
 
 QImage
-toQImage(const FXPixmapARGB & bm) {
-#ifdef QX_IMAGE_NO_OPTIMIZE
-    QImage image(bm.width, bm.height, QImage::Format_ARGB32);
-    image.setDevicePixelRatio(2);
-    for (int y = 0; y < bm.height; ++ y) {
-        for (int x = 0; x < bm.width; ++ x) {
-            FXARGB color = bm.pixel(x, y);
-            image.setPixel(x, y, color);
-        }
-    }
-#else
+toQImage(const FXPixmapARGB & bm, bool copy) {
     FXPixmapARGB * ref = new FXPixmapARGB(bm); // make a new ref
     QImage image(reinterpret_cast<uchar*>(bm.buffer),
                  bm.width,
@@ -40,12 +31,11 @@ toQImage(const FXPixmapARGB & bm) {
                  QImage::Format_ARGB32,
                  &deleteFXPixmap<FXPixmapARGB>,
                  ref);
-#endif
-    return image;
+    return copy? image.copy() : image; 
 }
 
 QImage
-toQImage(const FXPixmapGray & bm) {
+toQImage(const FXPixmapGray & bm, bool copy) {
     FXPixmapGray* ref = new FXPixmapGray(bm); // make a new ref
     QImage image(reinterpret_cast<uchar*>(bm.buffer),
         bm.width,
@@ -54,12 +44,55 @@ toQImage(const FXPixmapGray & bm) {
         QImage::Format_Alpha8,
         &deleteFXPixmap<FXPixmapGray>,
         ref);
-    return image;
+    return copy? image.copy(): image;
+}
+
+static FXString bmWhiteForegroundKey = "fg";
+
+FXPixmapARGB
+convertToWhite(const FXPixmapARGB & bm) {
+    if (bm.properties->has(bmWhiteForegroundKey) &&
+        bm.properties->get<bool>(bmWhiteForegroundKey)) {
+        return bm; // is white 
+    }
+
+    // Convert to white by QImage, (without copying the data)
+    QImage image = toQImage(bm, false);
+    image.invertPixels();
+    const_cast<FXPixmapARGB&>(bm).properties->set(bmWhiteForegroundKey, true);
+    return bm;
+}
+
+FXPixmapARGB
+convertToBlack(const FXPixmapARGB & bm) {
+    if (!bm.properties->has(bmWhiteForegroundKey) ||
+        !bm.properties->get<bool>(bmWhiteForegroundKey)) {
+        return bm; // is black
+    }
+
+    // Convert to white by QImage, (without copying the data)
+    QImage image = toQImage(bm, false);
+    image.invertPixels();
+    const_cast<FXPixmapARGB&>(bm).properties->set(bmWhiteForegroundKey, false);
+    return bm;
+}
+
+FXGlyphImage
+autoColorGlyphImage(const FXGlyphImage & img, bool selected) {
+    if (img.empty())
+        return img;
+
+    auto gi = img;
+    if (gi.mode != FXGlyphImage::kColor && (selected || qApp->darkMode()))
+        gi.pixmap = convertToWhite(gi.pixmap);
+    else
+        gi.pixmap = convertToBlack(gi.pixmap);
+    return gi;
 }
 
 QImage
-toQImage(const FXGlyphImage & im) {
-    return toQImage(im.pixmap);
+toQImage(const FXGlyphImage & im, bool copy) {
+    return toQImage(im.pixmap, copy);
 }
 
 QSize
@@ -70,7 +103,7 @@ glyphEmSize() {
 
 QImage
 drawGlyphImage(const FXGlyphImage & img, const QSize & emSize) {
-    QImage image = toQImage(img);
+    QImage image = toQImage(img, true);
 
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());

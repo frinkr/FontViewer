@@ -98,10 +98,8 @@ QXGlyphInfoWidget::loadGlyph() {
     
     FXGlyph glyph = document_->face()->glyph(char_);
     
-    FXGlyphImage bm = glyph.glyphImage();
+    FXGlyphImage bm = autoColorGlyphImage(glyph.glyphImage(), false);
     QImage image = drawGlyphImage(bm, glyphEmSize());
-    if (bm.mode != FXGlyphImage::kColor && qApp->darkMode())
-        image.invertPixels();
     
     QTextDocument * qdoc = new QTextDocument;
     qdoc->addResource(QTextDocument::ImageResource,

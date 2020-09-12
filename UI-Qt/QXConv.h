@@ -14,13 +14,22 @@ std::string
 toStdString(const QString & str);
 
 QImage
-toQImage(const FXPixmapARGB & bm);
+toQImage(const FXPixmapARGB & bm, bool copy);
 
 QImage
-toQImage(const FXPixmapGray & bm);
+toQImage(const FXPixmapGray & bm, bool copy);
 
 QImage
-toQImage(const FXGlyphImage & im);
+toQImage(const FXGlyphImage & im, bool copy);
+
+FXPixmapARGB
+convertToWhite(const FXPixmapARGB & bm);
+
+FXPixmapARGB
+convertToBlack(const FXPixmapARGB & bm);
+
+FXGlyphImage
+autoColorGlyphImage(const FXGlyphImage & img, bool selected);
 
 QSize
 glyphEmSize();

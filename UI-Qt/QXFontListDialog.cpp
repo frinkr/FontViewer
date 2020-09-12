@@ -170,7 +170,7 @@ namespace {
 
                     FXVec2d<int> bmOffset;
                     double bmScale = face->bmScale();
-                    FXGlyphImage bm = face->glyphImage(g.gid);
+                    FXGlyphImage bm = autoColorGlyphImage(face->glyphImage(g.gid), selected);
                     qreal scaledBmHeight = sampleFontScale * bm.height() * bmScale;
                     qreal scaledBmWidth = sampleFontScale * bm.width() * bmScale;
                     if (!face->isScalable()) {
@@ -185,11 +185,9 @@ namespace {
                     }
 
                     if (!bm.empty()) {
-                        auto img = toQImage(bm);
+                        auto img = toQImage(bm, true);
                         img = img.scaledToWidth(scaledBmWidth * qApp->devicePixelRatio(),
                                                 face->isScalable()? Qt::SmoothTransformation: Qt::FastTransformation);
-                        if (bm.mode != FXGlyphImage::kColor && (selected || qApp->darkMode()))
-                            img.invertPixels();
 
                         const qreal left   = pen.x() + bm.offset.x * sampleFontScale;
                         const qreal bottom = pen.y() - bm.offset.y * sampleFontScale;
