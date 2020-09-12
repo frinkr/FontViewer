@@ -44,11 +44,8 @@ namespace {
             
             // image
             if (true) {
-                QSize emSize = glyphEmSize();
-                QRect emRect(0, 0, emSize.width(), emSize.height());
-                
                 FXGlyphImage bm = autoColorGlyphImage(g.glyphImage(), option.selected);
-                QImage image = drawGlyphImage(bm, emSize);
+                QImage image = drawGlyphImageInEmBox(bm);
                 QPixmap pixmap = QPixmap::fromImage(image);
                 QRect imageRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);
                 painter->drawImage(imageRect, image, QRectF(0, 0, image.width(), image.height()));

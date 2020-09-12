@@ -102,8 +102,9 @@ glyphEmSize() {
 }
 
 QImage
-drawGlyphImage(const FXGlyphImage & img, const QSize & emSize) {
-    QImage image = toQImage(img, true);
+drawGlyphImageInEmBox(const FXGlyphImage & gi) {
+    QSize emSize(gi.emSize.x, gi.emSize.y);
+    QImage image = toQImage(gi, false);
 
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());
@@ -115,10 +116,10 @@ drawGlyphImage(const FXGlyphImage & img, const QSize & emSize) {
         return out;
     
     QPainter p(&out);
-    if (img.isSmoothScalable())
+    if (gi.isSmoothScalable())
         p.setRenderHints(QPainter::SmoothPixmapTransform | QPainter::Antialiasing);
 
-    const double r = img.isSmoothScalable()? 0.8: 0.618;
+    const double r = gi.isSmoothScalable()? 0.8: 0.618;
     double wr, hr;
     if (image.width() > image.height()) {
         wr = r;
@@ -133,7 +134,7 @@ drawGlyphImage(const FXGlyphImage & img, const QSize & emSize) {
                   (1 - hr) / 2 * emSize.height(),
                   emSize.width() * wr,
                   emSize.height() * hr);
-    if (img.isSmoothScalable()) {
+    if (gi.isSmoothScalable()) {
         // if the image is too small to full-fill outRect, let's keep the orignal size
         if ((outRect.width() > imageRect.width()) && (outRect.height() > imageRect.height()))
             outRect = QRect((emSize.width() - imageRect.width()) / 2,
@@ -180,12 +181,4 @@ ftDateTimeToString(int64_t value) {
     static QDateTime epoch(QDate(1904, 01, 01), QTime(0, 0, 0), Qt::UTC);
 
     return epoch.addSecs(value).toString("yyyy-MM-dd HH:mm:ss t");
-}
-
-bool
-needInvertImage(const QImage & img, bool selected, bool darkMode) {
-    if (img.format() == QImage::Format_ARGB32)
-        return false;
-
-    return selected || darkMode;
 }

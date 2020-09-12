@@ -40,7 +40,7 @@ struct FXGlyphImage {
     FXPixmapARGB     pixmap {};
     Mode             mode {kGrayscale};
     FXVec2d<int>     offset {};
-
+    FXVec2d<int>     emSize {};
     
     bool empty() const {
         return pixmap.empty();

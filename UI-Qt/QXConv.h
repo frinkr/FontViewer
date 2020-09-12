@@ -42,17 +42,11 @@ convertToBlack(const FXPixmapARGB & bm);
 FXGlyphImage
 autoColorGlyphImage(const FXGlyphImage & img, bool selected);
 
-QSize
-glyphEmSize();
-
 QImage
-drawGlyphImage(const FXGlyphImage & img, const QSize & emSize);
+drawGlyphImageInEmBox(const FXGlyphImage & img);
 
 QImage
 unicodeCharImage(FXChar c, const QSize & emSize);
 
 QString
 ftDateTimeToString(int64_t value);
-
-bool
-needInvertImage(const QImage & img, bool selected, bool darkMode);
