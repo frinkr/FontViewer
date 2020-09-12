@@ -53,7 +53,7 @@ struct FXSFNTName {
     FXString           value;
 };
 
-class FXFaceSFNTNames : public FXVector<FXSFNTName> {
+class FXFaceNames{
 public:
     const FXString &
     familyName() const;
@@ -96,11 +96,20 @@ public:
 
     template<class Archive>
     void serialize(Archive & ar, const unsigned int version) {
-        FXVector<FXSFNTName> & vec = *this;
-        ar & vec;
+        ar & sfntNames_;
         ar & defaultFamilyName_;
         ar & defaultStyleName_;
         ar & defaultPostscriptName_;
+    }
+
+    FXVector<FXSFNTName> &
+    sfntNames() {
+        return sfntNames_;
+    }
+
+    const FXVector<FXSFNTName> &
+    sfntNames() const {
+        return sfntNames_;
     }
 protected:
     FXString
@@ -111,11 +120,15 @@ protected:
     mutable FXString     familyName_;
     mutable FXString     styleName_;
     mutable FXString     postscriptName_;
-    FXString     defaultFamilyName_;
-    FXString     defaultStyleName_;
-    FXString     defaultPostscriptName_;
+    FXString             defaultFamilyName_;
+    FXString             defaultStyleName_;
+    FXString             defaultPostscriptName_;
+    FXVector<FXSFNTName> sfntNames_;
     
 };
+
+
+
 
 struct FXFaceFormatConstant {
     static const FXString TrueType;
@@ -130,7 +143,7 @@ struct FXFaceAttributes {
     size_t           upem { 0 };
     FXString         format;
     size_t           glyphCount { 0 };
-    FXFaceSFNTNames  sfntNames;
+    FXFaceNames  names;
     fu               ascender {};
     fu               descender {};
     FXRect<fu>       bbox;

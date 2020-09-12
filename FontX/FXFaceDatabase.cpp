@@ -18,7 +18,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 12;
+    constexpr int FACE_DB_VERSION = 14;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {
@@ -57,7 +57,7 @@ namespace cereal  {
         ar & sfnt.nameId;
         ar & sfnt.value;
     }
-        
+
     template <class Archive>
     void
     serialize(Archive & ar, FXFaceDescriptor & desc) {
@@ -72,7 +72,7 @@ namespace cereal  {
         ar & atts.upem;
         ar & atts.format;
         ar & atts.glyphCount;
-        ar & static_cast<FXVector<FXSFNTName>&>(atts.sfntNames);
+        ar & atts.names;
         ar & atts.ascender;
         ar & atts.descender;
         ar & atts.haveUnicodeCMap;
@@ -149,9 +149,9 @@ FXOpt<size_t>
 FXFaceDatabase::findIndex(const FXString & psName) const {
     for (size_t i = 0; i < faces_.size(); ++ i) {
         auto & f =  faces_[i];
-        if (f.atts.sfntNames.postscriptName() == psName)
+        if (f.atts.names.postscriptName() == psName)
             return i;
-        for (auto [lang, name]: f.atts.sfntNames.localizedPostscriptNames()) {
+        for (auto [lang, name]: f.atts.names.localizedPostscriptNames()) {
             if (name == psName)
                 return i;
         }

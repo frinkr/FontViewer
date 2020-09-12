@@ -28,7 +28,7 @@ namespace {
             allFiles.insert(desc.filePath);
 
             formats[atts.format].insert(desc.filePath);
-            duplicates[atts.sfntNames.postscriptName()].insert(desc);
+            duplicates[atts.names.postscriptName()].insert(desc);
         }
 
         FontDbStats stats;

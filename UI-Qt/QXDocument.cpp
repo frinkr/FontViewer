@@ -93,13 +93,13 @@ QXDocument::faceDisplayName(const FXPtr<FXFace> & face, const FXFaceLanguage & l
 
 QString
 QXDocument::faceDisplayName(const FXFaceAttributes & atts, const FXFaceLanguage & language) {
-    QString familyName = toQString(atts.sfntNames.localizedFamilyNames()[language]);
-    QString styleName = toQString(atts.sfntNames.localizedStyleNames()[language]);
+    QString familyName = toQString(atts.names.localizedFamilyNames()[language]);
+    QString styleName = toQString(atts.names.localizedStyleNames()[language]);
 
     if (familyName.isEmpty())
-        familyName = toQString(atts.sfntNames.familyName());
+        familyName = toQString(atts.names.familyName());
     if (styleName.isEmpty())
-        styleName = toQString(atts.sfntNames.styleName());
+        styleName = toQString(atts.names.styleName());
     
     if (familyName.isEmpty() && language != FXFaceLanguages::en)
         return faceDisplayName(atts, FXFaceLanguages::en);
@@ -109,7 +109,7 @@ QXDocument::faceDisplayName(const FXFaceAttributes & atts, const FXFaceLanguage 
             return familyName;
         return QString("%1 - %2").arg(familyName, styleName);
     }
-    if (auto name = atts.sfntNames.postscriptName(); !name.empty())
+    if (auto name = atts.names.postscriptName(); !name.empty())
         return toQString(name);
 
     return QFileInfo(toQString(atts.desc.filePath)).baseName();

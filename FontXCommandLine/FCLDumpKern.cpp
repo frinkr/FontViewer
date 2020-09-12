@@ -18,10 +18,10 @@ namespace {
             for (size_t i = 0; i < db->faceCount(); ++ i) {
                 auto & desc = db->faceDescriptor(i);
                 auto & atts = db->faceAttributes(i);
-                if (loadedFamilies.count(atts.sfntNames.familyName()))
+                if (loadedFamilies.count(atts.names.familyName()))
                     continue;
-                loadedFamilies.insert(atts.sfntNames.familyName());
-                FX_INFO(">>>> Dumping kernings of " << atts.sfntNames.postscriptName());
+                loadedFamilies.insert(atts.names.familyName());
+                FX_INFO(">>>> Dumping kernings of " << atts.names.postscriptName());
                 dumpKern(db->createFace(desc));
             }
             

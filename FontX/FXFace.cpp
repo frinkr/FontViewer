@@ -91,7 +91,7 @@ static FXVector<FXFaceLanguage> sSFNTLanguageSearchOrder{
 };
 
 const FXString &
-FXFaceSFNTNames::familyName() const {
+FXFaceNames::familyName() const {
     if (familyName_.empty())
         familyName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY},
                                    sSFNTLanguageSearchOrder,
@@ -100,7 +100,7 @@ FXFaceSFNTNames::familyName() const {
 }
 
 const FXString &
-FXFaceSFNTNames::styleName() const {
+FXFaceNames::styleName() const {
     if (styleName_.empty())
         styleName_ = findSFNTName({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY},
                                   sSFNTLanguageSearchOrder,
@@ -109,7 +109,7 @@ FXFaceSFNTNames::styleName() const {
 }
 
 const FXString &
-FXFaceSFNTNames::postscriptName() const {
+FXFaceNames::postscriptName() const {
     if (postscriptName_.empty())
         postscriptName_ = findSFNTName({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME},
                                        sSFNTLanguageSearchOrder,
@@ -118,44 +118,44 @@ FXFaceSFNTNames::postscriptName() const {
 }
 
 FXHashMap<FXFaceLanguage, FXString>
-FXFaceSFNTNames::localizedFamilyNames() const {
+FXFaceNames::localizedFamilyNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_FAMILY,TT_NAME_ID_FONT_FAMILY, TT_NAME_ID_WWS_FAMILY});
 }
 
 FXHashMap<FXFaceLanguage, FXString>
-FXFaceSFNTNames::localizedStyleNames() const {
+FXFaceNames::localizedStyleNames() const {
     return findSFNTNames({TT_NAME_ID_TYPOGRAPHIC_SUBFAMILY,TT_NAME_ID_FONT_SUBFAMILY, TT_NAME_ID_WWS_SUBFAMILY});
 }
 
 FXHashMap<FXFaceLanguage, FXString>
-FXFaceSFNTNames::localizedPostscriptNames() const {
+FXFaceNames::localizedPostscriptNames() const {
     return findSFNTNames({TT_NAME_ID_PS_NAME, TT_NAME_ID_CID_FINDFONT_NAME});
 }
 
 void
-FXFaceSFNTNames::setDefaultFamilyName(const FXString & name) {
+FXFaceNames::setDefaultFamilyName(const FXString & name) {
     defaultFamilyName_ = name;
 }
 
 void
-FXFaceSFNTNames::setDefaultStyleName(const FXString & name) {
+FXFaceNames::setDefaultStyleName(const FXString & name) {
     defaultStyleName_ = name;
 }
 
 void
-FXFaceSFNTNames::setDefaultPostscriptName(const FXString & name) {
+FXFaceNames::setDefaultPostscriptName(const FXString & name) {
     defaultPostscriptName_ = name;
 }
 
 FXHashMap<FXFaceLanguage, FXString>
-FXFaceSFNTNames::findSFNTNames(const FXVector<int> & nameIds) const {
+FXFaceNames::findSFNTNames(const FXVector<int> & nameIds) const {
     FXHashMap<FXFaceLanguage, FXString> map;
-    for (auto itr = cbegin(); itr != cend(); ++ itr) {
-        if (itr->value.empty())
+    for (auto & sfnt: sfntNames_) {
+        if (sfnt.value.empty())
             continue;
         for (int nameId : nameIds) {
-            if (itr->nameId == nameId) {
-                map[itr->language] = itr->value;
+            if (sfnt.nameId == nameId) {
+                map[sfnt.language] = sfnt.value;
             }
         }
     }
@@ -163,7 +163,7 @@ FXFaceSFNTNames::findSFNTNames(const FXVector<int> & nameIds) const {
 }
 
 FXString
-FXFaceSFNTNames::getSFNTName(int nameId) const {
+FXFaceNames::getSFNTName(int nameId) const {
     auto names = findSFNTNames({nameId});
     auto itr = names.find("en");
     if (itr != names.end())
@@ -174,40 +174,34 @@ FXFaceSFNTNames::getSFNTName(int nameId) const {
 }
 
 FXString
-FXFaceSFNTNames::vendor() const {
+FXFaceNames::vendor() const {
     return getSFNTName(TT_NAME_ID_MANUFACTURER);
 }
 
 FXString
-FXFaceSFNTNames::version() const {
+FXFaceNames::version() const {
     return getSFNTName(TT_NAME_ID_VERSION_STRING);
 }
 
 
 FXString
-FXFaceSFNTNames::findSFNTName(const FXVector<int> & nameIds,
+FXFaceNames::findSFNTName(const FXVector<int> & nameIds,
                           const FXVector<FXFaceLanguage> & languages,
                           const FXString & defaultName) const {
-    auto findName = [&] () {
-        for (auto itr = cbegin(); itr != cend(); ++ itr) {
-            if (itr->value.empty())
-                continue;
-            for (int nameId : nameIds) {
-                if (itr->nameId == nameId) {
-                    for (const FXFaceLanguage & lang: languages) {
-                        if (itr->language == lang)
-                            return itr->value;
-                    }
-                    return itr->value;
+    for (auto & sfnt : sfntNames_) {
+        if (sfnt.value.empty())
+            continue;
+        for (int nameId : nameIds) {
+            if (sfnt.nameId == nameId) {
+                for (const FXFaceLanguage & lang: languages) {
+                    if (sfnt.language == lang)
+                        return sfnt.value;
                 }
+                return sfnt.value;
             }
         }
-        return FXString();
-    };
-    FXString name = findName();
-    if (name.empty())
-        name = defaultName;
-    return name;
+    }
+    return defaultName;
 }
 
 const FXString FXFaceFormatConstant::TrueType{"TrueType"};
@@ -316,7 +310,7 @@ FXFace::index() const {
 
 std::string
 FXFace::postscriptName() const {
-    return atts_.sfntNames.postscriptName();
+    return atts_.names.postscriptName();
 }
 
 size_t
@@ -629,13 +623,13 @@ FXFace::initAttributes() {
     
     // names
     if (face_->family_name)
-        atts_.sfntNames.setDefaultFamilyName(face_->family_name);
+        atts_.names.setDefaultFamilyName(face_->family_name);
     if (face_->style_name)
-        atts_.sfntNames.setDefaultStyleName(face_->style_name);
+        atts_.names.setDefaultStyleName(face_->style_name);
 
     const char * psName = FT_Get_Postscript_Name(face_);
     if (psName)
-        atts_.sfntNames.setDefaultPostscriptName(psName);
+        atts_.names.setDefaultPostscriptName(psName);
     
     if (!atts_.upem && psName) {
         if (!strcmp(psName, "AppleColorEmoji")) atts_.upem = 800;
@@ -655,7 +649,7 @@ FXFace::initAttributes() {
         entry.nameId     = sfnt.name_id;
         entry.value      = FXToString(sfnt.platform_id, sfnt.encoding_id, sfnt.string, sfnt.string_len);
 
-        atts_.sfntNames.push_back(entry);
+        atts_.names.sfntNames().push_back(entry);
     }
 
     // cid
@@ -732,7 +726,7 @@ FXFace::initVariables() {
     for (FT_UInt i = 0; i < var->num_axis; ++ i) {
         const FT_Var_Axis * axis = var->axis + i;
         VariableAxis a;
-        a.name     = atts_.sfntNames.getSFNTName(axis->strid);
+        a.name     = atts_.names.getSFNTName(axis->strid);
         a.index    = i;
         a.tag      = axis->tag;
         a.minValue = axis->minimum;
@@ -750,8 +744,8 @@ FXFace::initVariables() {
         const FT_Var_Named_Style * style = var->namedstyle + i;
         VariableNamedInstance instance;
         instance.index      = i;
-        instance.name       = atts_.sfntNames.getSFNTName(style->strid);
-        instance.psName     = atts_.sfntNames.getSFNTName(style->psid);
+        instance.name       = atts_.names.getSFNTName(style->strid);
+        instance.psName     = atts_.names.getSFNTName(style->psid);
 
         bool isDefault = true;
         for (FT_UInt j = 0; j < var->num_axis; ++ j) {

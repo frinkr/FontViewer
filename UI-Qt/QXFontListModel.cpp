@@ -95,9 +95,9 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
         acceptWithFilter(displayName(row), filter.fontName) ||
         acceptWithFilter(fileName, filter.fontName) ||
         acceptWithFilter(filePath, filter.fontName) ||
-        searchInNames(atts.sfntNames.localizedFamilyNames(), filter.fontName) ||
-        searchInNames(atts.sfntNames.localizedStyleNames(), filter.fontName) ||
-        searchInNames(atts.sfntNames.localizedPostscriptNames(), filter.fontName) 
+        searchInNames(atts.names.localizedFamilyNames(), filter.fontName) ||
+        searchInNames(atts.names.localizedStyleNames(), filter.fontName) ||
+        searchInNames(atts.names.localizedPostscriptNames(), filter.fontName)
         ;
     
     if (!acceptFontName)

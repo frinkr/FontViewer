@@ -27,7 +27,7 @@ namespace {
                         ;//FX_INFO("no sp: " << desc.index << " - " << desc.filePath << ": " << db->faceAttributes(i).sfntNames.postscriptName());
                 }
                 else
-                    FX_INFO("no unicm: " << desc.index << " - " << desc.filePath << ": " << db->faceAttributes(i).sfntNames.postscriptName());
+                    FX_INFO("no unicm: " << desc.index << " - " << desc.filePath << ": " << db->faceAttributes(i).names.postscriptName());
 #elif 0
                 // Find the font which have MacRomon encoding but no Unicode
                 if (!face->currentCMap().isUnicode()) {
