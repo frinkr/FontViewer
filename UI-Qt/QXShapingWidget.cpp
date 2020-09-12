@@ -167,7 +167,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             const double bmScale = face->bmScale();
             
             FXGlyphImage bm = autoColorGlyphImage(face->glyphImage(gid), i == selectedIndex_);
-            QImage img = toQImage(bm, true);
+            QImage img = toQImage(bm);
 
             const int left = penX + bm.offset.x;
             const int bottom = penY - bm.offset.y;

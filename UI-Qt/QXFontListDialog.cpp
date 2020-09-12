@@ -185,7 +185,7 @@ namespace {
                     }
 
                     if (!bm.empty()) {
-                        auto img = toQImage(bm, true);
+                        auto img = toQImage(bm);
                         img = img.scaledToWidth(scaledBmWidth * qApp->devicePixelRatio(),
                                                 face->isScalable()? Qt::SmoothTransformation: Qt::FastTransformation);
 

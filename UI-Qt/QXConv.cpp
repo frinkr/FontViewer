@@ -23,7 +23,7 @@ toStdString(const QString & str) {
 }
 
 QImage
-toQImage(const FXPixmapARGB & bm, bool copy) {
+toQImage(const FXPixmapARGB & bm) {
     FXPixmapARGB * ref = new FXPixmapARGB(bm); // make a new ref
     QImage image(reinterpret_cast<uchar*>(bm.buffer),
                  bm.width,
@@ -31,11 +31,11 @@ toQImage(const FXPixmapARGB & bm, bool copy) {
                  QImage::Format_ARGB32,
                  &deleteFXPixmap<FXPixmapARGB>,
                  ref);
-    return copy? image.copy() : image; 
+    return image; 
 }
 
 QImage
-toQImage(const FXPixmapGray & bm, bool copy) {
+toQImage(const FXPixmapGray & bm) {
     FXPixmapGray* ref = new FXPixmapGray(bm); // make a new ref
     QImage image(reinterpret_cast<uchar*>(bm.buffer),
         bm.width,
@@ -44,7 +44,7 @@ toQImage(const FXPixmapGray & bm, bool copy) {
         QImage::Format_Alpha8,
         &deleteFXPixmap<FXPixmapGray>,
         ref);
-    return copy? image.copy(): image;
+    return image;
 }
 
 static FXString bmWhiteForegroundKey = "fg";
@@ -57,7 +57,7 @@ convertToWhite(const FXPixmapARGB & bm) {
     }
 
     // Convert to white by QImage, (without copying the data)
-    QImage image = toQImage(bm, false);
+    QImage image = toQImage(bm);
     image.invertPixels();
     const_cast<FXPixmapARGB&>(bm).properties->set(bmWhiteForegroundKey, true);
     return bm;
@@ -71,7 +71,7 @@ convertToBlack(const FXPixmapARGB & bm) {
     }
 
     // Convert to white by QImage, (without copying the data)
-    QImage image = toQImage(bm, false);
+    QImage image = toQImage(bm);
     image.invertPixels();
     const_cast<FXPixmapARGB&>(bm).properties->set(bmWhiteForegroundKey, false);
     return bm;
@@ -91,8 +91,8 @@ autoColorGlyphImage(const FXGlyphImage & img, bool selected) {
 }
 
 QImage
-toQImage(const FXGlyphImage & im, bool copy) {
-    return toQImage(im.pixmap, copy);
+toQImage(const FXGlyphImage & im) {
+    return toQImage(im.pixmap);
 }
 
 QSize
@@ -104,7 +104,7 @@ glyphEmSize() {
 QImage
 drawGlyphImageInEmBox(const FXGlyphImage & gi) {
     QSize emSize(gi.emSize.x, gi.emSize.y);
-    QImage image = toQImage(gi, false);
+    QImage image = toQImage(gi);
 
     QRect imageRect(0, 0, image.width(), image.height());
     QRect emRect(0, 0, emSize.width(), emSize.height());

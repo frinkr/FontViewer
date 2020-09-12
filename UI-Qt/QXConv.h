@@ -25,13 +25,13 @@ QString pathJoin(const QString & first, Args... args) {
 }
 
 QImage
-toQImage(const FXPixmapARGB & bm, bool copy);
+toQImage(const FXPixmapARGB & bm);
 
 QImage
-toQImage(const FXPixmapGray & bm, bool copy);
+toQImage(const FXPixmapGray & bm);
 
 QImage
-toQImage(const FXGlyphImage & im, bool copy);
+toQImage(const FXGlyphImage & im);
 
 FXPixmapARGB
 convertToWhite(const FXPixmapARGB & bm);
