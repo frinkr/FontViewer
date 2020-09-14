@@ -5,6 +5,7 @@
 #include "QXConv.h"
 #include "QXHtmlTemplate.h"
 #include "QXEncoding.h"
+#include "QXImageHelpers.h"
 #include "QXResources.h"
 
 #include <QImage>

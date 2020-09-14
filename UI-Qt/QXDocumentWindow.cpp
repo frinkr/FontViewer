@@ -298,6 +298,7 @@ QXDocumentWindow::eventFilter(QObject * watched, QEvent * event) {
         }
         else if (event->type() == QEvent::DragEnter) {
             auto ev = static_cast<QDragEnterEvent *>(event);
+
             if (ev->mimeData()->hasUrls())
                 ev->acceptProposedAction();
             return true;

@@ -45,9 +45,9 @@ template <> struct QXHtmlTableTemplateStringTraits<bool> {
     }
 };
 
-template <> struct QXHtmlTableTemplateStringTraits<FXString> {
+template <> struct QXHtmlTableTemplateStringTraits<std::string> {
     static QString
-    toQString(const FXString & value) {
+    toQString(const std::string & value) {
         return ::toQString(value);
     }
 };

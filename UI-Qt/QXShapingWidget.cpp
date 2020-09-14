@@ -13,6 +13,7 @@
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
 #include "QXEncoding.h"
+#include "QXImageHelpers.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
 #include "QXShapingOptionsWidget.h"

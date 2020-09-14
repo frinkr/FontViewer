@@ -13,6 +13,7 @@
 #include "QXEncoding.h"
 #include "QXDocument.h"
 #include "QXGlyphTableWidget.h"
+#include "QXImageHelpers.h"
 #include "QXSearchEngine.h"
 #include "ui_QXGlyphTableWidget.h"
 

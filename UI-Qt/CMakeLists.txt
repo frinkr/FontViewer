@@ -95,6 +95,8 @@ set(SHARED_SOURCES
   QXIconButton.h
   QXIconEngine.cpp
   QXIconEngine.h
+  QXImageHelpers.h
+  QXImageHelpers.cpp
   QXMain.cpp
   QXMain.h
   QXMenuBar.cpp

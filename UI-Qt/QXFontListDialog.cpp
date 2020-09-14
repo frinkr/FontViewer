@@ -18,6 +18,7 @@
 #include "QXFontManager.h"
 #include "QXHtmlTemplate.h"
 #include "QXPopoverWindow.h"
+#include "QXImageHelpers.h"
 #include "QXResources.h"
 #include "ui_QXFontListDialog.h"
 
