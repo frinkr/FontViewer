@@ -49,11 +49,9 @@ namespace {
                 QImage image = toQImage(glyphImage);
 
                 const QRect emRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);
-                double scale = emRect.width() * 1.0 / glyphImage.emSize.x * 0.8;
                 
-                const QRect targetRect = QRect(QPoint(option.rect.left() + (emRect.width() - image.width() * scale * g.face->bmScale()) / 2,
-                                                      option.rect.top() + (glyphImage.emSize.y - glyphImage.offset.y * g.face->bmScale() - glyphImage.height() * g.face->bmScale()) * scale),
-                                               image.size() * scale * g.face->bmScale());
+                const QRect targetRect = calculateTargetRect(glyphImage, emRect);
+
                 painter->drawImage(targetRect, image, QRectF(0, 0, image.width(), image.height()));
             }
             

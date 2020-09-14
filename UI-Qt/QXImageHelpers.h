@@ -30,3 +30,5 @@ drawGlyphImageInEmBox(const FXGlyphImage & img);
 QImage
 unicodeCharImage(FXChar c, const QSize & emSize);
 
+QRect
+calculateTargetRect(const FXGlyphImage & glyphImage, const QRect & emRect);

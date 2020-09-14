@@ -518,6 +518,7 @@ FXFace::glyphImage(FXGlyphID gid) {
     image.offset.x = face_->glyph->bitmap_left;
     image.offset.y = face_->glyph->bitmap_top - face_->glyph->bitmap.rows;
     image.emSize   = FXVec2d<int>{ int(pt2px(fontSize_)), int(pt2px(fontSize_)) };
+    image.scale    = bmScale_;
     
     if (fontSize_ == FXDefaultFontSize)
         glyphImageCache_->put(gid, image);

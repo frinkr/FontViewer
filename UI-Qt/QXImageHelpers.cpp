@@ -70,7 +70,7 @@ convertToBlack(const FXPixmapARGB & bm) {
 
 FXGlyphImage
 autoColorGlyphImage(const FXGlyphImage & img, bool selected) {
-    if (img.empty())
+    if (img.pixmap.empty())
         return img;
 
     auto gi = img;
@@ -165,4 +165,16 @@ unicodeCharImage(FXChar c, const QSize & emSize) {
     else {
         return QImage(":images/undefined_d.png");
     }
+}
+
+
+
+QRect
+calculateTargetRect(const FXGlyphImage & glyphImage, const QRect & emRect) {
+    const double scale = emRect.width() * 1.0 / glyphImage.emSize.x * 0.8;
+    const QSize imageSize(glyphImage.pixmap.width, glyphImage.pixmap.height);
+    
+    return QRect(QPoint(emRect.left() + (emRect.width() - imageSize.width() * scale * glyphImage.scale) / 2,
+                        emRect.top() + (glyphImage.emSize.y - glyphImage.offset.y * glyphImage.scale - imageSize.height() * glyphImage.scale) * scale),
+                 imageSize * scale * glyphImage.scale);
 }

@@ -165,19 +165,18 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             const FXVec2d<fu> adv = shaper_->advance(i);
             const FXVec2d<fu> off = shaper_->offset(i);
 
-            const double bmScale = face->bmScale();
-            
-            FXGlyphImage bm = autoColorGlyphImage(face->glyphImage(gid), i == selectedIndex_);
-            QImage img = toQImage(bm);
+          
+            FXGlyphImage gi = autoColorGlyphImage(face->glyphImage(gid), i == selectedIndex_);
+            QImage img = toQImage(gi);
 
-            const int left = penX + bm.offset.x;
-            const int bottom = penY - bm.offset.y;
-            const int right = left + bm.width() * bmScale + fu2px(off.x);
-            const int top = bottom - bm.height() * bmScale - fu2px(off.y);
+            const int left = penX + gi.offset.x * gi.scale;
+            const int bottom = penY - gi.offset.y * gi.scale;
+            const int right = left + gi.pixmap.width * gi.scale + fu2px(off.x);
+            const int top = bottom - gi.pixmap.height * gi.scale - fu2px(off.y);
 
             painter.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                         img,
-                        QRect(0, 0, bm.width(), bm.height()),
+                        QRect(0, 0, gi.pixmap.width, gi.pixmap.height),
                         Qt::AutoColor
                 );
             

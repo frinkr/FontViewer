@@ -171,9 +171,9 @@ namespace {
 
                     FXVec2d<int> bmOffset;
                     double bmScale = face->bmScale();
-                    FXGlyphImage bm = autoColorGlyphImage(face->glyphImage(g.gid), selected);
-                    qreal scaledBmHeight = sampleFontScale * bm.height() * bmScale;
-                    qreal scaledBmWidth = sampleFontScale * bm.width() * bmScale;
+                    FXGlyphImage gi = autoColorGlyphImage(face->glyphImage(g.gid), selected);
+                    qreal scaledBmHeight = sampleFontScale * gi.pixmap.height * bmScale;
+                    qreal scaledBmWidth = sampleFontScale * gi.pixmap.width * bmScale;
                     if (!face->isScalable()) {
                         if (scaledBmHeight >= 0.95 * sampleFontSizePx) {
                             qreal heightFittingScale = 0.95 * sampleFontSizePx / scaledBmHeight;
@@ -185,15 +185,15 @@ namespace {
                         pen.setY(option.rect.top() + fontTypeIconSize + (sampleFontSizePx + scaledBmHeight) / 2);
                     }
 
-                    if (!bm.empty()) {
-                        auto img = toQImage(bm);
+                    if (!gi.pixmap.empty()) {
+                        auto img = toQImage(gi);
                         img = img.scaledToWidth(scaledBmWidth * qApp->devicePixelRatio(),
                                                 face->isScalable()? Qt::SmoothTransformation: Qt::FastTransformation);
 
-                        const qreal left   = pen.x() + bm.offset.x * sampleFontScale;
-                        const qreal bottom = pen.y() - bm.offset.y * sampleFontScale;
-                        const qreal right  = left + bm.width() * bmScale * sampleFontScale;
-                        const qreal top    = bottom - bm.height() * bmScale * sampleFontScale;
+                        const qreal left   = pen.x() + gi.offset.x * sampleFontScale;
+                        const qreal bottom = pen.y() - gi.offset.y * sampleFontScale;
+                        const qreal right  = left + gi.pixmap.width * bmScale * sampleFontScale;
+                        const qreal top    = bottom - gi.pixmap.height * bmScale * sampleFontScale;
 
                         painter->drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                                            img);

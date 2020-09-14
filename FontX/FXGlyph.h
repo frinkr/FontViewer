@@ -39,21 +39,17 @@ struct FXGlyphImage {
 
     FXPixmapARGB     pixmap {};
     Mode             mode {kGrayscale};
+
+    // Left bottom offset to draw the image in an EM square
     FXVec2d<int>     offset {};
+    
+    // The bitmap scale related to emSize.
+    // pixmap and offset should be scaled to be painted correctly
+    double           scale {1};
+
+    // The EM square
     FXVec2d<int>     emSize {};
     
-    bool empty() const {
-        return pixmap.empty();
-    }
-
-    int width() const {
-        return pixmap.width;
-    }
-
-    int height() const {
-        return pixmap.height;
-    }
-
     bool isSmoothScalable() const {
         return mode != kMono;
     }
