@@ -1,6 +1,9 @@
 #pragma once
 
 #include <QWidget>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+
 #include "FontX/FXGlyph.h"
 class QXOutlineWidget : public QWidget
 {
@@ -23,7 +26,14 @@ public:
     setOutline(const FXGlyphOutline & outline);
 
 private:
+    void
+        buildScene();
+
+private:
     FXGlyphOutline outline_ {};
+
+    QGraphicsView * view_{};
+    QGraphicsScene* scene_{};
 };
 
 
