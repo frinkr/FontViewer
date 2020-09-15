@@ -5,6 +5,7 @@
 #include <QDropEvent>
 #include <QFileIconProvider>
 #include <QFileInfo>
+#include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QMimeData>
@@ -25,12 +26,13 @@
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphTableWidget.h"
 #include "QXMenuBar.h"
+#include "QXOutLineWidget.h"
 #include "QXPopoverWindow.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
 #include "QXTheme.h"
-#include "QXVariableWidget.h"
 #include "QXToastMessage.h"
+#include "QXVariableWidget.h"
 
 #if defined(Q_OS_MAC)
 #  include "MacHelper.h"
@@ -238,9 +240,11 @@ QXDocumentWindow::initCollectionView() {
     ui_->glyphCollectionView->setAcceptDrops(true);
 
     connect(ui_->glyphCollectionView, &QXCollectionView::clicked, 
-        this, &QXDocumentWindow::onGlyphClicked);
+            this, &QXDocumentWindow::onGlyphClicked);
+    connect(ui_->glyphCollectionView, &QXCollectionView::rightClicked,
+            this, &QXDocumentWindow::onGlyphRightClicked);
     connect(ui_->glyphCollectionView, &QXCollectionView::doubleClicked,
-        this, &QXDocumentWindow::onGlyphDoubleClicked);
+            this, &QXDocumentWindow::onGlyphDoubleClicked);
 }
 
 void
@@ -339,6 +343,22 @@ QXDocumentWindow::onGlyphClicked(const QXCollectionModelIndex & index) {
         ui_->statusBar->showMessage(message);
     }
 }
+
+void
+QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
+    FXGChar c = document_->charAt(index);
+    FXGlyph g = document_->face()->glyph(c);
+    if (auto outline = document_->face()->glyphOutline(g.gid)) {
+        QDialog olv(this);
+        QHBoxLayout * layout = new QHBoxLayout(&olv);
+        QXOutlineWidget * widget = new QXOutlineWidget(&olv);
+        widget->setOutline(*outline);
+        layout->addWidget(widget);
+
+        olv.exec();
+    }
+}
+    
 
 void
 QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {

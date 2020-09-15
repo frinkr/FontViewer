@@ -101,6 +101,8 @@ set(SHARED_SOURCES
   QXMain.h
   QXMenuBar.cpp
   QXMenuBar.h
+  QXOutlineWidget.h
+  QXOutLineWidget.cpp
   QXPopoverWindow.cpp
   QXPopoverWindow.h
   QXPreferences.cpp

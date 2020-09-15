@@ -98,6 +98,9 @@ private slots:
     onGlyphClicked(const QXCollectionModelIndex & index);
 
     void
+    onGlyphRightClicked(const QXCollectionModelIndex & index);
+    
+    void
     onGlyphDoubleClicked(const QXCollectionModelIndex & index);
 
     void

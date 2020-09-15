@@ -70,6 +70,9 @@ signals:
     clicked(const QXCollectionModelIndex & index);
 
     void
+    rightClicked(const QXCollectionModelIndex& index);
+
+    void
     doubleClicked(const QXCollectionModelIndex & index);
 
 private:
@@ -204,6 +207,9 @@ public:
 signals:
     void
     clicked(const QXCollectionModelIndex & index);
+
+    void
+    rightClicked(const QXCollectionModelIndex& index);
 
     void
     doubleClicked(const QXCollectionModelIndex & index);

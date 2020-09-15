@@ -320,7 +320,11 @@ QXCollectionViewContentWidget::drawHeader(QPainter * painter, const QXCollection
 void
 QXCollectionViewContentWidget::mousePressEvent(QMouseEvent * event) {
     select(itemAt(event->pos()));
-    emit clicked(selected_);
+
+    if (event->button() == Qt::RightButton)
+        emit rightClicked(selected_);
+    else
+        emit clicked(selected_);
 }
 
 void
@@ -348,6 +352,9 @@ QXCollectionView::QXCollectionView(QWidget *parent)
     
     connect(widget_, &QXCollectionViewContentWidget::clicked,
             this, &QXCollectionView::clicked);
+
+    connect(widget_, &QXCollectionViewContentWidget::rightClicked,
+        this, &QXCollectionView::rightClicked);
 
     connect(widget_, &QXCollectionViewContentWidget::doubleClicked,
             this, &QXCollectionView::doubleClicked);

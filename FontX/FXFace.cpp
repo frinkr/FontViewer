@@ -525,6 +525,167 @@ FXFace::glyphImage(FXGlyphID gid) {
     return image;
 }
 
+namespace FXGlyphOutlineDecomposer {
+
+
+    int
+    FT_Outline_MoveToFunc(const FT_Vector* to,
+                          void* user) {
+        FXGlyphOutline & ol = *(FXGlyphOutline*)user;
+        FXGlyphOutline::Contour cnt{};
+        FXGlyphOutline::Point p;
+        p.on = true;
+        p.pos.x = to->x;
+        p.pos.y = to->y;
+
+        cnt.points.push_back(p);
+
+        ol.contours.push_back(cnt);
+        return 0;
+    }
+
+    int
+    FT_Outline_LineToFunc(const FT_Vector* to,
+                          void* user) {
+        FXGlyphOutline & ol = *(FXGlyphOutline*)user;
+
+        if (ol.contours.empty() || ol.contours.back().points.empty())
+            return -1;
+
+        FXGlyphOutline::Point p;
+        p.on = true;
+        p.pos.x = to->x;
+        p.pos.y = to->y;
+
+        ol.contours.back().points.push_back(p);
+
+        return 0;
+    }
+
+    int
+    FT_Outline_ConicToFunc(const FT_Vector* control,
+                           const FT_Vector* to,
+                           void* user) {
+        FXGlyphOutline & ol = *(FXGlyphOutline*)user;
+
+        if (ol.contours.empty() || ol.contours.back().points.empty())
+            return -1;
+
+
+        FXGlyphOutline::Point c, p;
+        c.on = false;
+        c.pos.x = control->x;
+        c.pos.y = control->y;
+
+        p.on = true;
+        p.pos.x = to->x;
+        p.pos.y = to->y;
+
+        ol.contours.back().points.push_back(c);
+        ol.contours.back().points.push_back(p);
+
+        return 0;
+    }
+
+    int
+    FT_Outline_CubicToFunc(const FT_Vector * control1,
+                           const FT_Vector* control2,
+                           const FT_Vector* to,
+                           void* user) {
+        FXGlyphOutline & ol = *(FXGlyphOutline*)user;
+
+        if (ol.contours.empty() || ol.contours.back().points.empty())
+            return -1;
+
+
+        FXGlyphOutline::Point c1, c2, p;
+        c1.on = false;
+        c1.pos.x = control1->x;
+        c1.pos.y = control1->y;
+        
+        c2.on = false;
+        c2.pos.x = control2->x;
+        c2.pos.y = control2->y;
+
+        p.on = true;
+        p.pos.x = to->x;
+        p.pos.y = to->y;
+
+        ol.contours.back().points.push_back(c1);
+        ol.contours.back().points.push_back(c2);
+        ol.contours.back().points.push_back(p);
+
+        return 0;
+
+    }
+
+    FT_Outline_Funcs get() {
+        FT_Outline_Funcs funcs;
+        funcs.move_to = &FT_Outline_MoveToFunc;
+        funcs.line_to = &FT_Outline_LineToFunc;
+        funcs.conic_to = &FT_Outline_ConicToFunc;
+        funcs.cubic_to = &FT_Outline_CubicToFunc;
+        funcs.shift = 0;
+        funcs.delta = 0;
+        return funcs;
+    }
+};
+
+FXOpt<FXGlyphOutline>
+FXFace::glyphOutline(FXGlyphID gid) {
+    bool tricky = face_->face_flags & FT_FACE_FLAG_TRICKY;
+#if 0
+    if (tricky) {
+        FT_Set_Char_Size(face_, 0/*same as height*/, face_->units_per_EM * 64, FXDefaultDPI, FXDefaultDPI);
+    }
+        ;// TODO:
+#endif
+    FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
+    FT_Outline outline = face_->glyph->outline;
+
+    
+    FXGlyphOutline ol;
+
+    for (short cntIdx = 0; cntIdx < outline.n_contours; ++cntIdx) {
+        const short pointStart = cntIdx == 0? 0: outline.contours[cntIdx - 1] + 1;
+        const short pointEnd = outline.contours[cntIdx];
+
+        if (pointStart >= outline.n_points || pointEnd >= outline.n_points)
+            ;// bad outline
+
+        FXGlyphOutline::Contour outCnt{};
+        for (short pointIndex = pointStart; pointIndex <= pointEnd; ++pointIndex) {
+            const FT_Vector pos = outline.points[pointIndex];
+            const char tag = outline.tags[pointIndex];
+
+            const bool on = tag & 0x01;
+            const bool thirdOrder = tag & 0x02;
+
+            bool drop = false;
+
+            FXGlyphOutline::Point p;
+            p.pos.x = pos.x;
+            p.pos.y = pos.y;
+            p.on = on;
+            p.thirdOrder = thirdOrder;
+
+            outCnt.points.push_back(p);
+        }
+        ol.contours.push_back(outCnt);
+    }
+
+    ol.upem = upem();
+    ol.evenOdd = true;
+
+
+    FXGlyphOutline ol2;
+    auto funcs = FXGlyphOutlineDecomposer::get();
+    FT_Outline_Decompose(&outline, &funcs, &ol2);
+    ol2.upem = upem();
+    return ol2;
+    return ol;
+}
+
 FXVector<FXChar>
 FXFace::charsForGlyph(FXGlyphID gid) const {
     return currentCMap().charsForGlyph(gid);

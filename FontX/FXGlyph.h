@@ -55,6 +55,24 @@ struct FXGlyphImage {
     }
 };
 
+
+struct FXGlyphOutline {
+    struct Point {
+        FXVec2d<int> pos {};
+        bool on{};
+        bool thirdOrder{};
+    };
+
+    struct Contour {
+        FXVector<Point> points;
+    };
+
+    FXVector<Contour> contours{};
+    int upem{1000};
+    bool evenOdd{};
+};
+
+
 struct FXGlyph {
     FXFace          * face;
     FXGlyphID         gid;
@@ -64,4 +82,7 @@ struct FXGlyph {
     
     FXGlyphImage
     glyphImage() const;
+
+    FXOpt<FXGlyphOutline>
+    glyphOutline() const;
 };

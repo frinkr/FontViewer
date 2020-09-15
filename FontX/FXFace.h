@@ -264,6 +264,9 @@ public:
     FXGlyphImage
     glyphImage(FXGlyphID gid);
 
+    FXOpt<FXGlyphOutline>
+    glyphOutline(FXGlyphID gid);
+
     /**
      * return the chars which maps to the gid in current cmap
      */
