@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QMenu>
 #include <QMimeData>
 #include <QToolButton>
 #include <QWidgetAction>
@@ -347,15 +348,24 @@ QXDocumentWindow::onGlyphClicked(const QXCollectionModelIndex & index) {
 
 void
 QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
-    FXGChar c = document_->charAt(index);
-    FXGlyph g = document_->face()->glyph(c);
-    if (auto outline = document_->face()->glyphOutline(g.gid)) {
-        QXOutlineDialog dlg(this);
-        dlg.outlineWidget()->setOutline(*outline);
-        dlg.setWindowTitle(windowTitle());
-        dlg.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
-        dlg.exec();
-    }
+
+    QMenu* menu = new QMenu(this);
+    menu->addAction("Copy Unicode", [this, index]() {
+        copyUnicodeAtIndex(index);
+    });
+    menu->addAction("View Outline", [this, index]() {
+        FXGChar c = document_->charAt(index);
+        FXGlyph g = document_->face()->glyph(c);
+        if (auto outline = document_->face()->glyphOutline(g.gid)) {
+            QXOutlineDialog dlg(this);
+            dlg.outlineWidget()->setOutline(*outline);
+            dlg.setWindowTitle(windowTitle());
+            dlg.exec();
+        }
+    });
+
+    auto center = ui_->glyphCollectionView->mapToGlobal(ui_->glyphCollectionView->itemRect(index).center());
+    menu->popup(QCursor::pos() + QPoint(5, 5));
 }
 
 void
@@ -386,17 +396,7 @@ QXDocumentWindow::onCopyAction() {
         }
         return;
     }
-    
-    FXGChar c = document_->charAt(ui_->glyphCollectionView->selectedIndex());
-    if (c.isUnicode()) {
-        QString text = QString::fromUcs4(static_cast<uint*>(&c.value), 1);
-        qApp->clipboard()->setText(text);
-        static_assert(sizeof(uint) == sizeof(FXChar), "");
-
-        QXToastMessage * message = new QXToastMessage(this);
-        message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxInformation),
-                              QString(R"("%1" has been copied to clipboard)").arg(text));
-    }
+    copyUnicodeAtIndex(ui_->glyphCollectionView->selectedIndex());
 }
 
 void
@@ -528,3 +528,17 @@ QXDocumentWindow::toggleDockWidget(QDockWidget * dockWidget) {
     }
 }
     
+
+void
+QXDocumentWindow::copyUnicodeAtIndex(const QXCollectionModelIndex & index) {
+    FXGChar c = document_->charAt(index);
+    if (c.isUnicode()) {
+        QString text = QString::fromUcs4(static_cast<uint*>(&c.value), 1);
+        qApp->clipboard()->setText(text);
+        static_assert(sizeof(uint) == sizeof(FXChar), "");
+
+        QXToastMessage * message = new QXToastMessage(this);
+        message->showToParent(style()->standardIcon(QStyle::SP_MessageBoxInformation),
+                              QString(R"("%1" has been copied to clipboard)").arg(text));
+    }
+}

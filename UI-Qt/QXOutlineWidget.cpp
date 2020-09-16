@@ -20,7 +20,6 @@ QXOutlineWidget::QXOutlineWidget(QWidget *parent)
     view_->setRenderHint(QPainter::Antialiasing);
     view_->viewport()->installEventFilter(this);
     view_->setMouseTracking(true);
-    view_->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
 
     layout->setMargin(0);
     layout->addWidget(view_);

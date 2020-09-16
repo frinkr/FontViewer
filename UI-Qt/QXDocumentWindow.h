@@ -145,7 +145,9 @@ private slots:
 private:
     void
     toggleDockWidget(QDockWidget * dockWidget);
-    
+
+    void
+    copyUnicodeAtIndex(const QXCollectionModelIndex & index);
 private:
     Ui::QXDocumentWindow * ui_;
     QXMenuBar       * menuBar_;
