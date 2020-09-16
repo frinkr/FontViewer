@@ -354,11 +354,10 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
         QXOutlineWidget * widget = new QXOutlineWidget(&olv);
         widget->setOutline(*outline);
         layout->addWidget(widget);
-
+        layout->setMargin(0);
         olv.exec();
     }
 }
-    
 
 void
 QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
