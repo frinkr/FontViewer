@@ -26,6 +26,7 @@
 #include "QXGlyphInfoWidget.h"
 #include "QXGlyphTableWidget.h"
 #include "QXMenuBar.h"
+#include "QXOutlineDialog.h"
 #include "QXOutLineWidget.h"
 #include "QXPopoverWindow.h"
 #include "QXSearchEngine.h"
@@ -349,13 +350,11 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
     FXGChar c = document_->charAt(index);
     FXGlyph g = document_->face()->glyph(c);
     if (auto outline = document_->face()->glyphOutline(g.gid)) {
-        QDialog olv(this);
-        QHBoxLayout * layout = new QHBoxLayout(&olv);
-        QXOutlineWidget * widget = new QXOutlineWidget(&olv);
-        widget->setOutline(*outline);
-        layout->addWidget(widget);
-        layout->setMargin(0);
-        olv.exec();
+        QXOutlineDialog dlg(this);
+        dlg.outlineWidget()->setOutline(*outline);
+        dlg.setWindowTitle(windowTitle());
+        dlg.setWindowFlags(Qt::FramelessWindowHint | Qt::Dialog);
+        dlg.exec();
     }
 }
 

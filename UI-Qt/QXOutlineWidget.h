@@ -15,7 +15,8 @@ public:
         kContours       = 1,
         kPoints         = 2,
         kSketch         = 4,
-        kAxises         = 8,
+        kGrids           = 8,
+        kEmSquare       = 16
 
     };
 
@@ -40,6 +41,9 @@ public:
     void
     setComponents(Components components);
 
+    bool
+    eventFilter(QObject * object, QEvent * event) override;
+
 private:
     void
     buildScene();
@@ -58,12 +62,16 @@ private:
     QGraphicsScene    * scene_ {};
 
     QPen axisPen_{};
+    QPen axisAuxPen_{};
     QPen contourPen_ {};
     QPen sketchPen_ {};
     QPen onPointPen_ {};
     QPen offPointPen_ {};
 
     Components components_{};
+
+    QPoint targetViewportPos_ {};
+    QPointF targetScenePos_ {};
 };
 
 

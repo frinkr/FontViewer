@@ -37,6 +37,7 @@ set(UI
   QXFontCollectionDialog.ui
   QXFontInfoWidget.ui
   QXGlyphTableWidget.ui
+  QXOutlineDialog.ui
   QXPreferencesDialog.ui
   QXShapingWidget.ui
   QXShapingOptionsWidget.ui
@@ -101,6 +102,8 @@ set(SHARED_SOURCES
   QXMain.h
   QXMenuBar.cpp
   QXMenuBar.h
+  QXOutlineDialog.h
+  QXOutlineDialog.cpp
   QXOutlineWidget.h
   QXOutLineWidget.cpp
   QXPopoverWindow.cpp

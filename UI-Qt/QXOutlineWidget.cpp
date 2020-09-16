@@ -3,6 +3,9 @@
 #include <QPainterPath>
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
+#include <QMouseEvent>
+#include <QTimer>
+#include <qmath.h>
 #include "QXOutlineWidget.h"
 
 QXOutlineWidget::QXOutlineWidget(QWidget *parent)
@@ -15,17 +18,21 @@ QXOutlineWidget::QXOutlineWidget(QWidget *parent)
     view_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view_->setRenderHint(QPainter::Antialiasing);
+    view_->viewport()->installEventFilter(this);
+    view_->setMouseTracking(true);
+    view_->setAlignment(Qt::AlignLeft | Qt::AlignBottom);
 
     layout->setMargin(0);
     layout->addWidget(view_);
 
     axisPen_ = QPen(Qt::gray);
+    axisAuxPen_ = QPen(Qt::gray, 0.2, Qt::DotLine);
     contourPen_ = QPen(Qt::yellow);
     sketchPen_ = QPen(Qt::red);
     onPointPen_ = QPen(Qt::red);
     offPointPen_ = QPen(Qt::green);
 
-    components_ = kContours | kPoints | kSketch | kAxises;
+    components_ = kContours | kPoints | kSketch | kGrids | kEmSquare;
 }
 
 QXOutlineWidget::~QXOutlineWidget() {
@@ -61,33 +68,76 @@ QXOutlineWidget::setComponents(Components components) {
 }
 
 
+bool
+QXOutlineWidget::eventFilter(QObject * object, QEvent * event) {
+    if (event->type() == QEvent::MouseMove) {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        QPointF delta = targetViewportPos_ - mouseEvent->pos();
+        if (qAbs(delta.x()) > 5 || qAbs(delta.y()) > 5) {
+            targetViewportPos_ = mouseEvent->pos();
+            targetScenePos_ = view_->mapToScene(targetViewportPos_);
+        }
+    }
+    else if (event->type() == QEvent::Wheel){
+        QWheelEvent * wheelEvent = static_cast<QWheelEvent*>(event);
+        if (wheelEvent->orientation() == Qt::Vertical) {
+            double angle = wheelEvent->angleDelta().y();
+            double factor = qPow(1.0015, angle);
+
+            view_->scale(factor, factor);
+            view_->centerOn(targetScenePos_);
+            QPointF deltaPos = targetViewportPos_ - 
+                QPointF(view_->viewport()->width() / 2.0,
+                        view_->viewport()->height() / 2.0);
+            
+            QPointF viewportCenter = view_->mapFromScene(targetScenePos_) - deltaPos;
+            view_->centerOn(view_->mapToScene(viewportCenter.toPoint()));
+
+            return true;
+        }
+    }
+
+    Q_UNUSED(object);
+    return false;
+}
+
+
 void 
 QXOutlineWidget::buildScene() {
     //scene_ = new QGraphicsScene(this);
     scene_->clear();
 
-
+    constexpr int sceneScale = 20; // How many EMs in a row
     const QPointF origin(0, 0);
-    const QSizeF emSize(1000, 1000);
+    const QSizeF emSize(500, 500);
+    const QRectF sceneRect(-emSize.width() * sceneScale / 2, -emSize.height() * sceneScale / 2, emSize.width() * sceneScale, emSize.height() * sceneScale);
 
-    scene_->setSceneRect(QRectF(-emSize.width() * 9.5, -emSize.height() * 9.5, emSize.width() * 20, emSize.height() * 20));
+    scene_->setSceneRect(sceneRect);
 
     
-    // Axises
-    if (components_ & kAxises) {
-        scene_->addLine(origin.x(), origin.y(),
-            origin.x(), origin.y() - emSize.height(),
-            axisPen_);
-
-        scene_->addLine(origin.x(), origin.y(),
-            origin.x() + emSize.width(), origin.y(),
-            axisPen_);
-    }
-
     auto xf = [origin, emSize, this](const FXVec2d<int>& p) {
         return transformPoint(p, emSize, origin);
     };
 
+    
+    // Grid
+    if (components_ & kGrids) {
+        constexpr int step = 100;
+        const int gridMin = -sceneScale * outline_.upem;
+        const int gridMax = +sceneScale * outline_.upem;
+
+        for (int y = gridMin; y <= gridMax; y += step)
+            scene_->addLine(QLineF(xf({gridMin, y}), xf({gridMax, y})), axisAuxPen_);
+        for (int x = gridMin; x <= gridMax; x += step)
+            scene_->addLine(QLineF(xf({x, gridMin}), xf({x, gridMax})), axisAuxPen_);
+
+    }
+
+    // EM square
+    if (components_ & kEmSquare) {
+        QRectF rect(xf({ 0, outline_.upem }), xf({ outline_.upem, 0 }));
+        scene_->addRect(rect, axisPen_);
+    }
 
     // Connected lines of on-path points
     if (components_ & kSketch) {
@@ -142,7 +192,6 @@ QXOutlineWidget::buildScene() {
             }
         }
     }
-
 }
 
 
