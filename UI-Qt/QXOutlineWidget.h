@@ -12,11 +12,12 @@ class QXOutlineWidget : public QWidget
     
 public:
     enum Component {
-        kContours       = 1,
-        kPoints         = 2,
-        kSketch         = 4,
-        kGrids           = 8,
-        kEmSquare       = 16
+        kContours       = 1 << 0,
+        kFillContours   = 1 << 1,
+        kPoints         = 1 << 2,
+        kSketch         = 1 << 3,
+        kGrids          = 1 << 4,
+        kEmSquare       = 1 << 5,
 
     };
 
@@ -61,14 +62,14 @@ private:
     QGraphicsView     * view_ {};
     QGraphicsScene    * scene_ {};
 
-    QPen axisPen_{};
-    QPen axisAuxPen_{};
+    QPen axisPen_ {};
+    QPen axisAuxPen_ {};
     QPen contourPen_ {};
     QPen sketchPen_ {};
     QPen onPointPen_ {};
     QPen offPointPen_ {};
 
-    Components components_{};
+    Components components_ {};
 
     QPoint targetViewportPos_ {};
     QPointF targetScenePos_ {};

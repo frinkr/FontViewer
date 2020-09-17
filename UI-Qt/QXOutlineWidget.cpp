@@ -24,14 +24,18 @@ QXOutlineWidget::QXOutlineWidget(QWidget *parent)
     layout->setMargin(0);
     layout->addWidget(view_);
 
-    axisPen_ = QPen(Qt::gray);
-    axisAuxPen_ = QPen(Qt::gray, 0.2, Qt::DotLine);
-    contourPen_ = QPen(Qt::yellow);
-    sketchPen_ = QPen(Qt::red);
-    onPointPen_ = QPen(Qt::red);
-    offPointPen_ = QPen(Qt::green);
+    int defaultPenWidth = 1;
+    auto defaultCap = Qt::FlatCap;
+    auto defaultJoin = Qt::MiterJoin;
 
-    components_ = kContours | kPoints | kSketch | kGrids | kEmSquare;
+    axisPen_ = QPen(Qt::gray, defaultPenWidth, Qt::SolidLine, defaultCap, defaultJoin);
+    axisAuxPen_ = QPen(Qt::gray, 0.2, Qt::DotLine);
+    contourPen_ = QPen(Qt::yellow, defaultPenWidth, Qt::SolidLine, defaultCap, defaultJoin);
+    sketchPen_ = QPen(Qt::red, defaultPenWidth, Qt::SolidLine, defaultCap, defaultJoin);
+    onPointPen_ = QPen(Qt::red, defaultPenWidth, Qt::SolidLine, defaultCap, defaultJoin);
+    offPointPen_ = QPen(Qt::green, defaultPenWidth, Qt::SolidLine, defaultCap, defaultJoin);
+
+    components_ = kContours | kFillContours | kPoints | kSketch | kGrids | kEmSquare;
 }
 
 QXOutlineWidget::~QXOutlineWidget() {
@@ -106,7 +110,7 @@ QXOutlineWidget::buildScene() {
     //scene_ = new QGraphicsScene(this);
     scene_->clear();
 
-    constexpr int sceneScale = 20; // How many EMs in a row
+    constexpr float sceneScale = 20; // How many EMs in a row
     const QPointF origin(0, 0);
     const QSizeF emSize(500, 500);
     const QRectF sceneRect(-emSize.width() * sceneScale / 2, -emSize.height() * sceneScale / 2, emSize.width() * sceneScale, emSize.height() * sceneScale);
@@ -122,8 +126,8 @@ QXOutlineWidget::buildScene() {
     // Grid
     if (components_ & kGrids) {
         constexpr int step = 100;
-        const int gridMin = -sceneScale * outline_.upem;
-        const int gridMax = +sceneScale * outline_.upem;
+        const int gridMin = -qRound(sceneScale * outline_.upem / step) * step;
+        const int gridMax = -gridMin;
 
         for (int y = gridMin; y <= gridMax; y += step)
             scene_->addLine(QLineF(xf({gridMin, y}), xf({gridMax, y})), axisAuxPen_);
@@ -169,10 +173,13 @@ QXOutlineWidget::buildScene() {
 
     // Bezier
     if (components_ & kContours) {
-        for (auto& cnt : outline_.contours) {
+        QPainterPath paths;
+        for (auto & cnt : outline_.contours) {
             QPainterPath path = contourToPainterPath(cnt, emSize, origin);
-            scene_->addPath(path, contourPen_);
+            paths.addPath(path);
         }
+        paths.setFillRule(Qt::OddEvenFill);
+        scene_->addPath(paths, contourPen_, (components_ & kFillContours)? QBrush(contourPen_.color()) : QBrush());
     }
 
 

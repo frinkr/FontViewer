@@ -14,6 +14,8 @@ public:
     void
     setDocument(QXDocument * document);
 
+    void
+    keyPressEvent(QKeyEvent * event) override;
 private:
-    QXDocument * document_;
+    QXDocument * document_ {};
 };

@@ -279,6 +279,9 @@ QXDocumentWindow::senderToolButton() {
 
 void
 QXDocumentWindow::closeEvent(QCloseEvent * event) {
+    for (auto subWindow : subWindows_)
+        subWindow->close();
+
     emit aboutToClose(this);
     QMainWindow::closeEvent(event);
 }
@@ -357,10 +360,14 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
         FXGChar c = document_->charAt(index);
         FXGlyph g = document_->face()->glyph(c);
         if (auto outline = document_->face()->glyphOutline(g.gid)) {
-            QXOutlineDialog dlg(this);
-            dlg.outlineWidget()->setOutline(*outline);
-            dlg.setWindowTitle(windowTitle());
-            dlg.exec();
+            auto dlg = new QXOutlineDialog();
+            dlg->outlineWidget()->setOutline(*outline);
+            dlg->setWindowTitle(windowTitle());
+            dlg->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+            dlg->setAttribute(Qt::WA_DeleteOnClose);
+            //dlg.exec();
+            dlg->show();
+            subWindows_.append(dlg);
         }
     });
 

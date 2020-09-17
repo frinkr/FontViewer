@@ -8,11 +8,13 @@ QXOutlineDialog::QXOutlineDialog(QWidget *parent) :
     ui->setupUi(this);
 
     connect(ui->contoursCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
+    connect(ui->fillCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
     connect(ui->pointsCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
     connect(ui->sketchCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
     connect(ui->gridsCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
     connect(ui->emSquareCheckBox, &QCheckBox::stateChanged, this, &QXOutlineDialog::updateComponents);
 
+    updateComponents();
 }
 
 QXOutlineDialog::~QXOutlineDialog()
@@ -30,6 +32,8 @@ QXOutlineDialog::updateComponents() {
     QXOutlineWidget::Components comps{};
     if (ui->contoursCheckBox->isChecked())
         comps |= QXOutlineWidget::kContours;
+    if (ui->fillCheckBox->isChecked())
+        comps |= QXOutlineWidget::kFillContours;
     if (ui->pointsCheckBox->isChecked())
         comps |= QXOutlineWidget::kPoints;
     if (ui->sketchCheckBox->isChecked())

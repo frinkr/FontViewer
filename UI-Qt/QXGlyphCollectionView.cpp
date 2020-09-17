@@ -1,5 +1,6 @@
 #include <QPainter>
 #include <QPainterPath>
+#include <QKeyEvent>
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXEncoding.h"
@@ -123,4 +124,11 @@ QXGlyphCollectionView::setDocument(QXDocument * document) {
     document_ = document;
     (dynamic_cast<QXGlyphCollectionViewDelegate*>(delegate()))->document_ = document;
     setModel(document_);
+}
+
+
+void
+QXGlyphCollectionView::keyPressEvent(QKeyEvent * event) {
+    if (auto text = event->text(); text.size() == 1)
+        document_->search(text);
 }
