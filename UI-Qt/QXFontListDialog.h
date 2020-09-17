@@ -13,6 +13,7 @@ class QMenu;
 class QModelIndex;
 class QTextBrowser;
 class QXFontListModel;
+class QXFontListOptionsWidget;
 class QXPopoverWindow;
 class QXSortFilterFontListModel;
 
@@ -93,9 +94,16 @@ private slots:
 
     void
     quitApplication();
+
+    void
+    showOptions();
+    
 private:
     Ui::QXFontListDialog * ui_;
     QMenu             * recentMenu_ {nullptr}; 
     QXPopoverWindow   * popover_ {nullptr};
     QTextBrowser      * popoverWidget_{ nullptr };
+
+    QXPopoverWindow   * optionsPopover_ {};
+    QXFontListOptionsWidget * optionsWidget_ {};
 };

@@ -15,6 +15,7 @@
 #include "QXDocumentWindowManager.h"
 #include "QXFontListDialog.h"
 #include "QXFontListModel.h"
+#include "QXFontListOptionsWidget.h"
 #include "QXFontManager.h"
 #include "QXHtmlTemplate.h"
 #include "QXPopoverWindow.h"
@@ -321,6 +322,7 @@ QXFontListDialog::QXFontListDialog(QWidget * parent)
     // Menu button
     QMenu * menu = new QMenu(ui_->menuButton);
     ui_->menuButton->setMenu(menu);
+    //connect(ui_->menuButton, &QPushButton::clicked, this, &QXFontListDialog::showOptions);
 
     menu->addAction(qApp->loadIcon(":/images/preview.png"), tr("Preview Options"), [this]() {
             if (ui_->previewSettingsGoupBox->isVisible())
@@ -607,3 +609,20 @@ QXFontListDialog::quitApplication() {
     this->close();
     QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();    
 }
+
+
+void
+QXFontListDialog::showOptions() {
+    if (!optionsPopover_) {
+        optionsPopover_ = new QXPopoverWindow(this);
+        optionsWidget_ = new QXFontListOptionsWidget(this);
+        optionsPopover_->setFixedWidth(400);
+        optionsPopover_->setWidget(optionsWidget_);
+    }
+
+    optionsPopover_->showRelativeTo(QRect(
+        ui_->menuButton->mapToGlobal(ui_->menuButton->rect().topLeft()),
+        ui_->menuButton->mapToGlobal(ui_->menuButton->rect().bottomRight())));
+    
+}
+    
