@@ -13,9 +13,10 @@ if (WIN32)
   endif()
   
 elseif (APPLE)
-  # message(FATAL_ERROR "Not implemented")
-  # Qt
-  # OpenSSL
+  execute_process(COMMAND brew --prefix qt OUTPUT_VARIABLE QT_ROOT)
+  string(REGEX REPLACE "\n$" "" QT_ROOT "${QT_ROOT}")
+  list(APPEND CMAKE_PREFIX_PATH ${QT_ROOT})
+  
 elseif (UNIX)
   # Nothing to configure
 endif()
