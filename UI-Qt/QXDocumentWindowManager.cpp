@@ -18,7 +18,7 @@
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
-#include "QXFontListDialog.h"
+#include "QXFontListWidget.h"
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 
@@ -195,7 +195,7 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 void
 QXDocumentWindowManager::doOpenFontDialog() {
     if (!openFontDialog_) {
-        openFontDialog_ = new QXFontListDialog(nullptr);
+        openFontDialog_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 #if !defined(Q_OS_MAC)
         // This piece of shit makes qApp quit
         connect(openFontDialog_, &QDialog::rejected, this, [this]() {
@@ -206,10 +206,10 @@ QXDocumentWindowManager::doOpenFontDialog() {
             }
         }, Qt::QueuedConnection);
 #endif
-        //connect(openFontDialog_, &QDialog::accept, this, [this]() {
-        //    const QXFontURI fontURI = openFontDialog_->selectedFont();
-        //    openFontURI(fontURI);
-        //});
+        connect(openFontDialog_, &QXFontListWidget::accepted, this, [this]() {
+            const QXFontURI fontURI = openFontDialog_->selectedFont();
+            openFontURI(fontURI);
+        });
     }
     
     // The timer makes the QXDocumentWindow's desctructor called ealier, otherwise the 'exec'
@@ -218,10 +218,7 @@ QXDocumentWindowManager::doOpenFontDialog() {
         if (openFontDialog_) {
             openFontDialog_->setWindowFlag(Qt::WindowType::WindowMinMaxButtonsHint, documents_.empty());
             
-            if (QDialog::Accepted == openFontDialog_->exec()) {
-                const QXFontURI fontURI = openFontDialog_->selectedFont();
-                openFontURI(fontURI);
-            }
+            openFontDialog_->show();
         }
     });
 }

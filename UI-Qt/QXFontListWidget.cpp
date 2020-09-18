@@ -13,7 +13,7 @@
 #include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocumentWindowManager.h"
-#include "QXFontListDialog.h"
+#include "QXFontListWidget.h"
 #include "QXFontListModel.h"
 #include "QXFontManager.h"
 #include "QXHtmlTemplate.h"
@@ -76,7 +76,7 @@ namespace {
 
                 QRect rect = infoIconRect(option);
                 if (rect.contains(mouseEvent->pos())) {
-                    QXFontListDialog * window = qobject_cast<QXFontListDialog*>(option.widget->window());
+                    QXFontListWidget * window = qobject_cast<QXFontListWidget*>(option.widget->window());
                     if (window) {
                         QRect globalRect(option.widget->mapToGlobal(rect.topLeft()), option.widget->mapToGlobal(rect.bottomRight()));
                         window->showFontInfoPopover(index, globalRect);
@@ -210,7 +210,7 @@ namespace {
             }
 
             // Draw info icon
-            QXFontListDialog * window = qobject_cast<QXFontListDialog*>(option.widget->window());
+            QXFontListWidget * window = qobject_cast<QXFontListWidget*>(option.widget->window());
             bool popoverVisible = false;
             if (window) popoverVisible = window->isFontInfoPopoverVisible();
             if ((selected && popoverVisible) || (option.state & QStyle::State_MouseOver)) {
@@ -266,8 +266,8 @@ namespace {
    
 }
 
-QXFontListDialog::QXFontListDialog(QWidget * parent)
-    : QXThemedWindow<QDialog>(parent)
+QXFontListWidget::QXFontListWidget(QWidget * parent, Qt::WindowFlags flags)
+    : QXThemedWindow<QWidget>(parent, flags)
     , ui_(new Ui::QXFontListDialog) {
     ui_->setupUi(this);
     ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
@@ -280,8 +280,8 @@ QXFontListDialog::QXFontListDialog(QWidget * parent)
     ui_->fontListView->setItemDelegate(new QXFontBrowserItemDelegate(this));
     ui_->fontListView->setMouseTracking(true);
     ui_->fontListView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontListDialog::onFontDoubleClicked, Qt::QueuedConnection);
-    connect(ui_->fontListView, &QListView::customContextMenuRequested, this, &QXFontListDialog::onFontContextMenuRequested, Qt::QueuedConnection);
+    connect(ui_->fontListView, &QListView::doubleClicked, this, &QXFontListWidget::onFontDoubleClicked, Qt::QueuedConnection);
+    connect(ui_->fontListView, &QListView::customContextMenuRequested, this, &QXFontListWidget::onFontContextMenuRequested, Qt::QueuedConnection);
 
     QXFontManager::instance();
     QXDocumentWindowManager * mgr = QXDocumentWindowManager::instance();
@@ -315,8 +315,8 @@ QXFontListDialog::QXFontListDialog(QWidget * parent)
     QAction * searchIconAction = new QAction(this);
     searchIconAction->setIcon(qApp->loadIcon(":/images/search.png"));
     ui_->searchLineEdit->addAction(searchIconAction, QLineEdit::LeadingPosition);
-    connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontListDialog::onSearchLineEditReturnPressed);
-    connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontListDialog::onFilterChanged);
+    connect(ui_->searchLineEdit, &QLineEdit::returnPressed, this, &QXFontListWidget::onSearchLineEditReturnPressed);
+    connect(ui_->searchLineEdit, &QLineEdit::textEdited, this, &QXFontListWidget::onFilterChanged);
 
     // Menu button
     QMenu * menu = new QMenu(ui_->menuButton);
@@ -358,27 +358,17 @@ QXFontListDialog::QXFontListDialog(QWidget * parent)
     ui_->previewFontSizeSlider->setMinimum(MIN_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setMaximum(MAX_PREVIEW_FONT_SIZE);
     ui_->previewFontSizeSlider->setValue(DEFAULT_PREVIEW_FONT_SIZE);
-    connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontListDialog::updatePreviewText);
-    connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontListDialog::onPreviewTextChanged);
-    connect(ui_->previewCoverAllCharsCheckBox, &QCheckBox::stateChanged, this, &QXFontListDialog::onFilterChanged);
+    connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontListWidget::updatePreviewText);
+    connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontListWidget::onPreviewTextChanged);
+    connect(ui_->previewCoverAllCharsCheckBox, &QCheckBox::stateChanged, this, &QXFontListWidget::onFilterChanged);
         
     ui_->previewSettingsGoupBox->hide();
 
     // Add actions
     QAction * searchAction = new QAction(this);
-    connect(searchAction, &QAction::triggered, this, &QXFontListDialog::onSearchAction);
+    connect(searchAction, &QAction::triggered, this, &QXFontListWidget::onSearchAction);
     searchAction->setShortcuts(QKeySequence::Find);
     addAction(searchAction);
-
-    QAction * closeAction = new QAction(this);
-    connect(closeAction, &QAction::triggered, this, &QDialog::close);
-    closeAction->setShortcuts(QKeySequence::Close);
-    addAction(closeAction);
-
-    QAction * quitAction = new QAction(this);
-    connect(quitAction, &QAction::triggered, this, &QXFontListDialog::quitApplication);
-    quitAction->setShortcuts(QKeySequence::Quit);
-    addAction(quitAction);
 
     qApp->dismissSplashScreen(this);
     
@@ -389,17 +379,28 @@ QXFontListDialog::QXFontListDialog(QWidget * parent)
     //setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(qApp->benchmark().time().count()));
 }
 
-QXFontListDialog::~QXFontListDialog() {
+QXFontListWidget::~QXFontListWidget() {
     delete ui_;
 }
 
+void
+QXFontListWidget::accept() {
+    hide();
+    emit accepted();
+}
+
+void
+QXFontListWidget::reject() {
+    hide();
+}
+
 int
-QXFontListDialog::selectedFontIndex() const {
+QXFontListWidget::selectedFontIndex() const {
     return currentSourceIndex().row();
 }
 
 QXFontURI
-QXFontListDialog::selectedFont() const {
+QXFontListWidget::selectedFont() const {
     int row = selectedFontIndex();
     if (row == -1)
         return QXFontURI{};
@@ -411,7 +412,7 @@ QXFontListDialog::selectedFont() const {
 }
 
 int
-QXFontListDialog::selectFont(int index) {
+QXFontListWidget::selectFont(int index) {
     QModelIndex proxyIndex = proxyModel()->mapFromSource(sourceModel()->index(index));
     ui_->fontListView->setCurrentIndex(proxyIndex);
     scrollToCurrentIndex();
@@ -419,20 +420,20 @@ QXFontListDialog::selectFont(int index) {
 }
 
 int
-QXFontListDialog::selectFont(const QXFontURI & fontURI) {
+QXFontListWidget::selectFont(const QXFontURI & fontURI) {
     clearFilter();
     int index = sourceModel()->db()->faceIndex({toStdString(fontURI.filePath), fontURI.faceIndex});
     return selectFont(index);
 }
 
 void
-QXFontListDialog::clearFilter() {
+QXFontListWidget::clearFilter() {
     proxyModel()->clearFilter();
     ui_->searchLineEdit->clear();
 }
 
 void
-QXFontListDialog::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) {
+QXFontListWidget::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) {
     if (popover_ == nullptr) {
         popover_ = new QXPopoverWindow(this);
         popoverWidget_ = new QTextBrowser(this);
@@ -460,12 +461,12 @@ QXFontListDialog::showFontInfoPopover(const QModelIndex & index, const QRect & g
 }
 
 bool
-QXFontListDialog::isFontInfoPopoverVisible() const {
+QXFontListWidget::isFontInfoPopoverVisible() const {
     return popover_ && popover_->isVisible();
 }
 
 bool
-QXFontListDialog::eventFilter(QObject * obj, QEvent * event) {
+QXFontListWidget::eventFilter(QObject * obj, QEvent * event) {
     if (obj == ui_->searchLineEdit && event->type() == QEvent::KeyPress) {
         QKeyEvent * keyEvent = (QKeyEvent*)event;
 
@@ -480,37 +481,33 @@ QXFontListDialog::eventFilter(QObject * obj, QEvent * event) {
             QKeyEvent * eventCopy = new QKeyEvent(QEvent::KeyPress, keyEvent->key(), Qt::NoModifier);
             qApp->postEvent(ui_->fontListView, eventCopy);
         }
-        else if (keyEvent == QKeySequence::Quit){
-            quitApplication();
-            return true;
-        }
     }
 
-    return QDialog::eventFilter(obj, event);
+    return QWidget::eventFilter(obj, event);
 }
 
 QXSortFilterFontListModel *
-QXFontListDialog::proxyModel() const {
+QXFontListWidget::proxyModel() const {
     return qobject_cast<QXSortFilterFontListModel *>(ui_->fontListView->model());
 }
 
 QXFontListModel *
-QXFontListDialog::sourceModel() const {
+QXFontListWidget::sourceModel() const {
     return qobject_cast<QXFontListModel *>(proxyModel()->sourceModel());
 }
 
 QModelIndex
-QXFontListDialog::currentProxyIndex() const {
+QXFontListWidget::currentProxyIndex() const {
     return ui_->fontListView->currentIndex();
 }
 
 QModelIndex
-QXFontListDialog::currentSourceIndex() const {
+QXFontListWidget::currentSourceIndex() const {
     return proxyModel()->mapToSource(currentProxyIndex());
 }
 
 QXFontListFilter
-QXFontListDialog::fontListFilter() const {
+QXFontListWidget::fontListFilter() const {
     QXFontListFilter filter;
     filter.fontName = ui_->searchLineEdit->text().trimmed();
     filter.sampleText = ui_->previewTextEdit->text();
@@ -519,17 +516,17 @@ QXFontListDialog::fontListFilter() const {
 }
 
 void
-QXFontListDialog::scrollToCurrentIndex() {
+QXFontListWidget::scrollToCurrentIndex() {
     ui_->fontListView->scrollTo(ui_->fontListView->currentIndex(), QAbstractItemView::PositionAtTop);    
 }
 
 void
-QXFontListDialog::onFontDoubleClicked(const QModelIndex & index) {
+QXFontListWidget::onFontDoubleClicked(const QModelIndex & index) {
     accept();
 }
 
 void
-QXFontListDialog::onFontContextMenuRequested(const QPoint & pos) {
+QXFontListWidget::onFontContextMenuRequested(const QPoint & pos) {
     auto index = currentSourceIndex();
     if (index.row() < 0)
         return;
@@ -559,11 +556,11 @@ QXFontListDialog::onFontContextMenuRequested(const QPoint & pos) {
 }
 
 void
-QXFontListDialog::onSearchLineEditReturnPressed() {
+QXFontListWidget::onSearchLineEditReturnPressed() {
 }
 
 void
-QXFontListDialog::onFilterChanged() {
+QXFontListWidget::onFilterChanged() {
     auto filter = fontListFilter();
     proxyModel()->setFilter(fontListFilter());
     if (!filter.fontName.isEmpty() || selectedFontIndex() == -1)
@@ -572,19 +569,19 @@ QXFontListDialog::onFilterChanged() {
 }
 
 void
-QXFontListDialog::onSearchAction() {
+QXFontListWidget::onSearchAction() {
     ui_->searchLineEdit->setFocus();
     ui_->searchLineEdit->selectAll();
 }
 
 void
-QXFontListDialog::onOpenFileButtonClicked() {
+QXFontListWidget::onOpenFileButtonClicked() {
     if (QXDocumentWindowManager::instance()->doNativeOpenFileDialog())
         reject();    
 }
 
 void
-QXFontListDialog::onPreviewTextChanged() {
+QXFontListWidget::onPreviewTextChanged() {
     updatePreviewText();
     
     if (ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked)
@@ -592,7 +589,7 @@ QXFontListDialog::onPreviewTextChanged() {
 }
 
 void
-QXFontListDialog::updatePreviewText() {
+QXFontListWidget::updatePreviewText() {
     QXFontBrowserItemDelegate * delegate = dynamic_cast<QXFontBrowserItemDelegate *>(ui_->fontListView->itemDelegate());
     if (delegate) {
         delegate->setFontSize(ui_->previewFontSizeSlider->value());
@@ -600,10 +597,4 @@ QXFontListDialog::updatePreviewText() {
         ui_->fontListView->model()->layoutChanged();
         scrollToCurrentIndex();
     }
-}
-
-void
-QXFontListDialog::quitApplication() {
-    this->close();
-    QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();    
 }

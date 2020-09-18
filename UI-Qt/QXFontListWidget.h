@@ -17,13 +17,21 @@ class QXFontListOptionsWidget;
 class QXPopoverWindow;
 class QXSortFilterFontListModel;
 
-class QXFontListDialog : public QXThemedWindow<QDialog> {
+class QXFontListWidget : public QXThemedWindow<QWidget> {
     Q_OBJECT
 
 public:
-    explicit QXFontListDialog(QWidget * parent = nullptr);
-    ~QXFontListDialog();
+    explicit QXFontListWidget(QWidget * parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~QXFontListWidget();
 
+public slots:
+    void
+    accept();
+
+    void
+    reject();
+
+public:
     int
     selectedFontIndex() const;
 
@@ -45,6 +53,10 @@ public:
     bool
     isFontInfoPopoverVisible() const;
 
+signals:
+    void
+    accepted();
+    
 protected:
     bool
     eventFilter(QObject * obj, QEvent * event) override;
@@ -64,6 +76,7 @@ private:
 
     QXFontListFilter
     fontListFilter() const;
+    
 private slots:
     void
     onFontDoubleClicked(const QModelIndex & index);
@@ -91,9 +104,6 @@ private slots:
     
     void
     updatePreviewText();
-
-    void
-    quitApplication();
 
 private:
     Ui::QXFontListDialog * ui_;
