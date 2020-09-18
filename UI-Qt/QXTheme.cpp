@@ -116,9 +116,7 @@ namespace {
 
             // Normal
             p.setColor(QPalette::Window,          QColor(53, 53, 53));
-            p.setColor(QPalette::Background,      QColor(53, 53, 53));
             p.setColor(QPalette::WindowText,      Qt::white);
-            p.setColor(QPalette::Foreground,      Qt::white);
             p.setColor(QPalette::Base,            QColor(42, 42, 42));
             p.setColor(QPalette::AlternateBase,   QColor(53, 53, 53));
             p.setColor(QPalette::ToolTipBase,     Qt::white);
@@ -171,9 +169,7 @@ namespace {
 
             // Normal
             p.setColor(QPalette::Window,          QColor("#1976D2"));
-            p.setColor(QPalette::Background,      QColor("#1976D2"));
             p.setColor(QPalette::WindowText,      Qt::white);
-            p.setColor(QPalette::Foreground,      Qt::white);
             p.setColor(QPalette::Base,            QColor("#2086E2"));
             p.setColor(QPalette::AlternateBase,   QColor("#368fe7"));
             p.setColor(QPalette::ToolTipBase,     Qt::white);
@@ -225,9 +221,7 @@ namespace {
 
             // Normal
             p.setColor(QPalette::Window,          gray(0x00));
-            p.setColor(QPalette::Background,      gray(0x00));
             p.setColor(QPalette::WindowText,      gray(0xFF));
-            p.setColor(QPalette::Foreground,      gray(0xFF));
             p.setColor(QPalette::Base,            gray(0x10));
             p.setColor(QPalette::AlternateBase,   gray(0x20));
             p.setColor(QPalette::ToolTipBase,     gray(0xFF));

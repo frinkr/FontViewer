@@ -11,6 +11,8 @@
 #include "QXPopoverWindow.h"
 #include "QXThemedWindow.h"
 
+class FXGChar;
+
 class QAction;
 class QFileDialog;
 class QLineEdit;

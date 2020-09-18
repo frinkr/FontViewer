@@ -28,7 +28,7 @@
 #include "QXGlyphTableWidget.h"
 #include "QXMenuBar.h"
 #include "QXOutlineDialog.h"
-#include "QXOutLineWidget.h"
+#include "QXOutlineWidget.h"
 #include "QXPopoverWindow.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"

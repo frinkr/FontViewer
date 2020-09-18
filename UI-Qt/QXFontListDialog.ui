@@ -116,13 +116,13 @@
            </property>
            <property name="minimumSize">
             <size>
-             <width>15</width>
+             <width>22</width>
              <height>22</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
-             <width>15</width>
+             <width>22</width>
              <height>22</height>
             </size>
            </property>
@@ -142,11 +142,8 @@
             <iconset resource="QXApplication.qrc">
              <normaloff>:/images/menu.png</normaloff>:/images/menu.png</iconset>
            </property>
-           <property name="iconSize">
-            <size>
-             <width>15</width>
-             <height>22</height>
-            </size>
+           <property name="autoDefault">
+            <bool>false</bool>
            </property>
            <property name="flat">
             <bool>true</bool>

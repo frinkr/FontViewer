@@ -9,7 +9,7 @@ class QVariantAnimation;
 class QXSplash : public QSplashScreen {
     Q_OBJECT
 public:
-    explicit QXSplash(QWidget * parent = nullptr);
+    explicit QXSplash(QScreen * parent = nullptr);
     
     void
     dismiss(QWidget * widget);

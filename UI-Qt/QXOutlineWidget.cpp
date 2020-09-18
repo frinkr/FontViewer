@@ -83,8 +83,7 @@ QXOutlineWidget::eventFilter(QObject * object, QEvent * event) {
     }
     else if (event->type() == QEvent::Wheel){
         QWheelEvent * wheelEvent = static_cast<QWheelEvent*>(event);
-        if (wheelEvent->orientation() == Qt::Vertical) {
-            double angle = wheelEvent->angleDelta().y();
+        if (double angle = wheelEvent->angleDelta().y()) {
             double factor = qPow(1.0015, angle);
 
             view_->scale(factor, factor);

@@ -26,7 +26,7 @@ QSize
 QXRichLineEdit::sizeHint() const {
     QFontMetrics fm(font());
     int h = qMax(fm.height(), 14) + 4;
-    int w = fm.width(QLatin1Char('x')) * 17 + 4;
+    int w = fm.horizontalAdvance(QLatin1Char('x')) * 17 + 4;
     QStyleOptionFrame opt;
     opt.initFrom(this);
     return (style()->sizeFromContents(QStyle::CT_LineEdit, &opt, QSize(w, h).

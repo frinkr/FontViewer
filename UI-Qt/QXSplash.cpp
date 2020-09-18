@@ -5,7 +5,7 @@
 #include "QXSplash.h"
 #include "QXApplication.h"
 
-QXSplash::QXSplash(QWidget * parent)
+QXSplash::QXSplash(QScreen * parent)
     : QSplashScreen(parent) {
     setPixmap(qApp->loadIcon(":/images/splash.png").pixmap(256, 256));
 }

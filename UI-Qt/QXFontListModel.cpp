@@ -156,7 +156,7 @@ QXSortFilterFontListModel::lessThan(const QModelIndex & left, const QModelIndex 
     if (!filter_.isEmpty()) 
         return lessThanWithFilter(d0.toString(), d1.toString(), filter_);
     
-    return d0 < d1;
+    return d0.toString() < d1.toString();
     return true;
 }
 

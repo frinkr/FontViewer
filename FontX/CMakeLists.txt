@@ -22,10 +22,6 @@ else()
   pkg_check_modules(ICU REQUIRED icu-uc)
 endif()
 
-if (FX_BUILD_PDF_ADDON)
-  add_subdirectory(PDF)
-endif()
-
 add_library(FontX
   STATIC
   FX.h
@@ -87,9 +83,8 @@ target_link_libraries(FontX
   ${Iconv_LIBRARIES}
   )
 
-if (FX_BUILD_PDF_ADDON)
-  target_link_libraries(FontX FontXPDF)
-endif()
+add_subdirectory(PDF)
+target_link_libraries(FontX FontXPDF)
 
 if (APPLE)
   target_link_libraries(FontX
