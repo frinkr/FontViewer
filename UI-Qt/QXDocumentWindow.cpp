@@ -279,8 +279,8 @@ QXDocumentWindow::senderToolButton() {
 
 void
 QXDocumentWindow::closeEvent(QCloseEvent * event) {
-    for (auto subWindow : subWindows_)
-        subWindow->close();
+    //for (auto subWindow : subWindows_)
+    //    subWindow->close();
 
     emit aboutToClose(this);
     QMainWindow::closeEvent(event);
@@ -367,7 +367,9 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
             dlg->setAttribute(Qt::WA_DeleteOnClose);
             //dlg.exec();
             dlg->show();
-            subWindows_.append(dlg);
+            //subWindows_.append(dlg);
+            
+            QXDocumentWindowManager::instance()->addManagedWindow(dlg);
         }
     });
 

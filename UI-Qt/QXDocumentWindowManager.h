@@ -37,7 +37,7 @@ public:
     void
     removeDocument(QXDocument * document);
 
-    const QList<QPointer<QXDocument> > &
+    const QList<QXDocument *> &
     documents() const;
 
     QXDocument *
@@ -49,6 +49,12 @@ public:
     QXDocumentWindow *
     createDocumentWindow(QXDocument * document);
 
+    void
+    addManagedWindow(QWidget * window);
+    
+    void
+    removeManagedWindow(QWidget *w);
+    
     const QList<QXRecentFontItem> &
     recentFonts() const;
 
@@ -89,19 +95,9 @@ private slots:
     onDocumentWindowDestroyed(QObject * obj);
 
 protected:
-    void
-    removeDocumentWindow(QXDocumentWindow *w);
-
 protected:
     void
     addToRecents(QXDocument * document);
-
-private slots:
-    
-#ifdef Q_OS_MAC
-    void
-    slotShowWindow();
-#endif
 
 private:
     void
@@ -109,6 +105,9 @@ private:
 
     QXDocumentWindow *
     activeDocumentWindow() const;
+
+    QList<QXDocumentWindow * >
+    documentWindows() const;
     
 private:
     enum {kMaxRecentFiles = 20};
@@ -118,12 +117,13 @@ private:
 #ifdef Q_OS_MAC
     QMenu * openRecentSubMenu;
 #endif
-    QList<QPointer<QXDocumentWindow> > documentWindows_;
-    QList<QPointer<QXDocument> >       documents_;
-    bool                               appIsAboutToQuit_ {false};
-    QXFontListWidget                    * openFontDialog_ {nullptr};
+    QList<QWidget *>                     managedWindows_ {};
+    QMap<QWidget *, QXDocument *>        windowToDocumentMap_ {};
+    QList<QXDocument *>                  documents_ {};
+    bool                                 appIsAboutToQuit_ {false};
+    QXFontListWidget                   * openFontDialog_ {nullptr};
 
-    static QXDocumentWindowManager   * instance_;
+    static QXDocumentWindowManager     * instance_;
 
 };
 

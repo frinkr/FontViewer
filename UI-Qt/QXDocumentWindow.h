@@ -173,6 +173,4 @@ private:
     QXGlyphInfoWidget * glyphWidget_;
 
     QXDocument        * document_;
-
-    QList<QWidget *>    subWindows_ {};
 };

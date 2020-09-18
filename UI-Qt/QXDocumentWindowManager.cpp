@@ -93,7 +93,7 @@ QXDocumentWindowManager::removeDocument(QXDocument * document) {
 
 }
 
-const QList<QPointer<QXDocument> > &
+const QList<QXDocument *> &
 QXDocumentWindowManager::documents() const {
     return documents_;
 }
@@ -109,7 +109,7 @@ QXDocumentWindowManager::getDocument(const QXFontURI & fontURI) const {
     
 QXDocumentWindow *
 QXDocumentWindowManager::getDocumentWindow(const QXDocument * document) const {
-    foreach(QPointer<QXDocumentWindow> window, documentWindows_) {
+    for (auto window: documentWindows()) {
         if (window->document() == document)
             return window;
     }
@@ -120,6 +120,7 @@ QXDocumentWindow *
 QXDocumentWindowManager::createDocumentWindow(QXDocument * document) {
     QXDocumentWindow * window = new QXDocumentWindow(document, nullptr);
 
+    #if 0
     connect(window,
             &QXDocumentWindow::aboutToClose,
             this,
@@ -130,17 +131,34 @@ QXDocumentWindowManager::createDocumentWindow(QXDocument * document) {
             this,
             &QXDocumentWindowManager::onDocumentWindowDestroyed);
     
-    documentWindows_.append(window);
+    createdWindows_.append(window);
+#endif
+    addManagedWindow(window);
     return window;            
 }
 
 void
-QXDocumentWindowManager::removeDocumentWindow(QXDocumentWindow * window)
+QXDocumentWindowManager::addManagedWindow(QWidget * window)
+{
+    connect(window, &QWidget::destroyed, [window, this]() {
+        removeManagedWindow(window);
+        if (auto itr = windowToDocumentMap_.find(window); itr != windowToDocumentMap_.end())
+            removeDocument(itr.value());
+    });
+       
+    managedWindows_.append(window);
+    
+    if (auto documentWindow = qobject_cast<QXDocumentWindow *>(window))
+        windowToDocumentMap_[window] = documentWindow->document();
+}
+
+void
+QXDocumentWindowManager::removeManagedWindow(QWidget * window)
 {
     // remove from window list
-    for (int i = documentWindows_.count() - 1; i >= 0; --i)
-        if (documentWindows_.at(i) == window)
-            documentWindows_.removeAt(i);
+    for (int i = managedWindows_.count() - 1; i >= 0; --i)
+        if (managedWindows_.at(i) == window)
+            managedWindows_.removeAt(i);
 }
 
 const QList<QXRecentFontItem> &
@@ -153,23 +171,24 @@ QXDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
     QList<QAction *> actionsToRemove;
     for (QAction * action: menu->actions()) {
         QVariant data = action->data();
-        if (data.canConvert<QXFontURI>())
+        if (data.canConvert<bool>())
             actionsToRemove.append(action);
     }
 
     for (QAction * action: actionsToRemove) {
         menu->removeAction(action);
     }
-
-    foreach(QXDocumentWindow * window, documentWindows_) {
+    
+    foreach(QWidget * window, managedWindows_) {
         QAction * action = new QAction(window->windowTitle(), menu);
         connect(action, &QAction::triggered, this, [window]() {
             window->show();
             window->raise();
             window->activateWindow();
         });
-        action->setData(QVariant::fromValue<QXFontURI>(window->document()->uri()));
-
+        
+        action->setData(QVariant(true));
+        
         QWidget * parent = menu;
         while ((parent = parent->parentWidget())) {
             if (parent == window) {
@@ -250,7 +269,7 @@ QXDocumentWindowManager::autoOpenFontDialog() {
 void
 QXDocumentWindowManager::onDocumentWindowAboutToClose(QXDocumentWindow * window) {
     // remove from list
-    removeDocumentWindow(window);
+    removeManagedWindow(window);
     removeDocument(window->document());
 }
 
@@ -278,8 +297,6 @@ QXDocumentWindowManager::addToRecents(QXDocument * document) {
 
     while (recentFonts_.size() > kMaxRecentFiles)
         recentFonts_.takeLast();
-
-    //QXJumpListHelper::addRecentFontItem(item);
 }
 
 bool
@@ -367,25 +384,6 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
 }
 
 
-#ifdef Q_OS_MAC
-// Handle selection of a document window in the Window menu.
-void
-QXDocumentWindowManager::slotShowWindow() {
-    if (QAction *action = qobject_cast<QAction *>(sender())) {
-        QVariant v = action->data();
-        if (v.canConvert<int>()) {
-            int offset = qvariant_cast<int>(v);
-            QXDocumentWindow *w = documentWindows_.at(offset);
-
-            if (w->isMinimized())
-                w->showNormal();
-            w->activateWindow();
-        }
-    }
-}
-
-#endif
-
 void
 QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
     QMessageBox::critical(nullptr,
@@ -396,7 +394,7 @@ QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
 
 QXDocumentWindow *
 QXDocumentWindowManager::activeDocumentWindow() const {
-    for (auto window : documentWindows_) {
+    for (auto window : documentWindows()) {
         if (window->isActiveWindow())
             return window;
     }
@@ -406,14 +404,22 @@ QXDocumentWindowManager::activeDocumentWindow() const {
 
 void
 QXDocumentWindowManager::closeAllDocumentsAndQuit() {
-    for (int i = 0; i < documentWindows_.size(); i++) {
-        QXDocumentWindow * w = documentWindows_[i];
-        w->close();
-    }
+    for (int i = 0; i < managedWindows_.size(); i++)
+        managedWindows_[i]->close();
     
     QXPreferences::setRecentFonts(recentFonts_);
     delete openFontDialog_;
     openFontDialog_ = nullptr;
     appIsAboutToQuit_ = true;
     QTimer::singleShot(100, qApp, &QXApplication::quit);
+}
+
+QList<QXDocumentWindow *>
+QXDocumentWindowManager::documentWindows() const {
+    QList<QXDocumentWindow *> windows;
+    for (auto widget: managedWindows_) {
+        if (auto window = qobject_cast<QXDocumentWindow*>(widget))
+            windows.append(window);
+    }
+    return windows;
 }
