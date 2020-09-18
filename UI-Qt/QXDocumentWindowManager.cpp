@@ -68,7 +68,7 @@ QXDocumentWindowManager::QXDocumentWindowManager() {
 }
 
 QXDocumentWindowManager::~QXDocumentWindowManager() {
-    delete openFontDialog_;
+    delete fontListWindow_;
 }
 
 // Singleton
@@ -132,7 +132,7 @@ QXDocumentWindowManager::addManagedWindow(QWidget * window)
             removeDocument(itr.value());
 
         if (!appIsAboutToQuit_ && documents_.empty())
-            doOpenFontDialog();
+            showFontListWindow();
     });
        
     managedWindows_.append(window);
@@ -193,31 +193,31 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
 }
 
 void
-QXDocumentWindowManager::doOpenFontDialog() {
-    if (!openFontDialog_) {
-        openFontDialog_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+QXDocumentWindowManager::showFontListWindow() {
+    if (!fontListWindow_) {
+        fontListWindow_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 #if !defined(Q_OS_MAC)
         // This piece of shit makes qApp quit
-        connect(openFontDialog_, &QXFontListWidget::rejected, this, [this]() {
+        connect(fontListWindow_, &QXFontListWidget::rejected, this, [this]() {
             if (documents_.empty()) {
-                delete openFontDialog_;
-                openFontDialog_ = nullptr;
+                delete fontListWindow_;
+                fontListWindow_ = nullptr;
                 closeAllDocumentsAndQuit();
             }
         }, Qt::QueuedConnection);
 #endif
-        connect(openFontDialog_, &QXFontListWidget::accepted, this, [this]() {
-            const QXFontURI fontURI = openFontDialog_->selectedFont();
+        connect(fontListWindow_, &QXFontListWidget::accepted, this, [this]() {
+            const QXFontURI fontURI = fontListWindow_->selectedFont();
             openFontURI(fontURI);
         });
     }
     
-    //openFontDialog_->setWindowFlag(Qt::WindowType::WindowMinMaxButtonsHint, documents_.empty());
-    openFontDialog_->show();
+    fontListWindow_->show();
+    fontListWindow_->activateWindow();
 }
 
 void
-QXDocumentWindowManager::autoOpenFontDialog() {
+QXDocumentWindowManager::autoShowFontListWindow() {
     if (appIsAboutToQuit_)
         return;
     if (documents().empty()) {
@@ -236,7 +236,7 @@ QXDocumentWindowManager::autoOpenFontDialog() {
             }
         }
         if (!hasWindow)
-            doOpenFontDialog();
+            showFontListWindow();
     }
 }
 
@@ -307,8 +307,8 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
 
 bool
 QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace) {
-    if (openFontDialog_ && openFontDialog_->isVisible())
-        openFontDialog_->close();
+    if (fontListWindow_ && fontListWindow_->isVisible())
+        fontListWindow_->close();
 
     // check already open
     QXDocument * document = getDocument(uri);
@@ -366,8 +366,8 @@ QXDocumentWindowManager::closeAllDocumentsAndQuit() {
         managedWindows_[i]->close();
     
     QXPreferences::setRecentFonts(recentFonts_);
-    delete openFontDialog_;
-    openFontDialog_ = nullptr;
+    delete fontListWindow_;
+    fontListWindow_ = nullptr;
     appIsAboutToQuit_ = true;
     QTimer::singleShot(100, qApp, &QXApplication::quit);
 }

@@ -66,10 +66,10 @@ public:
 
 public slots:
     void
-    doOpenFontDialog();
+    showFontListWindow();
 
     void
-    autoOpenFontDialog();
+    autoShowFontListWindow();
 
     void
     closeAllDocumentsAndQuit();
@@ -114,7 +114,7 @@ private:
     QMap<QWidget *, QXDocument *>        windowToDocumentMap_ {};
     QList<QXDocument *>                  documents_ {};
     bool                                 appIsAboutToQuit_ {false};
-    QXFontListWidget                   * openFontDialog_ {nullptr};
+    QXFontListWidget                   * fontListWindow_ {nullptr};
 
     static QXDocumentWindowManager     * instance_;
 

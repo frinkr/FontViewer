@@ -413,7 +413,7 @@ QXDocumentWindow::onOpenFontAction() {
     if (qApp->queryKeyboardModifiers().testFlag(Qt::ShiftModifier))
         QXDocumentWindowManager::instance()->doQuickOpenFontDialog();
     else
-        QXDocumentWindowManager::instance()->doOpenFontDialog();
+        QXDocumentWindowManager::instance()->showFontListWindow();
 }
 
 void

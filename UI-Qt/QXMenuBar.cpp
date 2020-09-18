@@ -7,7 +7,7 @@ QXMenuBar::QXMenuBar(QWidget * parent)
 {
     menuFile = addMenu(tr("&File")); {
         actionOpen = menuFile->addAction(tr("&Open"), []() {
-            QXDocumentWindowManager::instance()->doOpenFontDialog();
+            QXDocumentWindowManager::instance()->showFontListWindow();
         }, QKeySequence(QKeySequence::Open));
 
         actionOpenFromFile = menuFile->addAction(tr("Open from &File"), []() {

@@ -58,7 +58,7 @@ int qxMain(int argc, char *argv[]) {
     }
     else {
 #if !defined(Q_OS_MAC)
-        QXDocumentWindowManager::instance()->autoOpenFontDialog();
+        QXDocumentWindowManager::instance()->autoShowFontListWindow();
 #endif
     }  
 
