@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>QXFontListDialog</class>
+ <class>QXFontListWidget</class>
  <widget class="QWidget" name="QXFontListWidget">
   <property name="geometry">
    <rect>

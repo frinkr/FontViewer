@@ -20,7 +20,7 @@
 #include "QXPopoverWindow.h"
 #include "QXImageHelpers.h"
 #include "QXResources.h"
-#include "ui_QXFontListDialog.h"
+#include "ui_QXFontListWidget.h"
 
 namespace {
     constexpr qreal MIN_PREVIEW_FONT_SIZE = 20;
@@ -268,7 +268,7 @@ namespace {
 
 QXFontListWidget::QXFontListWidget(QWidget * parent, Qt::WindowFlags flags)
     : QXThemedWindow<QWidget>(parent, flags)
-    , ui_(new Ui::QXFontListDialog) {
+    , ui_(new Ui::QXFontListWidget) {
     ui_->setupUi(this);
     ui_->menuButton->setIcon(qApp->loadIcon(":/images/menu.png"));
 
@@ -392,6 +392,7 @@ QXFontListWidget::accept() {
 void
 QXFontListWidget::reject() {
     hide();
+    emit rejected();
 }
 
 int
@@ -484,6 +485,11 @@ QXFontListWidget::eventFilter(QObject * obj, QEvent * event) {
     }
 
     return QWidget::eventFilter(obj, event);
+}
+
+void
+QXFontListWidget::closeEvent(QCloseEvent* event) {
+    reject();
 }
 
 QXSortFilterFontListModel *

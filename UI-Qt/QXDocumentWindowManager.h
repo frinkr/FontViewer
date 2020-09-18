@@ -87,13 +87,6 @@ public slots:
     bool
     openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr);
 
-private slots:
-    void
-    onDocumentWindowAboutToClose(QXDocumentWindow * window);
-
-    void
-    onDocumentWindowDestroyed(QObject * obj);
-
 protected:
 protected:
     void

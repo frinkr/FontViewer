@@ -6,7 +6,7 @@
 #include "QXFontListModel.h"
 
 namespace Ui {
-    class QXFontListDialog;
+    class QXFontListWidget;
 }
 
 class QMenu;
@@ -57,9 +57,15 @@ signals:
     void
     accepted();
     
+    void
+    rejected();
+
 protected:
     bool
     eventFilter(QObject * obj, QEvent * event) override;
+
+    void
+    closeEvent(QCloseEvent* event) override;
 
 private:
     QXSortFilterFontListModel *
@@ -106,7 +112,7 @@ private slots:
     updatePreviewText();
 
 private:
-    Ui::QXFontListDialog * ui_;
+    Ui::QXFontListWidget * ui_;
     QMenu             * recentMenu_ {nullptr}; 
     QXPopoverWindow   * popover_ {nullptr};
     QTextBrowser      * popoverWidget_{ nullptr };

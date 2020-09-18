@@ -119,20 +119,6 @@ QXDocumentWindowManager::getDocumentWindow(const QXDocument * document) const {
 QXDocumentWindow *
 QXDocumentWindowManager::createDocumentWindow(QXDocument * document) {
     QXDocumentWindow * window = new QXDocumentWindow(document, nullptr);
-
-    #if 0
-    connect(window,
-            &QXDocumentWindow::aboutToClose,
-            this,
-            &QXDocumentWindowManager::onDocumentWindowAboutToClose);
-
-    connect(window,
-            &QXDocumentWindow::destroyed,
-            this,
-            &QXDocumentWindowManager::onDocumentWindowDestroyed);
-    
-    createdWindows_.append(window);
-#endif
     addManagedWindow(window);
     return window;            
 }
@@ -144,6 +130,9 @@ QXDocumentWindowManager::addManagedWindow(QWidget * window)
         removeManagedWindow(window);
         if (auto itr = windowToDocumentMap_.find(window); itr != windowToDocumentMap_.end())
             removeDocument(itr.value());
+
+        if (!appIsAboutToQuit_ && documents_.empty())
+            doOpenFontDialog();
     });
        
     managedWindows_.append(window);
@@ -188,16 +177,8 @@ QXDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
         });
         
         action->setData(QVariant(true));
-        
-        QWidget * parent = menu;
-        while ((parent = parent->parentWidget())) {
-            if (parent == window) {
-                action->setCheckable(true);
-                action->setChecked(true);
-                break;
-            }
-        }
-        
+        action->setCheckable(true);
+        action->setChecked(window->isActiveWindow());
         menu->addAction(action);
     }
 }
@@ -217,7 +198,7 @@ QXDocumentWindowManager::doOpenFontDialog() {
         openFontDialog_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
 #if !defined(Q_OS_MAC)
         // This piece of shit makes qApp quit
-        connect(openFontDialog_, &QDialog::rejected, this, [this]() {
+        connect(openFontDialog_, &QXFontListWidget::rejected, this, [this]() {
             if (documents_.empty()) {
                 delete openFontDialog_;
                 openFontDialog_ = nullptr;
@@ -231,15 +212,8 @@ QXDocumentWindowManager::doOpenFontDialog() {
         });
     }
     
-    // The timer makes the QXDocumentWindow's desctructor called ealier, otherwise the 'exec'
-    // will block it.
-    QTimer::singleShot(100, [this]() {
-        if (openFontDialog_) {
-            openFontDialog_->setWindowFlag(Qt::WindowType::WindowMinMaxButtonsHint, documents_.empty());
-            
-            openFontDialog_->show();
-        }
-    });
+    //openFontDialog_->setWindowFlag(Qt::WindowType::WindowMinMaxButtonsHint, documents_.empty());
+    openFontDialog_->show();
 }
 
 void
@@ -264,22 +238,6 @@ QXDocumentWindowManager::autoOpenFontDialog() {
         if (!hasWindow)
             doOpenFontDialog();
     }
-}
-
-void
-QXDocumentWindowManager::onDocumentWindowAboutToClose(QXDocumentWindow * window) {
-    // remove from list
-    removeManagedWindow(window);
-    removeDocument(window->document());
-}
-
-void
-QXDocumentWindowManager::onDocumentWindowDestroyed(QObject * obj) {
-    Q_UNUSED(obj);
-
-    // show Open Font dialog if no document open
-    if (!appIsAboutToQuit_ && documents_.empty())
-        doOpenFontDialog();  
 }
 
 void

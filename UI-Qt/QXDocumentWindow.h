@@ -11,7 +11,7 @@
 #include "QXPopoverWindow.h"
 #include "QXThemedWindow.h"
 
-class FXGChar;
+struct FXGChar;
 
 class QAction;
 class QFileDialog;

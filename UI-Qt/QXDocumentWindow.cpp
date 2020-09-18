@@ -360,14 +360,14 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
         FXGChar c = document_->charAt(index);
         FXGlyph g = document_->face()->glyph(c);
         if (auto outline = document_->face()->glyphOutline(g.gid)) {
+            const QString charCode = g.character == FXCharInvalid ? "N/A" : QXEncoding::charHexNotation(g.character);
+
             auto dlg = new QXOutlineDialog();
             dlg->outlineWidget()->setOutline(*outline);
-            dlg->setWindowTitle(windowTitle());
+            dlg->setWindowTitle(QString("%1 : %2").arg(windowTitle()).arg(g.name.empty()? charCode: toQString(g.name)));
             dlg->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
             dlg->setAttribute(Qt::WA_DeleteOnClose);
-            //dlg.exec();
             dlg->show();
-            //subWindows_.append(dlg);
             
             QXDocumentWindowManager::instance()->addManagedWindow(dlg);
         }
