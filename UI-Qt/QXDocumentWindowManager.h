@@ -11,6 +11,7 @@
 class QXDocumentWindow;
 class QXOpenFontDialog;
 class QXFontListWidget;
+class QDropEvent;
 class QMenu;
 class QString;
 
@@ -63,6 +64,9 @@ public:
 
     void
     aboutToShowRecentMenu(QMenu * recentMenu);
+
+    bool
+    handleDropEvent(QDropEvent * event);
 
 public slots:
     void

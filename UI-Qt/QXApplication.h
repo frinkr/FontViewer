@@ -38,6 +38,8 @@ public:
     showInGraphicalShell(QWidget * parent, const QString & path);
 
     void
+    bringWindowToFront(QWidget * window);
+    void
     copyTextToClipBoard(const QString & text);
 
     FXBenchmark &

@@ -1,7 +1,10 @@
 #include <QAbstractTextDocumentLayout>
 #include <QAction>
+#include <QDragEnterEvent>
+#include <QDropEvent>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QMimeData>
 #include <QPainter>
 #include <QStyledItemDelegate>
 #include <QTextBrowser>
@@ -377,6 +380,14 @@ QXFontListWidget::QXFontListWidget(QWidget * parent, Qt::WindowFlags flags)
         .arg(QXFontManager::instance().dbInitSeconds(), 0, 'f', 2)
         .arg(qApp->benchmark().time().count(), 0, 'f', 2));
     //setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(qApp->benchmark().time().count()));
+        
+    // Drops
+    std::vector<QWidget*> widgets = {ui_->fontListView, ui_->searchLineEdit};
+    this->setAcceptDrops(true);
+    for (auto w: widgets) {
+        w->setAcceptDrops(true);
+        w->installEventFilter(this);
+    }
 }
 
 QXFontListWidget::~QXFontListWidget() {
@@ -481,6 +492,24 @@ QXFontListWidget::eventFilter(QObject * obj, QEvent * event) {
 
             QKeyEvent * eventCopy = new QKeyEvent(QEvent::KeyPress, keyEvent->key(), Qt::NoModifier);
             qApp->postEvent(ui_->fontListView, eventCopy);
+        }
+    }
+    else if (event->type() == QEvent::DragEnter) {
+         if (obj == ui_->fontListView || obj == ui_->searchLineEdit) {
+             auto dragEnterEvent = ((QDragEnterEvent *)event);
+             if (dragEnterEvent->mimeData()->hasUrls()) {
+                 dragEnterEvent->acceptProposedAction();
+                 return true;
+             }
+         }
+    }
+    else if (event->type() == QEvent::Drop) {
+        if (obj == ui_->fontListView || obj == ui_->searchLineEdit) {
+            if (QXDocumentWindowManager::instance()->handleDropEvent((QDropEvent*)event)) {
+                event->accept();
+                hide();
+                return true;
+            }
         }
     }
 

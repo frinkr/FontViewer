@@ -132,6 +132,14 @@ QXApplication::showInGraphicalShell(QWidget * parent, const QString & path) {
 }
 
 void
+QXApplication::bringWindowToFront(QWidget * window) {
+    window->show();
+    window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    window->activateWindow();
+    window->raise();
+}
+
+void
 QXApplication::copyTextToClipBoard(const QString & text) {
     clipboard()->setText(text);
 }

@@ -171,9 +171,7 @@ QXDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
     foreach(QWidget * window, managedWindows_) {
         QAction * action = new QAction(window->windowTitle(), menu);
         connect(action, &QAction::triggered, this, [window]() {
-            window->show();
-            window->raise();
-            window->activateWindow();
+            qApp->bringWindowToFront(window);
         });
         
         action->setData(QVariant(true));
@@ -190,6 +188,16 @@ QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
         QAction * action = recentMenu->addAction(font.fullName);
         action->setData(QVariant::fromValue<QXFontURI>(font));
     }
+}
+
+bool
+QXDocumentWindowManager::handleDropEvent(QDropEvent * event) {
+    bool ok = false;
+    for (const QUrl & url: event->mimeData()->urls()) {
+        QString filePath = url.toLocalFile();
+        ok |= QXDocumentWindowManager::instance()->openFontFile(filePath);
+    }
+    return ok;
 }
 
 void
@@ -211,9 +219,8 @@ QXDocumentWindowManager::showFontListWindow() {
             openFontURI(fontURI);
         });
     }
-    
-    fontListWindow_->show();
-    fontListWindow_->activateWindow();
+
+    qApp->bringWindowToFront(fontListWindow_);
 }
 
 void
@@ -313,10 +320,7 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
     // check already open
     QXDocument * document = getDocument(uri);
     if (document) {
-        QXDocumentWindow * window = getDocumentWindow(document);
-        window->setWindowState((window->windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-        window->activateWindow();
-        window->raise();
+        qApp->bringWindowToFront(getDocumentWindow(document));
         return true;
     }
     else {

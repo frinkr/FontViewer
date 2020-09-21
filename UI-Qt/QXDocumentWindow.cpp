@@ -169,7 +169,7 @@ QXDocumentWindow::initToolBar() {
     // There are multiple faces in this file
    if (auto face = document()->face(); face->faceCount() > 1) {
        bool isPDF = false;
-#if FX_HAS_PDF_ADDON
+#if FX_HAVE_PDF_ADDON
        isPDF = face->userProperties().has(FXPDFDocumentInfoKey);
 #endif
        //isPDF = false;
@@ -288,10 +288,8 @@ QXDocumentWindow::closeEvent(QCloseEvent * event) {
 
 void
 QXDocumentWindow::dropEvent(QDropEvent * event) {
-    for (const QUrl & url: event->mimeData()->urls()) {
+    if (QXDocumentWindowManager::instance()->handleDropEvent(event)) {
         event->acceptProposedAction();
-        QString filePath = url.toLocalFile();
-        QXDocumentWindowManager::instance()->openFontFile(filePath);
         return;
     }
     QMainWindow::dropEvent(event);

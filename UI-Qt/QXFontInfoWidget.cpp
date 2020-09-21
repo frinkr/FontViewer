@@ -785,7 +785,7 @@ namespace {
         }
     };
 
-#if FX_HAS_PDF_ADDON
+#if FX_HAVE_PDF_ADDON
     class QXPdfPage : public QXFontHtmlTemplatePage {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
@@ -857,7 +857,7 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
         pages_.append(new QXPsFontPage(tr("CFF"), face, this));
     }
     
-#if FX_HAS_PDF_ADDON
+#if FX_HAVE_PDF_ADDON
     if (face->userProperties().has(FXPDFDocumentInfoKey)) {
         pages_.append(new QXPdfPage(tr("PDF"), face, this));
     }
