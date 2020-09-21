@@ -26,7 +26,7 @@
 }
 
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender {
-    QXDocumentWindowManager::instance()->autoOpenFontDialog();
+    QXDocumentWindowManager::instance()->autoShowFontListWindow();
     return YES;
 }
 
