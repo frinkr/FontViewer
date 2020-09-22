@@ -168,13 +168,8 @@ QXDocumentWindow::initToolBar() {
 
     // There are multiple faces in this file
    if (auto face = document()->face(); face->faceCount() > 1) {
-       bool isPDF = false;
-#if FX_HAVE_PDF_ADDON
-       isPDF = face->userProperties().has(FXPDFDocumentInfoKey);
-#endif
-       //isPDF = false;
        openFontInSameFileAction_ = toolBar->addAction(
-           qApp->loadIcon(isPDF?":/images/pdf.png": ":/images/font-list.png"), tr("Open Face in Same File"),
+           qApp->loadIcon(document()->isPDF()?":/images/pdf.png": ":/images/font-list.png"), tr("Open Face in Same File"),
            this, &QXDocumentWindow::onOpenFontInSameFileAction);
    }
     

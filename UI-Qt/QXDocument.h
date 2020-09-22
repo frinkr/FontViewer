@@ -129,6 +129,10 @@ public:
 
     QString
     displayName(const FXFaceLanguage & language) const;
+
+    bool
+    isPDF() const;
+                 
 public slots:
     bool
     selectCMap(size_t index);

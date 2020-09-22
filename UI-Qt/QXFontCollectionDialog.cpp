@@ -96,6 +96,8 @@ QXFontCollectionDialog::QXFontCollectionDialog(const QString & filePath, FXPtr<F
     if (!initFace)
        initFace = FXFace::createFace(toStdString(filePath), 0);
     loadFaceList(ui_->listWidget, initFace);
+    connect(ui_->listWidget, &QListWidget::itemDoubleClicked, this, &QXFontCollectionDialog::accept);
+    
     ui_->listWidget->setCurrentRow(0);
 }
 

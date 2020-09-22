@@ -123,7 +123,23 @@ QXDocument::face() const {
 
 QString
 QXDocument::displayName(const FXFaceLanguage & language) const {
-    return faceDisplayName(face_->attributes(), language);
+    auto name = faceDisplayName(face_->attributes(), language);
+    if (isPDF()) {
+        return QString("%1 (%2)")
+            .arg(name)
+            .arg(QFileInfo(uri_.filePath).fileName());
+    }
+    else
+        return name;
+}
+
+bool
+QXDocument::isPDF() const {
+#if FX_HAVE_PDF_ADDON
+    return face_->userProperties().has(FXPDFDocumentInfoKey);
+#else
+    return false;
+#endif 
 }
 
 bool

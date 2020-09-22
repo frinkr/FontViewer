@@ -382,12 +382,9 @@ QXFontListWidget::QXFontListWidget(QWidget * parent, Qt::WindowFlags flags)
     //setWindowTitle(QString("%1 (scaning fonts in %2s)").arg(windowTitle()).arg(qApp->benchmark().time().count()));
         
     // Drops
-    std::vector<QWidget*> widgets = {ui_->fontListView, ui_->searchLineEdit};
     this->setAcceptDrops(true);
-    for (auto w: widgets) {
-        w->setAcceptDrops(true);
-        w->installEventFilter(this);
-    }
+    ui_->fontListView->setAcceptDrops(true);
+    ui_->fontListView->installEventFilter(this);
 }
 
 QXFontListWidget::~QXFontListWidget() {
