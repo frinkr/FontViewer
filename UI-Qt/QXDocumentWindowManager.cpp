@@ -130,9 +130,10 @@ QXDocumentWindowManager::addManagedWindow(QWidget * window)
         removeManagedWindow(window);
         if (auto itr = windowToDocumentMap_.find(window); itr != windowToDocumentMap_.end())
             removeDocument(itr.value());
-
+#if defined(Q_OS_MACOS)
         if (!appIsAboutToQuit_ && documents_.empty())
             showFontListWindow();
+#endif
     });
        
     managedWindows_.append(window);
@@ -204,16 +205,6 @@ void
 QXDocumentWindowManager::showFontListWindow() {
     if (!fontListWindow_) {
         fontListWindow_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-#if !defined(Q_OS_MAC)
-        // This piece of shit makes qApp quit
-        connect(fontListWindow_, &QXFontListWidget::rejected, this, [this]() {
-            if (documents_.empty()) {
-                delete fontListWindow_;
-                fontListWindow_ = nullptr;
-                closeAllDocumentsAndQuit();
-            }
-        }, Qt::QueuedConnection);
-#endif
         connect(fontListWindow_, &QXFontListWidget::accepted, this, [this]() {
             const QXFontURI fontURI = fontListWindow_->selectedFont();
             openFontURI(fontURI);

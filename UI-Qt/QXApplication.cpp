@@ -30,7 +30,10 @@ QXApplication::QXApplication(int & argc, char ** argv)
     setOrganizationName("FontViewer");
     setOrganizationDomain("frinkr.top");
     setApplicationName("FontViewer");
+
+#if defined (Q_OS_MACOS)
     setQuitOnLastWindowClosed(false);
+#endif
 }
 
 bool
