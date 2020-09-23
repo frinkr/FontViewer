@@ -474,6 +474,11 @@ QXFontListWidget::isFontInfoPopoverVisible() const {
     return popover_ && popover_->isVisible();
 }
 
+QLineEdit *
+QXFontListWidget::searchLineEdit() const {
+    return ui_->searchLineEdit;
+}
+
 bool
 QXFontListWidget::eventFilter(QObject * obj, QEvent * event) {
     if (obj == ui_->searchLineEdit && event->type() == QEvent::KeyPress) {

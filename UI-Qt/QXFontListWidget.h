@@ -53,6 +53,9 @@ public:
     bool
     isFontInfoPopoverVisible() const;
 
+    QLineEdit *
+    searchLineEdit() const;
+    
 signals:
     void
     accepted();

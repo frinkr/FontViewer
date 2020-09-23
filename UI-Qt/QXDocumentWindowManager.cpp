@@ -221,6 +221,7 @@ QXDocumentWindowManager::showFontListWindow() {
     }
 
     qApp->bringWindowToFront(fontListWindow_);
+    fontListWindow_->searchLineEdit()->setFocus();
 }
 
 void
