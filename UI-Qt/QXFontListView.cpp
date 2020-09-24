@@ -56,10 +56,10 @@ namespace {
 
                 QRect rect = infoIconRect(option);
                 if (rect.contains(mouseEvent->pos())) {
-                    QXFontListView * window = qobject_cast<QXFontListView*>(option.widget->window());
-                    if (window) {
-                        QRect globalRect(option.widget->mapToGlobal(rect.topLeft()), option.widget->mapToGlobal(rect.bottomRight()));
-                        window->showFontInfoPopover(index, globalRect);
+                    auto view = qobject_cast<const QXFontListView *>(option.widget);
+                    if (view) {
+                        QRect globalRect(view->mapToGlobal(rect.topLeft()), view->mapToGlobal(rect.bottomRight()));
+                        view->showFontInfoPopover(index, globalRect);
                     }
                 }
             }
@@ -335,10 +335,10 @@ QXFontListView::db() const {
 }
     
 void
-QXFontListView::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) {
+QXFontListView::showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) const{
     if (popover_ == nullptr) {
-        popover_ = new QXPopoverWindow(this);
-        popoverWidget_ = new QTextBrowser(this);
+        popover_ = new QXPopoverWindow(const_cast<QXFontListView*>(this));
+        popoverWidget_ = new QTextBrowser(const_cast<QXFontListView*>(this));
         popoverWidget_->setFixedWidth(250);
         popoverWidget_->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         popoverWidget_->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

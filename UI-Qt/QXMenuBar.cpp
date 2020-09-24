@@ -26,7 +26,7 @@ QXMenuBar::QXMenuBar(QWidget * parent)
 
         menuRecent = menuFile->addMenu(tr("Open &Recent"));
         connect(menuRecent, &QMenu::aboutToShow, [this]() {
-            QXDocumentWindowManager::instance()->aboutToShowRecentMenu(menuRecent);
+            QXDocumentWindowManager::instance()->reloadRecentMenu(menuRecent);
             foreach (QAction * action, menuRecent->actions()) {
                 if (!action->isSeparator() && !action->menu()) {
                     connect(action, &QAction::triggered, [action]() {

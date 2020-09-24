@@ -63,7 +63,7 @@ public:
     aboutToShowWindowMenu(QMenu * windowMenu);
 
     void
-    aboutToShowRecentMenu(QMenu * recentMenu);
+    reloadRecentMenu(QMenu * recentMenu, bool includeIcon = false);
 
     bool
     handleDropEvent(QDropEvent * event);

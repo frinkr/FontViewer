@@ -81,7 +81,7 @@ public:
     
 public:
     void
-    showFontInfoPopover(const QModelIndex & index, const QRect & globalRect);
+    showFontInfoPopover(const QModelIndex & index, const QRect & globalRect) const;
 
     bool
     isFontInfoPopoverVisible() const;
@@ -108,6 +108,6 @@ private slots:
     scrollToCurrentIndex();
     
 private:
-    QXPopoverWindow       * popover_  {nullptr} ;
-    QTextBrowser          * popoverWidget_{ nullptr };
+    mutable QXPopoverWindow       * popover_  {nullptr} ;
+    mutable QTextBrowser          * popoverWidget_{ nullptr };
 };

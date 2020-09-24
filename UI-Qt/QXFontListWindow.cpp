@@ -88,7 +88,7 @@ QXFontListWindow::QXFontListWindow(QWidget * parent)
 
     recentMenu_ = menu->addMenu(qApp->loadIcon(":/images/history.png"), tr("Recents"));
     connect(recentMenu_, &QMenu::aboutToShow, [this]() {
-        QXDocumentWindowManager::instance()->aboutToShowRecentMenu(recentMenu_);
+        QXDocumentWindowManager::instance()->reloadRecentMenu(recentMenu_, true);
         foreach (QAction * action, recentMenu_->actions()) {
             if (!action->isSeparator() && !action->menu()) {
                 connect(action, &QAction::triggered, [this, action]() {

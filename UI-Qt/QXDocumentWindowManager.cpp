@@ -2,6 +2,7 @@
 #include <QDesktopWidget>
 #include <QDockWidget>
 #include <QFileDialog>
+#include <QFileIconProvider>
 #include <QInputDialog>
 #include <QMenu>
 #include <QMenuBar>
@@ -184,11 +185,15 @@ QXDocumentWindowManager::aboutToShowWindowMenu(QMenu * menu) {
 }
 
 void
-QXDocumentWindowManager::aboutToShowRecentMenu(QMenu * recentMenu) {
+QXDocumentWindowManager::reloadRecentMenu(QMenu * recentMenu, bool includeIcon) {
     recentMenu->clear();
     foreach(QXRecentFontItem font, recentFonts_) {
         QAction * action = recentMenu->addAction(font.fullName);
         action->setData(QVariant::fromValue<QXFontURI>(font));
+        if (includeIcon) {
+            QFileInfo fi(font.filePath);
+            action->setIcon(QFileIconProvider().icon(fi));
+        }
     }
 }
 
