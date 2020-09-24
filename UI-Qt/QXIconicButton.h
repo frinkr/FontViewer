@@ -1,7 +1,7 @@
 #pragma once
 #include <QPushButton>
 
-class QXIconButton : public QPushButton {
+class QXIconicButton : public QPushButton {
     Q_OBJECT
 public:
     using QPushButton::QPushButton;

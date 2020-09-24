@@ -1,9 +1,9 @@
 #include <QPainter>
 #include <QPaintEvent>
-#include "QXIconButton.h"
+#include "QXIconicButton.h"
 
 void
-QXIconButton::paintEvent(QPaintEvent * event) {
+QXIconicButton::paintEvent(QPaintEvent * event) {
     QIcon icon = this->icon();
     QPainter painter(this);
     QPixmap px = icon.pixmap(this->iconSize());

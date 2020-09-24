@@ -94,8 +94,8 @@ set(SHARED_SOURCES
   QXGlyphTableWidget.h
   QXHtmlTemplate.cpp
   QXHtmlTemplate.h
-  QXIconButton.cpp
-  QXIconButton.h
+  QXIconicButton.cpp
+  QXIconicButton.h
   QXIconEngine.cpp
   QXIconEngine.h
   QXImageHelpers.h
