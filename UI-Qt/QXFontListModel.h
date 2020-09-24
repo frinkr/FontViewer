@@ -33,6 +33,9 @@ public:
     bool
     acceptRow(const QXFontListFilter & filter, int row) const;
 public:
+    void
+    setDb(FXPtr<FXFaceDatabase> db);
+
     FXPtr<FXFaceDatabase>
     db() const;
 
@@ -44,6 +47,9 @@ public:
 
     QIcon
     icon(size_t index) const;
+
+private:
+    FXPtr<FXFaceDatabase> db_ {};
 };
 
 class QXSortFilterFontListModel : public QSortFilterProxyModel {
@@ -61,6 +67,9 @@ public:
     void
     setFilter(const QXFontListFilter & filter);
 
+    const QXFontListFilter &
+    filter() const;
+    
     void
     clearFilter();
 

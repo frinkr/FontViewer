@@ -10,7 +10,7 @@
 
 class QXDocumentWindow;
 class QXOpenFontDialog;
-class QXFontListWidget;
+class QXFontListWindow;
 class QDropEvent;
 class QMenu;
 class QString;
@@ -118,7 +118,7 @@ private:
     QMap<QWidget *, QXDocument *>        windowToDocumentMap_ {};
     QList<QXDocument *>                  documents_ {};
     bool                                 appIsAboutToQuit_ {false};
-    QXFontListWidget                   * fontListWindow_ {nullptr};
+    QXFontListWindow                   * fontListWindow_ {nullptr};
 
     static QXDocumentWindowManager     * instance_;
 

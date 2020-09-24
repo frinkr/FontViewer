@@ -18,7 +18,8 @@
 #include "QXDockTitleBarWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
-#include "QXFontListWidget.h"
+#include "QXFontListView.h"
+#include "QXFontListWindow.h"
 #include "QXFontCollectionDialog.h"
 #include "QXMenuBar.h"
 
@@ -204,8 +205,8 @@ QXDocumentWindowManager::handleDropEvent(QDropEvent * event) {
 void
 QXDocumentWindowManager::showFontListWindow() {
     if (!fontListWindow_) {
-        fontListWindow_ = new QXFontListWidget(nullptr, Qt::Window | Qt::WindowTitleHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-        connect(fontListWindow_, &QXFontListWidget::accepted, this, [this]() {
+        fontListWindow_ = new QXFontListWindow(nullptr);
+        connect(fontListWindow_, &QXFontListWindow::fontSelected, this, [this]() {
             const QXFontURI fontURI = fontListWindow_->selectedFont();
             openFontURI(fontURI);
         });

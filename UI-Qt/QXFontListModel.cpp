@@ -6,7 +6,6 @@
 #include "QXConv.h"
 #include "QXDocument.h"
 #include "QXFontListModel.h"
-#include "QXFontManager.h"
 #include "QXPreferences.h"
 #include "score_match.h"
 
@@ -56,7 +55,10 @@ QXFontListModel::QXFontListModel(QObject * parent)
 
 int
 QXFontListModel::rowCount(const QModelIndex & parent) const {
-    return (int)db()->faceCount();
+    if (auto bd = db())
+        return (int)bd->faceCount();
+    else
+        return 0;
 }
     
 QVariant
@@ -144,9 +146,16 @@ QXFontListModel::icon(size_t index) const {
     return QIcon();
 }
 
+void
+QXFontListModel::setDb(FXPtr<FXFaceDatabase> db) {
+    beginResetModel();
+    db_ = db;
+    endResetModel();
+}
+
 FXPtr<FXFaceDatabase>
 QXFontListModel::db() const {
-    return QXFontManager::instance().db();
+    return db_;
 }
 
 bool
@@ -171,6 +180,11 @@ void
 QXSortFilterFontListModel::setFilter(const QXFontListFilter & filter) {
     filter_ = filter;
     invalidate();
+}
+
+const QXFontListFilter &
+QXSortFilterFontListModel::filter() const {
+    return filter_;
 }
 
 void
