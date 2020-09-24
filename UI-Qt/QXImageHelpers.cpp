@@ -69,15 +69,18 @@ convertToBlack(const FXPixmapARGB & bm) {
 }
 
 FXGlyphImage
-autoColorGlyphImage(const FXGlyphImage & img, bool selected) {
+fillGlyphImageWithColor(const FXGlyphImage & img, const QColor & color) {
     if (img.pixmap.empty())
+        return img;
+    if (img.mode == FXGlyphImage::kColor)
         return img;
 
     auto gi = img;
-    if (gi.mode != FXGlyphImage::kColor && (selected || qApp->darkMode()))
-        gi.pixmap = convertToWhite(gi.pixmap);
-    else
+    if (color == Qt::black)
         gi.pixmap = convertToBlack(gi.pixmap);
+    else if (color == Qt::white)
+        gi.pixmap = convertToWhite(gi.pixmap);
+    
     return gi;
 }
 

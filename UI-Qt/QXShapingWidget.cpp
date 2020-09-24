@@ -160,13 +160,17 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         const int penY = baseLineY;
         
         int penX = baseLineX;
+
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             const FXGlyphID gid = shaper_->glyph(i);
             const FXVec2d<fu> adv = shaper_->advance(i);
             const FXVec2d<fu> off = shaper_->offset(i);
 
-          
-            FXGlyphImage gi = autoColorGlyphImage(face->glyphImage(gid), i == selectedIndex_);
+            QColor textColor = p.color(QPalette::Text);
+            if (i == selectedIndex_)
+                textColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
+
+            FXGlyphImage gi = fillGlyphImageWithColor(face->glyphImage(gid), textColor);
             QImage img = toQImage(gi);
 
             const int left = penX + gi.offset.x * gi.scale;

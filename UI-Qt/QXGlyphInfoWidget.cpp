@@ -113,7 +113,7 @@ QXGlyphInfoWidget::loadGlyph() {
     
     FXGlyph glyph = document_->face()->glyph(char_);
     
-    FXGlyphImage bm = autoColorGlyphImage(glyph.glyphImage(), false);
+    FXGlyphImage bm = fillGlyphImageWithColor(glyph.glyphImage(), palette().color(QPalette::Text));
     QImage image = drawGlyphImageInEmBox(bm);
     
     QTextDocument * qdoc = new QTextDocument;
