@@ -5,7 +5,9 @@
 #include "FontX/FXFace.h"
 #include "FontX/FXGlyph.h"
 
-
+bool
+isDarkColor(const QColor & color);
+    
 QImage
 toQImage(const FXPixmapARGB & bm);
 

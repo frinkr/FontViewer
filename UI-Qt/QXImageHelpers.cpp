@@ -13,6 +13,14 @@ namespace {
     }
 }
 
+bool
+isDarkColor(const QColor & color) {
+    QColor gray(55, 55, 55);
+    QColor hsl = color.toHsl();
+    return hsl.lightnessF() < 0.3;
+
+}
+
 QImage
 toQImage(const FXPixmapARGB & bm) {
     FXPixmapARGB * ref = new FXPixmapARGB(bm); // make a new ref
@@ -76,9 +84,9 @@ fillGlyphImageWithColor(const FXGlyphImage & img, const QColor & color) {
         return img;
 
     auto gi = img;
-    if (color == Qt::black)
+    if (isDarkColor(color))
         gi.pixmap = convertToBlack(gi.pixmap);
-    else if (color == Qt::white)
+    else
         gi.pixmap = convertToWhite(gi.pixmap);
     
     return gi;
@@ -87,12 +95,6 @@ fillGlyphImageWithColor(const FXGlyphImage & img, const QColor & color) {
 QImage
 toQImage(const FXGlyphImage & im) {
     return toQImage(im.pixmap);
-}
-
-QSize
-glyphEmSize() {
-    return QSize(pt2px(FXDefaultFontSize),
-                 pt2px(FXDefaultFontSize));
 }
 
 QImage

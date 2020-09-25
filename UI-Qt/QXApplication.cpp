@@ -14,6 +14,7 @@
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"
 #include "QXIconEngine.h"
+#include "QXImageHelpers.h"
 #include "QXPreferencesDialog.h"
 #include "QXSplash.h"
 #include "QXThemedWindow.h"
@@ -38,13 +39,7 @@ QXApplication::QXApplication(int & argc, char ** argv)
 
 bool
 QXApplication::darkMode() const {
-	return isDarkColor(palette().color(QPalette::Normal, QPalette::Text));
-}
-
-bool
-QXApplication::isDarkColor(const QColor & color) const {
-    QColor gray(55, 55, 55);
-    return color.toRgb().value() > gray.value();
+	return isDarkColor(palette().color(QPalette::Normal, QPalette::Window));
 }
 
 QIcon
