@@ -176,10 +176,12 @@ unicodeCharImage(FXChar c, const QSize & emSize) {
 
 QRect
 calculateTargetRect(const FXGlyphImage & glyphImage, const QRect & emRect) {
-    const double scale = emRect.width() * 1.0 / glyphImage.emSize.x * 0.8;
+    const double emScale = emRect.width() * 1.0 / glyphImage.emSize.x * 0.8;
+    const double scale = emScale * glyphImage.scale;
+    
     const QSize imageSize(glyphImage.pixmap.width, glyphImage.pixmap.height);
     
-    return QRect(QPoint(emRect.left() + (emRect.width() - imageSize.width() * scale * glyphImage.scale) / 2,
-                        emRect.top() + (glyphImage.emSize.y - glyphImage.offset.y * glyphImage.scale - imageSize.height() * glyphImage.scale) * scale),
-                 imageSize * scale * glyphImage.scale);
+    return QRect(QPoint(emRect.left() + (emRect.width() - imageSize.width() * scale) / 2,
+                        emRect.top() + (glyphImage.emSize.y - glyphImage.offset.y  - imageSize.height()) * scale),
+                 imageSize * scale);
 }

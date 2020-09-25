@@ -23,7 +23,7 @@ namespace {
         void
         drawItem(QPainter * painter, const QXCollectionViewDrawItemOption & option) override {
             painter->save();
-            painter->setRenderHint(QPainter::Antialiasing);
+            painter->setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
             
             auto & palette = option.widget->palette();
             
