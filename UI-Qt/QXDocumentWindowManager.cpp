@@ -361,11 +361,15 @@ QXDocumentWindowManager::activeDocumentWindow() const {
     return nullptr;
 }
     
+void
+QXDocumentWindowManager::closeAllDocuments() {
+    for (int i = 0; i < managedWindows_.size(); i++)
+        managedWindows_[i]->close();
+}
 
 void
 QXDocumentWindowManager::closeAllDocumentsAndQuit() {
-    for (int i = 0; i < managedWindows_.size(); i++)
-        managedWindows_[i]->close();
+    closeAllDocuments();
     
     QXPreferences::setRecentFonts(recentFonts_);
     delete fontListWindow_;

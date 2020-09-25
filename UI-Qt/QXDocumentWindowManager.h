@@ -76,6 +76,9 @@ public slots:
     autoShowFontListWindow();
 
     void
+    closeAllDocuments();
+    
+    void
     closeAllDocumentsAndQuit();
 
     /* Return true if use selected a font file, false if canceled.*/

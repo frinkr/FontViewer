@@ -15,6 +15,7 @@ public:
     QAction * actionOpenFromFile;
     QAction * actionOpenFromPDF;
     QAction * actionClose;
+    QAction * actionCloseAll;
     QAction * actionRecent;
     QAction * actionPreferences;
     QAction * actionQuit;

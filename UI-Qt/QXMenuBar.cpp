@@ -19,8 +19,18 @@ QXMenuBar::QXMenuBar(QWidget * parent)
         });
         
         actionClose = menuFile->addAction(tr("&Close"), [parent]() {
-            if (parent) parent->close();
+            if (parent) {
+                parent->close();
+            }
+            else {
+                if (auto window = qApp->activeWindow())
+                    window->close();
+            }
         }, QKeySequence(QKeySequence::Close));
+
+        actionCloseAll = menuFile->addAction(tr("Close &All"), [parent]() {
+            QXDocumentWindowManager::instance()->closeAllDocuments();
+        });
 
         menuFile->addSeparator();
 
