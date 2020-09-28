@@ -39,5 +39,5 @@ protected:
 
 private:
     FXPtr<FXPDFDocument>      document_;
-    const FXPDFFontInfo     & font_;
+    const FXPDFFontInfo     & fontInfo_;
 };

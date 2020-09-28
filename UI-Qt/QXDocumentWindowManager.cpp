@@ -305,7 +305,7 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
         }
     }
     else {
-        showOpenFontFileError(filePath);
+        showOpenFontFileError(filePath, nullptr);
     }
     return false;
 }
@@ -337,7 +337,7 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
             }
             return true;
         } else {
-            showOpenFontFileError(uri.filePath);
+            showOpenFontFileError(uri.filePath, initFace);
             return false;
         }
     }
@@ -345,10 +345,12 @@ QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFa
 
 
 void
-QXDocumentWindowManager::showOpenFontFileError(const QString & file) {
+QXDocumentWindowManager::showOpenFontFileError(const QString & file, FXPtr<FXFace> initFace) {
     QMessageBox::critical(nullptr,
                       tr("Error to open file"),
-                      tr("The file %1 can't be open.").arg(file),
+                      tr("The file %1 can't be open. (init font %2)")
+                          .arg(file)
+                          .arg(initFace? toQString(initFace->postscriptName()): "<null>"),
                       QMessageBox::Ok);
 }
 

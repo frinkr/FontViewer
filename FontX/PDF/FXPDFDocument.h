@@ -11,7 +11,7 @@ class FXPDFFace;
 
 struct FXPDFFontInfo {
     FXString  reference {};
-    FXString  baseFont{};
+    FXString  fontName{};
     FXString  subType{};
     bool      isSubset{false};
     const PoDoFo::PdfObject * fontObject {nullptr};

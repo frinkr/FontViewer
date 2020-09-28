@@ -168,13 +168,18 @@ FXPDFDocument::processFontResource(const PoDoFo::PdfObject * fontRes) {
         
         const PdfObject * baseFont = fontObj->GetIndirectKey("BaseFont");
         if (baseFont && baseFont->IsName())
-            font.baseFont = baseFont->GetName().GetName();
+            font.fontName = baseFont->GetName().GetName();
+        else if (const PdfObject * descriptor = fontObj->GetIndirectKey("FontDescriptor")) {
+            if (const PdfName fontName = descriptor->GetIndirectKeyAsName("FontName"); fontName.GetLength()) {
+                font.fontName = fontName.GetName();
+            }
+        }
         
         // Don't add if exists
-        if (font.baseFont.size()) {
-            if (baseFontsNames_.count(font.baseFont) != 0)
+        if (font.fontName.size()) {
+            if (baseFontsNames_.count(font.fontName) != 0)
                 continue;
-            baseFontsNames_.insert(font.baseFont);
+            baseFontsNames_.insert(font.fontName);
         }
         
         const PdfObject * subType = fontObj->GetIndirectKey("Subtype");

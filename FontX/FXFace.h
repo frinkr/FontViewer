@@ -143,7 +143,7 @@ struct FXFaceAttributes {
     size_t           upem { 0 };
     FXString         format;
     size_t           glyphCount { 0 };
-    FXFaceNames  names;
+    FXFaceNames      names;
     fu               ascender {};
     fu               descender {};
     FXRect<fu>       bbox;

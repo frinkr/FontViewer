@@ -101,7 +101,7 @@ protected:
 
 private:
     void
-    showOpenFontFileError(const QString & file);
+    showOpenFontFileError(const QString & file, FXPtr<FXFace> initFace);
 
     QXDocumentWindow *
     activeDocumentWindow() const;

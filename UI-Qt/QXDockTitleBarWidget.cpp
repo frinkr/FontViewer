@@ -31,7 +31,8 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
         QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
         dockWidget->hide();
     });
-
+    
+    setFocusPolicy(Qt::StrongFocus);
     connect(qApp, &QApplication::focusChanged, this, &QXDockTitleBarWidget::onFocusChanged);
 
     layout->addSpacing(5);

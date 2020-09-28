@@ -3,6 +3,7 @@
 #include "FontX/FXFace.h"
 #include "FontX/FXPDF.h"
 
+#include "QXApplication.h"
 #include "QXConv.h"
 #include "QXDocument.h"
 #include "QXFontCollectionDialog.h"
@@ -27,6 +28,11 @@ namespace {
                 
                 if (i == currFace->index())
                     listWidget->setCurrentItem(item);
+                
+                if (!face->hasValidFaceData()) {
+                    item->setData(Qt::DecorationRole, qApp->loadIcon(":/images/warning.png"));
+                    item->setToolTip("No font data.");
+                }
             }
             else
                 listWidget->addItem(QXFontCollectionDialog::tr("<INVALID FACE>"));
