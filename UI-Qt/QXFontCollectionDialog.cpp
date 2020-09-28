@@ -30,8 +30,8 @@ namespace {
                     listWidget->setCurrentItem(item);
                 
                 if (!face->hasValidFaceData()) {
-                    item->setData(Qt::DecorationRole, qApp->loadIcon(":/images/warning.png"));
-                    item->setToolTip("No font data.");
+                    item->setData(Qt::DecorationRole, qApp->loadIcon(":/images/error.png"));
+                    item->setData(Qt::ToolTipRole, "No font data.");
                 }
             }
             else

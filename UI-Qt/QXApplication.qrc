@@ -10,14 +10,13 @@
     <file alias="images/cmap.png">../Resources/Images/cmap.png</file>
     <file alias="images/cmap_d.png">../Resources/Images/cmap_d.png</file>
     <file alias="images/empty.png">../Resources/Images/empty.png</file>
-    <file alias="images/pdf.png">../Resources/Images/pdf.png</file>  
-    <file alias="images/pdf_d.png">../Resources/Images/pdf_d.png</file>
-    <file alias="images/font-list.png">../Resources/Images/font-list.png</file>
-    <file alias="images/font-list_d.png">../Resources/Images/font-list_d.png</file>
+    <file alias="images/error.png">../Resources/Images/error.png</file>
     <file alias="images/filter.png">../Resources/Images/filter.png</file>
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
     <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
     <file alias="images/font-book_d.png">../Resources/Images/font-book_d.png</file>
+    <file alias="images/font-list.png">../Resources/Images/font-list.png</file>
+    <file alias="images/font-list_d.png">../Resources/Images/font-list_d.png</file>
     <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
     <file alias="images/glyph_d.png">../Resources/Images/glyph_d.png</file>
     <file alias="images/history.png">../Resources/Images/history.png</file>
@@ -37,6 +36,8 @@
     <file alias="images/open_d.png">../Resources/Images/open_d.png</file>
     <file alias="images/opentype.png">../Resources/Images/opentype.png</file>
     <file alias="images/opentype_d.png">../Resources/Images/opentype_d.png</file>
+    <file alias="images/pdf.png">../Resources/Images/pdf.png</file>  
+    <file alias="images/pdf_d.png">../Resources/Images/pdf_d.png</file>
     <file alias="images/plus.png">../Resources/Images/plus.png</file>
     <file alias="images/plus_d.png">../Resources/Images/plus_d.png</file>
     <file alias="images/postscript.png">../Resources/Images/postscript.png</file>
@@ -47,6 +48,8 @@
     <file alias="images/search_d.png">../Resources/Images/search_d.png</file>
     <file alias="images/shape.png">../Resources/Images/shape.png</file>
     <file alias="images/shape_d.png">../Resources/Images/shape_d.png</file>
+    <file alias="images/splash-text.png">../Resources/Images/splash-text.png</file>
+    <file alias="images/splash.png">../Resources/Images/splash.png</file>
     <file alias="images/table.png">../Resources/Images/table.png</file>
     <file alias="images/table_d.png">../Resources/Images/table_d.png</file>
     <file alias="images/truetype.png">../Resources/Images/truetype.png</file>
@@ -57,8 +60,6 @@
     <file alias="images/variant_d.png">../Resources/Images/variant_d.png</file>
     <file alias="images/warning.png">../Resources/Images/warning.png</file>
     <file alias="images/windowsfnt.png">../Resources/Images/windowsfnt.png</file>
-    <file alias="images/splash.png">../Resources/Images/splash.png</file>
-    <file alias="images/splash-text.png">../Resources/Images/splash-text.png</file>
     <file alias="shaping-samples.txt">../Resources/shaping-samples.txt</file>
 </qresource>
 </RCC>
