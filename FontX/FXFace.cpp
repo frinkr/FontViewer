@@ -394,6 +394,8 @@ FXFace::selectCMap(size_t cmapIndex) {
 FXFace::AutoFontSize::AutoFontSize(FXFace * face, double fontSize)
     : face_(face) {
     oldSize_ = face_->face()->size;
+    oldFontSize_ = face_->fontSize();
+
     FT_New_Size(face_->face(), &newSize_);
     FT_Activate_Size(newSize_);
     
@@ -401,6 +403,7 @@ FXFace::AutoFontSize::AutoFontSize(FXFace * face, double fontSize)
 }
     
 FXFace::AutoFontSize::~AutoFontSize() {
+    face_->selectFontSize(oldFontSize_);
     FT_Activate_Size(oldSize_);
     FT_Done_Size(newSize_);
 }

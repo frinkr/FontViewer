@@ -239,6 +239,7 @@ public:
     private:
         FXFace * face_;
         FXFTSize oldSize_;
+        double   oldFontSize_;
         FXFTSize newSize_;
     };
     
