@@ -46,13 +46,13 @@ namespace {
             alterFolders << fonts;
             
 #endif
-#endif
 
         for(auto & folder: alterFolders) {
             if (!folders.contains(folder))
                 folders << folder;
         }
         return folders;
+#endif
     }
 }
 

@@ -25,13 +25,16 @@ namespace {
 
         void
         applyToApplication() override {
-#ifdef Q_OS_WIN
-            auto style = QStyleFactory::create("windowsvista");
+            QStyle * style {};
+#if defined(Q_OS_WIN)
+            style = QStyleFactory::create("windowsvista");
 #elif defined(Q_OS_MAC)
-            auto style = QStyleFactory::create("macintosh");
+            style = QStyleFactory::create("macintosh");
 #endif
-            qApp->setStyle(style);
-            qApp->setPalette(style->standardPalette());
+            if (style) {
+                qApp->setStyle(style);
+                qApp->setPalette(style->standardPalette());
+            }
         }
     };
 

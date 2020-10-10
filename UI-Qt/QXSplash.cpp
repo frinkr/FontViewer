@@ -6,7 +6,12 @@
 #include "QXApplication.h"
 
 QXSplash::QXSplash(QScreen * parent)
-    : QSplashScreen(parent) {
+#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+    : QSplashScreen()
+#else
+    : QSplashScreen(parent)
+#endif
+{
     setPixmap(qApp->loadIcon(":/images/splash.png").pixmap(256, 256));
 }
 
