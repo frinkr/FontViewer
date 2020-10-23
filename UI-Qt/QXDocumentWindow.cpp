@@ -185,7 +185,8 @@ QXDocumentWindow::initToolBar() {
     infoAction_->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_I));
     
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
-
+    toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
+    
 #if defined(Q_OS_MAC)
     this->setUnifiedTitleAndToolBarOnMac(true);
     QXTheme::current()->applyToToolBar(toolBar);

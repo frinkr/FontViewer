@@ -66,7 +66,7 @@ public:
         const QXGlyph ug = qvariant_cast<QXGlyph>(index.data());
         const FXGlyph & g = ug.g();
 
-        QIcon icon(QPixmap::fromImage(drawGlyphImageInEmBox(g.glyphImage())));
+        QIcon icon(QPixmap::fromImage(drawGlyphImageInEmBox(fillGlyphImageWithColor(g.glyphImage(), Qt::black))));
                    
         QIcon::Mode mode = QIcon::Normal;
         if (!(opt.state & QStyle::State_Enabled))
