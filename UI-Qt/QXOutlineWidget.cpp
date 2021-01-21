@@ -58,6 +58,14 @@ QXOutlineWidget::setOutline(const FXGlyphOutline & outline) {
     update();
 }
 
+void
+QXOutlineWidget::setMetrics(const FXGlyphMetrics & metrics) {
+    metrics_ = metrics;
+    buildScene();
+    update();
+}
+
+
 QXOutlineWidget::Components
 QXOutlineWidget::components() const {
     return components_;
@@ -196,6 +204,14 @@ QXOutlineWidget::buildScene() {
                 textItem->setDefaultTextColor(color);
             }
         }
+    }
+
+    // Metrics
+    if (metrics_.horiAdvance) {
+        auto adv = metrics_.horiAdvance;
+        auto p0 = xf({adv, 0});
+        auto p1 = xf({adv, metrics_.upem});
+        scene_->addLine(QLineF(p0, p1), QPen(Qt::green, 1, Qt::DotLine));
     }
 }
 

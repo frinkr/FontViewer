@@ -8,6 +8,7 @@ class FXFace;
 struct FXGlyphMetrics {
     using value_type = fu;
 
+    value_type        upem;
     value_type        width;
     value_type        height;
 

@@ -36,6 +36,9 @@ public:
     void
     setOutline(const FXGlyphOutline & outline);
 
+    void
+    setMetrics(const FXGlyphMetrics & metrics);
+    
     Components
     components() const;
 
@@ -59,6 +62,7 @@ private:
     
 private:
     FXGlyphOutline      outline_ {};
+    FXGlyphMetrics      metrics_ {};
     QGraphicsView     * view_ {};
     QGraphicsScene    * scene_ {};
 

@@ -195,6 +195,9 @@ public:
     bool
     isUnicode() const;
 
+    bool
+    isSymbol() const;
+    
     const FXVector<FXPtr<FXGCharBlock> > &
     blocks() const;
 

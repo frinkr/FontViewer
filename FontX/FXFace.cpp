@@ -492,6 +492,7 @@ FXFace::glyph(FXGChar gc) {
     FT_Load_Glyph(face_, gid, FT_LOAD_NO_SCALE);
     FT_GlyphSlot slot = face_->glyph;
 
+    glyph.metrics.upem         = (fu)face_->units_per_EM;
     glyph.metrics.width        = (fu)slot->metrics.width;
     glyph.metrics.height       = (fu)slot->metrics.height;
     glyph.metrics.horiBearingX = (fu)slot->metrics.horiBearingX;

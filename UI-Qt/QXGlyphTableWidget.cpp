@@ -111,37 +111,20 @@ namespace {
         return QVariant();
     }
     
-    template <class PointerToMember>
-    class QXGlyphBasicColumn : public QXGlyphTableModelColumn {
+    template <class Functor>
+    class QXGlyphDynamicColumn : public QXGlyphTableModelColumn {
     public:
-        QXGlyphBasicColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
+        QXGlyphDynamicColumn(Functor && func, const QString & name, QObject * parent = nullptr)
             : QXGlyphTableModelColumn(name, parent)
-            , p_(p)
-        {}
+            , func_(std::forward<Functor>(func)) {}
+
+        QVariant
+        value(const FXGlyph & g) const override {
+            return toVariant(func_(g));
+        }
         
-        virtual QVariant
-        value(const FXGlyph & g) const {
-            return toVariant(g.*p_);
-        }
-    protected:
-        PointerToMember p_;
+        Functor func_;
     };
-    
-    template <class PointerToMember>
-    class QXGlyphMetricColumn : public QXGlyphTableModelColumn {
-    public:
-        QXGlyphMetricColumn(const QString & name, PointerToMember p, QObject * parent = nullptr)
-            : QXGlyphTableModelColumn(name, parent)
-            , p_(p) {}
-
-        virtual QVariant
-        value(const FXGlyph & g) const {
-            return toVariant(g.metrics.*p_);
-        }
-    protected:
-        PointerToMember p_;
-    };
-
     
     class QXGlyphCodePointColumn : public QXGlyphTableModelColumn {
     public:
@@ -165,17 +148,26 @@ namespace {
         }
     };
 
-    template <typename PointerToMember>
-    QXGlyphBasicColumn<PointerToMember> *
-    makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
-        return new QXGlyphBasicColumn<PointerToMember>(name, p, parent);
+    template <class Functor>
+    auto
+    makeDynamicColumn(const QString & name, QObject * parent, Functor && fun) {
+        return new QXGlyphDynamicColumn<Functor>(std::forward<Functor>(fun), name, parent);
     }
-
+        
+    template <typename PointerToMember>
+    auto
+    makeBasicColumn(const QString & name, PointerToMember p, QObject * parent) {
+        return makeDynamicColumn(name, parent, [p](const FXGlyph & g) {
+            return g.*p;
+        });
+    }
     
     template <typename PointerToMember>
-    QXGlyphMetricColumn<PointerToMember> *
+    auto
     makeMetricColumn(const QString & name, PointerToMember p, QObject * parent) {
-        return new QXGlyphMetricColumn<PointerToMember>(name, p, parent);
+        return makeDynamicColumn(name, parent, [p](const FXGlyph & g) {
+            return g.metrics.*p;
+        });
     }
 
 }
@@ -196,8 +188,9 @@ QXGlyphTableModel::QXGlyphTableModel(QXDocument * document, QObject * parent)
     columns_.append(makeMetricColumn(tr("Hori Advance"), &FXGlyphMetrics::horiAdvance, this));
     columns_.append(makeMetricColumn(tr("Vert Bearing X"), &FXGlyphMetrics::vertBearingX, this));
     columns_.append(makeMetricColumn(tr("Vert Bearing Y"), &FXGlyphMetrics::vertBearingY, this));
-    columns_.append(makeMetricColumn(tr("Vert Advance"), &FXGlyphMetrics::vertAdvance, this));
-
+    columns_.append(makeMetricColumn(tr("Vert Advance"), &FXGlyphMetrics::vertAdvance, this));    
+    columns_.append(makeDynamicColumn(tr("Descender"), this, [](auto & g) { return g.metrics.height - g.metrics.horiBearingY; }));
+    
     connect(document_, &QXDocument::cmapActivated,
             this, &QXGlyphTableModel::reset);
 }

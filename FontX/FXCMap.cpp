@@ -101,7 +101,7 @@ void
 FXCMapPlatform::initMicrosoftEncoding() {
     blocksMap_[TT_MS_ID_UNICODE_CS] = getUnicodeBlocks();
     blocksMap_[TT_MS_ID_UCS_4] = getUnicodeBlocks();
-    blocksMap_[TT_MS_ID_SYMBOL_CS].push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF + 1, FXGCharTypeUnicode, "Windows Symbol"));
+    blocksMap_[TT_MS_ID_SYMBOL_CS] = getUnicodeBlocks();//.push_back(std::make_shared<FXCharRangeBlock>(0xF020, 0xF0FF + 1, FXGCharTypeUnicode, "Windows Symbol"));
 }
 
 void
@@ -210,6 +210,11 @@ FXCMap::isUnicode() const {
     return platformID_ == TT_PLATFORM_APPLE_UNICODE
         || (platformID_ == TT_PLATFORM_MICROSOFT && (encodingID_ == TT_MS_ID_UNICODE_CS || encodingID_ == TT_MS_ID_UCS_4 || encodingID_ == TT_MS_ID_SYMBOL_CS))
         ;
+}
+
+bool
+FXCMap::isSymbol() const {
+    return platformID_ == TT_PLATFORM_MICROSOFT && encodingID_ == TT_MS_ID_SYMBOL_CS;
 }
 
 const FXVector<FXPtr<FXGCharBlock> > & 

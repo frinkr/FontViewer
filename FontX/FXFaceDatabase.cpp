@@ -177,6 +177,7 @@ FXFaceDatabase::rescan() {
     FXVector<FaceItem> faces;
 
     size_t current = 0;
+    FXString lastFontFile;
     for (auto & kv: diskHash_.files) {
         ++ current;
 
@@ -193,11 +194,12 @@ FXFaceDatabase::rescan() {
             continue;
         }
 
-        if (progress_)
-            progress_(current, diskHash_.files.size(), file);
+        if (progress_ && !lastFontFile.empty())
+            progress_(current, diskHash_.files.size(), lastFontFile);
 
         size_t count = 0;
         if (!FXFTCountFaces(FXLib::get(), file, count)) {
+            lastFontFile = file;
             for (size_t i = 0; i < count; ++ i) {
                 FXFaceDescriptor desc = {file, i};
                 FXPtr<FXFace> face = FXFace::createFace(desc);

@@ -358,6 +358,7 @@ QXDocumentWindow::onGlyphRightClicked(const QXCollectionModelIndex & index) {
 
             auto dlg = new QXOutlineDialog();
             dlg->outlineWidget()->setOutline(*outline);
+            dlg->outlineWidget()->setMetrics(g.metrics);
             dlg->setWindowTitle(QString("%1 : %2").arg(windowTitle()).arg(g.name.empty()? charCode: toQString(g.name)));
             dlg->setWindowFlags(Qt::Window | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
             dlg->setAttribute(Qt::WA_DeleteOnClose);

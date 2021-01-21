@@ -11,15 +11,16 @@ namespace {
         void
         processDatabase(FXPtr<const FCLDatabase> db) override {
             
-            {
-                auto face = FXFace::createFace("/Users/frinkr/Library/Fonts/HeiseiKakuGo W5", 0);
-                face->currentCMap();
-                
-            }
             
             for (size_t i = 0; i < db->faceCount(); ++ i) {
                 auto & desc = db->faceDescriptor(i);
                 auto face = FXFace::createFace(desc);
+                
+                for (auto & cm: face->cmaps()) {
+                    if (cm.isSymbol())
+                        FX_INFO(desc.filePath);
+                }
+                continue;
 #if 1
                 // Find the font which doesn't have the unicode cmap, or the unicode cmap doesn't contains the char space.
                 if (face->currentCMap().isUnicode()) {
