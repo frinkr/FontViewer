@@ -614,6 +614,21 @@ namespace {
     public:
         using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
 
+        void
+        loadTableRows() override {
+            FT_Error error = 0;
+            FT_ULong length = 0;
+            error = FT_Load_Sfnt_Table(ftFace_, 'GDEF', 0, 0, &length);
+            if (error)
+                return;
+            
+            std::vector<unsigned char> tableData(length);
+            error = FT_Load_Sfnt_Table(ftFace_, 'GDEF', 0, tableData.data(), &length);
+            if (error)
+                return;
+
+            
+        }
     };
 
     template <FXTag otTable>

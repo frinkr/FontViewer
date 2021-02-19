@@ -116,6 +116,8 @@ set(SHARED_SOURCES
   QXPreferencesDialog.h
   QXResources.cpp
   QXResources.h
+  QXRelatedFontsWidget.cpp
+  QXRelatedFontsWidget.h
   QXRichLineEdit.cpp
   QXRichLineEdit.h
   QXSearchEngine.cpp

@@ -29,6 +29,7 @@
 #include "QXMenuBar.h"
 #include "QXOutlineDialog.h"
 #include "QXOutlineWidget.h"
+#include "QXRelatedFontsWidget.h"
 #include "QXPopoverWindow.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
@@ -475,13 +476,25 @@ void
 QXDocumentWindow::onOpenFontInSameFileAction() {
     if (!openFontInSameFilePopover_) {
         openFontInSameFilePopover_ = new QXPopoverWindow(this);
-        QXFontCollectionWidget * widget = new QXFontCollectionWidget;
-        connect(widget, &QXFontCollectionWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
-        widget->setDocument(document_);
+        QWidget * widget = new QWidget;
+        QVBoxLayout * layout = new QVBoxLayout;
+         
+        QXFontCollectionWidget * ttcWidget = new QXFontCollectionWidget;
+        connect(ttcWidget, &QXFontCollectionWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
+        ttcWidget->setDocument(document_);
+
+        layout->addWidget(ttcWidget);
+
+        QXRelatedFontsWidget * relWidget = new QXRelatedFontsWidget;
+        connect(relWidget, &QXRelatedFontsWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
+        relWidget->setDocument(document_);
+        layout->addWidget(relWidget);
+        
+        widget->setLayout(layout);
         openFontInSameFilePopover_->setWidget(widget);
     }
-    if (auto widget = dynamic_cast<QXFontCollectionWidget*>(openFontInSameFilePopover_->widget())) 
-        widget->setCurrentFace(document()->face()->index());
+    if (auto ttcWidget = openFontInSameFilePopover_->widget()->findChild<QXFontCollectionWidget*>())
+        ttcWidget->setCurrentFace(document()->face()->index());
     
     openFontInSameFilePopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
 }

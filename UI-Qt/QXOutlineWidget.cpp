@@ -212,6 +212,10 @@ QXOutlineWidget::buildScene() {
         auto p0 = xf({adv, 0});
         auto p1 = xf({adv, metrics_.upem});
         scene_->addLine(QLineF(p0, p1), QPen(Qt::green, 1, Qt::DotLine));
+        
+        auto p2 = xf({adv/2, 0});
+        auto p3 = xf({adv/2, metrics_.upem});
+        scene_->addLine(QLineF(p2, p3), QPen(Qt::green, 1, Qt::DotLine));
     }
 }
 
