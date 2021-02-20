@@ -1,10 +1,10 @@
 #pragma once
 
 #include "FontX/FXFace.h"
+#include "QXDocument.h"
 
 class QListWidget;
 class QListWidgetItem;
-class QXDocument;
 
 class QXRelatedFontsWidget : public QWidget {
     Q_OBJECT
@@ -16,25 +16,23 @@ public:
     setDocument(QXDocument * document);
 
     void
-    setCurrentFace(int index);
-
-    int
-    currentFace() const;
+    selectCurrentFace();
     
 signals:
     void
-    fontDoubleClicked(int i);
+    fontDoubleClicked(const QXFontURI & uri);
 
 private slots:
     void
     onListItemDoubleClicked(QListWidgetItem * item);
 
-    int
+    QXFontURI
     itemData(QListWidgetItem * item) const;
     
 private:
     void
     reload();
+
     
 private:
     QListWidget * list_ {};

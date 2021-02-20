@@ -51,7 +51,7 @@ QXDocumentWindow::QXDocumentWindow(QXDocument * document, QWidget *parent)
     , shapingDockWidget_(nullptr)
     , tableDockWidget_(nullptr)
     , infoDockWidget_(nullptr)
-    , openFontInSameFilePopover_(nullptr)
+    , openRelatedFontsPopover_(nullptr)
     , glyphPopover_(nullptr)
     , glyphWidget_(nullptr)
     , document_(document)
@@ -167,12 +167,10 @@ QXDocumentWindow::initToolBar() {
 		qApp->loadIcon(":/images/info.png"), tr("Info"),
         this, &QXDocumentWindow::onFontInfoAction);
 
-    // There are multiple faces in this file
-   if (auto face = document()->face(); face->faceCount() > 1) {
-       openFontInSameFileAction_ = toolBar->addAction(
-           qApp->loadIcon(document()->isPDF()?":/images/pdf.png": ":/images/font-list.png"), tr("Open Face in Same File"),
-           this, &QXDocumentWindow::onOpenFontInSameFileAction);
-   }
+    openRelatedFontsAction_ = toolBar->addAction(
+        qApp->loadIcon(document()->isPDF()?":/images/pdf.png": ":/images/font-list.png"), tr("Open Related Fonts"),
+        this, &QXDocumentWindow::onOpenRelatedFontsAction);
+
     
     QWidget * spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -473,37 +471,24 @@ QXDocumentWindow::onFontInfoAction() {
 }
 
 void
-QXDocumentWindow::onOpenFontInSameFileAction() {
-    if (!openFontInSameFilePopover_) {
-        openFontInSameFilePopover_ = new QXPopoverWindow(this);
-        QWidget * widget = new QWidget;
-        QVBoxLayout * layout = new QVBoxLayout;
-         
-        QXFontCollectionWidget * ttcWidget = new QXFontCollectionWidget;
-        connect(ttcWidget, &QXFontCollectionWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
-        ttcWidget->setDocument(document_);
-
-        layout->addWidget(ttcWidget);
+QXDocumentWindow::onOpenRelatedFontsAction() {
+    if (!openRelatedFontsPopover_) {
+        openRelatedFontsPopover_ = new QXPopoverWindow(this);
 
         QXRelatedFontsWidget * relWidget = new QXRelatedFontsWidget;
         connect(relWidget, &QXRelatedFontsWidget::fontDoubleClicked, this, &QXDocumentWindow::onFontListItemDoubleClicked);
         relWidget->setDocument(document_);
-        layout->addWidget(relWidget);
-        
-        widget->setLayout(layout);
-        openFontInSameFilePopover_->setWidget(widget);
+        openRelatedFontsPopover_->setWidget(relWidget);
     }
-    if (auto ttcWidget = openFontInSameFilePopover_->widget()->findChild<QXFontCollectionWidget*>())
-        ttcWidget->setCurrentFace(document()->face()->index());
+    if (auto widget = dynamic_cast<QXRelatedFontsWidget*>(openRelatedFontsPopover_->widget())) 
+        widget->selectCurrentFace();
     
-    openFontInSameFilePopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
+    openRelatedFontsPopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
 }
 
 void
-QXDocumentWindow::onFontListItemDoubleClicked(int index) {
-    openFontInSameFilePopover_->hide();
-    QXFontURI uri = document()->uri();
-    uri.faceIndex = index;
+QXDocumentWindow::onFontListItemDoubleClicked(const QXFontURI & uri) {
+    openRelatedFontsPopover_->hide();
     QXDocumentWindowManager::instance()->openFontURI(uri); 
 }
     

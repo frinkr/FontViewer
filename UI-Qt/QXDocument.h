@@ -17,9 +17,15 @@ struct QXFontURI
     QString
     toString() const;
 
-    static const QXFontURI
+    static QXFontURI
     fromString(const QString & string);
 
+    static QXFontURI
+    fromDesc(const FXFaceDescriptor & desc);
+
+    FXFaceDescriptor
+    toDesc() const;
+    
     bool
     operator==(const QXFontURI & other) const {
         return filePath == other.filePath && faceIndex == other.faceIndex;

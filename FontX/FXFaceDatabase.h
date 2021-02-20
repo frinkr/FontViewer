@@ -33,6 +33,9 @@ public:
     FXOpt<FXFaceDescriptor>
     findDescriptor(const FXString & psName) const;
 
+    FXVector<size_t>
+    findFamily(const FXString & psName) const;
+    
 public:
 
     struct FaceItem {

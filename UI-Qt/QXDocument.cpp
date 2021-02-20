@@ -10,7 +10,7 @@ QXFontURI::toString() const {
     return QString("%1@%2").arg(faceIndex).arg(filePath);
 }
 
-const QXFontURI
+QXFontURI
 QXFontURI::fromString(const QString & string) {
     QXFontURI uri;
 
@@ -27,6 +27,19 @@ QXFontURI::fromString(const QString & string) {
     return uri;
 }
 
+QXFontURI
+QXFontURI::fromDesc(const FXFaceDescriptor & desc) {
+    QXFontURI uri;
+    uri.filePath = toQString(desc.filePath);
+    uri.faceIndex = desc.index;
+    return uri;
+}
+
+FXFaceDescriptor
+QXFontURI::toDesc() const {
+    return {toStdString(filePath), faceIndex};
+}
+    
 QXGlyph::QXGlyph(const FXGlyph & glyph, QObject * parent)
     : QObject(parent)
     , g_(glyph) {}

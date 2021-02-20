@@ -1,8 +1,9 @@
-#include <iostream>
-#include <functional>
-#include <fstream>
-#include <thread>
 #include <chrono>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <set>
+#include <thread>
 
 #include <cereal/archives/portable_binary.hpp>
 #include <cereal/archives/json.hpp>
@@ -166,6 +167,37 @@ FXFaceDatabase::findDescriptor(const FXString & psName) const {
     else
         return FXNone<FXFaceDescriptor>;
 }
+
+namespace {
+    template <typename K, typename V>
+    bool haveSharedValue(const FXHashMap<K, V> & m1, const FXHashMap<K, V> & m2) {
+        std::set<V> s1, s2, s;
+        for (auto & [k, v]: m1) s1.insert(v);
+        for (auto & [k, v]: m2) s2.insert(v);
+        std::set_intersection(s1.begin(), s1.end(), s2.begin(), s2.end(), std::inserter(s, s.begin()));
+        return !s.empty();
+    }
+}
+
+FXVector<size_t>
+FXFaceDatabase::findFamily(const FXString & psName) const {
+    auto index = findIndex(psName);
+    if (!index)
+        return {};
+    const auto & face = faces_[*index];
+    auto familyNames = face.atts.names.localizedFamilyNames();
+
+    FXVector<size_t> ret;
+
+    for (size_t i = 0; i < faces_.size(); ++ i) {
+        auto & f = faces_[i];
+        const auto names = f.atts.names.localizedFamilyNames();
+        if (haveSharedValue(familyNames, names))
+            ret.push_back(i);
+    }
+    
+    return ret;
+};
 
 void
 FXFaceDatabase::rescan() {

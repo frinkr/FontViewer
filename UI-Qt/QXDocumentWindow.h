@@ -24,6 +24,7 @@ class QToolButton;
 class QXDocument;
 class QXDocumentWindowManager;
 class QXFontInfoWindow;
+class QXFontURI;
 class QXGlyphInfoWidget;
 class QXMenuBar;
 class QXPopoverWindow;
@@ -130,10 +131,10 @@ private slots:
     onFontInfoAction();
 
     void
-    onOpenFontInSameFileAction();
+    onOpenRelatedFontsAction();
 
     void
-    onFontListItemDoubleClicked(int index);
+    onFontListItemDoubleClicked(const QXFontURI & uri);
     
     void
     onSearchAction();
@@ -165,8 +166,8 @@ private:
     QDockWidget     * tableDockWidget_;
     QAction         * infoAction_;
     QDockWidget     * infoDockWidget_;
-    QAction         * openFontInSameFileAction_;
-    QXPopoverWindow * openFontInSameFilePopover_;
+    QAction         * openRelatedFontsAction_;
+    QXPopoverWindow * openRelatedFontsPopover_;
     QLineEdit       * searchLineEdit_;
 
     QXPopoverWindow   * glyphPopover_;
