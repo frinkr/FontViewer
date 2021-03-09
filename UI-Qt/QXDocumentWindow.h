@@ -24,7 +24,7 @@ class QToolButton;
 class QXDocument;
 class QXDocumentWindowManager;
 class QXFontInfoWindow;
-class QXFontURI;
+struct QXFontURI;
 class QXGlyphInfoWidget;
 class QXMenuBar;
 class QXPopoverWindow;
