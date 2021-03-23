@@ -27,6 +27,8 @@ int qxMain(int argc, char *argv[]) {
     MacHelper::installNSApplicationDelegate();
 #endif
     Q_INIT_RESOURCE(QXApplication);
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
     
     QXApplication app(argc, argv);
     app.benchmark().start();
