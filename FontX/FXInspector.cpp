@@ -22,6 +22,7 @@ struct FXInspectorImp {
     void
     loadOTTables(hb_face_t * hbFace) {
         loadGSUBGPOS(hbFace);
+        loadAAT(hbFace);
     }
 
 
@@ -228,8 +229,64 @@ struct FXInspectorImp {
         }
     }
 
+    void
+    loadAAT(hb_face_t * hbFace) {
+        aat_.hasSubstitution = hb_aat_layout_has_substitution(hbFace);
+        aat_.hasPositioning = hb_aat_layout_has_positioning(hbFace);
+        aat_.hasTracking = hb_aat_layout_has_tracking(hbFace);
+
+
+        unsigned int featureCount = hb_aat_layout_get_feature_types(hbFace, 0, nullptr, nullptr);
+
+
+        auto getName = [&hbFace, this](hb_ot_name_id_t id) -> FXString {
+            char name[128] {};
+            unsigned int nameSize = 128;
+            unsigned int error = hb_ot_name_get_utf8(hbFace, id, hb_language_get_default(), &nameSize, name);
+
+            return face_->attributes().names.getSFNTName(id);
+            return name;
+                
+        };
+        
+        if (featureCount) {
+            FXVector<hb_aat_layout_feature_type_t> featureTypes(featureCount);
+            hb_aat_layout_get_feature_types(hbFace, 0, &featureCount, featureTypes.data());
+
+
+            
+            for (auto featureType: featureTypes) {
+
+                FXInsAAT::Feature feature;
+                feature.type = featureType;
+                
+                hb_ot_name_id_t nameId = hb_aat_layout_feature_type_get_name_id(hbFace, featureType);
+
+                auto name = getName(nameId);
+                feature.name = name;
+                
+
+                unsigned int selectorCount = hb_aat_layout_feature_type_get_selector_infos(hbFace, featureType, 0, nullptr, nullptr, nullptr);
+                unsigned int defaultIndex {};
+
+
+                FXVector<hb_aat_layout_feature_selector_info_t> selectors(selectorCount);
+                hb_aat_layout_feature_type_get_selector_infos(hbFace, featureType, 0, &selectorCount, selectors.data(), &defaultIndex);
+
+                for (auto sel: selectors) {
+                    auto selName = getName(sel.name_id);
+                    auto on = sel.enable;
+                    auto off = sel.disable;
+                    feature.selectors.push_back(selName);
+                }
+
+                aat_.features.push_back(feature);
+            }
+        }
+    }
     
     FXVector<FXInsOTTable> otTables_;
+    FXInsAAT aat_;
     FXFace  * face_;
 };
 
@@ -294,3 +351,9 @@ FXInspector::otFeatures(FXTag script, FXTag language, FXTag table) const {
     });
     return sortAndRemoveDuplicates(features);
 }
+
+FXInsAAT 
+FXInspector::aat () const {
+    return imp_->aat_;
+}
+    

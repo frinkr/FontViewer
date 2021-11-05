@@ -460,6 +460,9 @@ QXShapingWidget::doShape() {
     if (!shaper_)
         return;
 
+    //auto face = document_->face();
+    //auto g = face->glyph(0x1F44B, 0xFE01);
+        
     auto options = optionsWidget_->options();
     
     FXTag script, language;

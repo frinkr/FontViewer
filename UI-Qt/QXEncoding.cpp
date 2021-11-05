@@ -18,10 +18,12 @@ QXEncoding::charHexNotation(FXGChar c) {
 
 FXGChar
 QXEncoding::charFromHexNotation(const QString & str) {
-    QString code = str;
+    QString code = str.toLower();
     bool ok = false;
-    if (code.indexOf("U+") == 0 || code.indexOf("0x") == 0 || code.indexOf("\\u") == 0) {
+    if (code.indexOf("u+") == 0 || code.indexOf("0x") == 0 || code.indexOf("\\u") == 0) {
         code.remove(0, 2);
+        if (code.endsWith(';'))
+            code.chop(1);
         FXChar c = code.toUInt(&ok, 16);
         return ok? FXGChar(c, FXGCharTypeUnicode): FXGCharInvalid;
     }
@@ -66,7 +68,7 @@ QXEncoding::charFromLink(const QUrl & link) {
 
 QString
 QXEncoding::decodeFromHexNotation(const QString & str) {
-    std::regex re(R"(([uU]\+|\\[uU]|0x){1}[A-Za-z0-9]{4})");
+    std::regex re(R"(([uU]\+|\\[uU]|0x){1}[A-Fa-f0-9]{4,6}[;]?)");
     std::string s = str.toStdString();
     auto matchBegin = std::sregex_iterator(s.begin(), s.end(), re);
     auto matchEnd = std::sregex_iterator();
@@ -80,9 +82,9 @@ QXEncoding::decodeFromHexNotation(const QString & str) {
 
         if (lastEnd != start)
             list << QString::fromStdString(s.substr(lastEnd, start - lastEnd));
-
-        uint c = QString::fromStdString(s.substr(start + 2, len - 2)).toUInt(nullptr, 16);
-        list << QString::fromUcs4(&c, 1);
+        FXGChar gc = charFromHexNotation(QString::fromStdString(s.substr(start, len)));
+        uint ch = gc.value;
+        list << QString::fromUcs4(&ch, 1);
         lastEnd = end;
     }
     if (lastEnd != s.length())

@@ -260,7 +260,7 @@ public:
 
 public:
     FXGlyph
-    glyph(FXGChar c);
+    glyph(FXGChar c, FXChar variantSelector = 0);
 
     FXGlyphImage
     glyphImage(FXGlyphID gid);

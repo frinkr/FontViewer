@@ -34,6 +34,19 @@ struct FXInsOTTable {
     FXVector<FXTag> featureTags;
 };
 
+struct FXInsAAT {
+    struct Feature {
+        unsigned int type;
+        FXString name;
+        FXVector<FXString> selectors;
+    };
+    bool hasSubstitution {};
+    bool hasPositioning {};
+    bool hasTracking {};
+
+    FXVector<Feature> features {};
+};
+
 class FXInspector {
     
 public:
@@ -48,6 +61,9 @@ public:
     FXVector<FXTag>
     otFeatures(FXTag script, FXTag language, FXTag table = FXOT::MERGED_GSUBGPOS) const;
 
+    FXInsAAT 
+    aat () const;
+    
 private:
     void
     init();

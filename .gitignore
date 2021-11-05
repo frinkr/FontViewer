@@ -8,3 +8,6 @@ cmake-build-debug/
 CMakeLists.txt.user
 *.pro.user
 *.autosave
+.cache/
+.clangd/
+compile_commands.json

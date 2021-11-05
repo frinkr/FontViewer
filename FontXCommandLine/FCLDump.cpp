@@ -10,6 +10,14 @@ namespace {
 
         void
         processDatabase(FXPtr<const FCLDatabase> db) override {
+
+            {
+                auto face = FXFace::createFace("/System/Library/Fonts/Supplemental/Apple Chancery.ttf", 0);
+                auto insp = face->inspector();
+                
+            }
+
+            
             for (size_t i = 0; i < db->faceCount(); ++ i) {
                 auto & desc = db->faceDescriptor(i);
                 dumpFace(db->createFace(desc));

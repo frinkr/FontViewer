@@ -464,7 +464,7 @@ FXFace::selectFontSize(double fontSize) {
 //
 
 FXGlyph
-FXFace::glyph(FXGChar gc) {
+FXFace::glyph(FXGChar gc, FXChar variantSelector) {
     FXGlyphID gid = gc.value;
     FXChar c = gc.value;
     if (FXGCharTypeGlyphID == gc.type) {
@@ -475,11 +475,14 @@ FXFace::glyph(FXGChar gc) {
             c = FXCharInvalid;
     }
     else {
-        gid = FT_Get_Char_Index(face_, c);
+        if (variantSelector == 0)
+            gid = FT_Get_Char_Index(face_, c);
+        else
+            gid = FT_Face_GetCharVariantIndex(face_, c, variantSelector);
     }
 
     // lookup in cache
-    if (glyphCache_->has(gid)) {
+    if (!variantSelector && glyphCache_->has(gid)) {
         FXGlyph glyph = glyphCache_->get(gid);
         glyph.character = {c, currentCMap().isUnicode()? FXGCharTypeUnicode : FXGCharTypeOther};
         return glyph;

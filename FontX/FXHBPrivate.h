@@ -3,6 +3,7 @@
 #include <hb.h>
 #include <hb-ft.h>
 #include <hb-ot.h>
+#include <hb-aat.h>
 #include "FXFace.h"
 
 void

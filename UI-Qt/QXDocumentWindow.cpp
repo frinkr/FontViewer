@@ -186,6 +186,8 @@ QXDocumentWindow::initToolBar() {
     toolBar->setToolButtonStyle(Qt::ToolButtonIconOnly);
     toolBar->setContextMenuPolicy(Qt::PreventContextMenu);
     
+    QT_VERSION;
+    
 #if defined(Q_OS_MAC)
     this->setUnifiedTitleAndToolBarOnMac(true);
     QXTheme::current()->applyToToolBar(toolBar);

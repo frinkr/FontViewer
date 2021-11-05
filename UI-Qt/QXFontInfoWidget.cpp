@@ -822,6 +822,28 @@ namespace {
         }
     };
 #endif
+
+    class QXAATPage : public QXFontHtmlTemplatePage {
+    public:
+        using QXFontHtmlTemplatePage::QXFontHtmlTemplatePage;
+        void
+        loadTableRows() override {
+             FXPtr<FXInspector> inspector = face_->inspector();
+             const auto & aat = inspector->aat();
+             addDataRow(tr("Has Substitution"), aat.hasSubstitution);
+             addDataRow(tr("Has Positioning"), aat.hasPositioning);
+             addDataRow(tr("Has Tracking"), aat.hasTracking);
+
+             addHeadRow(tr("Features"));
+             
+             for (const FXInsAAT::Feature & feature: aat.features) {
+                 QStringList list;
+                 for (auto & sel: feature.selectors)
+                     list << toQString(sel);
+                 addDataRow(toQString(feature.name), list.join("<br>"));
+             }
+        }        
+    };
 }
 
 QXFontInfoPage::QXFontInfoPage(const QString & title, FXPtr<FXFace> face, QObject * parent)
@@ -861,6 +883,11 @@ QXFontInfoWidget::QXFontInfoWidget(FXPtr<FXFace> face, QWidget *parent)
         pages_.append(new QXGSUBPage(tr("GSUB"), face, this));
         pages_.append(new QXGPOSPage(tr("GPOS"), face, this));
         pages_.append(new QXGlyfPage(tr("glyf"), face, this));
+
+        FT_ULong len {};
+        if (!FT_Load_Sfnt_Table(face->face(), 'morx', 0, nullptr, &len) && len) 
+            pages_.append(new QXAATPage(tr("AAT"), face, this));
+
     }
     else if (face->attributes().format == FXFaceFormatConstant::WinFNT) {
         pages_.append(new QXWinFNTPage(tr("Windows FNT"), face, this));
