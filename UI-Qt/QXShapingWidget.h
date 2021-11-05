@@ -112,6 +112,9 @@ public slots:
     
     void
     doCopyAction();
+
+    void
+    doCopyHexAction();
     
     void
     doTogglePanelAction();

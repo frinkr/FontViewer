@@ -31,7 +31,11 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     connect(ui->copyTextButton, &QPushButton::clicked,
             this, &QXShapingOptionsWidget::copyTextButtonClicked);
 
+    connect(ui->copyHexButton, &QPushButton::clicked,
+            this, &QXShapingOptionsWidget::copyHexButtonClicked);
+
     ui->copyTextButton->setIcon(qApp->loadIcon(":/images/truetype.png"));
+    ui->copyHexButton->setIcon(qApp->loadIcon(":/images/hex.png"));
 }
 
 QXShapingOptionsWidget::~QXShapingOptionsWidget() {

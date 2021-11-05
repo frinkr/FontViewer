@@ -392,6 +392,9 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     connect(optionsWidget_, &QXShapingOptionsWidget::copyTextButtonClicked,
             this, &QXShapingWidget::doCopyAction);
 
+    connect(optionsWidget_, &QXShapingOptionsWidget::copyHexButtonClicked,
+            this, &QXShapingWidget::doCopyHexAction);
+    
     connect(optionsWidget_, &QXShapingOptionsWidget::optionsChanged,
             this, &QXShapingWidget::doShape);
 
@@ -524,6 +527,14 @@ QXShapingWidget::offFeatures() const {
 void
 QXShapingWidget::doCopyAction() {
     QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
+    qApp->copyTextToClipBoard(text);
+    qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
+}
+
+void
+QXShapingWidget::doCopyHexAction() {
+    QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
+    text = QXEncoding::encodeToHexNotation(text);
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }

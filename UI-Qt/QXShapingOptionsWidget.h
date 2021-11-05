@@ -34,7 +34,9 @@ signals:
 
     void
     copyTextButtonClicked();
-    
+
+    void
+    copyHexButtonClicked();
 private:
     Ui::QXShapingOptionsWidget *ui;
 };

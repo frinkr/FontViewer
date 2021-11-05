@@ -33,4 +33,7 @@ struct QXEncoding {
 
     static QString
     decodeFromHexNotation(const QString & str);
+
+    static QString
+    encodeToHexNotation(const QString & str);
 };

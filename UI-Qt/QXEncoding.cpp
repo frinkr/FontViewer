@@ -91,3 +91,17 @@ QXEncoding::decodeFromHexNotation(const QString & str) {
         list << QString::fromStdString(s.substr(lastEnd, s.length() - lastEnd));
     return list.join("");
 }
+
+
+QString
+QXEncoding::encodeToHexNotation(const QString & str) {
+    QStringList list;
+    for (QChar ch : str) {
+        if (ch < 128) 
+            list << ch;
+        else 
+            list << QString("U+%1;").arg(ch.unicode(), 4, 16, QLatin1Char('0'));
+    }
+    
+    return list.join("");
+}
