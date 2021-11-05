@@ -15,7 +15,7 @@ add_library(FontXPDF
   )
 
 # PoDoFo
-set(FX_USE_SYSTERM_PODOFO OFF)
+set(FX_USE_SYSTERM_PODOFO ON)
 
 if (FX_USE_SYSTERM_PODOFO)
   find_package(PoDoFo REQUIRED)

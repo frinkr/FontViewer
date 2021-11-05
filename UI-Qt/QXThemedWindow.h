@@ -17,7 +17,7 @@ public:
     }
 
     virtual bool
-    onNativeEvent(QWidget * widget, const QByteArray & eventType, void * message, long * result) {
+    onNativeEvent(QWidget * widget, const QByteArray & eventType, void * message,  qintptr * result) {
         return false;
     }
 
@@ -47,7 +47,7 @@ protected:
     }
 
     bool
-    nativeEvent(const QByteArray & eventType, void * message, long * result) override {
+    nativeEvent(const QByteArray & eventType, void * message,  qintptr * result) override {
         if (ApplyTheme && decorator_ && decorator_->onNativeEvent(this, eventType, message, result))
             return true;
 

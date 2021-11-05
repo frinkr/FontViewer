@@ -14,13 +14,13 @@ if (UNIX AND NOT APPLE)
   set(UIQT_USE_FONTCONFIG ON)
 endif()
 
-find_package(Qt5Core REQUIRED)
-find_package(Qt5Gui REQUIRED)
-find_package(Qt5Widgets REQUIRED)
-find_package(Qt5Network REQUIRED)
+find_package(Qt6Core REQUIRED)
+find_package(Qt6Gui REQUIRED)
+find_package(Qt6Widgets REQUIRED)
+find_package(Qt6Network REQUIRED)
 
 if (WIN32)
-  find_package(Qt5WinExtras CONFIG REQUIRED)
+  find_package(Qt6WinExtras CONFIG REQUIRED)
 endif()
 
 if (UIQT_USE_FONTCONFIG)
@@ -44,7 +44,7 @@ set(UI
   QXVariableWidget.ui
   )
 
-qt5_wrap_ui(UI_HEADERS ${UI})
+qt6_wrap_ui(UI_HEADERS ${UI})
 
 set(SHARED_SOURCES
   score_match.cpp
@@ -118,8 +118,6 @@ set(SHARED_SOURCES
   QXResources.h
   QXRelatedFontsWidget.cpp
   QXRelatedFontsWidget.h
-  QXRichLineEdit.cpp
-  QXRichLineEdit.h
   QXSearchEngine.cpp
   QXSearchEngine.h
   QXShapingWidget.cpp
@@ -165,12 +163,12 @@ add_library(UI-Qt
   ${UI_HEADERS}
   )
 
-target_link_libraries(UI-Qt PRIVATE Qt5::Core)
-target_link_libraries(UI-Qt PRIVATE Qt5::Gui)
-target_link_libraries(UI-Qt PRIVATE Qt5::Widgets)
-target_link_libraries(UI-Qt PRIVATE Qt5::Network)
+target_link_libraries(UI-Qt PRIVATE Qt6::Core)
+target_link_libraries(UI-Qt PRIVATE Qt6::Gui)
+target_link_libraries(UI-Qt PRIVATE Qt6::Widgets)
+target_link_libraries(UI-Qt PRIVATE Qt6::Network)
 if (WIN32)
-  target_link_libraries(UI-Qt PRIVATE Qt5::WinExtras Qt5::WinExtrasPrivate)
+  target_link_libraries(UI-Qt PRIVATE Qt6::WinExtras Qt6::WinExtrasPrivate)
 endif()
 
 target_link_libraries(UI-Qt PRIVATE FontX)

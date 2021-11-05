@@ -43,7 +43,7 @@ struct QXRecentFontItem : public QXFontURI {
 };
 Q_DECLARE_METATYPE(QXRecentFontItem);
 
-
+#if 0
 class QXGlyph : public QObject {
     Q_OBJECT
 public:
@@ -59,6 +59,9 @@ public:
 protected:
     FXGlyph  g_;
 };
+#endif
+
+using QXGlyph = FXGlyph;
 
 constexpr int QXGlyphRole= Qt::UserRole + 1;
 

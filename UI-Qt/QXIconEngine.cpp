@@ -62,7 +62,7 @@ QXIconEngine::pixmap(const QSize & size,
 QString
 QXIconEngine::GetDarkIconFile() const {
     QFileInfo fi(filePath_);
-    fi = fi.dir().filePath(fi.baseName() + "_d." + fi.completeSuffix());
+    fi.setFile(fi.dir().filePath(fi.baseName() + "_d." + fi.completeSuffix()));
     if (fi.exists())
         return fi.absoluteFilePath();
     else

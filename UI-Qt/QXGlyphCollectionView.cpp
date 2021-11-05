@@ -39,7 +39,7 @@ namespace {
             if (!data.canConvert<QXGlyph>())
                 return;
 
-            const FXGlyph g = qvariant_cast<QXGlyph>(data).g();
+            const FXGlyph g = qvariant_cast<QXGlyph>(data);
             
             if (g.face->attributes().format != FXFaceFormatConstant::WinFNT)
                 painter->setRenderHint(QPainter::SmoothPixmapTransform);

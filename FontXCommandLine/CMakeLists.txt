@@ -3,7 +3,7 @@ set(PROJECT_NAME FontXCommandLine)
 
 project(${PROJECT_NAME})
 
-find_package(Qt5Core REQUIRED)
+find_package(Qt6Core REQUIRED)
 
 add_executable(${PROJECT_NAME}
   main.cpp
@@ -24,5 +24,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   ${CMAKE_SOURCE_DIR}
   )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt5::Core FontX)
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core FontX)
 

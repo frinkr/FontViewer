@@ -39,7 +39,7 @@ FXFaceDescriptor
 QXFontURI::toDesc() const {
     return {toStdString(filePath), faceIndex};
 }
-    
+#if 0
 QXGlyph::QXGlyph(const FXGlyph & glyph, QObject * parent)
     : QObject(parent)
     , g_(glyph) {}
@@ -50,7 +50,7 @@ QXGlyph::QXGlyph(QObject * parent)
 QXGlyph::QXGlyph(const QXGlyph & other)
     : g_(other.g()){
 }
-
+#endif
 QXGCharBook::QXGCharBook(Type type, const QString & name)
     : type_(type),
       name_(name) {
@@ -271,7 +271,7 @@ QXDocument::data(const QXCollectionModelIndex & index, int role) const {
         auto & block = currentBook().blocks()[index.section];
         FXGlyph g = face_->glyph(block->get(index.item));
         QVariant v;
-        v.setValue(QXGlyph(g));
+        v.setValue(g);
         return v;
     }
     return QString("G %1,%2").arg(index.section).arg(index.item);

@@ -38,7 +38,7 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     layout->addSpacing(5);
     layout->addWidget(closeButton);
     layout->addItem(spacer);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 }
 
 QXDockTitleBarWidget::~QXDockTitleBarWidget() {

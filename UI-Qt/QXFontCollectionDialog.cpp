@@ -72,7 +72,7 @@ QXFontCollectionWidget::reload() {
         connect(list_, &QListWidget::itemDoubleClicked, this, &QXFontCollectionWidget::onListItemDoubleClicked);
         
         QVBoxLayout * layout = new QVBoxLayout(this);
-        layout->setMargin(0);
+        layout->setContentsMargins(0, 0, 0, 0);
         layout->addWidget(list_);
         setLayout(layout);
     }

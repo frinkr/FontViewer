@@ -1,3 +1,4 @@
+#include <QActionGroup>
 #include "QXMenuBar.h"
 #include "QXApplication.h"
 #include "QXDocumentWindowManager.h"

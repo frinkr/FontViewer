@@ -17,7 +17,7 @@ protected:
     showEvent(QShowEvent * event) override;
 
     void
-    enterEvent(QEvent * event) override;
+    enterEvent(QEnterEvent * event) override;
 
     void
     leaveEvent(QEvent * event) override;

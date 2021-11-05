@@ -62,7 +62,7 @@ QXToastMessage::showEvent(QShowEvent * event) {
 }
 
 void
-QXToastMessage::enterEvent(QEvent * event) {
+QXToastMessage::enterEvent(QEnterEvent * event) {
     QWidget::enterEvent(event);
     stopFadeOutTimer();
     stopCloseTimer();

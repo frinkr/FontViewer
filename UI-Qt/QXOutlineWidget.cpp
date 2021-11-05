@@ -21,7 +21,7 @@ QXOutlineWidget::QXOutlineWidget(QWidget *parent)
     view_->viewport()->installEventFilter(this);
     view_->setMouseTracking(true);
 
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(view_);
 
     int defaultPenWidth = 1;

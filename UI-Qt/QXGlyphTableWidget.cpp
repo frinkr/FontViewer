@@ -63,8 +63,7 @@ public:
         QStyleOptionViewItem opt = option;
         initStyleOption(&opt, index);
 
-        const QXGlyph ug = qvariant_cast<QXGlyph>(index.data());
-        const FXGlyph & g = ug.g();
+        const QXGlyph g = qvariant_cast<QXGlyph>(index.data());
 
         QIcon icon(QPixmap::fromImage(drawGlyphImageInEmBox(fillGlyphImageWithColor(g.glyphImage(), Qt::black))));
                    
@@ -143,7 +142,7 @@ namespace {
         QVariant
         value(const FXGlyph & g) const {
             QVariant v;
-            v.setValue(QXGlyph(g));
+            v.setValue(g);
             return v;
         }
     };
