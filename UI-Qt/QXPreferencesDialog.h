@@ -9,7 +9,7 @@ namespace Ui {
 
 class QListWidgetItem;
 
-class QXPreferencesDialog : public QXThemedWindow<QDialog> {
+class QXPreferencesDialog : public QDialog {
     Q_OBJECT
 
 public:

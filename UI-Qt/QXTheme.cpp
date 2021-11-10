@@ -29,7 +29,7 @@ namespace {
 #if defined(Q_OS_WIN)
             style = QStyleFactory::create("windowsvista");
 #elif defined(Q_OS_MAC)
-            style = QStyleFactory::create("macintosh");
+            style = QStyleFactory::create("mac");
 #endif
             if (style) {
                 qApp->setStyle(style);

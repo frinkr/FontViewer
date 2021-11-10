@@ -24,12 +24,10 @@ namespace {
 
     QRect
     screenRectAtPoint(const QPoint & point) {
-#if QT_VERSION_MAJOR >= 5 && QT_VERSION_MINOR >= 10
         QScreen * screen = qApp->screenAt(point);
-        if (!screen) screen = qApp->primaryScreen();
-#else
-        QScreen * screen = qApp->primaryScreen();
-#endif
+        if (!screen)
+            screen = qApp->primaryScreen();
+        
         if (screen)
             return screen->availableGeometry();
         else
