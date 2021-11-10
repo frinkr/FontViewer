@@ -173,10 +173,10 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             FXGlyphImage gi = fillGlyphImageWithColor(face->glyphImage(gid), textColor);
             QImage img = toQImage(gi);
 
-            const int left = penX + gi.offset.x * gi.scale;
-            const int bottom = penY - gi.offset.y * gi.scale;
-            const int right = left + gi.pixmap.width * gi.scale + fu2px(off.x);
-            const int top = bottom - gi.pixmap.height * gi.scale - fu2px(off.y);
+            const int left = penX + gi.offset.x * gi.scale + fu2px(off.x);
+            const int bottom = penY - gi.offset.y * gi.scale - fu2px(off.y);
+            const int right = left + gi.pixmap.width * gi.scale;
+            const int top = bottom - gi.pixmap.height * gi.scale;
 
             painter.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
                         img,
