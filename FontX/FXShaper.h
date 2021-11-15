@@ -6,12 +6,12 @@ class FXFace;
 struct FXShaperImp;
 
 enum FXShapingDirection {
-    FXShappingDirectionInvalid = 0,
-    FXShappingDirectionAuto,
-    FXShappingLTR = 4,
-    FXShappingRTL,
-    FXShappingTTB,
-    FXShappingBTT
+    FXShapingDirectionInvalid = 0,
+    FXShapingDirectionAuto,
+    FXShapingLTR = 4,
+    FXShapingRTL,
+    FXShapingTTB,
+    FXShapingBTT
 };
 
 enum class FXBidiDirection {
@@ -20,7 +20,7 @@ enum class FXBidiDirection {
     AUTO,
 };
 
-struct FXShappingBidiOptions {
+struct FXShapingBidiOptions {
     bool bidiActivated {false};
     FXBidiDirection direction {FXBidiDirection::AUTO};
     bool resolveScripts {true};
@@ -37,8 +37,8 @@ public:
     shape(const FXString & text,
           FXTag script = FXOT::DEFAULT_SCRIPT,
           FXTag language = FXOT::DEFAULT_LANGUAGE,
-          FXShapingDirection direction = FXShappingLTR,
-          FXShappingBidiOptions bidiOpts = FXShappingBidiOptions{},
+          FXShapingDirection direction = FXShapingLTR,
+          FXShapingBidiOptions bidiOpts = FXShapingBidiOptions{},
           const FXVector<FXTag> & onFeatures = FXVector<FXTag>(),
           const FXVector<FXTag> & offFeatures = FXVector<FXTag>());
 

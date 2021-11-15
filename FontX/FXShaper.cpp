@@ -60,7 +60,7 @@ struct FXShaperImp {
           FXTag script,
           FXTag language,
           FXShapingDirection direction,
-          FXShappingBidiOptions bidiOpts,
+          FXShapingBidiOptions bidiOpts,
           const FXVector<FXTag> & onFeatures,
           const FXVector<FXTag> & offFeatures) {
 
@@ -107,6 +107,9 @@ struct FXShaperImp {
                         if (lastScriptIndex != -1) {
                             hbScripts[i] = lastScriptValue;
                             lastSetIndex = i;
+                        }
+                        else if (i && hbScripts[i] == HB_SCRIPT_INHERITED) {
+                            hbScripts[i] = hbScripts[i-1];
                         }
                     } else {
                         for (int j = lastSetIndex + 1; j < i; ++j)
@@ -235,8 +238,8 @@ struct FXShaperImp {
             }
             // Reorder glyphs
             
-            FXVector<FriBidiStrIndex> map(u32BidiTextLength, 0);
-            for (auto i = 0; i < u32BidiTextLength; ++ i)
+            FXVector<FriBidiStrIndex> map(totalGlyphCount, 0);
+            for (auto i = 0; i < totalGlyphCount; ++ i)
                 map[i] = i;
             
             fribidi_reorder_line(0, &newTypes[0], totalGlyphCount, 0, bidiParType, &newLevels[0], 0, &map[0]);
@@ -380,7 +383,7 @@ FXShaper::shape(const FXString & text,
                 FXTag script,
                 FXTag language,
                 FXShapingDirection direction,
-                FXShappingBidiOptions bidiOpts,
+                FXShapingBidiOptions bidiOpts,
                 const FXVector<FXTag> & onFeatures,
                 const FXVector<FXTag> & offFeatures) {
     return imp_->shape(text, script, language, direction, bidiOpts, onFeatures, offFeatures);

@@ -11,7 +11,7 @@ namespace Ui {
 struct QXShapingOptions {
     double fontSize {100};
     bool showGlyphsBoundary {true};
-    FXShappingBidiOptions bidi {};
+    FXShapingBidiOptions bidi {};
 };
     
 class QXShapingOptionsWidget : public QWidget

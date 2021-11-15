@@ -474,7 +474,7 @@ QXShapingWidget::doShape() {
     shaper_->shape(toStdString(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText())),
                    script,
                    language,
-                   FXShappingLTR,
+                   FXShapingLTR,
                    options.bidi,
                    onFeatures(),
                    offFeatures());

@@ -58,15 +58,19 @@ namespace {
         map["UNICODE_GENERAL_CATEGORY"] = isDefined? toQString(FXUnicode::category(c).fullName): QString();
         map["UNICODE_EAST_ASIAN_WIDTH"] = isDefined? toQString2(FXUnicode::eastAsianWidth(c)): QString();
 
-        QStringList decompositionLinks;
-        for (FXChar d : FXUnicode::decomposition(c)) {
-            decompositionLinks << QXEncoding::htmlLinkElement(
-                QXEncoding::charHexLink({d, FXGCharTypeUnicode}).toDisplayString(),
-                QXEncoding::charHexNotation({d, FXGCharTypeUnicode}));
-        }
+        auto decompose = [](FXChar c, bool nfkd) {
+            QStringList decompositionLinks;
+            for (FXChar d : FXUnicode::decomposition(c, nfkd)) {
+                decompositionLinks << QXEncoding::htmlLinkElement(
+                    QXEncoding::charHexLink({d, FXGCharTypeUnicode}).toDisplayString(),
+                    QXEncoding::charHexNotation({d, FXGCharTypeUnicode}));
+            }
+            return decompositionLinks.join(", ");
+        };
         
-        map["UNICODE_DECOMPOSITION"] = isDefined? decompositionLinks.join(", "): QString();
-
+        map["UNICODE_DECOMPOSITION_NFD"] = isDefined? decompose(c, false): QString();
+        map["UNICODE_DECOMPOSITION_NFKD"] = isDefined? decompose(c, true): QString();
+        
         // Encoding
         QStringList utf8;
         for (auto b : FXUnicode::utf8(c))

@@ -15,6 +15,7 @@ add_executable(${PROJECT_NAME}
   FCLDumpKern.cpp
   FCLPlayground.cpp
   FCLDumpTextInShape.cpp
+  FCLShaping.cpp
   )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
