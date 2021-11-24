@@ -249,18 +249,23 @@ FXUnicode::eastAsianWidth(FXChar c) {
     return (FXEastAsianWidth)u_getIntPropertyValue(c, UCHAR_EAST_ASIAN_WIDTH);
 }
 
+FXBidiClass
+FXUnicode::bidiClass(FXChar c) {
+    return (FXBidiClass)u_getIntPropertyValue(c, UCHAR_BIDI_CLASS);
+}
+    
 FXVector<FXChar>
 FXUnicode::decomposition(FXChar c, bool nfkd) {
     UErrorCode error = U_ZERO_ERROR;
     const UNormalizer2 * nfdNormalizer = unorm2_getNFDInstance(&error);
     const UNormalizer2 * nfkdNormalizer = unorm2_getNFKDInstance(&error);
 
-    UChar components[16] = {0};
+    UChar components[256] = {0};
     int32_t len = unorm2_getDecomposition(
         nfkd? nfkdNormalizer: nfdNormalizer,
         c,
         components,
-        sizeof(components),
+        sizeof(components)/sizeof(components[0]),
         &error);
     
     FXVector<FXChar> d;

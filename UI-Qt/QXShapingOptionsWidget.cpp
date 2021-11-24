@@ -34,8 +34,12 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     connect(ui->copyHexButton, &QPushButton::clicked,
             this, &QXShapingOptionsWidget::copyHexButtonClicked);
 
+    connect(ui->copyHexCStyleButton, &QPushButton::clicked,
+            this, &QXShapingOptionsWidget::copyHexCStyleButtonClicked);
+    
     ui->copyTextButton->setIcon(qApp->loadIcon(":/images/truetype.png"));
     ui->copyHexButton->setIcon(qApp->loadIcon(":/images/hex.png"));
+    ui->copyHexCStyleButton->setIcon(qApp->loadIcon(":/images/hexc.png"));
 }
 
 QXShapingOptionsWidget::~QXShapingOptionsWidget() {
@@ -60,7 +64,7 @@ QXShapingOptionsWidget::options() const {
     opts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
     opts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
     opts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
-    
+    opts.bidi.overrideOpenTypeFeatures = ui->overrideOpenTypeFeaturesCheckBox->isChecked();
     return opts;
 }
     

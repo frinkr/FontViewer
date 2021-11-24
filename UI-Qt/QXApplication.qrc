@@ -15,6 +15,8 @@
     <file alias="images/filter_d.png">../Resources/Images/filter_d.png</file>
     <file alias="images/hex.png">../Resources/Images/hex.png</file>
     <file alias="images/hex_d.png">../Resources/Images/hex_d.png</file>
+    <file alias="images/hexc.png">../Resources/Images/hexc.png</file>
+    <file alias="images/hexc_d.png">../Resources/Images/hexc_d.png</file>
     <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
     <file alias="images/font-book_d.png">../Resources/Images/font-book_d.png</file>
     <file alias="images/font-list.png">../Resources/Images/font-list.png</file>

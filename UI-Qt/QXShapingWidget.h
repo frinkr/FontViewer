@@ -80,7 +80,8 @@ protected:
     fu2px(fu f) const;
 
 protected:
-    int selectedIndex_;
+    int selectedColIndex_;
+    int selectedRowIndex_;
     double fontSize_;    
     FXShaper * shaper_;
     QXShapingOptions options_{};
@@ -115,6 +116,9 @@ public slots:
 
     void
     doCopyHexAction();
+
+    void
+    doCopyHexCStyleAction();
     
     void
     doTogglePanelAction();
@@ -126,7 +130,10 @@ public slots:
     showOptionsPopover();
     
 private:
-        
+
+    void
+    copyTextToClipboard(const QString & text);
+    
     FXPtr<FXInspector>
     inspector();
 

@@ -26,6 +26,7 @@ struct FXShapingBidiOptions {
     bool resolveScripts {true};
     bool breakOnScriptChange {true};
     bool breakOnLevelChange {true};
+    bool overrideOpenTypeFeatures {false};
     
 };
 
@@ -54,6 +55,9 @@ public:
     FXVec2d<fu>
     offset(size_t index) const;
 
+    size_t
+    cluster(size_t index) const;
+    
     FXFace *
     face() const;
 

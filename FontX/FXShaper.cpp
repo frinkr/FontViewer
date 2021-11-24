@@ -171,7 +171,7 @@ struct FXShaperImp {
             
                 hb_feature_t * features = nullptr;
                 unsigned int featuresCount = 0;
-                if (false && featuresVec.size()) {
+                if (bidiOpts.overrideOpenTypeFeatures && featuresVec.size()) {
                     features = &featuresVec[0];
                     featuresCount = featuresVec.size();
                 }
@@ -188,6 +188,8 @@ struct FXShaperImp {
                                       featuresCount);
                 
 
+                if (HB_DIRECTION_IS_BACKWARD(bidiRun.direction))
+                    hb_buffer_reverse(buffer);
                 // get result
                 bidiRun.glyphInfos = hb_buffer_get_glyph_infos(buffer, &bidiRun.glyphCount);
                 bidiRun.glyphPositions = hb_buffer_get_glyph_positions(buffer, &bidiRun.glyphCount);
@@ -216,18 +218,19 @@ struct FXShaperImp {
             for (size_t i = 0; i < bidiRuns.size(); ++ i) {
                 auto & bidiRun = bidiRuns[i];
                 
-                for (size_t j = 0; j < bidiRun.glyphCount; ++ j) {
-                    auto gIndex = bidiRun.direction == HB_DIRECTION_LTR? j : (bidiRun.glyphCount - 1 - j);
+                for (size_t gIndex = 0; gIndex < bidiRun.glyphCount; ++ gIndex) {
+                    //auto gIndex = j; //bidiRun.direction == HB_DIRECTION_LTR? j : (bidiRun.glyphCount - 1 - j);
                     
                     auto sourceIndex = bidiRun.glyphInfos[gIndex].cluster + bidiRun.textBegin;
                     
-                    newGlyphIndices[glyphIndexBase + j] = bidiRun.glyphInfos[gIndex].codepoint;
-                    newScripts[glyphIndexBase + j] = hbScripts[sourceIndex];
-                    newTypes[glyphIndexBase + j] = bidiTypes[sourceIndex];
-                    newLevels[glyphIndexBase + j] = bidiLevels[sourceIndex];
+                    newGlyphIndices[glyphIndexBase + gIndex] = bidiRun.glyphInfos[gIndex].codepoint;
+                    newScripts[glyphIndexBase + gIndex] = hbScripts[sourceIndex];
+                    newTypes[glyphIndexBase + gIndex] = bidiTypes[sourceIndex];
+                    newLevels[glyphIndexBase + gIndex] = bidiLevels[sourceIndex];
                     
-                    hbGlyphInfos[glyphIndexBase + j] = bidiRun.glyphInfos[gIndex];
-                    hbGlyphPositions[glyphIndexBase + j] = bidiRun.glyphPositions[gIndex];
+                    hbGlyphInfos[glyphIndexBase + gIndex] = bidiRun.glyphInfos[gIndex];
+                    hbGlyphInfos[glyphIndexBase + gIndex].cluster += bidiRun.textBegin;
+                    hbGlyphPositions[glyphIndexBase + gIndex] = bidiRun.glyphPositions[gIndex];
                 }
                 glyphIndexBase += bidiRun.glyphCount;
             }
@@ -412,6 +415,11 @@ FXShaper::offset(size_t index) const {
         imp_->hbGlyphPositions_[index].x_offset,
         imp_->hbGlyphPositions_[index].y_offset);
 
+}
+
+size_t
+FXShaper::cluster(size_t index) const {
+    return imp_->hbGlyphInfos_[index].cluster;
 }
 
 FXFace *

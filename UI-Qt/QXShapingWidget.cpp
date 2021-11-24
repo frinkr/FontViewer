@@ -52,12 +52,13 @@ namespace {
     constexpr int QX_SHAPINGVIEW_MARGIN = 20;
     constexpr int QX_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
     constexpr int QX_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
-
+    constexpr int QX_SHAPINGVIEW_TOTAL_ROW = 7;
 }
 
 QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
     : QWidget(parent)
-    , selectedIndex_(-1)
+    , selectedColIndex_(-1)
+    , selectedRowIndex_(-1)
     , shaper_(nullptr) {
     setFocusPolicy(Qt::StrongFocus);
 }
@@ -92,7 +93,7 @@ QXShapingGlyphView::sizeHint() const {
     const int baselineY = baseLinePosition().y();
     const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QX_SHAPINGVIEW_MARGIN;
     
-    return QSize(gridCellLeft(5, shaper_->glyphCount()) + QX_SHAPINGVIEW_MARGIN, height);
+    return QSize(gridCellLeft(1, shaper_->glyphCount()) + QX_SHAPINGVIEW_MARGIN, height);
 }
 
 void
@@ -135,24 +136,44 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     if (face->attributes().format != FXFaceFormatConstant::WinFNT)
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
+    // alternative color
+    if (options_.alternativeRowColor) {
+        for (int i = 1; i < QX_SHAPINGVIEW_TOTAL_ROW; i += 2) {
+            if (i == selectedRowIndex_)
+                continue;
+            
+            auto rect = gridCellRect(i, shaper_->glyphCount());
+            rect.setLeft(gridCellLeft(i, -1));
+            painter.fillRect(rect, palette().brush(QPalette::Inactive, QPalette::Highlight));
+        }
+    }
+
     // draw baseline
     const int baseLineY = baseLinePosition().y();
     const int baseLineX = baseLinePosition().x();
 
     // draw selected glyph background
     {
-        int penX = baseLineX;
-        for (int i = 0; i < shaper_->glyphCount(); ++ i) {
-            const FXVec2d<fu> adv = shaper_->advance(i);
 
-            // draw background for selected
-            if (selectedIndex_ == i) {
-                QRect rect(penX, 0, fu2px(adv.x), gridCellBottom(1));
-                painter.fillRect(rect, palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
-            }
+        if (selectedColIndex_ != -1) {
+            int penX = baseLineX;
+            for (int i = 0; i < shaper_->glyphCount(); ++ i) {
+                const FXVec2d<fu> adv = shaper_->advance(i);
+
+                // draw background for selected
+                if (selectedColIndex_ == i) {
+                    QRect rect(penX, 0, fu2px(adv.x), gridCellBottom(1));
+                    painter.fillRect(rect, palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
+                }
             
-            penX += fu2px(adv.x);
-        }  
+                penX += fu2px(adv.x);
+            }
+        }
+        else if (selectedRowIndex_ != -1) {
+            auto rect = gridCellRect(selectedRowIndex_, shaper_->glyphCount());
+            rect.setLeft(gridCellLeft(selectedRowIndex_, -1));
+            painter.fillRect(rect, palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));   
+        }
     }
     
     // draw glyphs
@@ -167,7 +188,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             const FXVec2d<fu> off = shaper_->offset(i);
 
             QColor textColor = p.color(QPalette::Text);
-            if (i == selectedIndex_)
+            if (i == selectedColIndex_)
                 textColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
 
             FXGlyphImage gi = fillGlyphImageWithColor(face->glyphImage(gid), textColor);
@@ -196,7 +217,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
 
             painter.setPen(boundaryPen);
-            painter.drawLine(penX, 0, penX, gridCellBottom(4, i));
+            painter.drawLine(penX, 0, penX, gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1, i));
             
             if (i == shaper_->glyphCount())
                 break;
@@ -215,15 +236,16 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     {
         painter.setPen(gridPen);
 
+        
         // row lines
-        for (int i = 0; i < 6; ++ i)
+        for (int i = 0; i < QX_SHAPINGVIEW_TOTAL_ROW; ++ i)
             painter.drawLine(QX_SHAPINGVIEW_MARGIN, gridCellBottom(i),
                        rect().right(), gridCellBottom(i));
         // column lines
         for (int i = 0; i <= shaper_->glyphCount(); ++ i)  {
-            painter.drawLine(gridCellLeft(4, i), gridCellBottom(4),
+            painter.drawLine(gridCellLeft(QX_SHAPINGVIEW_TOTAL_ROW - 1, i), gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1),
                        gridCellLeft(1, i), gridCellBottom(1));
-            painter.drawLine(gridCellLeft(0, i), gridCellBottom(1),
+            painter.drawLine(gridCellLeft(0, i), gridCellBottom(1), // for kern row
                        gridCellLeft(0, i), gridCellBottom(0));
         }
         
@@ -232,34 +254,56 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         painter.drawText(gridCellRect(1, -1).translated(0, QX_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
         painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
         painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
-        painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("GID "));
-        painter.drawText(gridCellRect(4, -1), Qt::AlignRight, tr("Index "));
+        painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("Cluster "));
+        painter.drawText(gridCellRect(4, -1), Qt::AlignRight, tr("GID "));
+        painter.drawText(gridCellRect(5, -1), Qt::AlignRight, tr("Index "));
         
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             FXGlyphID gid = shaper_->glyph(i);
             FXVec2d<fu> adv = shaper_->advance(i);
+            size_t cluster = shaper_->cluster(i);
             FXGlyph g = face->glyph(FXGChar(gid, FXGCharTypeGlyphID));
             fu kern = adv.x - g.metrics.horiAdvance;
             
             painter.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
             painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
             painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
-            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(gid));
-            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(i));
+            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(cluster));
+            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(gid));
+            painter.drawText(gridCellRect(5, i), Qt::AlignCenter, QString::number(i));
         }
     }
 }
 
 void
 QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
-    FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
+    if (event->modifiers().testFlag(Qt::ShiftModifier)) {
+        selectedColIndex_ = -1;
 
-    int index = glyphAtPoint(event->pos());
-    if (selectedIndex_ != index) {
-        selectedIndex_ = index;
-        update();
+        int newRowIndex = -1;
+        for (int i = 0; (i + 1) < QX_SHAPINGVIEW_TOTAL_ROW; ++ i) {
+            auto bottom = gridCellBottom(i);
+            auto top = gridCellBottom(i + 1);
+            if (event->pos().y() < bottom && event->pos().y() > top) {
+                newRowIndex = i;
+            }
+        }
+        if (newRowIndex != -1 && newRowIndex != selectedRowIndex_) {
+            selectedRowIndex_ = newRowIndex;
+            update();
+        }
+    }
+    else {
+        selectedRowIndex_ = -1;
+        FXFace * face = shaper_->face();
+        FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
+
+        int index = glyphAtPoint(event->pos());
+        if (selectedColIndex_ != index) {
+            selectedColIndex_ = index;
+            update();
+        }
     }
 }
 
@@ -272,12 +316,12 @@ QXShapingGlyphView::mouseMoveEvent(QMouseEvent *event) {
 void
 QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
     mousePressEvent(event);
-    if (selectedIndex_ != -1) {
-        auto gid = shaper_->glyph(selectedIndex_);
+    if (selectedColIndex_ != -1) {
+        auto gid = shaper_->glyph(selectedColIndex_);
         
         QXDocumentWindow * documentWindow = QXDocumentWindowManager::instance()->getDocumentWindow(document_);
         if (documentWindow) {
-            QRect rect = glyphInteractionRect(selectedIndex_);
+            QRect rect = glyphInteractionRect(selectedColIndex_);
             QRect globalRect(this->mapToGlobal(rect.topLeft()),
                              this->mapToGlobal(rect.bottomRight()));
             documentWindow->showGlyphPopover(FXGChar(gid, FXGCharTypeGlyphID),
@@ -291,8 +335,8 @@ QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
 
 QPoint
 QXShapingGlyphView::baseLinePosition() const {
-    return QPoint(gridCellLeft(6, 0),
-                  gridCellBottom(6, 0) + fu2px(shaper_->face()->attributes().descender));
+    return QPoint(gridCellLeft(QX_SHAPINGVIEW_TOTAL_ROW, 0),
+                  gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW, 0) + fu2px(shaper_->face()->attributes().descender));
 }
 
 int
@@ -394,6 +438,9 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
 
     connect(optionsWidget_, &QXShapingOptionsWidget::copyHexButtonClicked,
             this, &QXShapingWidget::doCopyHexAction);
+
+    connect(optionsWidget_, &QXShapingOptionsWidget::copyHexCStyleButtonClicked,
+            this, &QXShapingWidget::doCopyHexCStyleAction);
     
     connect(optionsWidget_, &QXShapingOptionsWidget::optionsChanged,
             this, &QXShapingWidget::doShape);
@@ -526,19 +573,29 @@ QXShapingWidget::offFeatures() const {
 
 void
 QXShapingWidget::doCopyAction() {
-    QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
-    qApp->copyTextToClipBoard(text);
-    qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
+    copyTextToClipboard(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()));
 }
 
 void
 QXShapingWidget::doCopyHexAction() {
     QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
-    text = QXEncoding::encodeToHexNotation(text);
+    text = QXEncoding::encodeToHexNotation(text, false);
+    copyTextToClipboard(text);
+}
+
+void
+QXShapingWidget::doCopyHexCStyleAction() {
+    QString text = QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText());
+    text = QXEncoding::encodeToHexNotation(text, true);
+    copyTextToClipboard(text);    
+}
+
+void
+QXShapingWidget::copyTextToClipboard(const QString & text) {
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }
-
+    
 void
 QXShapingWidget::doTogglePanelAction() {
     if (ui_->leftWidget->isHidden())

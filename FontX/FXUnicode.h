@@ -27,6 +27,32 @@ enum class FXEastAsianWidth {
     wide
 };
 
+enum FXBidiClass {
+    L   = 0,
+    R   = 1,
+    EN  = 2,
+    ES  = 3,
+    ET  = 4,
+    AN  = 5,
+    CS  = 6,
+    B   = 7,
+    S   = 8,
+    WS  = 9,
+    ON  = 10,
+    LRE = 11,
+    LRO = 12,
+    AL  = 13,
+    RLE = 14,
+    RLO = 15,
+    PDF = 16,
+    NSM = 17,
+    BN  = 18,
+    FSI = 19,
+    LRI = 20,
+    RLI = 21,
+    PDI = 22,
+};
+
 extern FXUCDBlock FXUCDInvalidBlock;
 
 class FXUCD {
@@ -87,6 +113,9 @@ public:
 
     static FXEastAsianWidth
     eastAsianWidth(FXChar c);
+
+    static FXBidiClass
+    bidiClass(FXChar c);
     
     static FXVector<uint8_t>
     utf8(FXChar c);

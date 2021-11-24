@@ -11,6 +11,7 @@ namespace Ui {
 struct QXShapingOptions {
     double fontSize {100};
     bool showGlyphsBoundary {true};
+    bool alternativeRowColor {true};
     FXShapingBidiOptions bidi {};
 };
     
@@ -37,6 +38,10 @@ signals:
 
     void
     copyHexButtonClicked();
+
+    void
+    copyHexCStyleButtonClicked();
+    
 private:
     Ui::QXShapingOptionsWidget *ui;
 };

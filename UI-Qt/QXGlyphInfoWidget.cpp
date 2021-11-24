@@ -25,6 +25,35 @@ namespace {
         case FXEastAsianWidth::wide: return "wide";            
         }
     }
+
+    QString toQString3(FXBidiClass c) {
+        static const char * map [] = {
+            "L",
+            "R",
+            "EN",
+            "ES",
+            "ET",
+            "AN",
+            "CS",
+            "B",
+            "S",
+            "WS",
+            "ON",
+            "LRE",
+            "LRO",
+            "AL",
+            "RLE",
+            "RLO",
+            "PDF",
+            "NSM",
+            "BN",
+            "FSI",
+            "LRI",
+            "RLI",
+            "PDI",
+        };
+        return map[c];
+    };
     
     QMap<QString, QVariant>
     templateValues(const FXGlyph & glyph) {
@@ -70,6 +99,7 @@ namespace {
         
         map["UNICODE_DECOMPOSITION_NFD"] = isDefined? decompose(c, false): QString();
         map["UNICODE_DECOMPOSITION_NFKD"] = isDefined? decompose(c, true): QString();
+        map["BIDI_CLASS"] = isDefined? toQString3(FXUnicode::bidiClass(c)): QString();
         
         // Encoding
         QStringList utf8;
