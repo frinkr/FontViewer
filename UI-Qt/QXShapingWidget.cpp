@@ -460,7 +460,14 @@ QXShapingWidget::setDocument(QXDocument * document) {
 
     ui_->glyphView->setShaper(shaper_);
     ui_->glyphView->setDocument(document);
-    
+
+    connect(document, &QXDocument::variableCoordinatesChanged, [this]() {
+        delete shaper_;
+        shaper_ = new FXShaper(document_->face().get());
+        ui_->glyphView->setShaper(shaper_);
+        doShape();
+    });
+        
     reloadScriptList();
 }
 
