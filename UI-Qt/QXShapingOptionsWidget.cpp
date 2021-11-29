@@ -64,7 +64,7 @@ QXShapingOptionsWidget::options() const {
     opts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
     opts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
     opts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
-    opts.bidi.overrideOpenTypeFeatures = ui->overrideOpenTypeFeaturesCheckBox->isChecked();
+    opts.bidi.overrideOpenTypeFeatures = true;//ui->overrideOpenTypeFeaturesCheckBox->isChecked();
     return opts;
 }
     

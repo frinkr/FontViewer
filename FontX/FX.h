@@ -63,7 +63,8 @@ constexpr FXChar    FXCharInvalidBegin = FXChar(-1) - 0x100; // let's reserve so
 constexpr FXChar    FXCharInvalidEnd   = FXChar(-1);
 constexpr FXChar    FXCharInvalid      = FXCharInvalidBegin;
 constexpr FXGlyphID FXGIDNotDef        = 0;
-
+constexpr FXChar    FXCharGIDMin       = 0xF0000; // PUP-15
+constexpr FXChar    FXCharGIDMax       = 0xFFFFF; // PUP-16
 constexpr double    FXDefaultFontSize  = 150;
 constexpr double    FXDefaultDPI       = 72;
 
@@ -82,6 +83,18 @@ enum FXGCharType {
     FXGCharTypeGlyphID,
     FXGCharTypeOther,   // characters in other encoding
 };
+
+inline bool FXCharIsEncodedGID(FXChar c) {
+    return c >= FXCharGIDMin && c <= FXCharGIDMax;
+}
+
+inline FXChar FXCharEncodeGID(FXGlyphID gid) {
+    return gid + FXCharGIDMin;
+}
+
+inline FXGlyphID FXCharDecodeGID(FXChar ch) {
+    return ch - FXCharGIDMin;
+}
 
 struct FXGChar {
     FXGCharType type;

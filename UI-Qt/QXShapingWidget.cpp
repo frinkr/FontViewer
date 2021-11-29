@@ -1,7 +1,8 @@
-#include <QPainter>
-#include <QMenu>
+#include <QFontDatabase>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMouseEvent>
+#include <QPainter>
 #include <QTextStream>
 
 #include "FontX/FXInspector.h"
@@ -404,14 +405,14 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     , document_(nullptr)
     , shaper_(nullptr) {
     ui_->setupUi(this);
-    ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+    //ui_->featureListWidget->setSelectionMode(QAbstractItemView::MultiSelection);
     ui_->textComboBox->addItems(loadSamples());
         
     // connect signals
     connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::activated),
             this, &QXShapingWidget::reloadFeatureList);
-    connect(ui_->featureListWidget, &QListWidget::itemSelectionChanged,
-            this, &QXShapingWidget::doShape);
+    connect(ui_->featureListWidget, &QListWidget::itemChanged,
+            this, &QXShapingWidget::doShape);    
     connect(ui_->textComboBox, &QComboBox::editTextChanged,
             this, &QXShapingWidget::doShape);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
@@ -499,16 +500,31 @@ QXShapingWidget::reloadFeatureList() {
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
     const FXVector<FXTag> features =inspector()->otFeatures(script, language);
 
+    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    font.setPointSizeF(font.pointSizeF() * 1.5);
+    
     ui_->featureListWidget->clear();
     for (FXTag feature : features) {
-        QListWidgetItem * item = new QListWidgetItem(toQString(FXTag2Str(feature)));
+        QListWidgetItem * item = new QListWidgetItem("  " + toQString(FXTag2Str(feature)));
         item->setData(Qt::UserRole, feature);
+        item->setData(Qt::UserRole + 1, 0);
         item->setData(Qt::ToolTipRole, toQString(FXOT::featureName(feature)));
+        item->setFont(font);
         ui_->featureListWidget->addItem(item);
-        if (FXOT::autoFeatures.find(feature) != FXOT::autoFeatures.end())
-            item->setSelected(true);
     }
 
+    connect(ui_->featureListWidget, &QListWidget::itemClicked, [this](QListWidgetItem * item) {
+            int state = item->data(Qt::UserRole + 1).value<int>();
+            state = (state + 2) % 3 - 1;
+        
+            item->setData(Qt::UserRole + 1, state);
+            
+            QString text = item->text();
+            text[0] = state? (state == 1? '+': '-'): ' ';
+            item->setText(text);
+            
+        });
+    
     doShape();
 }
 
@@ -525,7 +541,7 @@ QXShapingWidget::doShape() {
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
 
-    shaper_->shape(toStdString(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText())),
+    shaper_->shape(toStdString(QXEncoding::decodeFromGidNotation(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()))),
                    script,
                    language,
                    FXShapingLTR,
@@ -560,7 +576,8 @@ QXShapingWidget::onFeatures() const {
     FXVector<FXTag> features;
     for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
         QListWidgetItem * item = ui_->featureListWidget->item(i);
-        if (item->isSelected())
+        int state = item->data(Qt::UserRole + 1).value<int>();
+        if (state == 1)
             features.push_back(item->data(Qt::UserRole).value<FXTag>());
     }
     features.push_back('locl');
@@ -572,7 +589,8 @@ QXShapingWidget::offFeatures() const {
     FXVector<FXTag> features;
     for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
         QListWidgetItem * item = ui_->featureListWidget->item(i);
-        if (!item->isSelected())
+        int state = item->data(Qt::UserRole + 1).value<int>();
+        if (state == -1)
             features.push_back(item->data(Qt::UserRole).value<FXTag>());
     }
     return features;

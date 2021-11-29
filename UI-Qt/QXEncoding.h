@@ -35,5 +35,8 @@ struct QXEncoding {
     decodeFromHexNotation(const QString & str);
 
     static QString
+    decodeFromGidNotation(const QString & str);
+    
+    static QString
     encodeToHexNotation(const QString & str, bool cStyle);
 };

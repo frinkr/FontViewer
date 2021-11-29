@@ -11,10 +11,8 @@ struct FXShaperImp {
         , hbFont_(nullptr)
         , hbFace_(nullptr)
         , hbBuffer_(nullptr)
-        , hbPlan_(nullptr)
         , hbGlyphCount_(0)
-        , hbGlyphInfos_(nullptr)
-        , hbGlyphPositions_(nullptr) {
+    {
     }
 
     ~FXShaperImp() {
@@ -23,22 +21,12 @@ struct FXShaperImp {
     }
     
     void reset() {
-        if(hasFallbackShaping_) {
-            delete [] hbGlyphInfos_;
-            delete [] hbGlyphPositions_;
-        }
-        
-        if (hbPlan_)
-            hb_shape_plan_destroy(hbPlan_);
-        hbPlan_ = nullptr;
         
         if (hbBuffer_)
             hb_buffer_destroy(hbBuffer_);
         hbBuffer_ = nullptr;
 
         hbGlyphCount_ = 0;
-        hbGlyphInfos_ = nullptr;
-        hbGlyphPositions_ = nullptr;
 
         hasFallbackShaping_ = false;
     }
@@ -68,14 +56,20 @@ struct FXShaperImp {
 
         if (text.empty())
             return;
+
+        const std::u32string u32Text = FXUnicode::utf8ToUTF32(text);
+        const auto haveEncodedGID = std::any_of(u32Text.begin(), u32Text.end(), [](auto c) { return FXCharIsEncodedGID(c);});
+
+        if (haveEncodedGID) {
+            hasFallbackShaping_ = true;
+            return fallbackShape(text);
+        }
         
         if (!hbFont_ || !hbFace_)
             FXHBCreateFontFace(face_, &hbFont_, &hbFace_);
         
         if (bidiOpts.bidiActivated) {
-            
             // Let's do bidi
-            std::u32string u32Text = FXUnicode::utf8ToUTF32(text);
             auto u32BidiText = (const FriBidiChar*)(u32Text.c_str());
             auto u32BidiTextLength = u32Text.size();
             
@@ -175,17 +169,11 @@ struct FXShaperImp {
                     features = &featuresVec[0];
                     featuresCount = featuresVec.size();
                 }
-                hbPlan_ = hb_shape_plan_create_cached(hbFace_,
-                                                      &segment_props,
-                                                      features,
-                                                      featuresCount,
-                                                      shappers);
-            
-                hb_shape_plan_execute(hbPlan_,
-                                      hbFont_,
-                                      buffer,
-                                      features,
-                                      featuresCount);
+
+                hb_shape(hbFont_,
+                         buffer,
+                         features,
+                         featuresCount);
                 
 
                 if (HB_DIRECTION_IS_BACKWARD(bidiRun.direction))
@@ -201,8 +189,6 @@ struct FXShaperImp {
             for (auto & run : bidiRuns)
                 totalGlyphCount += run.glyphCount;
             
-            delete [] hbGlyphInfos_;
-            delete [] hbGlyphPositions_;
             hbGlyphCount_ = 0;
             
             
@@ -248,17 +234,14 @@ struct FXShaperImp {
             fribidi_reorder_line(0, &newTypes[0], totalGlyphCount, 0, bidiParType, &newLevels[0], 0, &map[0]);
             
             hbGlyphCount_ = totalGlyphCount;
-            hbGlyphInfos_ = new hb_glyph_info_t[totalGlyphCount];
-            hbGlyphPositions_ = new hb_glyph_position_t[totalGlyphCount];
+            hbGlyphInfos_ = FXVector<hb_glyph_info_t>(totalGlyphCount);
+            hbGlyphPositions_ = FXVector<hb_glyph_position_t>(totalGlyphCount);
             for (auto i = 0; i < totalGlyphCount; ++ i) {
                 hbGlyphInfos_[i] = hbGlyphInfos[map[i]];
                 hbGlyphPositions_[i] = hbGlyphPositions[map[i]];
             }
             
             return;
-            
-            
-            
         }
         
         
@@ -308,23 +291,23 @@ struct FXShaperImp {
             features = &featuresVec[0];
             featuresCount = featuresVec.size();
         }
-        hbPlan_ = hb_shape_plan_create_cached(hbFace_,
-                                              &segment_props,
-                                              features,
-                                              featuresCount,
-                                              shappers);
     
-        hb_shape_plan_execute(hbPlan_,
-                              hbFont_,
-                              hbBuffer_,
-                              features,
-                              featuresCount);
+        hb_shape(hbFont_,
+                 hbBuffer_,
+                 features,
+                 featuresCount);
     
 
         // get result
-        hbGlyphInfos_ = hb_buffer_get_glyph_infos(hbBuffer_, &hbGlyphCount_);
-        hbGlyphPositions_ = hb_buffer_get_glyph_positions(hbBuffer_, &hbGlyphCount_);
-
+        auto inf = hb_buffer_get_glyph_infos(hbBuffer_, &hbGlyphCount_);
+        auto pos = hb_buffer_get_glyph_positions(hbBuffer_, &hbGlyphCount_);
+        hbGlyphInfos_ = FXVector<hb_glyph_info_t>(hbGlyphCount_);
+        hbGlyphPositions_ = FXVector<hb_glyph_position_t>(hbGlyphCount_);
+        for (size_t i = 0; i < hbGlyphCount_; ++ i) {
+            hbGlyphInfos_[i] = inf[i];
+            hbGlyphPositions_[i] = pos[i];
+        }
+        
         if (shouldFallback()) {
             hasFallbackShaping_ = true;
             fallbackShape(text);
@@ -349,18 +332,22 @@ struct FXShaperImp {
     void
     fallbackShape(const FXString & text) {
         auto u32 = FXUnicode::utf8ToUTF32(text);
-        hbGlyphInfos_ = new hb_glyph_info_t[u32.size()];
-        hbGlyphPositions_ = new hb_glyph_position_t[u32.size()];
+        hbGlyphInfos_ = FXVector<hb_glyph_info_t>(u32.size());
+        hbGlyphPositions_ = FXVector<hb_glyph_position_t>(u32.size());
         for (size_t i = 0; i < u32.size(); ++ i) {
-            const FXGChar ch(u32[i]);
+            FXGChar ch(u32[i]);
+            if (FXCharIsEncodedGID(ch.value))
+                ch = FXGChar(FXCharDecodeGID(ch.value), FXGCharTypeGlyphID);
+
             FXGlyph g = face_->glyph(ch);
             hbGlyphInfos_[i].cluster = i;
             hbGlyphInfos_[i].codepoint = g.gid;
-            hbGlyphPositions_[i].x_advance = g.metrics.horiAdvance;
-            hbGlyphPositions_[i].y_advance = g.metrics.vertAdvance;
+            hbGlyphPositions_[i].x_advance = g.metrics.horiAdvance? g.metrics.horiAdvance: g.metrics.width;
+            hbGlyphPositions_[i].y_advance = g.metrics.vertAdvance? g.metrics.vertAdvance: g.metrics.height;
             hbGlyphPositions_[i].x_offset = 0;
             hbGlyphPositions_[i].y_offset = 0;
         }
+        hbGlyphCount_ = u32.size();
     }
 
     FXFace * face_{};
@@ -369,11 +356,10 @@ struct FXShaperImp {
     hb_font_t * hbFont_ {};
     hb_face_t * hbFace_ {};
     hb_buffer_t * hbBuffer_{};
-    hb_shape_plan_t * hbPlan_{};
     
     unsigned int  hbGlyphCount_ {};
-    hb_glyph_info_t * hbGlyphInfos_ {};
-    hb_glyph_position_t * hbGlyphPositions_ {};
+    FXVector<hb_glyph_info_t> hbGlyphInfos_ {};
+    FXVector<hb_glyph_position_t> hbGlyphPositions_ {};
 
 };
 

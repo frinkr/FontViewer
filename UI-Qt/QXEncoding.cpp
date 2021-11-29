@@ -27,8 +27,10 @@ QXEncoding::charFromHexNotation(const QString & str) {
         FXChar c = code.toUInt(&ok, 16);
         return ok? FXGChar(c, FXGCharTypeUnicode): FXGCharInvalid;
     }
-    else if (code.indexOf("gid") == 0){
-        code.remove(0, 3);
+    else if (code.indexOf("\\g") == 0){
+        code.remove(0, 2);
+        if (code.endsWith(';'))
+            code.chop(1);
         FXChar c = code.toUInt(&ok);
         return ok? FXGChar(c, FXGCharTypeGlyphID): FXGCharInvalid;
     }
@@ -84,6 +86,33 @@ QXEncoding::decodeFromHexNotation(const QString & str) {
             list << QString::fromStdString(s.substr(lastEnd, start - lastEnd));
         FXGChar gc = charFromHexNotation(QString::fromStdString(s.substr(start, len)));
         uint ch = gc.value;
+        list << QString::fromUcs4(&ch, 1);
+        lastEnd = end;
+    }
+    if (lastEnd != s.length())
+        list << QString::fromStdString(s.substr(lastEnd, s.length() - lastEnd));
+    return list.join("");
+}
+
+
+QString
+QXEncoding::decodeFromGidNotation(const QString & str) {
+    std::regex re(R"(\\g[0-9]+[;]?)");
+    std::string s = str.toStdString();
+    auto matchBegin = std::sregex_iterator(s.begin(), s.end(), re);
+    auto matchEnd = std::sregex_iterator();
+    int lastEnd = 0;
+    QStringList list;
+    for (std::sregex_iterator i = matchBegin; i != matchEnd; ++i) {
+        std::smatch match = *i;
+        int start = match.position();
+        int len = match.length();
+        int end = start + len;
+
+        if (lastEnd != start)
+            list << QString::fromStdString(s.substr(lastEnd, start - lastEnd));
+        FXGChar gc = charFromHexNotation(QString::fromStdString(s.substr(start, len)));
+        uint ch = FXCharEncodeGID(gc.value);
         list << QString::fromUcs4(&ch, 1);
         lastEnd = end;
     }
