@@ -20,6 +20,13 @@ enum class FXBidiDirection {
     AUTO,
 };
 
+struct FXShapingGenralOptions {
+    FXShapingDirection direction {FXShapingLTR};
+    FXVector<FXTag> onFeatures {};
+    FXVector<FXTag> offFeatures {};
+    double glyphSpacing {};
+};
+
 struct FXShapingBidiOptions {
     bool bidiActivated {false};
     FXBidiDirection direction {FXBidiDirection::AUTO};
@@ -38,10 +45,8 @@ public:
     shape(const FXString & text,
           FXTag script = FXOT::DEFAULT_SCRIPT,
           FXTag language = FXOT::DEFAULT_LANGUAGE,
-          FXShapingDirection direction = FXShapingLTR,
-          FXShapingBidiOptions bidiOpts = FXShapingBidiOptions{},
-          const FXVector<FXTag> & onFeatures = FXVector<FXTag>(),
-          const FXVector<FXTag> & offFeatures = FXVector<FXTag>());
+          const FXShapingGenralOptions & opts = FXShapingGenralOptions{},
+          const FXShapingBidiOptions & bidiOpts = FXShapingBidiOptions{});
 
     size_t
     glyphCount() const;

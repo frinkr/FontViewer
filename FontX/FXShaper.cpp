@@ -47,10 +47,8 @@ struct FXShaperImp {
     shape(const FXString & text,
           FXTag script,
           FXTag language,
-          FXShapingDirection direction,
-          FXShapingBidiOptions bidiOpts,
-          const FXVector<FXTag> & onFeatures,
-          const FXVector<FXTag> & offFeatures) {
+          const FXShapingGenralOptions & opts,
+          const FXShapingBidiOptions & bidiOpts) {
 
         reset();
 
@@ -62,7 +60,8 @@ struct FXShaperImp {
 
         if (haveEncodedGID) {
             hasFallbackShaping_ = true;
-            return fallbackShape(text);
+            fallbackShape(text);
+            return addGlyphSpacing(opts.glyphSpacing);
         }
         
         if (!hbFont_ || !hbFace_)
@@ -148,11 +147,11 @@ struct FXShaperImp {
                                     bidiRun.textEnd - bidiRun.textBegin);
                 
                 std::vector<hb_feature_t> featuresVec;
-                for (FXTag t : onFeatures) {
+                for (FXTag t : opts.onFeatures) {
                     hb_feature_t f {t, 1/*on*/, 0, (unsigned int)-1};
                     featuresVec.push_back(f);
                 }
-                for (FXTag t :  offFeatures) {
+                for (FXTag t :  opts.offFeatures) {
                     hb_feature_t f {t, 0/*off*/, 0, (unsigned int)-1};
                     featuresVec.push_back(f);
                 }
@@ -241,7 +240,7 @@ struct FXShaperImp {
                 hbGlyphPositions_[i] = hbGlyphPositions[map[i]];
             }
             
-            return;
+            return addGlyphSpacing(opts.glyphSpacing);
         }
         
         
@@ -264,16 +263,16 @@ struct FXShaperImp {
         else
             hb_buffer_set_script(hbBuffer_, hb_ot_tag_to_script(script));
         hb_buffer_set_language(hbBuffer_, hb_ot_tag_to_language(language));
-        hb_buffer_set_direction(hbBuffer_, (hb_direction_t)dir);
+        hb_buffer_set_direction(hbBuffer_, (hb_direction_t)opts.direction);
         hb_buffer_add_utf8(hbBuffer_, text.c_str(), text.length(), 0, text.length());
         //hb_buffer_add_utf32(hbBuffer_, (const uint32_t *)u32Bidi.c_str(), u32Bidi.length(), 0, u32Bidi.length());
     
         std::vector<hb_feature_t> featuresVec;
-        for (FXTag t : onFeatures) {
+        for (FXTag t : opts.onFeatures) {
             hb_feature_t f {t, 1/*on*/, 0, (unsigned int)-1};
             featuresVec.push_back(f);
         }
-        for (FXTag t :  offFeatures) {
+        for (FXTag t :  opts.offFeatures) {
             hb_feature_t f {t, 0/*off*/, 0, (unsigned int)-1};
             featuresVec.push_back(f);
         }
@@ -315,6 +314,8 @@ struct FXShaperImp {
         else {
             hasFallbackShaping_ = false;
         }
+
+        return addGlyphSpacing(opts.glyphSpacing);
     }
 
     bool
@@ -350,6 +351,15 @@ struct FXShaperImp {
         hbGlyphCount_ = u32.size();
     }
 
+    void
+    addGlyphSpacing(double spacing) {
+        if (!spacing)
+            return;
+        
+        for (size_t i = 0; i < hbGlyphInfos_.size(); ++ i) 
+            hbGlyphPositions_[i].x_advance += face_->upem() * spacing;
+    }
+    
     FXFace * face_{};
 
     bool hasFallbackShaping_ {false};
@@ -371,11 +381,9 @@ void
 FXShaper::shape(const FXString & text,
                 FXTag script,
                 FXTag language,
-                FXShapingDirection direction,
-                FXShapingBidiOptions bidiOpts,
-                const FXVector<FXTag> & onFeatures,
-                const FXVector<FXTag> & offFeatures) {
-    return imp_->shape(text, script, language, direction, bidiOpts, onFeatures, offFeatures);
+                const FXShapingGenralOptions & opts,
+                const FXShapingBidiOptions & bidiOpts) {
+    return imp_->shape(text, script, language, opts, bidiOpts);
 }
 
 size_t

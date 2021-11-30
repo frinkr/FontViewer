@@ -12,6 +12,12 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
 
     connect(ui->showGlyphsBoundaryCheckBox, &QCheckBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
+
+    connect(ui->glyphSpacingSlider, &QSlider::valueChanged,
+            this, &QXShapingOptionsWidget::optionsChanged);
+
+    connect(ui->enableGlyphSpacingCheckBox, &QCheckBox::toggled,
+            this, &QXShapingOptionsWidget::optionsChanged);
     
     connect(ui->bidiGroupBox, & QGroupBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
@@ -56,6 +62,8 @@ QXShapingOptionsWidget::options() const {
     QXShapingOptions opts;
     opts.fontSize = fontSize;
     opts.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
+
+    opts.general.glyphSpacing = ui->enableGlyphSpacingCheckBox->isChecked()? ui->glyphSpacingSlider->value() / 100.0: 0;
     
     auto dir = ui->bidiDirectionComboBox->currentIndex();
     

@@ -500,16 +500,16 @@ QXShapingWidget::reloadFeatureList() {
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
     const FXVector<FXTag> features =inspector()->otFeatures(script, language);
 
-    QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    font.setPointSizeF(font.pointSizeF() * 1.5);
+    //QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+    //font.setPointSizeF(font.pointSizeF() * 1.5);
     
     ui_->featureListWidget->clear();
     for (FXTag feature : features) {
-        QListWidgetItem * item = new QListWidgetItem("  " + toQString(FXTag2Str(feature)));
+        QListWidgetItem * item = new QListWidgetItem(QString::fromStdU16String(u"\u3000 ") + toQString(FXTag2Str(feature)));
         item->setData(Qt::UserRole, feature);
         item->setData(Qt::UserRole + 1, 0);
         item->setData(Qt::ToolTipRole, toQString(FXOT::featureName(feature)));
-        item->setFont(font);
+        //item->setFont(font);
         ui_->featureListWidget->addItem(item);
     }
 
@@ -520,7 +520,7 @@ QXShapingWidget::reloadFeatureList() {
             item->setData(Qt::UserRole + 1, state);
             
             QString text = item->text();
-            text[0] = state? (state == 1? '+': '-'): ' ';
+            text[0] = state? (state == 1? u'\uFF0B': u'\uFF0D'): u'\u3000';
             item->setText(text);
             
         });
@@ -537,6 +537,8 @@ QXShapingWidget::doShape() {
     //auto g = face->glyph(0x1F44B, 0xFE01);
         
     auto options = optionsWidget_->options();
+    options.general.onFeatures = onFeatures();
+    options.general.offFeatures = offFeatures();
     
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
@@ -544,10 +546,8 @@ QXShapingWidget::doShape() {
     shaper_->shape(toStdString(QXEncoding::decodeFromGidNotation(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()))),
                    script,
                    language,
-                   FXShapingLTR,
-                   options.bidi,
-                   onFeatures(),
-                   offFeatures());
+                   options.general,
+                   options.bidi);
 
     ui_->glyphView->setOptions(options);
     ui_->glyphView->updateGeometry();

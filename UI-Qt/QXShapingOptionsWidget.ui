@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>345</height>
+    <height>402</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -139,6 +139,71 @@
        <widget class="QCheckBox" name="showGlyphsBoundaryCheckBox">
         <property name="text">
          <string>Show glyphs boundary</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>Glyph Spacing</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QSlider" name="glyphSpacingSlider">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>130</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+          <property name="pageStep">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="glyphSpacingSpinBox">
+          <property name="minimum">
+           <number>0</number>
+          </property>
+          <property name="maximum">
+           <number>100</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="enableGlyphSpacingCheckBox">
+        <property name="text">
+         <string>Enable Glyph Spacing</string>
         </property>
         <property name="checked">
          <bool>true</bool>
@@ -313,7 +378,6 @@
        </property>
       </widget>
      </item>
-
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
@@ -334,5 +398,70 @@
  <resources>
   <include location="QXApplication.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>glyphSpacingSlider</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glyphSpacingSpinBox</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>209</x>
+     <y>106</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>104</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>glyphSpacingSpinBox</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>glyphSpacingSlider</receiver>
+   <slot>setValue(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>351</x>
+     <y>105</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>207</x>
+     <y>105</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableGlyphSpacingCheckBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>glyphSpacingSlider</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>103</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>enableGlyphSpacingCheckBox</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>glyphSpacingSpinBox</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>251</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>350</x>
+     <y>103</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
