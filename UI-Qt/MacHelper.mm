@@ -9,17 +9,11 @@
 #include "QXDocumentWindowManager.h"
 
 @interface MacApplicationDelegate : NSObject<NSApplicationDelegate>
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender;
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender;
 - (BOOL)applicationOpenUntitledFile:(NSApplication *)sender;
 @end
 
 @implementation MacApplicationDelegate
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender {
-    Q_UNUSED(sender);
-    QXDocumentWindowManager::instance()->closeAllDocumentsAndQuit();
-    return NSTerminateNow;
-}
 
 - (BOOL)applicationShouldOpenUntitledFile:(NSApplication *)sender {
     return YES;
