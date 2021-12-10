@@ -208,14 +208,22 @@ QXDocumentWindowManager::handleDropEvent(QDropEvent * event) {
 
 void
 QXDocumentWindowManager::showFontListWindow() {
+    QXFontListWindow * isCreatingFontListWindow = (QXFontListWindow*)(-1);
+    if (fontListWindow_ == isCreatingFontListWindow)
+        // there is possible recursive creation of QXFontListWindow. When the splash is dismissed in
+        // constructor of QXFontListWindow, the MacApplicationDelegate.applicationOpenUntitledFile may
+        // run again in the event loop (e.g. user keeps clicking the icon in Dock bar)
+        return;
+    
     if (!fontListWindow_) {
+        fontListWindow_ = isCreatingFontListWindow;
         fontListWindow_ = new QXFontListWindow(nullptr);
         connect(fontListWindow_, &QXFontListWindow::fontSelected, this, [this]() {
             const QXFontURI fontURI = fontListWindow_->selectedFont();
             openFontURI(fontURI);
         });
     }
-
+    
     qApp->bringWindowToFront(fontListWindow_);
     fontListWindow_->searchLineEdit()->setFocus();
 }

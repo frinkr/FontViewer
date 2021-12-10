@@ -25,16 +25,16 @@ struct FXShapingGenralOptions {
     FXVector<FXTag> onFeatures {};
     FXVector<FXTag> offFeatures {};
     double glyphSpacing {};
+    bool forceShapeGIDEncodedText {};
 };
 
 struct FXShapingBidiOptions {
     bool bidiActivated {false};
     FXBidiDirection direction {FXBidiDirection::AUTO};
     bool resolveScripts {true};
+    bool resolveUnknownScripts {false};    
     bool breakOnScriptChange {true};
     bool breakOnLevelChange {true};
-    bool overrideOpenTypeFeatures {false};
-    
 };
 
 class FXShaper {

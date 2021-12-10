@@ -127,13 +127,14 @@ QXEncoding::encodeToHexNotation(const QString & str, bool cStyle) {
     const char * fmt = "U+%1;";
     if (cStyle)
         fmt = "\\u%1";
+    auto ucs4 = str.toUcs4();
     
     QStringList list;
-    for (QChar ch : str) {
-        if (ch.unicode() < 128) 
-            list << ch;
+    for (uint ch : ucs4) {
+        if (ch < 128)
+            list << QChar(ch);
         else 
-            list << QString(fmt).arg(ch.unicode(), 4, 16, QLatin1Char('0'));
+            list << QString(fmt).arg(ch, 4, 16, QLatin1Char('0'));
     }
     
     return list.join("");

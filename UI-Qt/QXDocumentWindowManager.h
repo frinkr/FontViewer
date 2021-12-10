@@ -122,7 +122,6 @@ private:
     QList<QXDocument *>                  documents_ {};
     bool                                 appIsAboutToQuit_ {false};
     QXFontListWindow                   * fontListWindow_ {nullptr};
-
     static QXDocumentWindowManager     * instance_;
 
 };
