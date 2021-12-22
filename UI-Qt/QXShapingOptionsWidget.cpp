@@ -83,3 +83,9 @@ QXShapingOptionsWidget::options() const {
     return opts;
 }
     
+
+void
+QXShapingOptionsWidget::setFontSize(double fontSize) {
+    ui->fontSizeComboBox->setCurrentText(QString("%1").arg(fontSize));
+}
+    

@@ -52,9 +52,15 @@ public:
     void
     mouseDoubleClickEvent(QMouseEvent *event) override;
     
+    void
+    wheelEvent(QWheelEvent *event) override;
+    
 signals:
     void
     glyphDoubleClicked(FXGlyphID gid) const;
+
+    void
+    fontSizeChanged(double fontSize) const;
     
 protected:
     
@@ -128,7 +134,7 @@ public slots:
 
     void
     showOptionsPopover();
-    
+
 private:
 
     void

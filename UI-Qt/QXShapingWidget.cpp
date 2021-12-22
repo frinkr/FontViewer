@@ -334,6 +334,29 @@ QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
     }
 }
 
+void
+
+QXShapingGlyphView::wheelEvent(QWheelEvent * event) {
+    if (event->modifiers().testFlag(Qt::ShiftModifier)) {
+        if (double angle = event->angleDelta().x()) {
+            double scale = qPow(1.0015, angle);
+            qPow(1.0015, angle);
+            
+            options_.fontSize *= scale;
+            
+            updateGeometry();
+            update();
+            event->accept();
+
+            emit fontSizeChanged(options_.fontSize);
+            
+            return;
+        }
+    }
+    
+    QWidget::wheelEvent(event);
+}
+
 QPoint
 QXShapingGlyphView::baseLinePosition() const {
     return QPoint(gridCellLeft(QX_SHAPINGVIEW_TOTAL_ROW, 0),
@@ -445,6 +468,9 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     
     connect(optionsWidget_, &QXShapingOptionsWidget::optionsChanged,
             this, &QXShapingWidget::doShape);
+
+    connect(ui_->glyphView, &QXShapingGlyphView::fontSizeChanged,
+            optionsWidget_, &QXShapingOptionsWidget::setFontSize);
 
 }
 
@@ -640,3 +666,4 @@ void
 QXShapingWidget::showOptionsPopover() {
     optionsPopover_->showRelativeTo(ui_->menuButton, QXPopoverTop);
 }
+
