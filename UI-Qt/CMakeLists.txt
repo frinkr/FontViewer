@@ -14,13 +14,16 @@ if (UNIX AND NOT APPLE)
   set(UIQT_USE_FONTCONFIG ON)
 endif()
 
+    find_package(Qt6 CONFIG REQUIRED)
+    # Note: 46 target(s) were omitted.
+    
 find_package(Qt6Core REQUIRED)
 find_package(Qt6Gui REQUIRED)
 find_package(Qt6Widgets REQUIRED)
 find_package(Qt6Network REQUIRED)
 
 if (WIN32)
-  find_package(Qt6WinExtras CONFIG REQUIRED)
+  #find_package(Qt6WinExtras CONFIG REQUIRED)
 endif()
 
 if (UIQT_USE_FONTCONFIG)
@@ -168,7 +171,7 @@ target_link_libraries(UI-Qt PRIVATE Qt6::Gui)
 target_link_libraries(UI-Qt PRIVATE Qt6::Widgets)
 target_link_libraries(UI-Qt PRIVATE Qt6::Network)
 if (WIN32)
-  target_link_libraries(UI-Qt PRIVATE Qt6::WinExtras Qt6::WinExtrasPrivate)
+  #target_link_libraries(UI-Qt PRIVATE Qt6::WinExtras Qt6::WinExtrasPrivate)
 endif()
 
 target_link_libraries(UI-Qt PRIVATE FontX)
