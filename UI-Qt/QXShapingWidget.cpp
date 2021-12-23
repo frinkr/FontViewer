@@ -22,20 +22,6 @@
 #include "ui_QXShapingWidget.h"
 
 namespace {
-    QVariant
-    langSysToVariant(FXTag script, FXTag language) {
-        return (qulonglong(script) << 32) + language;
-    }
-
-    bool
-    variantToLangSys(const QVariant & v, FXTag & script, FXTag & language) {
-        uint64_t i = v.value<uint64_t>();
-        script = (i >> 32);
-        language = (i & 0xFFFFFFFF);
-        return true;
-    }
-
-
     QStringList
     loadSamples() {
         QFile inputFile(":/shaping-samples.txt");
@@ -140,7 +126,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
     // alternative color
     if (options_.alternativeRowColor) {
-        for (int i = 1; i < QX_SHAPINGVIEW_TOTAL_ROW; i += 2) {
+        for (int i = 1; (i + 1) < QX_SHAPINGVIEW_TOTAL_ROW; i += 2) {
             if (i == selectedRowIndex_)
                 continue;
             
@@ -455,7 +441,8 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     warningAction_->setToolTip(tr("OpenType shaping is not available, fallback to basic shaping."));
 
     ui_->menuButton->setIcon(qApp->loadIcon(":/images/truetype.png"));
-
+    ui_->featuresButton->setIcon(qApp->loadIcon(":/images/shape.png"));
+        
     // Popover
     optionsPopover_ = new QXPopoverWindow(this);
     optionsWidget_ = new QXShapingOptionsWidget(this);

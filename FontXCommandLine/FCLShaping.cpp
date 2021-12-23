@@ -18,11 +18,11 @@ namespace {
                 const std::u16string text = u"\x0634\x0632";
                 
                 FXShaper shaper(face.get());
-                shaper.shape(FXUnicode::utf16ToUTF8(text),
-                             FXOT::DEFAULT_SCRIPT,
-                             FXOT::DEFAULT_LANGUAGE,
-                             FXShapingLTR,
-                             FXShapingBidiOptions{.bidiActivated = true});
+//                shaper.shape(FXUnicode::utf16ToUTF8(text),
+//                             FXOT::DEFAULT_SCRIPT,
+//                             FXOT::DEFAULT_LANGUAGE,
+//                             FXShapingLTR,
+//                             FXShapingBidiOptions{.bidiActivated = true});
             }
 
             

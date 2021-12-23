@@ -67,6 +67,8 @@ set(SHARED_SOURCES
   QXConv.h
   QXDockTitleBarWidget.cpp
   QXDockTitleBarWidget.h
+  QXDockWidget.cpp
+  QXDockWidget.h  
   QXDocument.cpp
   QXDocument.h
   QXDocumentWindow.cpp

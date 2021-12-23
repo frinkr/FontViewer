@@ -5,7 +5,7 @@
 #include "ui_QXShapingFeaturesWidget.h"
 
 namespace {
-        QVariant
+    QVariant
     langSysToVariant(FXTag script, FXTag language) {
         return (qulonglong(script) << 32) + language;
     }
