@@ -274,6 +274,8 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
 void
 QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
+    FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.fontSize);
+
     if (event->modifiers().testFlag(Qt::ShiftModifier)) {
         selectedColIndex_ = -1;
 
@@ -292,8 +294,6 @@ QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
     }
     else {
         selectedRowIndex_ = -1;
-        FXFace * face = shaper_->face();
-        FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
 
         int index = glyphAtPoint(event->pos());
         if (selectedColIndex_ != index) {
@@ -317,6 +317,7 @@ QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
         
         QXDocumentWindow * documentWindow = QXDocumentWindowManager::instance()->getDocumentWindow(document_);
         if (documentWindow) {
+            FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.fontSize);
             QRect rect = glyphInteractionRect(selectedColIndex_);
             QRect globalRect(this->mapToGlobal(rect.topLeft()),
                              this->mapToGlobal(rect.bottomRight()));

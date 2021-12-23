@@ -249,7 +249,7 @@ QXDocumentWindow::initCollectionView() {
 void
 QXDocumentWindow::initGlyphInfoView() {
     glyphPopover_ = new QXPopoverWindow(this);
-    glyphPopover_->setBorderRadius(0);
+    glyphPopover_->setBorderRadius(1);
     glyphWidget_  = new QXGlyphInfoWidget(glyphPopover_);
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
