@@ -408,12 +408,18 @@ struct FXShaperImp {
 
     void
     addGlyphSpacing(double spacing) {
+        glyphSpacing_.clear();
+        
         if (!spacing)
             return;
         
-        for (size_t i = 0; i < hbGlyphInfos_.size(); ++ i) 
+        for (size_t i = 0; i < hbGlyphInfos_.size(); ++ i) {
             hbGlyphPositions_[i].x_advance += face_->upem() * spacing;
+            glyphSpacing_.push_back(face_->upem() * spacing);
+        }
     }
+
+    
     
     FXFace * face_{};
 
@@ -425,6 +431,7 @@ struct FXShaperImp {
     unsigned int  hbGlyphCount_ {};
     FXVector<hb_glyph_info_t> hbGlyphInfos_ {};
     FXVector<hb_glyph_position_t> hbGlyphPositions_ {};
+    FXVector<fu> glyphSpacing_ {};
 
 };
 
@@ -469,6 +476,14 @@ FXShaper::offset(size_t index) const {
 size_t
 FXShaper::cluster(size_t index) const {
     return imp_->hbGlyphInfos_[index].cluster;
+}
+
+FXVec2d<fu>
+FXShaper::spacing(size_t index) const {
+    if (index < imp_->glyphSpacing_.size())
+        return {imp_->glyphSpacing_[index], 0};
+    else
+        return {0, 0};
 }
 
 FXFace *

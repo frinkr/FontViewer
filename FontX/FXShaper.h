@@ -62,6 +62,9 @@ public:
 
     size_t
     cluster(size_t index) const;
+
+    FXVec2d<fu>
+    spacing(size_t index) const;
     
     FXFace *
     face() const;

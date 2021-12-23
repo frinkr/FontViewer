@@ -39,6 +39,7 @@ set(UI
   QXGlyphTableWidget.ui
   QXOutlineDialog.ui
   QXPreferencesDialog.ui
+  QXShapingFeaturesWidget.ui
   QXShapingWidget.ui
   QXShapingOptionsWidget.ui
   QXVariableWidget.ui
@@ -120,6 +121,8 @@ set(SHARED_SOURCES
   QXRelatedFontsWidget.h
   QXSearchEngine.cpp
   QXSearchEngine.h
+  QXShapingFeaturesWidget.cpp
+  QXShapingFeaturesWidget.h
   QXShapingWidget.cpp
   QXShapingWidget.h
   QXShapingOptionsWidget.cpp

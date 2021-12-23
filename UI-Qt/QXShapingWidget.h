@@ -16,6 +16,7 @@ class FXInspector;
 class FXShaper;
 class QPaintEvent;
 class QXDocument;
+class QXShapingFeaturesWidget;
 class QXShapingOptionsWidget;
 class QXPopoverWindow;
 
@@ -106,12 +107,6 @@ public:
 
 public slots:
     void
-    reloadScriptList();
-
-    void
-    reloadFeatureList();
-
-    void
     doShape();
 
     void
@@ -127,14 +122,14 @@ public slots:
     doCopyHexCStyleAction();
     
     void
-    doTogglePanelAction();
-    
-    void
     focusLineEdit(bool selectAll = true);
 
     void
     showOptionsPopover();
 
+    void
+    showFeaturesPopover();
+    
 private:
 
     void
@@ -142,12 +137,6 @@ private:
     
     FXPtr<FXInspector>
     inspector();
-
-    FXVector<FXTag>
-    onFeatures() const;
-
-    FXVector<FXTag>
-    offFeatures() const;
     
 private:
     Ui::QXShapingWidget * ui_;
@@ -156,7 +145,9 @@ private:
     QAction      * warningAction_;
     
     QXShapingOptionsWidget * optionsWidget_{};
+    QXShapingFeaturesWidget * featuresWidget_{};
     QXPopoverWindow * optionsPopover_{};
+    QXPopoverWindow * featuresPopover_{};
 };
 
 

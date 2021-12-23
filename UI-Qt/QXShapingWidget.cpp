@@ -17,6 +17,7 @@
 #include "QXImageHelpers.h"
 #include "QXSearchEngine.h"
 #include "QXShapingWidget.h"
+#include "QXShapingFeaturesWidget.h"
 #include "QXShapingOptionsWidget.h"
 #include "ui_QXShapingWidget.h"
 
@@ -53,7 +54,7 @@ namespace {
     constexpr int QX_SHAPINGVIEW_MARGIN = 20;
     constexpr int QX_SHAPINGVIEW_GRID_ROW_HEIGHT = 20;
     constexpr int QX_SHAPINGVIEW_GRID_HEAD_WIDTH = 100;
-    constexpr int QX_SHAPINGVIEW_TOTAL_ROW = 7;
+    constexpr int QX_SHAPINGVIEW_TOTAL_ROW = 10;
 }
 
 QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
@@ -173,7 +174,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         else if (selectedRowIndex_ != -1) {
             auto rect = gridCellRect(selectedRowIndex_, shaper_->glyphCount());
             rect.setLeft(gridCellLeft(selectedRowIndex_, -1));
-            painter.fillRect(rect, palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));   
+            painter.fillRect(rect, Qt::red);//palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
         }
     }
     
@@ -252,27 +253,35 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         
         // headers
         painter.setPen(textPen);
-        painter.drawText(gridCellRect(1, -1).translated(0, QX_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Kern "));
-        painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Shaping Adv. "));
-        painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Natural Adv. "));
-        painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("Cluster "));
-        painter.drawText(gridCellRect(4, -1), Qt::AlignRight, tr("GID "));
-        painter.drawText(gridCellRect(5, -1), Qt::AlignRight, tr("Index "));
+        painter.drawText(gridCellRect(1, -1).translated(0, QX_SHAPINGVIEW_GRID_ROW_HEIGHT), Qt::AlignRight, tr("Shaping Kern "));
+        painter.drawText(gridCellRect(1, -1), Qt::AlignRight, tr("Total Adv. "));
+        painter.drawText(gridCellRect(2, -1), Qt::AlignRight, tr("Spacing "));
+        painter.drawText(gridCellRect(3, -1), Qt::AlignRight, tr("Shaping Offset "));
+        painter.drawText(gridCellRect(4, -1), Qt::AlignRight, tr("Shaping Adv. "));        
+        painter.drawText(gridCellRect(5, -1), Qt::AlignRight, tr("Natural Adv. "));
+        painter.drawText(gridCellRect(6, -1), Qt::AlignRight, tr("Cluster "));
+        painter.drawText(gridCellRect(7, -1), Qt::AlignRight, tr("GID "));
+        painter.drawText(gridCellRect(8, -1), Qt::AlignRight, tr("Index "));
         
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             FXGlyphID gid = shaper_->glyph(i);
             FXVec2d<fu> adv = shaper_->advance(i);
-            size_t cluster = shaper_->cluster(i);
+            FXVec2d<fu> off = shaper_->offset(i);
+            size_t cluster  = shaper_->cluster(i);
+            fu spacing = shaper_->spacing(i).x;
             FXGlyph g = face->glyph(FXGChar(gid, FXGCharTypeGlyphID));
-            fu kern = adv.x - g.metrics.horiAdvance;
+            fu kern = adv.x - spacing - g.metrics.horiAdvance;
             
             painter.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
             painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
-            painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
-            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString::number(cluster));
-            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(gid));
-            painter.drawText(gridCellRect(5, i), Qt::AlignCenter, QString::number(i));
+            painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(spacing));            
+            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString("%1, %2").arg(off.x).arg(off.y));            
+            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(adv.x - spacing));
+            painter.drawText(gridCellRect(5, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
+            painter.drawText(gridCellRect(6, i), Qt::AlignCenter, QString::number(cluster));
+            painter.drawText(gridCellRect(7, i), Qt::AlignCenter, QString::number(gid));
+            painter.drawText(gridCellRect(8, i), Qt::AlignCenter, QString::number(i));
         }
     }
 }
@@ -432,16 +441,14 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     ui_->textComboBox->addItems(loadSamples());
         
     // connect signals
-    connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::activated),
-            this, &QXShapingWidget::reloadFeatureList);
-    connect(ui_->featureListWidget, &QListWidget::itemChanged,
-            this, &QXShapingWidget::doShape);    
     connect(ui_->textComboBox, &QComboBox::editTextChanged,
             this, &QXShapingWidget::doShape);
     connect(ui_->glyphView, &QXShapingGlyphView::glyphDoubleClicked,
             this, &QXShapingWidget::gotoGlyph);
     connect(ui_->menuButton, &QPushButton::clicked,
             this, &QXShapingWidget::showOptionsPopover);
+    connect(ui_->featuresButton, &QPushButton::clicked,
+            this, &QXShapingWidget::showFeaturesPopover);
 
     warningAction_ = new QAction(this);
     warningAction_->setIcon(qApp->loadIcon(":/images/warning.png"));
@@ -453,10 +460,11 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
     optionsPopover_ = new QXPopoverWindow(this);
     optionsWidget_ = new QXShapingOptionsWidget(this);
     optionsPopover_->setWidget(optionsWidget_);
-
-    connect(optionsWidget_, &QXShapingOptionsWidget::togglePanelButtonClicked,
-            this, &QXShapingWidget::doTogglePanelAction);
-
+    
+    featuresPopover_ = new QXPopoverWindow(this);
+    featuresWidget_ = new QXShapingFeaturesWidget(this);
+    featuresPopover_->setWidget(featuresWidget_);
+    
     connect(optionsWidget_, &QXShapingOptionsWidget::copyTextButtonClicked,
             this, &QXShapingWidget::doCopyAction);
 
@@ -467,6 +475,9 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
             this, &QXShapingWidget::doCopyHexCStyleAction);
     
     connect(optionsWidget_, &QXShapingOptionsWidget::optionsChanged,
+            this, &QXShapingWidget::doShape);
+
+    connect(featuresWidget_, &QXShapingFeaturesWidget::featuresChanged,
             this, &QXShapingWidget::doShape);
 
     connect(ui_->glyphView, &QXShapingGlyphView::fontSizeChanged,
@@ -487,70 +498,15 @@ QXShapingWidget::setDocument(QXDocument * document) {
 
     ui_->glyphView->setShaper(shaper_);
     ui_->glyphView->setDocument(document);
-
+    
     connect(document, &QXDocument::variableCoordinatesChanged, [this]() {
         delete shaper_;
         shaper_ = new FXShaper(document_->face().get());
         ui_->glyphView->setShaper(shaper_);
         doShape();
     });
-        
-    reloadScriptList();
-}
 
-void
-QXShapingWidget::reloadScriptList() {
-    ui_->langSysComboBox->clear();
-
-    const FXVector<FXTag> scripts = inspector()->otScripts();
-    for (FXTag script : scripts) {
-        const FXVector<FXTag> languages = inspector()->otLanguages(script);
-        for (FXTag language : languages) {
-            ui_->langSysComboBox->addItem(
-                QString("%1 %2 [%3-%4]").arg(
-                    toQString(FXOT::scriptName(script)),
-                    toQString(FXOT::languageName(language)),
-                    toQString(FXTag2Str(script)),
-                    toQString(FXTag2Str(language))),
-                langSysToVariant(script, language));
-        }
-    }
-
-    ui_->langSysComboBox->setCurrentIndex(0);
-    reloadFeatureList();
-}
-
-void
-QXShapingWidget::reloadFeatureList() {
-    FXTag script, language;
-    variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
-    const FXVector<FXTag> features =inspector()->otFeatures(script, language);
-
-    //QFont font = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-    //font.setPointSizeF(font.pointSizeF() * 1.5);
-    
-    ui_->featureListWidget->clear();
-    for (FXTag feature : features) {
-        QListWidgetItem * item = new QListWidgetItem(QString::fromStdU16String(u"\u3000 ") + toQString(FXTag2Str(feature)));
-        item->setData(Qt::UserRole, feature);
-        item->setData(Qt::UserRole + 1, 0);
-        item->setData(Qt::ToolTipRole, toQString(FXOT::featureName(feature)));
-        //item->setFont(font);
-        ui_->featureListWidget->addItem(item);
-    }
-
-    connect(ui_->featureListWidget, &QListWidget::itemClicked, [this](QListWidgetItem * item) {
-            int state = item->data(Qt::UserRole + 1).value<int>();
-            state = (state + 2) % 3 - 1;
-        
-            item->setData(Qt::UserRole + 1, state);
-            
-            QString text = item->text();
-            text[0] = state? (state == 1? u'\uFF0B': u'\uFF0D'): u'\u3000';
-            item->setText(text);
-            
-        });
-    
+    featuresWidget_->setDocument(document);
     doShape();
 }
 
@@ -559,15 +515,11 @@ QXShapingWidget::doShape() {
     if (!shaper_)
         return;
 
-    //auto face = document_->face();
-    //auto g = face->glyph(0x1F44B, 0xFE01);
-        
     auto options = optionsWidget_->options();
-    options.general.onFeatures = onFeatures();
-    options.general.offFeatures = offFeatures();
+    options.general.onFeatures = featuresWidget_->onFeatures();
+    options.general.offFeatures = featuresWidget_->offFeatures();
     
-    FXTag script, language;
-    variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
+    auto [script, language] = featuresWidget_->scriptAndLanguage();
 
     shaper_->shape(toStdString(QXEncoding::decodeFromGidNotation(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()))),
                    script,
@@ -597,31 +549,6 @@ QXShapingWidget::inspector() {
     return document_->face()->inspector();
 }
 
-FXVector<FXTag>
-QXShapingWidget::onFeatures() const {
-    FXVector<FXTag> features;
-    for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
-        QListWidgetItem * item = ui_->featureListWidget->item(i);
-        int state = item->data(Qt::UserRole + 1).value<int>();
-        if (state == 1)
-            features.push_back(item->data(Qt::UserRole).value<FXTag>());
-    }
-    features.push_back('locl');
-    return features;
-}
-
-FXVector<FXTag>
-QXShapingWidget::offFeatures() const {
-    FXVector<FXTag> features;
-    for (int i = 0; i < ui_->featureListWidget->count(); ++ i) {
-        QListWidgetItem * item = ui_->featureListWidget->item(i);
-        int state = item->data(Qt::UserRole + 1).value<int>();
-        if (state == -1)
-            features.push_back(item->data(Qt::UserRole).value<FXTag>());
-    }
-    return features;
-}
-
 void
 QXShapingWidget::doCopyAction() {
     copyTextToClipboard(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()));
@@ -646,14 +573,6 @@ QXShapingWidget::copyTextToClipboard(const QString & text) {
     qApp->copyTextToClipBoard(text);
     qApp->message(QXDocumentWindowManager::instance()->getDocumentWindow(document_), QString(), text);
 }
-    
-void
-QXShapingWidget::doTogglePanelAction() {
-    if (ui_->leftWidget->isHidden())
-        ui_->leftWidget->show();
-    else
-        ui_->leftWidget->hide();
-}
 
 void
 QXShapingWidget::focusLineEdit(bool selectAll) {
@@ -667,3 +586,7 @@ QXShapingWidget::showOptionsPopover() {
     optionsPopover_->showRelativeTo(ui_->menuButton, QXPopoverTop);
 }
 
+void
+QXShapingWidget::showFeaturesPopover() {
+    featuresPopover_->showRelativeTo(ui_->featuresButton, QXPopoverTop);
+}
