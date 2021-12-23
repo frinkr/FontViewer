@@ -189,6 +189,13 @@ QXDocument::search(const QString & text) {
     emit searchDone(result, text);
 }
 
+void
+QXDocument::search(const FXGChar & ch) {
+    QXSearch s;
+    s.gchar = ch;
+    search(s);
+}
+
 const FXCMap &
 QXDocument::currentCMap() const {
     return face_->currentCMap();

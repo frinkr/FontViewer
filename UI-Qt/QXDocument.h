@@ -155,6 +155,9 @@ public slots:
     void
     search(const QString & text);
 
+    void
+    search(const FXGChar & ch);
+    
 public:    
     const FXCMap &
     currentCMap() const;
@@ -182,6 +185,9 @@ public:
 
     FXGChar
     charAt(const QXCollectionModelIndex & index) const;
+
+    QXCollectionModelIndex
+    indexFor(const FXGChar & ch) const;
 
 public:   // IMPL: QXCollectionViewModel
     int

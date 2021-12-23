@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QTextDocument>
 #include <QDebug>
+#include <QDesktopServices>
 
 namespace {
 
@@ -123,7 +124,7 @@ QXGlyphInfoWidget::QXGlyphInfoWidget(QWidget *parent)
     connect(this, &QTextBrowser::anchorClicked,
             this, &QXGlyphInfoWidget::onLinkClicked);
     setOpenLinks(true);
-    setOpenExternalLinks(true);
+    setOpenExternalLinks(false);
 }
 
 QXDocument *
@@ -166,4 +167,6 @@ QXGlyphInfoWidget::onLinkClicked(const QUrl & link) {
     FXGChar c = QXEncoding::charFromLink(link);
     if (c != FXGCharInvalid)
         emit charLinkClicked(c);
+    else
+        QDesktopServices::openUrl(link);
 }

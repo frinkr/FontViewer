@@ -387,7 +387,8 @@ QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
 
 void
 QXDocumentWindow::onCharLinkClicked(FXGChar c) {
-    //ui_->listView->selectChar(c);
+    glyphPopover_->hide();
+    document_->search(c);
 }
 
 void
