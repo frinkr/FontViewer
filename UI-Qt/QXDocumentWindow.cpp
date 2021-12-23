@@ -18,7 +18,7 @@
 #include "QXApplication.h"
 #include "QXCMapBlockWidget.h"
 #include "QXConv.h"
-#include "QXDockTitleBarWidget.h"
+#include "QXDockWidget.h"
 #include "QXDocumentWindow.h"
 #include "QXDocumentWindowManager.h"
 #include "QXEncoding.h"
@@ -249,7 +249,7 @@ QXDocumentWindow::initCollectionView() {
 void
 QXDocumentWindow::initGlyphInfoView() {
     glyphPopover_ = new QXPopoverWindow(this);
-    glyphPopover_->setBorderRadius(0);
+    glyphPopover_->setBorderRadius(1);
     glyphWidget_  = new QXGlyphInfoWidget(glyphPopover_);
     glyphWidget_->setMinimumSize(300, 400);
     glyphPopover_->setWidget(glyphWidget_);
@@ -387,7 +387,8 @@ QXDocumentWindow::onGlyphDoubleClicked(const QXCollectionModelIndex & index) {
 
 void
 QXDocumentWindow::onCharLinkClicked(FXGChar c) {
-    //ui_->listView->selectChar(c);
+    glyphPopover_->hide();
+    document_->search(c);
 }
 
 void
@@ -437,9 +438,8 @@ QXDocumentWindow::onVariableAction() {
 void
 QXDocumentWindow::onTableAction() {
     if (!tableDockWidget_) {
-        tableDockWidget_ = new QDockWidget(tr("Glyphs Table"), this);
+        tableDockWidget_ = new QXDockWidget(tr("Glyphs Table"), this);
         tableDockWidget_->setWidget(new QxGlyphTableWidget(document_));
-        tableDockWidget_->setTitleBarWidget(new QXDockTitleBarWidget(tableDockWidget_));
         addDockWidget(Qt::BottomDockWidgetArea, tableDockWidget_);
     }
     toggleDockWidget(tableDockWidget_);
@@ -448,11 +448,10 @@ QXDocumentWindow::onTableAction() {
 void
 QXDocumentWindow::onShapingAction() {
     if (!shapingDockWidget_) {
-        shapingDockWidget_ = new QDockWidget(tr("Shape"), this);
+        shapingDockWidget_ = new QXDockWidget(tr("Shape"), this);
         QXShapingWidget * widget = new QXShapingWidget(this);
         widget->setDocument(document_);
         shapingDockWidget_->setWidget(widget);
-        shapingDockWidget_->setTitleBarWidget(new QXDockTitleBarWidget(shapingDockWidget_));
         addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
     }
     toggleDockWidget(shapingDockWidget_);
@@ -463,9 +462,8 @@ QXDocumentWindow::onShapingAction() {
 void
 QXDocumentWindow::onFontInfoAction() {
     if (!infoDockWidget_) {
-        infoDockWidget_ = new QDockWidget(tr("Info"), this);
+        infoDockWidget_ = new QXDockWidget(tr("Info"), this);
         infoDockWidget_->setWidget(new QXFontInfoWidget(document_->face(), infoDockWidget_));
-        infoDockWidget_->setTitleBarWidget(new QXDockTitleBarWidget(infoDockWidget_));
         addDockWidget(Qt::LeftDockWidgetArea, infoDockWidget_);
     }
 

@@ -59,11 +59,9 @@ int qxMain(int argc, char *argv[]) {
         }
     }
     else {
-#if !defined(Q_OS_MAC)
         QXDocumentWindowManager::instance()->autoShowFontListWindow();
-#endif
     }  
-
+    
     int code = app.exec();
 
     QXPreferences::save();

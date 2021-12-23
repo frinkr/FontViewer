@@ -18,6 +18,9 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
 
     connect(ui->enableGlyphSpacingCheckBox, &QCheckBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
+
+    connect(ui->forceShapeGIDEncodedTextCheckBox, &QCheckBox::toggled,
+            this, &QXShapingOptionsWidget::optionsChanged);
     
     connect(ui->bidiGroupBox, & QGroupBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
@@ -33,7 +36,10 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     
     connect(ui->bidiResolveScriptsCheckBox, &QCheckBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
-        
+
+    connect(ui->bidiResolveUnknownScriptsCheckBox, &QCheckBox::toggled,
+            this, &QXShapingOptionsWidget::optionsChanged);
+    
     connect(ui->copyTextButton, &QPushButton::clicked,
             this, &QXShapingOptionsWidget::copyTextButtonClicked);
 
@@ -64,6 +70,7 @@ QXShapingOptionsWidget::options() const {
     opts.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
 
     opts.general.glyphSpacing = ui->enableGlyphSpacingCheckBox->isChecked()? ui->glyphSpacingSlider->value() / 100.0: 0;
+    opts.general.forceShapeGIDEncodedText = ui->forceShapeGIDEncodedTextCheckBox->isChecked();
     
     auto dir = ui->bidiDirectionComboBox->currentIndex();
     
@@ -71,8 +78,14 @@ QXShapingOptionsWidget::options() const {
     opts.bidi.breakOnLevelChange = ui->bidiBreakOnLevelChangeCheckBox->isChecked();
     opts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
     opts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
+    opts.bidi.resolveUnknownScripts = ui->bidiResolveUnknownScriptsCheckBox->isChecked();
     opts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
-    opts.bidi.overrideOpenTypeFeatures = true;//ui->overrideOpenTypeFeaturesCheckBox->isChecked();
     return opts;
+}
+    
+
+void
+QXShapingOptionsWidget::setFontSize(double fontSize) {
+    ui->fontSizeComboBox->setCurrentText(QString("%1").arg(fontSize));
 }
     

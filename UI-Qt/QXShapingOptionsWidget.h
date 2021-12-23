@@ -26,6 +26,10 @@ public:
 
     QXShapingOptions
     options() const;
+
+public slots:
+    void
+    setFontSize(double fontSize);
     
 signals:
     void 

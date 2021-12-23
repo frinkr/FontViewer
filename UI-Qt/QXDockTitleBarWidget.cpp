@@ -3,6 +3,7 @@
 #include <QMouseEvent>
 #include <QPainter>
 #include <QPushButton>
+#include <QToolButton>
 #include <QSpacerItem>
 #include <QStylePainter>
 
@@ -20,14 +21,11 @@ QXDockTitleBarWidget::QXDockTitleBarWidget(QWidget * parent)
     
     int iconSize = TITLE_BAR_HEIGHT - 6;
     QIcon closeIcon = qApp->loadIcon(":/images/close.png");
-    QPushButton * closeButton = new QPushButton(closeIcon, QString(), this);
+    QToolButton * closeButton = new QToolButton(this);
 
-    closeButton->setMinimumSize(iconSize, iconSize);
-    closeButton->setMaximumSize(iconSize, iconSize);
-    closeButton->setIconSize(QSize(iconSize, iconSize));
-    closeButton->setFlat(true);
-    //closeButton->setStyleSheet("boder:none;");
-    connect(closeButton, &QPushButton::clicked, this, [this]() {
+    closeButton->setFixedSize(iconSize, iconSize);
+    closeButton->setIcon(closeIcon);
+    connect(closeButton, &QAbstractButton::clicked, this, [this]() {
         QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
         dockWidget->hide();
     });
@@ -61,53 +59,33 @@ QXDockTitleBarWidget::paintEvent(QPaintEvent * event) {
     //return QWidget::paintEvent(event);
     QPainter p(this);
 
-    p.setRenderHints(QPainter::Antialiasing | QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
+    p.setRenderHints(QPainter::Antialiasing | QPainter::SmoothPixmapTransform);
     
-    //QRect rect(0, 0, width(), height());
-    //p.fillRect(rect, palette().color(QPalette::Normal, QPalette::Window));
-
     // Background color
-    QColor bgColor;
-    if (haveFocus_)
-        bgColor = palette().color(QPalette::Active, QPalette::Highlight);
-    else
-        bgColor = palette().color(QPalette::Normal, QPalette::Window);
-
+    QColor bgColor, fgColor;
+    if (haveFocus_) {
+        bgColor = palette().color(QPalette::Active, backgroundRole());
+        fgColor = palette().color(QPalette::Active, QPalette::HighlightedText);
+        if (qApp->darkMode())
+            bgColor = bgColor.lighter(150);
+        else
+            bgColor = bgColor.darker(120);
+    }
+    else {
+        bgColor = palette().color(QPalette::Inactive, backgroundRole());
+        fgColor = palette().color(QPalette::Normal, QPalette::Text);
+        
+        if (qApp->darkMode())
+            bgColor = bgColor.lighter(120);
+        else
+            bgColor = bgColor.darker(105);
+    }
     p.fillRect(rect(), bgColor);
 
-
-    // close icon
-    //QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
-    //p.drawPixmap(closeIconRect(), closeIcon, closeIcon.rect());
-
-    // title
-    QColor fgColor;
-    if (haveFocus_)
-        fgColor = palette().color(QPalette::Active, QPalette::HighlightedText);
-    else
-        fgColor = palette().color(QPalette::Normal, QPalette::Text);
     p.setPen(fgColor);
     QDockWidget * dockWidget = qobject_cast<QDockWidget*>(parentWidget());
     p.drawText(rect(), Qt::AlignCenter, dockWidget->windowTitle());
 
-    
-    // Grab bar
-    QFontMetrics fm(p.font());
-    int titleWidth = fm.horizontalAdvance(dockWidget->windowTitle());
-
-    float kHoriMargin = 5;
-    float kVertMargin = TITLE_BAR_HEIGHT / 4;
-    float barWidth = (width() - titleWidth) / 2 - 2 * kHoriMargin;
-    float barHeight = TITLE_BAR_HEIGHT - 2 * kVertMargin;
-    QRect leftRect(kHoriMargin, kVertMargin, barWidth, barHeight);
-    QRect rightRect(width() - barWidth - kHoriMargin, kVertMargin, barWidth, barHeight);
-    p.fillRect(leftRect, QBrush(qApp->darkMode()? bgColor.lighter(): bgColor.darker(), Qt::Dense7Pattern));
-    p.fillRect(rightRect, QBrush(qApp->darkMode()? bgColor.lighter(): bgColor.darker(), Qt::Dense7Pattern));
-}
-
-void
-QXDockTitleBarWidget::mousePressEvent(QMouseEvent * event) {
-    QWidget::mousePressEvent(event);
 }
 
 void
@@ -121,12 +99,4 @@ QXDockTitleBarWidget::onFocusChanged(QWidget * old, QWidget * now) {
         haveFocus_ = !haveFocus_;
         update();
     }
-}
-
-QRectF
-QXDockTitleBarWidget::closeIconRect() {
-    QPixmap closeIcon = style()->standardPixmap(QStyle::SP_TitleBarCloseButton, nullptr, this);
-    qreal h = qMin(closeIcon.height(), height());
-    qreal w = h * closeIcon.width() / closeIcon.height();
-    return QRectF(5, (height() - h) / 2, w, h);
 }

@@ -11,6 +11,7 @@
 #include <QImage>
 #include <QTextDocument>
 #include <QDebug>
+#include <QDesktopServices>
 
 namespace {
 
@@ -28,25 +29,25 @@ namespace {
 
     QString toQString3(FXBidiClass c) {
         static const char * map [] = {
-            "L",
-            "R",
-            "EN",
-            "ES",
-            "ET",
-            "AN",
-            "CS",
-            "B",
-            "S",
-            "WS",
-            "ON",
+            "L (LeftToRight)",
+            "R (RightToLeft)",
+            "EN (European Number)",
+            "ES (European Number Separator)",
+            "ET (European Number Terminator)",
+            "AN (Arabic Number)",
+            "CS (Common Number Seperator)",
+            "B (Paragraph Seperator)",
+            "S (Segment Separator)",
+            "WS (Whitespaces)",
+            "ON (Other Neutrals)",
             "LRE",
             "LRO",
-            "AL",
+            "AL (Arabic)",
             "RLE",
             "RLO",
             "PDF",
-            "NSM",
-            "BN",
+            "NSM (Nonspacing Mark)",
+            "BN (Boundary Neutral)",
             "FSI",
             "LRI",
             "RLI",
@@ -123,7 +124,7 @@ QXGlyphInfoWidget::QXGlyphInfoWidget(QWidget *parent)
     connect(this, &QTextBrowser::anchorClicked,
             this, &QXGlyphInfoWidget::onLinkClicked);
     setOpenLinks(true);
-    setOpenExternalLinks(true);
+    setOpenExternalLinks(false);
 }
 
 QXDocument *
@@ -166,4 +167,6 @@ QXGlyphInfoWidget::onLinkClicked(const QUrl & link) {
     FXGChar c = QXEncoding::charFromLink(link);
     if (c != FXGCharInvalid)
         emit charLinkClicked(c);
+    else
+        QDesktopServices::openUrl(link);
 }

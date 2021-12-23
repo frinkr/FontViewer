@@ -12,8 +12,13 @@ namespace {
     }
 }
 
+extern "C" void tryBidi();
+    
 int main(int argc, const char ** argv) {
 
+    //tryBidi();
+    //return 0;
+    
     if (false)
     {
         FXFileInDirectoryIterator itr("/Users/frinkr/Library/Fonts");

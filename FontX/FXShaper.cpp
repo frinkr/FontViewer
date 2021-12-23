@@ -5,6 +5,12 @@
 #include "FXHBPrivate.h"
 #include <fribidi/fribidi.h>
 
+#include <unicode/uchar.h>
+#include <unicode/uscript.h>
+#include <unicode/unorm2.h>
+#include <unicode/unistr.h>
+#include <unicode/ubidi.h>
+
 struct FXShaperImp {
     explicit FXShaperImp(FXFace * face)
         : face_ (face)
@@ -58,7 +64,7 @@ struct FXShaperImp {
         const std::u32string u32Text = FXUnicode::utf8ToUTF32(text);
         const auto haveEncodedGID = std::any_of(u32Text.begin(), u32Text.end(), [](auto c) { return FXCharIsEncodedGID(c);});
 
-        if (haveEncodedGID) {
+        if (haveEncodedGID && !opts.forceShapeGIDEncodedText) {
             hasFallbackShaping_ = true;
             fallbackShape(text);
             return addGlyphSpacing(opts.glyphSpacing);
@@ -85,6 +91,52 @@ struct FXShaperImp {
             FXVector<FriBidiLevel> bidiLevels(u32BidiTextLength, 0);
             FXVector<hb_script_t> hbScripts(u32BidiTextLength, HB_SCRIPT_COMMON);
             
+            {
+                
+                FriBidiParType paraDir = FRIBIDI_PAR_RTL;
+                
+                FriBidiChar logStr[] = {0x0630, 0x062a, ' ', '9', '%'};
+                FriBidiChar visStr[] = {'%', '9', ' ', 0x062a, 0x0630};
+                size_t strLen = sizeof(logStr)/sizeof(logStr[0]);
+                std::vector<FriBidiCharType> logBidiTypes(strLen, FRIBIDI_TYPE_LTR);
+                std::vector<FriBidiLevel>    logBidiLevels(strLen, 0);
+                std::vector<FriBidiCharType> visBidiTypes = logBidiTypes;
+                std::vector<FriBidiLevel>    visBidiLevels = logBidiLevels;
+                
+                fribidi_get_bidi_types(logStr, strLen, logBidiTypes.data());
+                fribidi_get_bidi_types(visStr, strLen, visBidiTypes.data());
+                auto L0 = fribidi_get_par_embedding_levels(logBidiTypes.data(), logBidiTypes.size(), &paraDir, logBidiLevels.data());
+                auto L1 = fribidi_get_par_embedding_levels(visBidiTypes.data(), visBidiTypes.size(), &paraDir, visBidiLevels.data());
+                
+                std::vector<FriBidiChar> logReorderedStr(strLen, 0);
+                for (size_t i = 0; i < strLen; ++ i) logReorderedStr[i] = logStr[i];
+                std::vector<FriBidiStrIndex> logMap(strLen, 0);
+                for (size_t i = 0; i < strLen; ++ i) logMap[i] = i;
+                auto R0 = fribidi_reorder_line(0, logBidiTypes.data(), logBidiTypes.size(), 0, paraDir, logBidiLevels.data(), logReorderedStr.data(), logMap.data());
+
+                std::vector<FriBidiChar> visReorderedStr(strLen, 0);
+                for (size_t i = 0; i < strLen; ++ i) visReorderedStr[i] = visStr[i];
+                std::vector<FriBidiStrIndex> visMap(strLen, 0);
+                for (size_t i = 0; i < strLen; ++ i) visMap[i] = i;
+                auto R1 = fribidi_reorder_line(0, visBidiTypes.data(), visBidiTypes.size(), 0, paraDir, visBidiLevels.data(), visReorderedStr.data(), visMap.data());
+
+
+
+                // icu
+                std::vector<UBiDiLevel> uLogBidiLevels(strLen, 0), uVisBidiLevels(strLen, 0);
+                std::vector<int32_t> uLogMap(strLen, 0), uVisMap(strLen, 0);
+                for (size_t i = 0; i < strLen; ++ i) uLogBidiLevels[i] = logBidiLevels[i];
+                for (size_t i = 0; i < strLen; ++ i) uVisBidiLevels[i] = visBidiLevels[i];
+                for (size_t i = 0; i < strLen; ++ i) uLogMap[i] = i;
+                for (size_t i = 0; i < strLen; ++ i) uVisMap[i] = i;
+
+                ubidi_reorderVisual(uLogBidiLevels.data(), uLogBidiLevels.size(), uLogMap.data());
+                ubidi_reorderVisual(uVisBidiLevels.data(), uVisBidiLevels.size(), uVisMap.data());
+                
+                assert(logBidiTypes.size() == visBidiTypes.size());
+            }
+            
+            
             fribidi_get_bidi_types(u32BidiText, u32BidiTextLength, &bidiTypes[0]);
             fribidi_get_par_embedding_levels(&bidiTypes[0], u32BidiTextLength, &bidiParType, &bidiLevels[0]);
             for (size_t i = 0; i < u32BidiTextLength; ++ i)
@@ -96,7 +148,9 @@ struct FXShaperImp {
                 int lastSetIndex = -1;
 
                 for (int i = 0; i < u32BidiTextLength; ++i) {
-                    if (hbScripts[i] == HB_SCRIPT_COMMON || hbScripts[i] == HB_SCRIPT_INHERITED) {
+                    if (hbScripts[i] == HB_SCRIPT_COMMON ||
+                        hbScripts[i] == HB_SCRIPT_INHERITED ||
+                        (bidiOpts.resolveUnknownScripts && hbScripts[i] == HB_SCRIPT_UNKNOWN) ) {
                         if (lastScriptIndex != -1) {
                             hbScripts[i] = lastScriptValue;
                             lastSetIndex = i;
@@ -141,6 +195,7 @@ struct FXShaperImp {
                 bidiRun.buffer = buffer;
                 hb_buffer_set_direction(buffer, bidiRun.direction);
                 hb_buffer_set_script(buffer, bidiRun.script);
+                hb_buffer_set_cluster_level(buffer, HB_BUFFER_CLUSTER_LEVEL_CHARACTERS);
                 hb_buffer_add_utf32(buffer,
                                     u32BidiText + bidiRun.textBegin,
                                     bidiRun.textEnd - bidiRun.textBegin, 0,
@@ -164,7 +219,7 @@ struct FXShaperImp {
             
                 hb_feature_t * features = nullptr;
                 unsigned int featuresCount = 0;
-                if (bidiOpts.overrideOpenTypeFeatures && featuresVec.size()) {
+                if (featuresVec.size()) {
                     features = &featuresVec[0];
                     featuresCount = featuresVec.size();
                 }
@@ -353,12 +408,18 @@ struct FXShaperImp {
 
     void
     addGlyphSpacing(double spacing) {
+        glyphSpacing_.clear();
+        
         if (!spacing)
             return;
         
-        for (size_t i = 0; i < hbGlyphInfos_.size(); ++ i) 
+        for (size_t i = 0; i < hbGlyphInfos_.size(); ++ i) {
             hbGlyphPositions_[i].x_advance += face_->upem() * spacing;
+            glyphSpacing_.push_back(face_->upem() * spacing);
+        }
     }
+
+    
     
     FXFace * face_{};
 
@@ -370,6 +431,7 @@ struct FXShaperImp {
     unsigned int  hbGlyphCount_ {};
     FXVector<hb_glyph_info_t> hbGlyphInfos_ {};
     FXVector<hb_glyph_position_t> hbGlyphPositions_ {};
+    FXVector<fu> glyphSpacing_ {};
 
 };
 
@@ -414,6 +476,14 @@ FXShaper::offset(size_t index) const {
 size_t
 FXShaper::cluster(size_t index) const {
     return imp_->hbGlyphInfos_[index].cluster;
+}
+
+FXVec2d<fu>
+FXShaper::spacing(size_t index) const {
+    if (index < imp_->glyphSpacing_.size())
+        return {imp_->glyphSpacing_[index], 0};
+    else
+        return {0, 0};
 }
 
 FXFace *

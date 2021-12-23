@@ -54,8 +54,9 @@ namespace {
 
             CTFontDescriptorRef descRef = (CTFontDescriptorRef)CFArrayGetValueAtIndex(allFonts_, currentFontIndex_ ++ );
             CFURLRef fontURL = (CFURLRef)CTFontDescriptorCopyAttribute(descRef, kCTFontURLAttribute);
-
-            auto filePath = toStdString(CFURLCopyFileSystemPath(fontURL, kCFURLPOSIXPathStyle));
+            CFStringRef fontPath = CFURLCopyFileSystemPath(fontURL, kCFURLPOSIXPathStyle);
+            auto filePath = toStdString(fontPath);
+            CFRelease(fontPath);
             CFRelease(fontURL);
 
             return filePath;

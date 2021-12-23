@@ -16,6 +16,7 @@ class FXInspector;
 class FXShaper;
 class QPaintEvent;
 class QXDocument;
+class QXShapingFeaturesWidget;
 class QXShapingOptionsWidget;
 class QXPopoverWindow;
 
@@ -52,9 +53,15 @@ public:
     void
     mouseDoubleClickEvent(QMouseEvent *event) override;
     
+    void
+    wheelEvent(QWheelEvent *event) override;
+    
 signals:
     void
     glyphDoubleClicked(FXGlyphID gid) const;
+
+    void
+    fontSizeChanged(double fontSize) const;
     
 protected:
     
@@ -100,12 +107,6 @@ public:
 
 public slots:
     void
-    reloadScriptList();
-
-    void
-    reloadFeatureList();
-
-    void
     doShape();
 
     void
@@ -121,13 +122,13 @@ public slots:
     doCopyHexCStyleAction();
     
     void
-    doTogglePanelAction();
-    
-    void
     focusLineEdit(bool selectAll = true);
 
     void
     showOptionsPopover();
+
+    void
+    showFeaturesPopover();
     
 private:
 
@@ -136,12 +137,6 @@ private:
     
     FXPtr<FXInspector>
     inspector();
-
-    FXVector<FXTag>
-    onFeatures() const;
-
-    FXVector<FXTag>
-    offFeatures() const;
     
 private:
     Ui::QXShapingWidget * ui_;
@@ -150,7 +145,9 @@ private:
     QAction      * warningAction_;
     
     QXShapingOptionsWidget * optionsWidget_{};
+    QXShapingFeaturesWidget * featuresWidget_{};
     QXPopoverWindow * optionsPopover_{};
+    QXPopoverWindow * featuresPopover_{};
 };
 
 

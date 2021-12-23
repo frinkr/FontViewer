@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>402</height>
+    <height>431</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -46,6 +46,12 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>0</height>
+         </size>
         </property>
         <property name="editable">
          <bool>true</bool>
@@ -210,6 +216,13 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="1">
+       <widget class="QCheckBox" name="forceShapeGIDEncodedTextCheckBox">
+        <property name="text">
+         <string>Force Shape GID Encoded Text</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
@@ -294,9 +307,9 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QCheckBox" name="overrideOpenTypeFeaturesCheckBox">
+       <widget class="QCheckBox" name="bidiResolveUnknownScriptsCheckBox">
         <property name="text">
-         <string>Override OpenType Features</string>
+         <string>Resolve Unknown scripts</string>
         </property>
        </widget>
       </item>
