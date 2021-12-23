@@ -164,24 +164,7 @@ QXPopoverWindow::paintEvent(QPaintEvent * event) {
     p.setRenderHints(QPainter::Antialiasing | QPainter::Antialiasing);
 
     auto backgroundColor = palette().window().color();
-    auto borderColor = palette().midlight().color();
-    
-    // Get the frame color
-    if (false) {
-        QPixmap px(5, 5);
-        px.fill();
-        QPainter pp(&px);
-        QStyleOptionFrame opt;
-        opt.initFrom(this);
-        opt.rect = QRect(QPoint(0, 0), px.size());
-        opt.frameShape = QFrame::StyledPanel;
-        opt.lineWidth = 20;
-        opt.midLineWidth = 0;
-        style()->drawControl(QStyle::CE_ShapedFrame, &opt, &pp, this);
-
-        QImage img = px.toImage();
-        borderColor = img.pixel(0, 0);
-    }
+    auto borderColor = palette().base().color().darker(180);
 
     p.setBrush(borderRadius_? backgroundColor: borderColor);
     p.setPen(QPen(borderColor, border_));
