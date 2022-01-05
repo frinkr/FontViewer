@@ -29,7 +29,6 @@ add_executable(${PROJECT_NAME}
   FCLPlayground.cpp
   FCLDumpTextInShape.cpp
   FCLShaping.cpp
-  FCLBidi.cpp
   )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE

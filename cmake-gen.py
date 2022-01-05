@@ -18,7 +18,7 @@ if not os.path.exists(build_root):
 
 def gen_win():
     os.chdir(build_root)
-    os.system('cmake -G "Visual Studio 16 2019" -A x64 ' + source_root)
+    os.system('cmake -G "Visual Studio 17 2022" -A x64 ' + source_root)
 
 def gen_mac():
     os.chdir(build_root)
