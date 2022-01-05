@@ -454,6 +454,7 @@ QXDocumentWindow::onShapingAction() {
         shapingDockWidget_->setWidget(widget);
         addDockWidget(Qt::BottomDockWidgetArea, shapingDockWidget_);    
     }
+
     toggleDockWidget(shapingDockWidget_);
     if (shapingDockWidget_->isVisible())
         ((QXShapingWidget*)(shapingDockWidget_->widget()))->focusLineEdit();

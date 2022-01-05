@@ -34,6 +34,7 @@ struct FXShapingOptions {
         bool resolveUnknownScripts {false};    
         bool breakOnScriptChange {true};
         bool breakOnLevelChange {true};
+        bool overrideScripts {false};
     } bidi; 
 };
 

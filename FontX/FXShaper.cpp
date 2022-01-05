@@ -97,6 +97,7 @@ struct FXShaperImp {
             gi.cluster = i;
             gi.advance = FXVec2d<fu>{fu(g.metrics.horiAdvance? g.metrics.horiAdvance: g.metrics.width), fu(g.metrics.vertAdvance? g.metrics.vertAdvance: g.metrics.height)};
             gi.offset  = FXVec2d<fu>{0, 0};
+            glyphs_.push_back(gi);
         }
 
     }
@@ -262,10 +263,17 @@ struct FXShaperImp {
         for (size_t i = 0; i < bidiRuns.size(); ++ i) {
             auto & bidiRun = bidiRuns[i];
 
+            hb_script_t hbScript = bidiRun.script;
+            if (opts.bidi.overrideScripts) {
+                hbScript = HB_SCRIPT_COMMON;
+                if (script != FXOT::DEFAULT_SCRIPT)
+                    hbScript = hb_ot_tag_to_script(script);
+            }
+            
             auto buffer = hbShape((const char32_t*)u32BidiText + bidiRun.textBegin,
-                                     bidiRun.textEnd - bidiRun.textBegin,
-                                     bidiRun.script,
-                                     bidiRun.direction, opts);
+                                  bidiRun.textEnd - bidiRun.textBegin,
+                                  hbScript,//bidiRun.script,
+                                  bidiRun.direction, opts);
 
             if (HB_DIRECTION_IS_BACKWARD(bidiRun.direction))
                 hb_buffer_reverse(buffer);

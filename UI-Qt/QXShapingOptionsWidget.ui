@@ -313,6 +313,13 @@
         </property>
        </widget>
       </item>
+      <item row="5" column="1">
+       <widget class="QCheckBox" name="bidiOverrideScriptsCheckBox">
+        <property name="text">
+         <string>Override scripts and language</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

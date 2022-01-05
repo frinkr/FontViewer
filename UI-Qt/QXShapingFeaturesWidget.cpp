@@ -24,7 +24,7 @@ QXShapingFeaturesWidget::QXShapingFeaturesWidget(QWidget *parent) :
     ui_(new Ui::QXShapingFeaturesWidget) {
     ui_->setupUi(this);
 
-    connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::activated),
+    connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &QXShapingFeaturesWidget::reloadFeatureList);
     connect(ui_->featureListWidget, &QListWidget::itemChanged,
             this, &QXShapingFeaturesWidget::featuresChanged);    
@@ -125,7 +125,7 @@ QXShapingFeaturesWidget::reloadFeatureList() {
             item->setText(text);
             
         });
-    
+    emit featuresChanged();
 }
 
 
