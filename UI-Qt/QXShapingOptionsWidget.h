@@ -12,8 +12,7 @@ struct QXShapingOptions {
     double fontSize {100};
     bool showGlyphsBoundary {true};
     bool alternativeRowColor {true};
-    FXShapingGenralOptions general {};
-    FXShapingBidiOptions bidi {};
+    FXShapingOptions shapingOpts {};
 };
     
 class QXShapingOptionsWidget : public QWidget

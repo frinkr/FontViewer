@@ -251,22 +251,27 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         
         // Values
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
-            FXGlyphID gid = shaper_->glyph(i);
-            FXVec2d<fu> adv = shaper_->advance(i);
-            FXVec2d<fu> off = shaper_->offset(i);
-            size_t cluster  = shaper_->cluster(i);
-            fu spacing = shaper_->spacing(i).x;
-            FXGlyph g = face->glyph(FXGChar(gid, FXGCharTypeGlyphID));
-            fu kern = adv.x - spacing - g.metrics.horiAdvance;
+            const auto & gi = shaper_->glyphInfo(i);
+
+            FXGlyph g = face->glyph(FXGChar(gi.id, FXGCharTypeGlyphID));
+            fu kern = 0;
+            if (!gi.rtl) { // ltr
+                kern = gi.advance.x - gi.spacing.x - g.metrics.horiAdvance;
+            }
+            else if ((i + 1) < shaper_->glyphCount()) {
+                auto & nextGi = shaper_->glyphInfo(i + 1);
+                auto nextG = face->glyph(FXGChar(nextGi.id, FXGCharTypeGlyphID));
+                kern = nextGi.advance.x - nextGi.spacing.x - nextG.metrics.horiAdvance;
+            }
             
             painter.drawText(gridCellRect(0, i), Qt::AlignCenter, QString::number(kern));
-            painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(adv.x));
-            painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(spacing));            
-            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString("%1, %2").arg(off.x).arg(off.y));            
-            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(adv.x - spacing));
+            painter.drawText(gridCellRect(1, i), Qt::AlignCenter, QString::number(gi.advance.x));
+            painter.drawText(gridCellRect(2, i), Qt::AlignCenter, QString::number(gi.spacing.x));            
+            painter.drawText(gridCellRect(3, i), Qt::AlignCenter, QString("%1, %2").arg(gi.offset.x).arg(gi.offset.y));
+            painter.drawText(gridCellRect(4, i), Qt::AlignCenter, QString::number(gi.advance.x - gi.spacing.x));
             painter.drawText(gridCellRect(5, i), Qt::AlignCenter, QString::number(g.metrics.horiAdvance));
-            painter.drawText(gridCellRect(6, i), Qt::AlignCenter, QString::number(cluster));
-            painter.drawText(gridCellRect(7, i), Qt::AlignCenter, QString::number(gid));
+            painter.drawText(gridCellRect(6, i), Qt::AlignCenter, QString::number(gi.cluster));
+            painter.drawText(gridCellRect(7, i), Qt::AlignCenter, QString::number(gi.id));
             painter.drawText(gridCellRect(8, i), Qt::AlignCenter, QString::number(i));
         }
     }
@@ -504,16 +509,15 @@ QXShapingWidget::doShape() {
         return;
 
     auto options = optionsWidget_->options();
-    options.general.onFeatures = featuresWidget_->onFeatures();
-    options.general.offFeatures = featuresWidget_->offFeatures();
+    options.shapingOpts.onFeatures = featuresWidget_->onFeatures();
+    options.shapingOpts.offFeatures = featuresWidget_->offFeatures();
     
     auto [script, language] = featuresWidget_->scriptAndLanguage();
 
     shaper_->shape(toStdString(QXEncoding::decodeFromGidNotation(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()))),
                    script,
                    language,
-                   options.general,
-                   options.bidi);
+                   options.shapingOpts);
 
     ui_->glyphView->setOptions(options);
     ui_->glyphView->updateGeometry();

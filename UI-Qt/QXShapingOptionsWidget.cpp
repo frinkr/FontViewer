@@ -69,17 +69,17 @@ QXShapingOptionsWidget::options() const {
     opts.fontSize = fontSize;
     opts.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
 
-    opts.general.glyphSpacing = ui->enableGlyphSpacingCheckBox->isChecked()? ui->glyphSpacingSlider->value() / 100.0: 0;
-    opts.general.forceShapeGIDEncodedText = ui->forceShapeGIDEncodedTextCheckBox->isChecked();
+    opts.shapingOpts.glyphSpacing = ui->enableGlyphSpacingCheckBox->isChecked()? ui->glyphSpacingSlider->value() / 100.0: 0;
+    opts.shapingOpts.forceShapeGIDEncodedText = ui->forceShapeGIDEncodedTextCheckBox->isChecked();
     
     auto dir = ui->bidiDirectionComboBox->currentIndex();
     
-    opts.bidi.bidiActivated = ui->bidiGroupBox->isChecked();
-    opts.bidi.breakOnLevelChange = ui->bidiBreakOnLevelChangeCheckBox->isChecked();
-    opts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
-    opts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
-    opts.bidi.resolveUnknownScripts = ui->bidiResolveUnknownScriptsCheckBox->isChecked();
-    opts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
+    opts.shapingOpts.bidi.activated = ui->bidiGroupBox->isChecked();
+    opts.shapingOpts.bidi.breakOnLevelChange = ui->bidiBreakOnLevelChangeCheckBox->isChecked();
+    opts.shapingOpts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
+    opts.shapingOpts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
+    opts.shapingOpts.bidi.resolveUnknownScripts = ui->bidiResolveUnknownScriptsCheckBox->isChecked();
+    opts.shapingOpts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
     return opts;
 }
     

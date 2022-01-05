@@ -20,24 +20,36 @@ enum class FXBidiDirection {
     AUTO,
 };
 
-struct FXShapingGenralOptions {
+struct FXShapingOptions {
     FXShapingDirection direction {FXShapingLTR};
     FXVector<FXTag> onFeatures {};
     FXVector<FXTag> offFeatures {};
     double glyphSpacing {};
     bool forceShapeGIDEncodedText {};
+
+    struct Bidi {
+        bool activated {false};
+        FXBidiDirection direction {FXBidiDirection::AUTO};
+        bool resolveScripts {true};
+        bool resolveUnknownScripts {false};    
+        bool breakOnScriptChange {true};
+        bool breakOnLevelChange {true};
+    } bidi; 
 };
 
-struct FXShapingBidiOptions {
-    bool bidiActivated {false};
-    FXBidiDirection direction {FXBidiDirection::AUTO};
-    bool resolveScripts {true};
-    bool resolveUnknownScripts {false};    
-    bool breakOnScriptChange {true};
-    bool breakOnLevelChange {true};
-};
+
 
 class FXShaper {
+public:
+    struct GlyphInfo {
+        FXGlyphID     id {};
+        size_t        cluster {};        
+        FXVec2d<fu>   advance {};
+        FXVec2d<fu>   offset {};
+        bool          rtl {};
+        FXVec2d<fu>   spacing {};
+        FXVec2d<fu>   kerning {};
+    };
 public:
     explicit FXShaper(FXFace * face);
     
@@ -45,12 +57,15 @@ public:
     shape(const FXString & text,
           FXTag script = FXOT::DEFAULT_SCRIPT,
           FXTag language = FXOT::DEFAULT_LANGUAGE,
-          const FXShapingGenralOptions & opts = FXShapingGenralOptions{},
-          const FXShapingBidiOptions & bidiOpts = FXShapingBidiOptions{});
+          const FXShapingOptions & opts = FXShapingOptions{});
+
 
     size_t
     glyphCount() const;
 
+    const GlyphInfo &
+    glyphInfo(size_t index) const;
+    
     FXGlyphID
     glyph(size_t index) const;
 
@@ -65,6 +80,9 @@ public:
 
     FXVec2d<fu>
     spacing(size_t index) const;
+    
+    FXVec2d<fu>
+    kerning(size_t index) const;
     
     FXFace *
     face() const;

@@ -113,6 +113,7 @@ namespace {
 
         map["UTF8"] = isDefined? utf8.join(" "): QString();
         map["UTF16"] = isDefined? utf16.join(" "): QString();
+        map["DEC"] = isDefined? QString("%1").arg(c): QString();
         return map;
     };
 }
