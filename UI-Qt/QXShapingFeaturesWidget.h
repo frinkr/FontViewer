@@ -31,7 +31,9 @@ public:
 
     std::tuple<FXTag, FXTag>
     scriptAndLanguage() const;
-    
+
+    bool
+    overrideBidiScripts() const;
 signals:
     void
     featuresChanged();

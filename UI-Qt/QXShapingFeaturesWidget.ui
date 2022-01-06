@@ -27,6 +27,13 @@
    <item>
     <widget class="QListWidget" name="featureListWidget"/>
    </item>
+   <item>
+    <widget class="QCheckBox" name="overrideBidiScriptsCheckBox">
+     <property name="text">
+      <string>Override resolved bidi scripts and languages</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

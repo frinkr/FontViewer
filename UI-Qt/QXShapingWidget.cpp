@@ -511,7 +511,8 @@ QXShapingWidget::doShape() {
     auto options = optionsWidget_->options();
     options.shapingOpts.onFeatures = featuresWidget_->onFeatures();
     options.shapingOpts.offFeatures = featuresWidget_->offFeatures();
-    
+    options.shapingOpts.bidi.overrideScripts = featuresWidget_->overrideBidiScripts();
+        
     auto [script, language] = featuresWidget_->scriptAndLanguage();
 
     shaper_->shape(toStdString(QXEncoding::decodeFromGidNotation(QXEncoding::decodeFromHexNotation(ui_->textComboBox->currentText()))),

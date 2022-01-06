@@ -27,7 +27,9 @@ QXShapingFeaturesWidget::QXShapingFeaturesWidget(QWidget *parent) :
     connect(ui_->langSysComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &QXShapingFeaturesWidget::reloadFeatureList);
     connect(ui_->featureListWidget, &QListWidget::itemChanged,
-            this, &QXShapingFeaturesWidget::featuresChanged);    
+            this, &QXShapingFeaturesWidget::featuresChanged);
+    connect(ui_->overrideBidiScriptsCheckBox, &QCheckBox::toggled,
+            this, &QXShapingFeaturesWidget::featuresChanged);
     
 }
 
@@ -71,6 +73,11 @@ QXShapingFeaturesWidget::scriptAndLanguage() const {
     FXTag script, language;
     variantToLangSys(ui_->langSysComboBox->currentData(), script, language);
     return {script, language};
+}
+
+bool
+QXShapingFeaturesWidget::overrideBidiScripts() const {
+    return ui_->overrideBidiScriptsCheckBox->isChecked();
 }
 
 void

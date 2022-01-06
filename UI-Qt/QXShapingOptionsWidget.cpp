@@ -40,9 +40,6 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     connect(ui->bidiResolveUnknownScriptsCheckBox, &QCheckBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
 
-    connect(ui->bidiOverrideScriptsCheckBox, &QCheckBox::toggled,
-            this, &QXShapingOptionsWidget::optionsChanged);
-    
     connect(ui->copyTextButton, &QPushButton::clicked,
             this, &QXShapingOptionsWidget::copyTextButtonClicked);
 
@@ -82,7 +79,6 @@ QXShapingOptionsWidget::options() const {
     opts.shapingOpts.bidi.breakOnScriptChange = ui->bidiBreakOnScriptChangeCheckBox->isChecked();
     opts.shapingOpts.bidi.resolveScripts = ui->bidiResolveScriptsCheckBox->isChecked();
     opts.shapingOpts.bidi.resolveUnknownScripts = ui->bidiResolveUnknownScriptsCheckBox->isChecked();
-    opts.shapingOpts.bidi.overrideScripts = ui->bidiOverrideScriptsCheckBox->isChecked();
     opts.shapingOpts.bidi.direction = dir == 0? FXBidiDirection::LTR : (dir == 1? FXBidiDirection::RTL: FXBidiDirection::AUTO);
     return opts;
 }
