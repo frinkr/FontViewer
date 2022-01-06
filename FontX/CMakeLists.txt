@@ -83,7 +83,6 @@ target_link_libraries(FontX
   ${Iconv_LIBRARIES}
   )
 
-add_compile_definitions(FX_HAVE_PDF_ADDON=1)
 add_subdirectory(PDF)
 target_link_libraries(FontX FontXPDF)
 

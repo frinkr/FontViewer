@@ -4,6 +4,8 @@
 #include <QImage>
 
 #include "FontX/FXFace.h"
+#include "FontX/FXPDF.h"
+
 #include "QXCollectionModel.h"
 
 struct QXSearchResult;
