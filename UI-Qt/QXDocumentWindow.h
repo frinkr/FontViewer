@@ -134,6 +134,9 @@ private slots:
     onOpenRelatedFontsAction();
 
     void
+    onOpenFontInNewWindowAction();
+    
+    void
     onFontListItemDoubleClicked(const QXFontURI & uri);
     
     void
@@ -168,6 +171,7 @@ private:
     QDockWidget     * infoDockWidget_;
     QAction         * openRelatedFontsAction_;
     QXPopoverWindow * openRelatedFontsPopover_;
+    QAction         * openNewWindowAction_;
     QLineEdit       * searchLineEdit_;
 
     QXPopoverWindow   * glyphPopover_;

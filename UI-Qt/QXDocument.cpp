@@ -138,12 +138,13 @@ QString
 QXDocument::displayName(const FXFaceLanguage & language) const {
     auto name = faceDisplayName(face_->attributes(), language);
     if (isPDF()) {
-        return QString("%1 (%2)")
+        name = QString("%1 (%2)")
             .arg(name)
             .arg(QFileInfo(uri_.filePath).fileName());
     }
-    else
-        return name;
+    if (fontInstanceId_)
+        name += QString(" : %1").arg(fontInstanceId_);
+    return name;
 }
 
 bool

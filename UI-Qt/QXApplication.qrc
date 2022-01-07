@@ -17,10 +17,14 @@
     <file alias="images/hex_d.png">../Resources/Images/hex_d.png</file>
     <file alias="images/hexc.png">../Resources/Images/hexc.png</file>
     <file alias="images/hexc_d.png">../Resources/Images/hexc_d.png</file>
+    <file alias="images/font-copy.png">../Resources/Images/font-copy.png</file>
+    <file alias="images/font-copy_d.png">../Resources/Images/font-copy_d.png</file>
     <file alias="images/font-book.png">../Resources/Images/font-book.png</file>
     <file alias="images/font-book_d.png">../Resources/Images/font-book_d.png</file>
     <file alias="images/font-list.png">../Resources/Images/font-list.png</file>
     <file alias="images/font-list_d.png">../Resources/Images/font-list_d.png</file>
+    <file alias="images/font-window.png">../Resources/Images/font-window.png</file>
+    <file alias="images/font-window_d.png">../Resources/Images/font-window_d.png</file>
     <file alias="images/glyph.png">../Resources/Images/glyph.png</file>
     <file alias="images/glyph_d.png">../Resources/Images/glyph_d.png</file>
     <file alias="images/history.png">../Resources/Images/history.png</file>

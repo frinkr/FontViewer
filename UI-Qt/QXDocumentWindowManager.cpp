@@ -51,6 +51,8 @@ namespace {
             text << fileTypeFilterToString(filter);
         return text.join(";;");
     }
+
+    const char * sKeyFontInstanceID = "FontInstanceID";
 }
 
 QXDocumentWindowManager * QXDocumentWindowManager::instance_ = nullptr;
@@ -318,23 +320,24 @@ QXDocumentWindowManager::openFontFile(const QString & filePath) {
 }
 
 bool
-QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace) {
+QXDocumentWindowManager::openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace, bool forceNewWindowInstance) {
     if (fontListWindow_ && fontListWindow_->isVisible())
         fontListWindow_->close();
 
     // check already open
-    QXDocument * document = getDocument(uri);
-    if (document) {
-        qApp->bringWindowToFront(getDocumentWindow(document));
+    QXDocument * openDocument = getDocument(uri);
+    if (!forceNewWindowInstance && openDocument) {
+        qApp->bringWindowToFront(getDocumentWindow(openDocument));
         return true;
     }
     else {
         // or open new
-        document = QXDocument::openFromURI(uri, initFace, this);
-        if (document) {
-            addDocument(document);
-            addToRecents(document);
-            QXDocumentWindow * window = createDocumentWindow(document);
+        QXDocument * newDocument = QXDocument::openFromURI(uri, initFace, this);
+        if (newDocument) {
+            newDocument->setFontInstanceId(newFontInstanceId(uri));
+            addDocument(newDocument);
+            addToRecents(newDocument);
+            QXDocumentWindow * window = createDocumentWindow(newDocument);
             if (auto activeWindow = activeDocumentWindow()) {
                 window->show();
                 window->move(activeWindow->pos() + QPoint(50, 50));
@@ -395,4 +398,15 @@ QXDocumentWindowManager::documentWindows() const {
             windows.append(window);
     }
     return windows;
+}
+
+
+int
+QXDocumentWindowManager::newFontInstanceId(const QXFontURI & uri) {
+    int maxId = -1;
+    for (auto doc: documents_) {
+        if (doc->uri() == uri) 
+            maxId = std::max(maxId, doc->fontInstanceId());
+    }
+    return maxId + 1;
 }

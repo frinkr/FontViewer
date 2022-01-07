@@ -168,9 +168,13 @@ QXDocumentWindow::initToolBar() {
         this, &QXDocumentWindow::onFontInfoAction);
 
     openRelatedFontsAction_ = toolBar->addAction(
-        qApp->loadIcon(document()->isPDF()?":/images/pdf.png": ":/images/font-list.png"), tr("Open Related Fonts"),
+        qApp->loadIcon(document()->isPDF()?":/images/pdf.png": ":/images/font-copy.png"), tr("Open Fonts in Same Collection"),
         this, &QXDocumentWindow::onOpenRelatedFontsAction);
 
+    openNewWindowAction_ = toolBar->addAction(
+        qApp->loadIcon(":/images/font-window.png"), tr("Open Font in New Window"),
+        this, &QXDocumentWindow::onOpenFontInNewWindowAction);
+    
     
     QWidget * spacer = new QWidget(this);
     spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
@@ -485,6 +489,11 @@ QXDocumentWindow::onOpenRelatedFontsAction() {
         widget->selectCurrentFace();
     
     openRelatedFontsPopover_->showRelativeTo(senderToolButton(), QXPopoverBottom);
+}
+
+void
+QXDocumentWindow::onOpenFontInNewWindowAction() {
+    QXDocumentWindowManager::instance()->openFontURI(document_->uri(), nullptr, true /*force new instance*/);
 }
 
 void

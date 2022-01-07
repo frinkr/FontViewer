@@ -135,6 +135,12 @@ public:
     const QXFontURI &
     uri() const { return uri_; }
 
+    int
+    fontInstanceId() const { return fontInstanceId_; }
+
+    void
+    setFontInstanceId(int id) { fontInstanceId_ = id; }
+    
     FXPtr<FXFace>
     face() const;
 
@@ -233,6 +239,8 @@ protected:
     initCurrentBook();
 protected:
     QXFontURI        uri_;
+    int              fontInstanceId_{};
+    
     FXPtr<FXFace>    face_;
 
     QXGCharBooks     books_;

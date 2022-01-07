@@ -92,7 +92,7 @@ public slots:
     openFontFile(const QString & filePath);
 
     bool
-    openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr);
+    openFontURI(const QXFontURI & uri, FXPtr<FXFace> initFace = nullptr, bool forceNewWindowInstance = false);
 
 protected:
 protected:
@@ -108,6 +108,9 @@ private:
 
     QList<QXDocumentWindow * >
     documentWindows() const;
+
+    int
+    newFontInstanceId(const QXFontURI & uri);
     
 private:
     enum {kMaxRecentFiles = 20};
