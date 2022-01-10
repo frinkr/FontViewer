@@ -10,6 +10,9 @@ QXShapingOptionsWidget::QXShapingOptionsWidget(QWidget *parent) :
     connect(ui->fontSizeComboBox, &QComboBox::currentTextChanged,
             this, &QXShapingOptionsWidget::optionsChanged);
 
+    connect(ui->highlightCombiningMarksCheckBox, &QCheckBox::toggled,
+            this, &QXShapingOptionsWidget::optionsChanged);
+    
     connect(ui->showGlyphsBoundaryCheckBox, &QCheckBox::toggled,
             this, &QXShapingOptionsWidget::optionsChanged);
 
@@ -66,9 +69,10 @@ QXShapingOptionsWidget::options() const {
         fontSize = 100;
     
     QXShapingOptions opts;
-    opts.fontSize = fontSize;
-    opts.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
-
+    opts.ui.fontSize = fontSize;
+    opts.ui.showGlyphsBoundary = ui->showGlyphsBoundaryCheckBox->isChecked();
+    opts.ui.highlightCombiningMarks = ui->highlightCombiningMarksCheckBox->isChecked();
+    
     opts.shapingOpts.glyphSpacing = ui->enableGlyphSpacingCheckBox->isChecked()? ui->glyphSpacingSlider->value() / 100.0: 0;
     opts.shapingOpts.forceShapeGIDEncodedText = ui->forceShapeGIDEncodedTextCheckBox->isChecked();
     

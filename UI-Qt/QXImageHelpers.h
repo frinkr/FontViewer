@@ -24,7 +24,7 @@ FXPixmapARGB
 convertToBlack(const FXPixmapARGB & bm);
 
 FXGlyphImage
-fillGlyphImageWithColor(const FXGlyphImage & img, const QColor & color);
+tintGlyphImageWithColor(const FXGlyphImage & img, const QColor & color, bool toBlackOrWhite = true);
 
 QImage
 drawGlyphImageInEmBox(const FXGlyphImage & img);

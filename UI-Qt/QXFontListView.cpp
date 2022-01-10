@@ -151,7 +151,7 @@ namespace {
 
                     FXVec2d<int> bmOffset;
                     double bmScale = face->bmScale();
-                    FXGlyphImage gi = fillGlyphImageWithColor(face->glyphImage(g.gid), option.palette.color(selected? QPalette::HighlightedText: QPalette::Text));
+                    FXGlyphImage gi = tintGlyphImageWithColor(face->glyphImage(g.gid), option.palette.color(selected? QPalette::HighlightedText: QPalette::Text));
                     qreal scaledBmHeight = sampleFontScale * gi.pixmap.height * bmScale;
                     qreal scaledBmWidth = sampleFontScale * gi.pixmap.width * bmScale;
                     if (!face->isScalable()) {

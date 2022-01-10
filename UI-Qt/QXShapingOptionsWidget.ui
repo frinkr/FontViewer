@@ -151,7 +151,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -164,7 +164,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="3" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QSlider" name="glyphSpacingSlider">
@@ -206,7 +206,7 @@
         </item>
        </layout>
       </item>
-      <item row="3" column="1">
+      <item row="4" column="1">
        <widget class="QCheckBox" name="enableGlyphSpacingCheckBox">
         <property name="text">
          <string>Enable Glyph Spacing</string>
@@ -216,10 +216,20 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="5" column="1">
        <widget class="QCheckBox" name="forceShapeGIDEncodedTextCheckBox">
         <property name="text">
          <string>Force Shape GID Encoded Text</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="highlightCombiningMarksCheckBox">
+        <property name="text">
+         <string>Highlight Combining Marks</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

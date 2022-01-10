@@ -76,7 +76,7 @@ QXShapingGlyphView::sizeHint() const {
     if (!shaper_)
         return QWidget::sizeHint();
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
+    FXFace::AutoFontSize autoFontSize(face, options_.ui.fontSize);
     
     const int baselineY = baseLinePosition().y();
     const int height = rect().height() - baselineY + fu2px(face->attributes().bbox.height()) + QX_SHAPINGVIEW_MARGIN;
@@ -118,14 +118,14 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
       | 
     */
     FXFace * face = shaper_->face();
-    FXFace::AutoFontSize autoFontSize(face, options_.fontSize);
+    FXFace::AutoFontSize autoFontSize(face, options_.ui.fontSize);
 
     painter.setRenderHint(QPainter::Antialiasing);
     if (face->attributes().format != FXFaceFormatConstant::WinFNT)
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
 
     // alternative color
-    if (options_.alternativeRowColor) {
+    if (options_.ui.alternativeRowColor) {
         for (int i = 1; (i + 1) < QX_SHAPINGVIEW_TOTAL_ROW; i += 2) {
             if (i == selectedRowIndex_)
                 continue;
@@ -174,12 +174,17 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             const FXGlyphID gid = shaper_->glyph(i);
             const FXVec2d<fu> adv = shaper_->advance(i);
             const FXVec2d<fu> off = shaper_->offset(i);
-
-            QColor textColor = p.color(QPalette::Text);
+            const FXVec2d<fu> spc = shaper_->spacing(i);
+            
+            QColor glyphColor = p.color(QPalette::Text);
             if (i == selectedColIndex_)
-                textColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
-
-            FXGlyphImage gi = fillGlyphImageWithColor(face->glyphImage(gid), textColor);
+                glyphColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
+            
+            bool highlightMark = options_.ui.highlightCombiningMarks && (adv.x - spc.x) == 0;
+            if (highlightMark)
+                glyphColor = Qt::red;
+            
+            FXGlyphImage gi = tintGlyphImageWithColor(face->glyphImage(gid), glyphColor, !highlightMark);
             QImage img = toQImage(gi);
 
             const int left = penX + gi.offset.x * gi.scale + fu2px(off.x);
@@ -199,7 +204,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     }
 
     // draw glyph boundary
-    if (options_.showGlyphsBoundary)
+    if (options_.ui.showGlyphsBoundary)
     {
         int penX = baseLineX;
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
@@ -279,7 +284,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
 void
 QXShapingGlyphView::mousePressEvent(QMouseEvent *event) {
-    FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.fontSize);
+    FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.ui.fontSize);
 
     if (event->modifiers().testFlag(Qt::ShiftModifier)) {
         selectedColIndex_ = -1;
@@ -322,7 +327,7 @@ QXShapingGlyphView::mouseDoubleClickEvent(QMouseEvent *event) {
         
         QXDocumentWindow * documentWindow = QXDocumentWindowManager::instance()->getDocumentWindow(document_);
         if (documentWindow) {
-            FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.fontSize);
+            FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.ui.fontSize);
             QRect rect = glyphInteractionRect(selectedColIndex_);
             QRect globalRect(this->mapToGlobal(rect.topLeft()),
                              this->mapToGlobal(rect.bottomRight()));
@@ -343,13 +348,13 @@ QXShapingGlyphView::wheelEvent(QWheelEvent * event) {
             double scale = qPow(1.0015, angle);
             qPow(1.0015, angle);
             
-            options_.fontSize *= scale;
+            options_.ui.fontSize *= scale;
             
             updateGeometry();
             update();
             event->accept();
 
-            emit fontSizeChanged(options_.fontSize);
+            emit fontSizeChanged(options_.ui.fontSize);
             
             return;
         }

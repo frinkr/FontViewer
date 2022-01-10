@@ -9,9 +9,13 @@ namespace Ui {
 }
 
 struct QXShapingOptions {
-    double fontSize {100};
-    bool showGlyphsBoundary {true};
-    bool alternativeRowColor {true};
+    struct Ui {
+        double fontSize {100};
+        bool   showGlyphsBoundary {true};
+        bool   alternativeRowColor {true};
+        bool   highlightCombiningMarks {true};
+    } ui {};
+    
     FXShapingOptions shapingOpts {};
 };
     

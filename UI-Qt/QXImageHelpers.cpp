@@ -77,18 +77,37 @@ convertToBlack(const FXPixmapARGB & bm) {
 }
 
 FXGlyphImage
-fillGlyphImageWithColor(const FXGlyphImage & img, const QColor & color) {
+tintGlyphImageWithColor(const FXGlyphImage & img, const QColor & color, bool toBlackOrWhite) {
     if (img.pixmap.empty())
         return img;
     if (img.mode == FXGlyphImage::kColor)
         return img;
 
     auto gi = img;
-    if (isDarkColor(color))
-        gi.pixmap = convertToBlack(gi.pixmap);
-    else
-        gi.pixmap = convertToWhite(gi.pixmap);
-    
+    if (toBlackOrWhite) {
+        if (isDarkColor(color))
+            gi.pixmap = convertToBlack(gi.pixmap);
+        else
+            gi.pixmap = convertToWhite(gi.pixmap);
+    }
+    else {
+        auto pm = img.pixmap.clone();
+        int inR, inG, inB;
+        color.getRgb(&inR, &inG, &inB);
+        for (size_t y = 0; y < pm.height; ++ y) {
+            auto rowBuffer = pm.buffer[y * pm.width];
+            for (size_t x = 0; x < pm.width; ++ x) {
+                auto c = pm.pixel(x, y);
+                uint8_t a, r, g, b;
+                getARGB(c, a, r, g, b);
+                if (a) 
+                    pm.setPixel(x, y, makeARGB(a, inR, inG, inB));
+            }
+        }
+        
+        gi.pixmap = pm;
+        
+    }
     return gi;
 }
 

@@ -50,7 +50,7 @@ namespace {
                 if (option.selected) 
                     textColor = palette.color(hasFocus ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
                 
-                FXGlyphImage glyphImage = fillGlyphImageWithColor(g.glyphImage(), textColor);
+                FXGlyphImage glyphImage = tintGlyphImageWithColor(g.glyphImage(), textColor);
                 QImage image = toQImage(glyphImage);
 
                 const QRect emRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);

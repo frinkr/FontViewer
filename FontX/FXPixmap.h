@@ -132,7 +132,13 @@ public:
     validPosition(PosType x, PosType y) const {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
-        
+
+    FXPixmap
+    clone() const {
+        FXPixmap pm (width, height);
+        memcpy(pm.buffer, buffer, width * height * sizeof(ColorType));
+        return pm;
+    }
 public:
     PosType         width {};
     PosType         height {};
