@@ -1,3 +1,5 @@
+#include <unordered_map>
+#include <map>
 #include <QFontDatabase>
 #include <QLineEdit>
 #include <QMenu>
@@ -43,11 +45,64 @@ namespace {
     constexpr int QX_SHAPINGVIEW_TOTAL_ROW = 10;
 }
 
+class QXShapingGlyphViewPerfCache {
+public:
+    struct ScopedGridLeftEnabler {
+        ScopedGridLeftEnabler(QXShapingGlyphViewPerfCache* cache)
+            : cache_{cache} 
+        {
+            cache_->gridLeftEnabled_ = true;
+            cache_->gridLeft_.clear();
+        }
+        
+        ~ScopedGridLeftEnabler()
+        {
+            cache_->gridLeftEnabled_ = false;
+            cache_->gridLeft_.clear();
+        }
+        
+        QXShapingGlyphViewPerfCache* cache_;  
+    };
+
+    friend class ScopedGridLeftEnabler;
+
+    ScopedGridLeftEnabler
+    createScopedGridLeftEnabler() {
+        return ScopedGridLeftEnabler(this);
+    }
+    
+    void
+    setGridLeft(int row, int col, int val) {
+        if (gridLeftEnabled_)
+            gridLeft_[gridLeftCacheKey(row, col)] = val;
+    }
+
+    std::optional<int>
+    gridLeft(int row, int col) const {
+        if (!gridLeftEnabled_)
+            return {};
+        
+        if (auto it = gridLeft_.find(gridLeftCacheKey(row, col)); it != gridLeft_.end())
+            return it->second;
+        return {};
+    }
+    
+    static unsigned int
+    gridLeftCacheKey(int row, int col) {
+        
+        return ((unsigned int)(row) << ((sizeof(int) - 1) * 8)) + unsigned int(col);
+    }
+    
+    std::map<unsigned int, int> gridLeft_;
+    bool gridLeftEnabled_ {};
+};
+
 QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
     : QWidget(parent)
     , selectedColIndex_(-1)
     , selectedRowIndex_(-1)
-    , shaper_(nullptr) {
+    , shaper_(nullptr)
+    , perfCache_(new QXShapingGlyphViewPerfCache) {
     setFocusPolicy(Qt::StrongFocus);
 }
 
@@ -92,6 +147,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
     if (!shaper_)
         return ;
+
     const QPen gridPen(Qt::darkGray, 1, Qt::SolidLine);
     const QPen baseLinePen(Qt::green, 1, Qt::SolidLine);
     const QPen boundaryPen(Qt::red, 1, Qt::DashLine);
@@ -120,6 +176,24 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     FXFace * face = shaper_->face();
     FXFace::AutoFontSize autoFontSize(face, options_.ui.fontSize);
 
+    auto perfCacheEnabler = perfCache_->createScopedGridLeftEnabler();
+    gridCellLeft(1, shaper_->glyphCount()); // this caches all the cells
+    
+    auto dirtyRect = event->rect();
+
+    int cellColMin = 0, cellColMax = shaper_->glyphCount();
+    for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
+        auto cellLeft = gridCellLeft(1, i);
+        auto cellRight = gridCellLeft(1, i + 1);
+        if (cellColMin == 0 && cellLeft <= dirtyRect.left() && cellRight >= dirtyRect.left()) {
+            cellColMin = i;
+        }
+        if (cellLeft <= dirtyRect.right() && cellRight >= dirtyRect.right()) {
+            cellColMax = i + 1;
+            break;
+        }
+    }
+    
     painter.setRenderHint(QPainter::Antialiasing);
     if (face->attributes().format != FXFaceFormatConstant::WinFNT)
         painter.setRenderHint(QPainter::SmoothPixmapTransform);
@@ -171,33 +245,36 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         int penX = baseLineX;
 
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
-            const FXGlyphID gid = shaper_->glyph(i);
             const FXVec2d<fu> adv = shaper_->advance(i);
-            const FXVec2d<fu> off = shaper_->offset(i);
-            const FXVec2d<fu> spc = shaper_->spacing(i);
+            if (i >= cellColMin && i <= cellColMax) {
+                const FXGlyphID gid = shaper_->glyph(i);
+           
             
-            QColor glyphColor = p.color(QPalette::Text);
-            if (i == selectedColIndex_)
-                glyphColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
+                const FXVec2d<fu> off = shaper_->offset(i);
+                const FXVec2d<fu> spc = shaper_->spacing(i);
             
-            bool highlightMark = options_.ui.highlightCombiningMarks && (adv.x - spc.x) == 0;
-            if (highlightMark)
-                glyphColor = Qt::red;
+                QColor glyphColor = p.color(QPalette::Text);
+                if (i == selectedColIndex_)
+                    glyphColor = p.color(hasFocus() ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
             
-            FXGlyphImage gi = tintGlyphImageWithColor(face->glyphImage(gid), glyphColor, !highlightMark);
-            QImage img = toQImage(gi);
+                bool highlightMark = options_.ui.highlightCombiningMarks && (adv.x - spc.x) == 0;
+                if (highlightMark)
+                    glyphColor = Qt::red;
+            
+                FXGlyphImage gi = tintGlyphImageWithColor(face->glyphImage(gid), glyphColor, !highlightMark);
+                QImage img = toQImage(gi);
 
-            const int left = penX + gi.offset.x * gi.scale + fu2px(off.x);
-            const int bottom = penY - gi.offset.y * gi.scale - fu2px(off.y);
-            const int right = left + gi.pixmap.width * gi.scale;
-            const int top = bottom - gi.pixmap.height * gi.scale;
+                const int left = penX + gi.offset.x * gi.scale + fu2px(off.x);
+                const int bottom = penY - gi.offset.y * gi.scale - fu2px(off.y);
+                const int right = left + gi.pixmap.width * gi.scale;
+                const int top = bottom - gi.pixmap.height * gi.scale;
 
-            painter.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
-                        img,
-                        QRect(0, 0, gi.pixmap.width, gi.pixmap.height),
-                        Qt::AutoColor
-                );
-            
+                painter.drawImage(QRect(QPoint(left, top), QPoint(right, bottom)),
+                                  img,
+                                  QRect(0, 0, gi.pixmap.width, gi.pixmap.height),
+                                  Qt::AutoColor
+                    );
+            }
             
             penX += fu2px(adv.x);
         }        
@@ -208,13 +285,13 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     {
         int penX = baseLineX;
         for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
-
-            painter.setPen(boundaryPen);
-            painter.drawLine(penX, 0, penX, gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1, i));
-            
+            if (i >= cellColMin && i <= cellColMax) {
+                painter.setPen(boundaryPen);
+                painter.drawLine(penX, 0, penX, gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1, i));
+            }
             if (i == shaper_->glyphCount())
                 break;
-            const FXVec2d<fu> adv = shaper_->advance(i);
+            const FXVec2d<fu> adv = shaper_->advance(i);            
             penX += fu2px(adv.x);
         }
     }
@@ -235,7 +312,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             painter.drawLine(QX_SHAPINGVIEW_MARGIN, gridCellBottom(i),
                        rect().right(), gridCellBottom(i));
         // column lines
-        for (int i = 0; i <= shaper_->glyphCount(); ++ i)  {
+        for (int i = cellColMin; i <= cellColMax; ++ i)  {
             painter.drawLine(gridCellLeft(QX_SHAPINGVIEW_TOTAL_ROW - 1, i), gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1),
                        gridCellLeft(1, i), gridCellBottom(1));
             painter.drawLine(gridCellLeft(0, i), gridCellBottom(1), // for kern row
@@ -255,7 +332,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         painter.drawText(gridCellRect(8, -1), Qt::AlignRight, tr("Index "));
         
         // Values
-        for (int i = 0; i < shaper_->glyphCount(); ++ i) {
+        for (int i = cellColMin; i < std::min<int>(cellColMax, shaper_->glyphCount()); ++ i) {
             const auto & gi = shaper_->glyphInfo(i);
 
             FXGlyph g = face->glyph(FXGChar(gi.id, FXGCharTypeGlyphID));
@@ -376,6 +453,9 @@ QXShapingGlyphView::gridCellBottom(int row, int col) const {
 
 int
 QXShapingGlyphView::gridCellLeft(int row, int col) const {
+    if (auto left = perfCache_->gridLeft(row, col))
+        return *left;
+    
     // col == -1: header
     // col == shaper_->glyphCount : last glyph right
     if (col < 0)
@@ -383,11 +463,21 @@ QXShapingGlyphView::gridCellLeft(int row, int col) const {
     if (row == 0) 
         return (gridCellLeft(1, col) + gridCellLeft(1, col + 1)) / 2;
 
-    int adv = 0;
-    for (int i = 0; i < std::min<int>(col, shaper_->glyphCount()); ++ i) 
-        adv += fu2px(shaper_->advance(i).x);
+    int adv = QX_SHAPINGVIEW_MARGIN + QX_SHAPINGVIEW_GRID_HEAD_WIDTH;
+    if (col == 0)
+        return adv;
+    else if (auto prev = perfCache_->gridLeft(row, col - 1)) {
+        adv = *prev + fu2px(shaper_->advance(std::min<int>(col, shaper_->glyphCount()) - 1).x);
+    }
+    else {
+        for (int i = 0; i < std::min<int>(col, shaper_->glyphCount()); ++ i) {
+            perfCache_->setGridLeft(row, i, adv);
+            adv += fu2px(shaper_->advance(i).x);
+        }
+    }
 
-    return QX_SHAPINGVIEW_MARGIN + QX_SHAPINGVIEW_GRID_HEAD_WIDTH + adv;
+    perfCache_->setGridLeft(row, col, adv);
+    return adv;
 }
 
 QRect

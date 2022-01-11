@@ -20,9 +20,10 @@ class QXShapingFeaturesWidget;
 class QXShapingOptionsWidget;
 class QXPopoverWindow;
 
+class QXShapingGlyphViewPerfCache;
 class QXShapingGlyphView : public QWidget {
     Q_OBJECT
-
+    
 public:
     explicit QXShapingGlyphView(QWidget * parent = nullptr);
 
@@ -93,6 +94,7 @@ protected:
     FXShaper * shaper_;
     QXShapingOptions options_{};
     QXDocument * document_;
+    mutable std::unique_ptr<QXShapingGlyphViewPerfCache> perfCache_;
 };
 
 class QXShapingWidget : public QWidget {
@@ -143,7 +145,7 @@ private:
     QXDocument   * document_;
     FXShaper     * shaper_;
     QAction      * warningAction_;
-    
+
     QXShapingOptionsWidget * optionsWidget_{};
     QXShapingFeaturesWidget * featuresWidget_{};
     QXPopoverWindow * optionsPopover_{};
