@@ -20,7 +20,6 @@ class QXShapingFeaturesWidget;
 class QXShapingOptionsWidget;
 class QXPopoverWindow;
 
-class QXShapingGlyphViewPerfCache;
 class QXShapingGlyphView : public QWidget {
     Q_OBJECT
     
@@ -28,7 +27,7 @@ public:
     explicit QXShapingGlyphView(QWidget * parent = nullptr);
 
     void
-    setShaper(FXShaper * shaper);
+    setShaper(const FXShaper * shaper);
 
     void
     setOptions(const QXShapingOptions & options);
@@ -87,14 +86,18 @@ protected:
     double
     fu2px(fu f) const;
 
+private slots:
+    void
+    onOptionsChanged();
+    
 protected:
     int selectedColIndex_;
     int selectedRowIndex_;
     double fontSize_;    
-    FXShaper * shaper_;
+    const FXShaper * shaper_;
     QXShapingOptions options_{};
     QXDocument * document_;
-    mutable std::unique_ptr<QXShapingGlyphViewPerfCache> perfCache_;
+    FXVector<int> cellLeftCache_;
 };
 
 class QXShapingWidget : public QWidget {

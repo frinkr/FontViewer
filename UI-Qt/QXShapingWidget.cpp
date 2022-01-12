@@ -45,75 +45,23 @@ namespace {
     constexpr int QX_SHAPINGVIEW_TOTAL_ROW = 10;
 }
 
-class QXShapingGlyphViewPerfCache {
-public:
-    struct ScopedGridLeftEnabler {
-        ScopedGridLeftEnabler(QXShapingGlyphViewPerfCache* cache)
-            : cache_{cache} 
-        {
-            cache_->gridLeftEnabled_ = true;
-            cache_->gridLeft_.clear();
-        }
-        
-        ~ScopedGridLeftEnabler()
-        {
-            cache_->gridLeftEnabled_ = false;
-            cache_->gridLeft_.clear();
-        }
-        
-        QXShapingGlyphViewPerfCache* cache_;  
-    };
-
-    friend class ScopedGridLeftEnabler;
-
-    ScopedGridLeftEnabler
-    createScopedGridLeftEnabler() {
-        return ScopedGridLeftEnabler(this);
-    }
-    
-    void
-    setGridLeft(int row, int col, int val) {
-        if (gridLeftEnabled_)
-            gridLeft_[gridLeftCacheKey(row, col)] = val;
-    }
-
-    std::optional<int>
-    gridLeft(int row, int col) const {
-        if (!gridLeftEnabled_)
-            return {};
-        
-        if (auto it = gridLeft_.find(gridLeftCacheKey(row, col)); it != gridLeft_.end())
-            return it->second;
-        return {};
-    }
-    
-    static unsigned int
-    gridLeftCacheKey(int row, int col) {
-        
-        return ((unsigned int)(row) << ((sizeof(int) - 1) * 8)) + unsigned int(col);
-    }
-    
-    std::map<unsigned int, int> gridLeft_;
-    bool gridLeftEnabled_ {};
-};
-
 QXShapingGlyphView::QXShapingGlyphView(QWidget * parent)
     : QWidget(parent)
     , selectedColIndex_(-1)
     , selectedRowIndex_(-1)
-    , shaper_(nullptr)
-    , perfCache_(new QXShapingGlyphViewPerfCache) {
+    , shaper_(nullptr) {
     setFocusPolicy(Qt::StrongFocus);
 }
 
 void
-QXShapingGlyphView::setShaper(FXShaper * shaper) {
+QXShapingGlyphView::setShaper(const FXShaper * shaper) {
     shaper_ = shaper;
 }
 
 void
 QXShapingGlyphView::setOptions(const QXShapingOptions & options) {
     options_ = options;
+    onOptionsChanged();
 }
 
 void
@@ -176,13 +124,13 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
     FXFace * face = shaper_->face();
     FXFace::AutoFontSize autoFontSize(face, options_.ui.fontSize);
 
-    auto perfCacheEnabler = perfCache_->createScopedGridLeftEnabler();
+//    auto perfCacheEnabler = perfCache_->createScopedGridLeftEnabler();
     gridCellLeft(1, shaper_->glyphCount()); // this caches all the cells
     
     auto dirtyRect = event->rect();
 
     int cellColMin = 0, cellColMax = shaper_->glyphCount();
-    for (int i = 0; i <= shaper_->glyphCount(); ++ i) {
+    for (int i = 0; i < shaper_->glyphCount(); ++ i) {
         auto cellLeft = gridCellLeft(1, i);
         auto cellRight = gridCellLeft(1, i + 1);
         if (cellColMin == 0 && cellLeft <= dirtyRect.left() && cellRight >= dirtyRect.left()) {
@@ -204,7 +152,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
             if (i == selectedRowIndex_)
                 continue;
             
-            auto rect = gridCellRect(i, shaper_->glyphCount());
+            auto rect = gridCellRect(i, shaper_->glyphCount() - 1);
             rect.setLeft(gridCellLeft(i, -1));
             painter.fillRect(rect, palette().brush(QPalette::Inactive, QPalette::Highlight));
         }
@@ -231,8 +179,8 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
                 penX += fu2px(adv.x);
             }
         }
-        else if (selectedRowIndex_ != -1) {
-            auto rect = gridCellRect(selectedRowIndex_, shaper_->glyphCount());
+        else if (selectedRowIndex_ != -1 && shaper_->glyphCount()) {
+            auto rect = gridCellRect(selectedRowIndex_, shaper_->glyphCount() - 1);
             rect.setLeft(gridCellLeft(selectedRowIndex_, -1));
             painter.fillRect(rect, Qt::red);//palette().color(this->hasFocus()? QPalette::Active: QPalette::Inactive, QPalette::Highlight));
         }
@@ -246,7 +194,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
 
         for (int i = 0; i < shaper_->glyphCount(); ++ i) {
             const FXVec2d<fu> adv = shaper_->advance(i);
-            if (i >= cellColMin && i <= cellColMax) {
+            if (i >= cellColMin && i < cellColMax) {
                 const FXGlyphID gid = shaper_->glyph(i);
            
             
@@ -313,7 +261,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
                        rect().right(), gridCellBottom(i));
         // column lines
         for (int i = cellColMin; i <= cellColMax; ++ i)  {
-            painter.drawLine(gridCellLeft(QX_SHAPINGVIEW_TOTAL_ROW - 1, i), gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1),
+            painter.drawLine(gridCellLeft(1, i), gridCellBottom(QX_SHAPINGVIEW_TOTAL_ROW - 1),
                        gridCellLeft(1, i), gridCellBottom(1));
             painter.drawLine(gridCellLeft(0, i), gridCellBottom(1), // for kern row
                        gridCellLeft(0, i), gridCellBottom(0));
@@ -332,7 +280,7 @@ QXShapingGlyphView::paintEvent(QPaintEvent * event) {
         painter.drawText(gridCellRect(8, -1), Qt::AlignRight, tr("Index "));
         
         // Values
-        for (int i = cellColMin; i < std::min<int>(cellColMax, shaper_->glyphCount()); ++ i) {
+        for (int i = cellColMin; i < cellColMax; ++ i) {
             const auto & gi = shaper_->glyphInfo(i);
 
             FXGlyph g = face->glyph(FXGChar(gi.id, FXGCharTypeGlyphID));
@@ -426,11 +374,8 @@ QXShapingGlyphView::wheelEvent(QWheelEvent * event) {
             qPow(1.0015, angle);
             
             options_.ui.fontSize *= scale;
-            
-            updateGeometry();
-            update();
+            onOptionsChanged();
             event->accept();
-
             emit fontSizeChanged(options_.ui.fontSize);
             
             return;
@@ -453,31 +398,15 @@ QXShapingGlyphView::gridCellBottom(int row, int col) const {
 
 int
 QXShapingGlyphView::gridCellLeft(int row, int col) const {
-    if (auto left = perfCache_->gridLeft(row, col))
-        return *left;
-    
-    // col == -1: header
-    // col == shaper_->glyphCount : last glyph right
     if (col < 0)
         return QX_SHAPINGVIEW_MARGIN;
-    if (row == 0) 
-        return (gridCellLeft(1, col) + gridCellLeft(1, col + 1)) / 2;
-
-    int adv = QX_SHAPINGVIEW_MARGIN + QX_SHAPINGVIEW_GRID_HEAD_WIDTH;
-    if (col == 0)
-        return adv;
-    else if (auto prev = perfCache_->gridLeft(row, col - 1)) {
-        adv = *prev + fu2px(shaper_->advance(std::min<int>(col, shaper_->glyphCount()) - 1).x);
+    if (row == 0) {
+        if (col + 1 == cellLeftCache_.size())
+            return (gridCellLeft(1, col) + gridCellLeft(1, col - 1)) / 2; // as previos one
+        else
+            return (gridCellLeft(1, col) + gridCellLeft(1, col + 1)) / 2;
     }
-    else {
-        for (int i = 0; i < std::min<int>(col, shaper_->glyphCount()); ++ i) {
-            perfCache_->setGridLeft(row, i, adv);
-            adv += fu2px(shaper_->advance(i).x);
-        }
-    }
-
-    perfCache_->setGridLeft(row, col, adv);
-    return adv;
+    return QX_SHAPINGVIEW_MARGIN + QX_SHAPINGVIEW_GRID_HEAD_WIDTH + cellLeftCache_[col];
 }
 
 QRect
@@ -516,6 +445,22 @@ QXShapingGlyphView::fu2px(fu f) const {
         return shaper_->face()->fontSize();
     else
         return shaper_->face()->fontSize() * f / shaper_->face()->upem();
+}
+
+void
+QXShapingGlyphView::onOptionsChanged() {
+    updateGeometry();
+    update();
+
+    FXFace::AutoFontSize autoFontSize(shaper_->face(), options_.ui.fontSize);
+
+    cellLeftCache_.resize(shaper_->glyphCount() + 1);
+    int adv = 0;
+    for (size_t i = 0; i < shaper_->glyphCount(); ++ i) {
+        cellLeftCache_[i] = adv;
+        adv += fu2px(shaper_->advance(i).x);
+    }
+    cellLeftCache_[shaper_->glyphCount()] = adv;
 }
     
 QXShapingWidget::QXShapingWidget(QWidget * parent)
@@ -616,8 +561,6 @@ QXShapingWidget::doShape() {
                    options.shapingOpts);
 
     ui_->glyphView->setOptions(options);
-    ui_->glyphView->updateGeometry();
-    ui_->glyphView->update();
     
     if (shaper_->hasFallbackShaping())
         ui_->textComboBox->lineEdit()->addAction(warningAction_, QLineEdit::TrailingPosition);
