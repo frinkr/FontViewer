@@ -16,6 +16,10 @@ elseif (APPLE)
   execute_process(COMMAND brew --prefix qt OUTPUT_VARIABLE QT_ROOT)
   string(REGEX REPLACE "\n$" "" QT_ROOT "${QT_ROOT}")
   list(APPEND CMAKE_PREFIX_PATH ${QT_ROOT})
+
+  execute_process(COMMAND brew --prefix icu4c OUTPUT_VARIABLE ICU_ROOT)
+  string(REGEX REPLACE "\n$" "" ICU_ROOT "${ICU_ROOT}")
+  list(APPEND CMAKE_PREFIX_PATH ${ICU_ROOT})
   
 elseif (UNIX)
   # Nothing to configure

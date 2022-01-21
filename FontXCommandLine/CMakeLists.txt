@@ -15,7 +15,7 @@ if (WIN32)
   find_package(HARFBUZZ REQUIRED harfbuzz)
 else()
   pkg_check_modules(HARFBUZZ REQUIRED harfbuzz)
-  pkg_check_modules(ICU REQUIRED icu-uc)
+  find_package(ICU COMPONENTS uc REQUIRED)
 endif()
 
 add_executable(${PROJECT_NAME}
