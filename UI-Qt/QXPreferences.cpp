@@ -15,10 +15,7 @@ namespace {
 
     QString
     jsonFilePath() {
-        QDir folder(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
-        if (!folder.exists())
-            folder.mkpath(".");
-        return folder.filePath("FontViewer.prefs");
+        return QXPreferences::filePathInAppData("FontViewer.prefs");
     }
 
     QJsonObject
@@ -137,4 +134,12 @@ QXPreferences::fontDisplayLanguage() {
 void
 QXPreferences::setFontDisplayLanguage(const std::string & language) {
     json["fontDisplayLanguage"] = QString::fromStdString(language);
+}
+
+QString
+QXPreferences::filePathInAppData(const QString & fileName) {
+    QDir folder(QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)));
+    if (!folder.exists())
+        folder.mkpath(".");
+    return folder.filePath(fileName);
 }

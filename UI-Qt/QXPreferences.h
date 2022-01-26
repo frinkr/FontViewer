@@ -38,7 +38,10 @@ public:
 
     static void
     setFontDisplayLanguage(const std::string & language);
-    
+
+    static QString
+    filePathInAppData(const QString & fileName);
+
 private:
     using QObject::QObject;
 };
