@@ -4,6 +4,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QListView>
+#include <QDebug>
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
@@ -526,27 +527,20 @@ namespace {
     public:
         using QStyledItemDelegate::QStyledItemDelegate;
         using Parent = QStyledItemDelegate;
-
+        
         
     public:
-        
-        QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            if (index.row() == 0) {
-                return new QPushButton("xxx", parent);
-            }
-            return Parent::createEditor(parent, option, index);
-        }
-
         bool 
         editorEvent(QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index) override {
-            if (event->type() == QEvent::MouseButtonPress) {
+            if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseMove) {
                 QMouseEvent * mouseEvent = static_cast<QMouseEvent*>(event);
-
                 QRect rect = closeButtonRect(option, index);
                 if (rect.contains(mouseEvent->pos())) {
-                    model->removeRow(index.row());
-                    return true;
+                    if (event->type() == QEvent::MouseButtonPress) 
+                        model->removeRow(index.row());
+                    
                 }
+                return true; // to repaint the cell
             }
             return false;
         }
@@ -565,16 +559,35 @@ namespace {
         paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
             if (index.row() == 0) 
                 return;
-            
+            painter->save();
             Parent::paint(painter, option, index);
-            painter->drawText(closeButtonRect(option, index), Qt::AlignCenter | Qt::AlignVCenter, "x");
+            
+            const auto closeRect = closeButtonRect(option, index);
+            const auto offset = closeRect.width() * 0.2;
+
+            auto pen = painter->pen();
+            pen.setWidthF(1.5);
+            painter->setPen(pen);
+            painter->drawLine(QPointF(closeRect.left() + offset + 1, closeRect.top() + offset + 1), QPointF(closeRect.right() - offset, closeRect.bottom() - offset));
+            painter->drawLine(QPointF(closeRect.left() + offset + 1, closeRect.bottom() - offset), QPointF(closeRect.right() - offset, closeRect.top() + offset + 1));
+
+            pen.setWidth(1);
+            painter->setPen(pen);
+            if (auto widget = qobject_cast<const QListView*>(option.widget)) {
+                auto mousePos = widget->viewport()->mapFromGlobal(QCursor::pos() );
+                if (closeRect.contains(mousePos))
+                    painter->drawRect(closeRect);
+            }
+            painter->restore();
         }
 
         QRect
         closeButtonRect(const QStyleOptionViewItem &option, const QModelIndex &index) const {
             auto rect = option.rect;
             rect.setLeft(rect.right() - rect.height());
-            return rect;
+
+            auto margin = rect.height() / 4;
+            return rect.marginsRemoved(QMargins(margin, margin, margin, margin));
         }
     };
 
@@ -601,7 +614,7 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
         itemWidgetLayout->addStretch();
         itemWidgetLayout->addWidget(addButton);
         itemWidgetLayout->addStretch();
-        itemWidgetLayout->setContentsMargins(0, 0, 0, 0);
+        itemWidgetLayout->setContentsMargins(5, 5, 5, 5);
         popupView->setIndexWidget(model.index(0), itemWidget);
 
         connect(addButton, &QPushButton::clicked, this, [&model, this]() {
@@ -614,6 +627,7 @@ QXShapingWidget::QXShapingWidget(QWidget * parent)
         });
     }
     popupView->setItemDelegate(new QXShapingTextComboboxItemDelegate);
+    popupView->setAlternatingRowColors(true);
     
     ui_->textComboBox->setModel(popupView->model());
     ui_->textComboBox->setView(popupView);

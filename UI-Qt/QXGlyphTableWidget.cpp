@@ -272,7 +272,7 @@ QxGlyphTableWidget::QxGlyphTableWidget(QXDocument * document, QWidget *parent)
     
     ui_->tableView->verticalHeader()->hide();
     ui_->tableView->setItemDelegateForColumn(1, new QXGlyphTableBitmapDelegate(this));
-    if (document->face()->glyphCount() < 1000) {
+    if (document->face()->glyphCount() < 10000) {
         ui_->tableView->setSortingEnabled(true);   
         ui_->tableView->sortByColumn(0, Qt::AscendingOrder);
     }
