@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPalette>
 #include <QPushButton>
 #include <QStringListModel>
 #include <QStyledItemDelegate>
@@ -28,6 +29,7 @@
 #include "QXShapingFeaturesWidget.h"
 #include "QXShapingOptionsWidget.h"
 #include "QXPreferences.h"
+#include "QXShapingTextCombobox.h"
 #include "ui_QXShapingWidget.h"
 
 namespace {
@@ -470,167 +472,13 @@ QXShapingGlyphView::onOptionsChanged() {
     cellLeftCache_[shaper_->glyphCount()] = adv;
 }
 
-namespace {
-    class QXShapingTextListModel: public QStringListModel {
-    public:
-        using QStringListModel::QStringListModel;
-
-        Qt::ItemFlags flags(const QModelIndex &index) const override {
-            if (index.row() == 0)
-                return Qt::NoItemFlags;
-            else
-                return QStringListModel::flags(index);
-        }
-
-        static QStringList
-        loadStrings() {
-            QStringList list;
-            list << "";
-            list << readLinesFromFile(QXPreferences::filePathInAppData("ShapingHistory.txt"));
-            
-            if (list.size() == 1)
-                list << readLinesFromFile(":/shaping-samples.txt");
-            return list;
-        }
-
-        static void
-        saveStrings(const QStringList & stringList) {
-            QString filePath = QXPreferences::filePathInAppData("ShapingHistory.txt");
-            QFile outputFile(filePath);
-            if (outputFile.open(QIODevice::WriteOnly)) {
-                QTextStream out(&outputFile);
-                for (auto & string: stringList)
-                    if (!string.isEmpty())
-                        out << string << "\n";
-            }
-        }
-        
-        static QXShapingTextListModel & instance() {
-            static QXShapingTextListModel model = []() {
-
-                return QXShapingTextListModel(loadStrings());
-            }();
-
-            static bool registerSaveOnce = []() {
-                qApp->connect(qApp, &QXApplication::aboutToQuit, [] () {
-                    saveStrings(model.stringList());
-                });
-                return true;
-            }();
-            
-            return model;
-        }
-    };
-
-    
-    class QXShapingTextComboboxItemDelegate : public QStyledItemDelegate {
-    public:
-        using QStyledItemDelegate::QStyledItemDelegate;
-        using Parent = QStyledItemDelegate;
-        
-        
-    public:
-        bool 
-        editorEvent(QEvent * event, QAbstractItemModel * model, const QStyleOptionViewItem & option, const QModelIndex & index) override {
-            if (event->type() == QEvent::MouseButtonPress || event->type() == QEvent::MouseMove) {
-                QMouseEvent * mouseEvent = static_cast<QMouseEvent*>(event);
-                QRect rect = closeButtonRect(option, index);
-                if (rect.contains(mouseEvent->pos())) {
-                    if (event->type() == QEvent::MouseButtonPress) 
-                        model->removeRow(index.row());
-                    
-                }
-                return true; // to repaint the cell
-            }
-            return false;
-        }
-        
-        QSize
-        sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            QSize size = Parent::sizeHint(option, index);            
-            if (index.row() == 0) 
-                size.setHeight(40);
-            else
-                size.setHeight(30);
-            return size;
-        }
-
-        void
-        paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
-            if (index.row() == 0) 
-                return;
-            painter->save();
-            Parent::paint(painter, option, index);
-            
-            const auto closeRect = closeButtonRect(option, index);
-            const auto offset = closeRect.width() * 0.2;
-
-            auto pen = painter->pen();
-            pen.setWidthF(1.5);
-            painter->setPen(pen);
-            painter->drawLine(QPointF(closeRect.left() + offset + 1, closeRect.top() + offset + 1), QPointF(closeRect.right() - offset, closeRect.bottom() - offset));
-            painter->drawLine(QPointF(closeRect.left() + offset + 1, closeRect.bottom() - offset), QPointF(closeRect.right() - offset, closeRect.top() + offset + 1));
-
-            pen.setWidth(1);
-            painter->setPen(pen);
-            if (auto widget = qobject_cast<const QListView*>(option.widget)) {
-                auto mousePos = widget->viewport()->mapFromGlobal(QCursor::pos() );
-                if (closeRect.contains(mousePos))
-                    painter->drawRect(closeRect);
-            }
-            painter->restore();
-        }
-
-        QRect
-        closeButtonRect(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-            auto rect = option.rect;
-            rect.setLeft(rect.right() - rect.height());
-
-            auto margin = rect.height() / 4;
-            return rect.marginsRemoved(QMargins(margin, margin, margin, margin));
-        }
-    };
-
-    
-}
-
 QXShapingWidget::QXShapingWidget(QWidget * parent)
     : QWidget(parent)
     , ui_(new Ui::QXShapingWidget)
     , document_(nullptr)
     , shaper_(nullptr) {
     ui_->setupUi(this);
-
-    QListView * popupView = new QListView(ui_->textComboBox);
-    auto & model = QXShapingTextListModel::instance();
-    popupView->setModel(&model); {
-        QWidget * itemWidget = new QWidget();
-        itemWidget->setAttribute(Qt::WA_MouseTracking);
-        QPushButton * addButton = new QPushButton("SAVE CURRENT TO LIST");
-        addButton->setAttribute(Qt::WA_MouseTracking);
-        addButton->setSizePolicy(QSizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred));
-
-        QHBoxLayout * itemWidgetLayout = new QHBoxLayout(itemWidget);
-        itemWidgetLayout->addStretch();
-        itemWidgetLayout->addWidget(addButton);
-        itemWidgetLayout->addStretch();
-        itemWidgetLayout->setContentsMargins(5, 5, 5, 5);
-        popupView->setIndexWidget(model.index(0), itemWidget);
-
-        connect(addButton, &QPushButton::clicked, this, [&model, this]() {
-            if (auto text = ui_->textComboBox->currentText(); !text.isEmpty()) {
-                model.insertRow(1);
-                model.setData(model.index(1), text);
-                ui_->textComboBox->hidePopup();
-            }
-
-        });
-    }
-    popupView->setItemDelegate(new QXShapingTextComboboxItemDelegate);
-    popupView->setAlternatingRowColors(true);
-    
-    ui_->textComboBox->setModel(popupView->model());
-    ui_->textComboBox->setView(popupView);
+    ui_->textComboBox->init();
     
     // connect signals
     connect(ui_->textComboBox, &QComboBox::editTextChanged,

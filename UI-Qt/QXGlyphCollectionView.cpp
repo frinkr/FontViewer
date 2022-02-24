@@ -6,6 +6,7 @@
 #include "QXEncoding.h"
 #include "QXGlyphCollectionView.h"
 #include "QXImageHelpers.h"
+#include "FontX/FXUnicode.h"
 
 namespace {
     constexpr int GLYPH_IMAGE_SIZE = 80;
@@ -49,15 +50,30 @@ namespace {
                 QColor textColor = palette.color(QPalette::Text);
                 if (option.selected) 
                     textColor = palette.color(hasFocus ? QPalette::Active : QPalette::Inactive, QPalette::HighlightedText);
-                
-                FXGlyphImage glyphImage = tintGlyphImageWithColor(g.glyphImage(), textColor);
-                QImage image = toQImage(glyphImage);
 
                 const QRect emRect = option.rect.adjusted(GLYPH_LABEL_HEIGHT / 2, 0, -GLYPH_LABEL_HEIGHT / 2, -GLYPH_LABEL_HEIGHT);
-                
-                const QRect targetRect = calculateTargetRect(glyphImage, emRect);
-
-                painter->drawImage(targetRect, image, QRectF(0, 0, image.width(), image.height()));
+                if (g.gid != 0 || !g.character.isUnicode() || !FXUnicode::defined(g.character.value)) {
+                    FXGlyphImage glyphImage = tintGlyphImageWithColor(g.glyphImage(), textColor);
+                    QImage image = toQImage(glyphImage);
+                    const QRect targetRect = calculateTargetRect(glyphImage, emRect);
+                    painter->drawImage(targetRect, image, QRectF(0, 0, image.width(), image.height()));
+                }
+                else {
+                    const char32_t c = g.character.value;
+                    QString text= QString::fromUcs4(&c, 1);
+                    
+                    QFontMetrics fm(painter->font());
+                    auto flags = Qt::AlignHCenter | Qt::AlignVCenter;
+                    auto bbox = fm.boundingRect(emRect, flags, text);
+                    painter->save();
+                    painter->setPen(Qt::red);
+                    auto scale = qMin(emRect.width() * 0.8 / bbox.width(), emRect.height() * 0.8 / bbox.height());
+                    painter->translate(emRect.center());
+                    painter->scale(scale, scale);
+                    painter->translate(-emRect.center());
+                    painter->drawText(emRect, Qt::AlignHCenter | Qt::AlignVCenter, text);
+                    painter->restore();
+                }
             }
             
             // draw the text

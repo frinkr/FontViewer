@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">
-    <widget class="QComboBox" name="textComboBox">
+    <widget class="QXShapingTextCombobox" name="textComboBox">
      <property name="editable">
       <bool>true</bool>
      </property>
@@ -107,6 +107,11 @@
    <extends>QWidget</extends>
    <header>QXShapingWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QXShapingTextCombobox</class>
+   <extends>QComboBox</extends>
+   <header>QXShapingTextCombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

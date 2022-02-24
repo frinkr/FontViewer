@@ -133,7 +133,9 @@ set(SHARED_SOURCES
   QXShapingOptionsWidget.cpp
   QXShapingOptionsWidget.h
   QXShapingTabWidget.cpp
-  QXShapingTabWidget.h  
+  QXShapingTabWidget.h
+  QXShapingTextCombobox.h
+  QXShapingTextCombobox.cpp
   QXSplash.cpp
   QXSplash.h
   QXTheme.cpp
