@@ -7,15 +7,14 @@ struct QXFontListFilter {
     QString  fontName;
     QString  sampleText;
     bool     converAllSampleCharacters {false};
-    
+    bool     excludeBitmapFont{ false };
+
     void clear() {
-        fontName.clear();
-        sampleText.clear();
-        converAllSampleCharacters = false;
+        *this = QXFontListFilter();
     }
     
     bool isEmpty() const {
-        return fontName.isEmpty() && (!converAllSampleCharacters && sampleText.isEmpty());
+        return fontName.isEmpty() && (!converAllSampleCharacters && sampleText.isEmpty()) && !excludeBitmapFont;
     }
 };
 

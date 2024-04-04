@@ -115,7 +115,8 @@ QXFontListWindow::QXFontListWindow(QWidget * parent)
     connect(ui_->previewFontSizeSlider, &QSlider::valueChanged, this, &QXFontListWindow::updatePreviewText);
     connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontListWindow::onPreviewTextChanged);
     connect(ui_->previewCoverAllCharsCheckBox, &QCheckBox::stateChanged, this, &QXFontListWindow::onFilterChanged);
-        
+    connect(ui_->excludeBitmapFontCheckBox, &QCheckBox::stateChanged, this, &QXFontListWindow::onFilterChanged);
+
     ui_->previewSettingsGoupBox->hide();
 
     // Add actions
@@ -201,6 +202,7 @@ QXFontListWindow::fontListFilter() const {
     QXFontListFilter filter;
     filter.fontName = ui_->searchLineEdit->text().trimmed();
     filter.sampleText = ui_->previewTextEdit->text();
+    filter.excludeBitmapFont = ui_->excludeBitmapFontCheckBox->checkState() == Qt::Checked;
     filter.converAllSampleCharacters = ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked;
     return filter;
 }

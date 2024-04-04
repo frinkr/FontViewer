@@ -105,6 +105,11 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
     if (!acceptFontName)
         return false;
     
+    // Check bitmap 
+    const bool acceptFontFormat = !filter.excludeBitmapFont || atts.format != "Windows FNT";
+    if (!acceptFontFormat)
+        return false;
+
     // Check sample chars
     if (filter.converAllSampleCharacters && !filter.sampleText.isEmpty()) {
         const FXFaceDescriptor & desc = db()->faceDescriptor(row);
