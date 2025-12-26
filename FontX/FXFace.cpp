@@ -791,6 +791,11 @@ FXFace::initAttributes() {
     if (format)
         atts_.format = format;
     
+    // digits aspect ratio
+    if (FT_Err_Ok == FT_Load_Char(face_, '0', FT_LOAD_NO_SCALE)) {
+        atts_.digitAspectRatio = int(face_->glyph->metrics.width * 1000.0 / face_->glyph->metrics.height);
+    }
+
     // names
     if (face_->family_name)
         atts_.names.setDefaultFamilyName(face_->family_name);

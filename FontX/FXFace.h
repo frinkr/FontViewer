@@ -147,6 +147,7 @@ struct FXFaceAttributes {
     fu               ascender {};
     fu               descender {};
     FXRect<fu>       bbox;
+    int              digitAspectRatio{ 500 };
 
     bool             haveUnicodeCMap {};
     bool             isCID {};

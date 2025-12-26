@@ -1,4 +1,5 @@
 #include <chrono>
+#include <string>
 
 #include "FXFS.h"
 
@@ -6,6 +7,11 @@
 #  include <Windows.h>
 #endif
 
+namespace {
+    const std::string & u8stringToStringUnsafe(const std::u8string & u8str) {
+        return *reinterpret_cast<const std::string*>(&u8str);
+    }
+}
 namespace FXFS {
     FXString
     pathJoin(const FXString & path, const FXString & name) {
@@ -31,14 +37,14 @@ namespace FXFS {
         for (const auto & n : list)
             p /= fs::u8path(n);
 
-        path = p.u8string();
+        path = u8stringToStringUnsafe(p.u8string());
         return path;
     }
 
     FXString
     fileName(const FXString & path) {
         fs::path p(fs::u8path(path));
-        return p.filename().u8string();
+        return u8stringToStringUnsafe(p.filename().u8string());
     }
     
     bool
@@ -51,12 +57,12 @@ namespace FXFS {
             const fs::path dir(fs::u8path(directory)); 
             for (auto & ent: fs::directory_iterator(dir)) {
                 if (recursive && fs::is_directory(ent)) {
-                    if (foreachFile(ent.path().u8string(), recursive, handler))
+                    if (foreachFile(u8stringToStringUnsafe(ent.path().u8string()), recursive, handler))
                         continue;
                     else
                         return false;
                 }
-                if (!handler(ent.path().u8string()))
+                if (!handler(u8stringToStringUnsafe(ent.path().u8string())))
                     return false;
             }
         }

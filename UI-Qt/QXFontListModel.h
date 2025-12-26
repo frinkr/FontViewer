@@ -8,13 +8,16 @@ struct QXFontListFilter {
     QString  sampleText;
     bool     converAllSampleCharacters {false};
     bool     excludeBitmapFont{ false };
+    bool     hasAspectRatio{ false };
+    int      aspectRatioMin{ 0 };
+    int      aspectRatioMax{ 3000 };
 
     void clear() {
         *this = QXFontListFilter();
     }
     
     bool isEmpty() const {
-        return fontName.isEmpty() && (!converAllSampleCharacters && sampleText.isEmpty()) && !excludeBitmapFont;
+        return fontName.isEmpty() && (!converAllSampleCharacters && sampleText.isEmpty()) && !excludeBitmapFont && !hasAspectRatio;
     }
 };
 

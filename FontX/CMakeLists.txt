@@ -83,8 +83,8 @@ target_link_libraries(FontX
   ${Iconv_LIBRARIES}
   )
 
-add_subdirectory(PDF)
-target_link_libraries(FontX FontXPDF)
+#add_subdirectory(PDF)
+#target_link_libraries(FontX FontXPDF)
 
 if (APPLE)
   target_link_libraries(FontX

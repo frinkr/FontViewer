@@ -241,6 +241,7 @@ namespace {
         map["CID"] = toQString(atts.cid);
         map["IS_OT_VARIANT"] = atts.isOpenTypeVariable;
         map["IS_MM"] = atts.isMultipleMaster;
+        map["ASPECT_RATIO"] = atts.digitAspectRatio;
         return map;
     }
    

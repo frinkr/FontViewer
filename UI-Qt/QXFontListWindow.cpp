@@ -116,6 +116,7 @@ QXFontListWindow::QXFontListWindow(QWidget * parent)
     connect(ui_->previewTextEdit, &QLineEdit::textEdited, this, &QXFontListWindow::onPreviewTextChanged);
     connect(ui_->previewCoverAllCharsCheckBox, &QCheckBox::stateChanged, this, &QXFontListWindow::onFilterChanged);
     connect(ui_->excludeBitmapFontCheckBox, &QCheckBox::stateChanged, this, &QXFontListWindow::onFilterChanged);
+    connect(ui_->aspectRatioCheckBox, &QCheckBox::stateChanged, this, &QXFontListWindow::onFilterChanged);
 
     ui_->previewSettingsGoupBox->hide();
 
@@ -204,6 +205,9 @@ QXFontListWindow::fontListFilter() const {
     filter.sampleText = ui_->previewTextEdit->text();
     filter.excludeBitmapFont = ui_->excludeBitmapFontCheckBox->checkState() == Qt::Checked;
     filter.converAllSampleCharacters = ui_->previewCoverAllCharsCheckBox->checkState() == Qt::Checked;
+    filter.hasAspectRatio = ui_->aspectRatioCheckBox->checkState() == Qt::Checked;
+    filter.aspectRatioMin = ui_->aspectRatioMinSpinBox->value();
+    filter.aspectRatioMax = ui_->aspectRatioMaxSpinBox->value();
     return filter;
 }
 

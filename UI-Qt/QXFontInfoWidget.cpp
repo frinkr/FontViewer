@@ -159,7 +159,7 @@ namespace {
             addDataRow(tr("Max Adv Height"), static_cast<int>(ftFace_->max_advance_height));
             addDataRow(tr("Underline Position"), static_cast<int>(ftFace_->underline_position));
             addDataRow(tr("Underline Thickness"), static_cast<int>(ftFace_->underline_thickness));
-
+            addDataRow(tr("Digits Aspect Ratio"), faceAtts().digitAspectRatio);
             addHeadRow(tr("Format"));            
             addDataRow(tr("Format"), toQString(faceAtts().format));
             addDataRow(tr("IsCID"), faceAtts().isCID);

@@ -19,7 +19,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 14;
+    constexpr int FACE_DB_VERSION = 15;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {
@@ -76,6 +76,7 @@ namespace cereal  {
         ar & atts.names;
         ar & atts.ascender;
         ar & atts.descender;
+        ar & atts.digitAspectRatio;
         ar & atts.haveUnicodeCMap;
         ar & atts.isCID;
         ar & atts.cid;
@@ -246,6 +247,12 @@ FXFaceDatabase::rescan() {
     // make progress finish
     if (progress_)
         progress_(diskHash_.files.size(), diskHash_.files.size(), FXString());
+
+    // sort the faces by family and style name
+    std::sort(faces.begin(), faces.end(), [](auto& left, auto& right) {
+        return (left.atts.names.familyName() < right.atts.names.familyName()) && 
+            (left.atts.names.styleName() < right.atts.names.styleName());
+    });
 
     faces_ = faces;
     dbHash_ = FoldersHash(); // don't need it anymore

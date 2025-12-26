@@ -6,10 +6,10 @@ include(cmake/bootstrap.cmake)
 
 project(FontViewer)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_compile_definitions(FX_HAVE_PDF_ADDON=1)
+add_compile_definitions(FX_HAVE_PDF_ADDON=0)
 
 # Subdirectories
 add_subdirectory(FontX)

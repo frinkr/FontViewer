@@ -89,8 +89,14 @@ QXFontListModel::acceptRow(const QXFontListFilter & filter, int row) const {
         return false;
     };
     
-    // Check names
     auto const & atts = attributes(row);
+
+    // Check aspect ratio
+    if (filter.hasAspectRatio && (atts.digitAspectRatio < filter.aspectRatioMin || atts.digitAspectRatio > filter.aspectRatioMax)) {
+        return false;
+    }
+
+    // Check names
     auto filePath = QString::fromStdString(atts.desc.filePath);
     auto fileName = QFileInfo(filePath).fileName();
     const bool acceptFontName = filter.fontName.isEmpty() ||
@@ -167,7 +173,7 @@ bool
 QXSortFilterFontListModel::lessThan(const QModelIndex & left, const QModelIndex & right) const {
     QVariant d0 = fontListModel()->data(left, Qt::DisplayRole);
     QVariant d1 = fontListModel()->data(right, Qt::DisplayRole);
-    if (!filter_.isEmpty()) 
+    if (!filter_.fontName.isEmpty())
         return lessThanWithFilter(d0.toString(), d1.toString(), filter_);
     
     return d0.toString() < d1.toString();
