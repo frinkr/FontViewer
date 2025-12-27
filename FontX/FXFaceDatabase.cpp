@@ -19,7 +19,7 @@
 #include "FXFTPrivate.h"
 
 namespace {
-    constexpr int FACE_DB_VERSION = 15;
+    constexpr int FACE_DB_VERSION = 16;
 
     template <typename T, typename V, typename... Rest>
     void hashCombine(T & seed, const V& v, Rest... rest) {
@@ -250,8 +250,7 @@ FXFaceDatabase::rescan() {
 
     // sort the faces by family and style name
     std::sort(faces.begin(), faces.end(), [](auto& left, auto& right) {
-        return (left.atts.names.familyName() < right.atts.names.familyName()) && 
-            (left.atts.names.styleName() < right.atts.names.styleName());
+        return std::tie(left.atts.names.familyName(), left.atts.names.styleName()) < std::tie(right.atts.names.familyName(), right.atts.names.styleName());
     });
 
     faces_ = faces;

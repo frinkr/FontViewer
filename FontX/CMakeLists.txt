@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+cmake_minimum_required(VERSION 3.20)
 project(FontX)
 
 if (NOT WIN32)
@@ -83,8 +83,8 @@ target_link_libraries(FontX
   ${Iconv_LIBRARIES}
   )
 
-#add_subdirectory(PDF)
-#target_link_libraries(FontX FontXPDF)
+# add_subdirectory(PDF)
+# target_link_libraries(FontX FontXPDF)
 
 if (APPLE)
   target_link_libraries(FontX
