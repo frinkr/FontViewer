@@ -1,6 +1,7 @@
 #include <QAbstractButton>
 #include <QBoxLayout>
 #include <QFormLayout>
+#include <QLineEdit>
 #include <QSplitter>
 #include <QSlider>
 #include <QSignalBlocker>
@@ -48,9 +49,13 @@ QXVariableWidget::initVariableFont() {
     ui_->warningWidget->hide();
     QFormLayout * layout = ui_->formLayout;
     for (auto & axis : document_->face()->variableAxises()) {
-        QLabel * label = new QLabel(toQString(axis.name), this);
+        QLabel * label = new QLabel(toQString(axis.name) + " (" + toQString(FXTag2Str(axis.tag)) + ")", this);
+        QHBoxLayout * rowLayout = new QHBoxLayout();
+        QLineEdit * sliderValueEdit = new QLineEdit(this);
         QSlider * slider = new QSlider(Qt::Horizontal, this);
-        layout->addRow(label, slider);
+        rowLayout->addWidget(slider);
+        rowLayout->addWidget(sliderValueEdit);
+        layout->addRow(label, rowLayout);
         label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         slider->setMinimum(axis.minValue);
         slider->setMaximum(axis.maxValue);
@@ -59,8 +64,16 @@ QXVariableWidget::initVariableFont() {
         slider->setTracking(true);
         slider->setTickPosition(QSlider::TicksBelow);
         slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        sliderValueEdit->setFixedWidth(60);
+        sliderValueEdit->setReadOnly(true);
+        sliderValueEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
         connect(slider, &QSlider::valueChanged, this, &QXVariableWidget::onSliderValueChanged);
+        connect(slider, &QSlider::valueChanged, this, [sliderValueEdit](int value) {
+            sliderValueEdit->setText(QString::number(value / 65536.0, 'f', 2));
+        });
+        
         sliders_.append(slider);
+        sliderEdits_.append(sliderValueEdit);
     }
 
     connect(ui_->buttonBox, &QDialogButtonBox::clicked, this, &QXVariableWidget::onResetButtonClicked);
@@ -169,5 +182,6 @@ QXVariableWidget::updateSliderValues() {
     for (size_t i = 0; i < coords.size(); ++ i) {
         QSignalBlocker signalBlocker(sliders_[i]);
         sliders_[i]->setValue(coords[i]);
+        sliderEdits_[i]->setText(QString::number(coords[i] / 65536.0, 'f', 2));
     } 
 }

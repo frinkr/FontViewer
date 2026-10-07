@@ -56,5 +56,6 @@ private:
     Ui::QXVariableWidget * ui_;
     QXDocument               * document_;
     QList<QSlider *>           sliders_;
+    QList<QLineEdit *>         sliderEdits_;
     FXVector<VariableInstance> varInstances_;
 };
