@@ -46,7 +46,7 @@
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="toolTip">
            <string>OK</string>
@@ -76,6 +76,60 @@
          </widget>
         </item>
         <item>
+         <widget class="QPushButton" name="previewButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::FocusPolicy::NoFocus</enum>
+          </property>
+          <property name="toolTip">
+           <string>OK</string>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border: none;</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="QXApplication.qrc">
+            <normaloff>:/images/preview_d.png</normaloff>
+            <normalon>:/images/preview.png</normalon>:/images/preview_d.png</iconset>
+          </property>
+          <property name="iconSize">
+           <size>
+            <width>22</width>
+            <height>22</height>
+           </size>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="default">
+           <bool>false</bool>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QXIconicButton" name="menuButton">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -96,7 +150,7 @@
            </size>
           </property>
           <property name="focusPolicy">
-           <enum>Qt::NoFocus</enum>
+           <enum>Qt::FocusPolicy::NoFocus</enum>
           </property>
           <property name="toolTip">
            <string>OK</string>
@@ -135,7 +189,7 @@
           <number>20</number>
          </property>
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
         </widget>
        </item>
@@ -155,7 +209,7 @@
           <string>Size</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -163,13 +217,6 @@
         <widget class="QCheckBox" name="excludeBitmapFontCheckBox">
          <property name="text">
           <string>Exclude Bitmap Fonts</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QCheckBox" name="aspectRatioCheckBox">
-         <property name="text">
-          <string>Aspect Ratio</string>
          </property>
         </widget>
        </item>
@@ -182,7 +229,7 @@
           <string>Sample Text</string>
          </property>
          <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
          </property>
         </widget>
        </item>
@@ -241,9 +288,23 @@
           </widget>
          </item>
          <item>
+          <widget class="QPushButton" name="applyAspectRatioButton">
+           <property name="text">
+            <string>Apply</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="disableAspectRatioPushButton">
+           <property name="text">
+            <string>Disable</string>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer_2">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -288,7 +349,7 @@
          <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
-            <enum>Qt::Horizontal</enum>
+            <enum>Qt::Orientation::Horizontal</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
@@ -299,6 +360,13 @@
           </spacer>
          </item>
         </layout>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>Aspect Ratio</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -326,34 +394,18 @@
  </resources>
  <connections>
   <connection>
-   <sender>aspectRatioCheckBox</sender>
+   <sender>previewButton</sender>
    <signal>toggled(bool)</signal>
-   <receiver>aspectRatioMaxSpinBox</receiver>
-   <slot>setEnabled(bool)</slot>
+   <receiver>previewSettingsGoupBox</receiver>
+   <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>71</x>
-     <y>195</y>
+     <x>608</x>
+     <y>24</y>
     </hint>
     <hint type="destinationlabel">
-     <x>610</x>
-     <y>195</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>aspectRatioCheckBox</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>aspectRatioMinSpinBox</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>71</x>
-     <y>195</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>296</x>
-     <y>195</y>
+     <x>329</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

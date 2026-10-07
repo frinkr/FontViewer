@@ -63,6 +63,7 @@ QXVariableWidget::initVariableFont() {
         slider->setPageStep((axis.maxValue - axis.minValue) / 20);
         slider->setTracking(true);
         slider->setTickPosition(QSlider::TicksBelow);
+        slider->setMinimumWidth(180);
         slider->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sliderValueEdit->setFixedWidth(60);
         sliderValueEdit->setReadOnly(true);

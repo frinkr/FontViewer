@@ -43,6 +43,9 @@ private:
     QXFontListFilter
     fontListFilter() const;
     
+    void
+    enableAspectRatioFilter(bool enabled);
+    
 private slots:
     void
     acceptFont();
@@ -67,5 +70,6 @@ private slots:
 
 private:
     Ui::QXFontListWindow * ui_;
-    QMenu                * recentMenu_ {nullptr}; 
+    bool                   aspectRatioFilterEnabled_ {false};
+    QMenu                * recentMenu_ {nullptr};
 };
